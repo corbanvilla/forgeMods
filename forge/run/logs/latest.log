@@ -1,0 +1,80 @@
+[16:18:15] [Client thread/INFO]: Setting user: Player704
+[16:18:20] [Client thread/INFO]: LWJGL Version: 2.9.2
+[16:18:26] [Client thread/INFO]: Reloading ResourceManager: Default, FMLFileResourcePack:Forge Mod Loader, FMLFileResourcePack:Minecraft Forge, FMLFileResourcePack:Example Mod, FMLFileResourcePack:myMods
+[16:18:27] [Sound Library Loader/INFO]: Starting up SoundSystem...
+[16:18:27] [Thread-7/INFO]: Initializing LWJGL OpenAL
+[16:18:27] [Thread-7/INFO]: (The LWJGL binding of OpenAL.  For more information, see http://www.lwjgl.org)
+[16:18:27] [Thread-7/INFO]: OpenAL initialized.
+[16:18:28] [Sound Library Loader/INFO]: Sound engine started
+[16:18:33] [Client thread/INFO]: Created: 16x16 textures-atlas
+[16:18:36] [Client thread/INFO]: Reloading ResourceManager: Default, FMLFileResourcePack:Forge Mod Loader, FMLFileResourcePack:Minecraft Forge, FMLFileResourcePack:Example Mod, FMLFileResourcePack:myMods
+[16:18:37] [Client thread/INFO]: SoundSystem shutting down...
+[16:18:37] [Client thread/WARN]: Author: Paul Lamb, www.paulscode.com
+[16:18:37] [Sound Library Loader/INFO]: Starting up SoundSystem...
+[16:18:37] [Thread-9/INFO]: Initializing LWJGL OpenAL
+[16:18:37] [Thread-9/INFO]: (The LWJGL binding of OpenAL.  For more information, see http://www.lwjgl.org)
+[16:18:37] [Thread-9/INFO]: OpenAL initialized.
+[16:18:37] [Sound Library Loader/INFO]: Sound engine started
+[16:18:42] [Client thread/INFO]: Created: 2048x1024 textures-atlas
+[16:18:43] [Client thread/ERROR]: ########## GL ERROR ##########
+[16:18:43] [Client thread/ERROR]: @ Post startup
+[16:18:43] [Client thread/ERROR]: 1281: Invalid value
+[16:18:44] [Realms Notification Availability checker #1/INFO]: Could not authorize you against Realms server: Invalid session id
+[16:18:48] [Realms Notification Availability checker #1/INFO]: Could not authorize you against Realms server: Invalid session id
+[16:18:48] [Server thread/INFO]: Starting integrated minecraft server version 1.8.9
+[16:18:48] [Server thread/INFO]: Generating keypair
+[16:18:49] [Server thread/INFO]: Preparing start region for level 0
+[16:18:50] [Server thread/INFO]: Preparing spawn area: 50%
+[16:18:50] [Realms Notification Availability checker #1/INFO]: Could not authorize you against Realms server: Invalid session id
+[16:18:51] [Server thread/INFO]: Changing view distance to 12, from 10
+[16:18:52] [Server thread/INFO]: Player704[local:E:058f9c63] logged in with entity id 113 at (-638.5176483255935, 7.123004782098102, 883.73507673959)
+[16:18:52] [Server thread/INFO]: Player704 joined the game
+[16:18:54] [pool-2-thread-1/WARN]: Couldn't look up profile properties for com.mojang.authlib.GameProfile@60cf9a96[id=eb7081a5-32ec-3752-9cbc-963a701e6fdd,name=Player704,properties={},legacy=false]
+com.mojang.authlib.exceptions.AuthenticationException: The client has sent too many requests within a certain amount of time
+	at com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService.makeRequest(YggdrasilAuthenticationService.java:65) ~[YggdrasilAuthenticationService.class:?]
+	at com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService.fillGameProfile(YggdrasilMinecraftSessionService.java:175) [YggdrasilMinecraftSessionService.class:?]
+	at com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService$1.load(YggdrasilMinecraftSessionService.java:59) [YggdrasilMinecraftSessionService$1.class:?]
+	at com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService$1.load(YggdrasilMinecraftSessionService.java:56) [YggdrasilMinecraftSessionService$1.class:?]
+	at com.google.common.cache.LocalCache$LoadingValueReference.loadFuture(LocalCache.java:3524) [guava-17.0.jar:?]
+	at com.google.common.cache.LocalCache$Segment.loadSync(LocalCache.java:2317) [guava-17.0.jar:?]
+	at com.google.common.cache.LocalCache$Segment.lockedGetOrLoad(LocalCache.java:2280) [guava-17.0.jar:?]
+	at com.google.common.cache.LocalCache$Segment.get(LocalCache.java:2195) [guava-17.0.jar:?]
+	at com.google.common.cache.LocalCache.get(LocalCache.java:3934) [guava-17.0.jar:?]
+	at com.google.common.cache.LocalCache.getOrLoad(LocalCache.java:3938) [guava-17.0.jar:?]
+	at com.google.common.cache.LocalCache$LocalLoadingCache.get(LocalCache.java:4821) [guava-17.0.jar:?]
+	at com.google.common.cache.LocalCache$LocalLoadingCache.getUnchecked(LocalCache.java:4827) [guava-17.0.jar:?]
+	at com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService.fillProfileProperties(YggdrasilMinecraftSessionService.java:165) [YggdrasilMinecraftSessionService.class:?]
+	at net.minecraft.client.Minecraft.func_181037_M(Minecraft.java:2915) [Minecraft.class:?]
+	at net.minecraft.client.resources.SkinManager$3.run(SkinManager.java:130) [SkinManager$3.class:?]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511) [?:1.8.0_65]
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [?:1.8.0_65]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142) [?:1.8.0_65]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617) [?:1.8.0_65]
+	at java.lang.Thread.run(Thread.java:745) [?:1.8.0_65]
+[16:19:00] [Client thread/INFO]: [CHAT] §6You Broke A Block!
+[16:19:01] [Client thread/INFO]: [CHAT] §6You Broke A Block!
+[16:19:02] [Client thread/INFO]: [CHAT] §6You Broke A Block!
+[16:19:04] [Server thread/INFO]: Player704 has just earned the achievement [Taking Inventory]
+[16:19:04] [Client thread/INFO]: [CHAT] Player704 has just earned the achievement [Taking Inventory]
+[16:19:31] [Server thread/INFO]: [Player704: Set own game mode to Survival Mode]
+[16:19:31] [Client thread/INFO]: [CHAT] Your game mode has been updated
+[16:19:31] [Client thread/INFO]: [CHAT] §5You have clicked on the most magic of all blocks - the ENDERIUM BLOCK!!!!!!!!!!!!!!!!!!!!!!!! Be Prepared for whatever might happen next! It is very mysterious...
+[16:19:31] [Client thread/INFO]: [CHAT] §5You have clicked on the most magic of all blocks - the ENDERIUM BLOCK!!!!!!!!!!!!!!!!!!!!!!!! Be Prepared for whatever might happen next! It is very mysterious...
+[16:19:31] [Client thread/INFO]: [CHAT] §5You have clicked on the most magic of all blocks - the ENDERIUM BLOCK!!!!!!!!!!!!!!!!!!!!!!!! Be Prepared for whatever might happen next! It is very mysterious...
+[16:19:32] [Client thread/INFO]: [CHAT] §5You have clicked on the most magic of all blocks - the ENDERIUM BLOCK!!!!!!!!!!!!!!!!!!!!!!!! Be Prepared for whatever might happen next! It is very mysterious...
+[16:19:32] [Client thread/INFO]: [CHAT] §5You have clicked on the most magic of all blocks - the ENDERIUM BLOCK!!!!!!!!!!!!!!!!!!!!!!!! Be Prepared for whatever might happen next! It is very mysterious...
+[16:19:33] [Client thread/INFO]: [CHAT] §5You have clicked on the most magic of all blocks - the ENDERIUM BLOCK!!!!!!!!!!!!!!!!!!!!!!!! Be Prepared for whatever might happen next! It is very mysterious...
+[16:19:55] [Client thread/WARN]: Unable to play unknown soundEvent: minecraft:mob.attack
+[16:20:06] [Server thread/INFO]: Saving and pausing game...
+[16:20:06] [Server thread/INFO]: Saving chunks for level 'Foo'/Overworld
+[16:20:06] [Server thread/INFO]: Saving chunks for level 'Foo'/Nether
+[16:20:06] [Server thread/INFO]: Saving chunks for level 'Foo'/The End
+[16:20:06] [Server thread/INFO]: Stopping server
+[16:20:06] [Server thread/INFO]: Saving players
+[16:20:06] [Server thread/INFO]: Saving worlds
+[16:20:06] [Server thread/INFO]: Saving chunks for level 'Foo'/Overworld
+[16:20:06] [Server thread/INFO]: Saving chunks for level 'Foo'/Nether
+[16:20:06] [Server thread/INFO]: Saving chunks for level 'Foo'/The End
+[16:20:08] [Client thread/INFO]: Stopping!
+[16:20:08] [Client thread/INFO]: SoundSystem shutting down...
+[16:20:08] [Client thread/WARN]: Author: Paul Lamb, www.paulscode.com

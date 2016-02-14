@@ -1,0 +1,881 @@
+Symbol range map extraction starting
+Processing 19 files
+processing com/example/examplemod/ExampleMod.java
+@|com/example/examplemod/ExampleMod.java|8|30|com.example.examplemod|package|com.example.examplemod|(file)
+Class Start: com.example.examplemod.ExampleMod
+   @|com/example/examplemod/ExampleMod.java|343|349|String|class|java.lang.String
+   @|com/example/examplemod/ExampleMod.java|350|355|MODID|field|com.example.examplemod.ExampleMod|MODID|
+   @|com/example/examplemod/ExampleMod.java|396|402|String|class|java.lang.String
+   @|com/example/examplemod/ExampleMod.java|403|410|VERSION|field|com.example.examplemod.ExampleMod|VERSION|
+   Method Start: init(Lnet/minecraftforge/fml/common/event/FMLInitializationEvent;)V
+      @|com/example/examplemod/ExampleMod.java|459|463|init|method|com.example.examplemod.ExampleMod|init|(Lnet/minecraftforge/fml/common/event/FMLInitializationEvent;)V
+      @|com/example/examplemod/ExampleMod.java|464|486|FMLInitializationEvent|class|net.minecraftforge.fml.common.event.FMLInitializationEvent
+      @|com/example/examplemod/ExampleMod.java|487|492|event|param|com.example.examplemod.ExampleMod|init|(Lnet/minecraftforge/fml/common/event/FMLInitializationEvent;)V|event|0
+      @|com/example/examplemod/ExampleMod.java|531|537|System|class|java.lang.System
+      @|com/example/examplemod/ExampleMod.java|538|541|out|field|java.lang.System|out
+      @|com/example/examplemod/ExampleMod.java|542|549|println|method|java.io.PrintStream|println|(Ljava/lang/String;)V
+      @|com/example/examplemod/ExampleMod.java|567|573|Blocks|class|net.minecraft.init.Blocks
+      @|com/example/examplemod/ExampleMod.java|574|578|dirt|field|net.minecraft.init.Blocks|dirt
+      @|com/example/examplemod/ExampleMod.java|579|597|getUnlocalizedName|method|net.minecraft.block.Block|getUnlocalizedName|()Ljava/lang/String;
+   Method End: init(Lnet/minecraftforge/fml/common/event/FMLInitializationEvent;)V
+Class End  : com.example.examplemod.ExampleMod
+endProcessing com/example/examplemod/ExampleMod.java
+
+processing org/devoxx4kids/forge/mods/BiggerTNTExplosions.java
+@|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|8|34|org.devoxx4kids.forge.mods|package|org.devoxx4kids.forge.mods|(file)
+Class Start: org.devoxx4kids.forge.mods.BiggerTNTExplosions
+   @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|499|503|fuse|field|org.devoxx4kids.forge.mods.BiggerTNTExplosions|fuse|
+   @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|528|533|power|field|org.devoxx4kids.forge.mods.BiggerTNTExplosions|power|
+   Method Start: SpawnTNTItem(Lnet/minecraftforge/event/entity/EntityJoinWorldEvent;)V
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|572|584|SpawnTNTItem|method|org.devoxx4kids.forge.mods.BiggerTNTExplosions|SpawnTNTItem|(Lnet/minecraftforge/event/entity/EntityJoinWorldEvent;)V
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|585|605|EntityJoinWorldEvent|class|net.minecraftforge.event.entity.EntityJoinWorldEvent
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|606|611|event|param|org.devoxx4kids.forge.mods.BiggerTNTExplosions|SpawnTNTItem|(Lnet/minecraftforge/event/entity/EntityJoinWorldEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|624|629|event|param|org.devoxx4kids.forge.mods.BiggerTNTExplosions|SpawnTNTItem|(Lnet/minecraftforge/event/entity/EntityJoinWorldEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|630|636|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|648|663|EntityTNTPrimed|class|net.minecraft.entity.item.EntityTNTPrimed
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|692|698|Entity|class|net.minecraft.entity.Entity
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|708|713|event|param|org.devoxx4kids.forge.mods.BiggerTNTExplosions|SpawnTNTItem|(Lnet/minecraftforge/event/entity/EntityJoinWorldEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|714|720|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|725|735|EntityItem|class|net.minecraft.entity.item.EntityItem
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|752|762|EntityItem|class|net.minecraft.entity.item.EntityItem
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|763|768|event|param|org.devoxx4kids.forge.mods.BiggerTNTExplosions|SpawnTNTItem|(Lnet/minecraftforge/event/entity/EntityJoinWorldEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|769|774|world|field|net.minecraftforge.event.entity.EntityJoinWorldEvent|world
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|790|794|posX|field|net.minecraft.entity.Entity|posX
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|803|807|posY|field|net.minecraft.entity.Entity|posY
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|816|820|posZ|field|net.minecraft.entity.Entity|posZ
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|833|842|ItemStack|class|net.minecraft.item.ItemStack
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|843|849|Blocks|class|net.minecraft.init.Blocks
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|850|853|tnt|field|net.minecraft.init.Blocks|tnt
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|870|892|setInfinitePickupDelay|method|net.minecraft.entity.item.EntityItem|setInfinitePickupDelay|()V
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|909|916|motionX|field|net.minecraft.entity.Entity|motionX
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|935|942|motionY|field|net.minecraft.entity.Entity|motionY
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|961|968|motionZ|field|net.minecraft.entity.Entity|motionZ
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|987|995|lifespan|field|net.minecraft.entity.item.EntityItem|lifespan
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|998|1002|fuse|field|org.devoxx4kids.forge.mods.BiggerTNTExplosions|fuse
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1017|1022|event|param|org.devoxx4kids.forge.mods.BiggerTNTExplosions|SpawnTNTItem|(Lnet/minecraftforge/event/entity/EntityJoinWorldEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1023|1028|world|field|net.minecraftforge.event.entity.EntityJoinWorldEvent|world
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1029|1037|isRemote|field|net.minecraft.world.World|isRemote
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1046|1051|event|param|org.devoxx4kids.forge.mods.BiggerTNTExplosions|SpawnTNTItem|(Lnet/minecraftforge/event/entity/EntityJoinWorldEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1052|1057|world|field|net.minecraftforge.event.entity.EntityJoinWorldEvent|world
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1058|1076|spawnEntityInWorld|method|net.minecraft.world.World|spawnEntityInWorld|(Lnet/minecraft/entity/Entity;)Z
+   Method End: SpawnTNTItem(Lnet/minecraftforge/event/entity/EntityJoinWorldEvent;)V
+   Method Start: explode(Lnet/minecraftforge/event/entity/item/ItemExpireEvent;)V
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1127|1134|explode|method|org.devoxx4kids.forge.mods.BiggerTNTExplosions|explode|(Lnet/minecraftforge/event/entity/item/ItemExpireEvent;)V
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1135|1150|ItemExpireEvent|class|net.minecraftforge.event.entity.item.ItemExpireEvent
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1151|1156|event|param|org.devoxx4kids.forge.mods.BiggerTNTExplosions|explode|(Lnet/minecraftforge/event/entity/item/ItemExpireEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1174|1179|event|param|org.devoxx4kids.forge.mods.BiggerTNTExplosions|explode|(Lnet/minecraftforge/event/entity/item/ItemExpireEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1180|1190|entityItem|field|net.minecraftforge.event.entity.item.ItemEvent|entityItem
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1191|1204|getEntityItem|method|net.minecraft.entity.item.EntityItem|getEntityItem|()Lnet/minecraft/item/ItemStack;
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1207|1214|getItem|method|net.minecraft.item.ItemStack|getItem|()Lnet/minecraft/item/Item;
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1234|1238|Item|class|net.minecraft.item.Item
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1239|1255|getItemFromBlock|method|net.minecraft.item.Item|getItemFromBlock|(Lnet/minecraft/block/Block;)Lnet/minecraft/item/Item;
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1256|1262|Blocks|class|net.minecraft.init.Blocks
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1263|1266|tnt|field|net.minecraft.init.Blocks|tnt
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1312|1322|EntityItem|class|net.minecraft.entity.item.EntityItem
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1335|1340|event|param|org.devoxx4kids.forge.mods.BiggerTNTExplosions|explode|(Lnet/minecraftforge/event/entity/item/ItemExpireEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1341|1351|entityItem|field|net.minecraftforge.event.entity.item.ItemEvent|entityItem
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1355|1360|event|param|org.devoxx4kids.forge.mods.BiggerTNTExplosions|explode|(Lnet/minecraftforge/event/entity/item/ItemExpireEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1361|1367|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1368|1376|worldObj|field|net.minecraft.entity.Entity|worldObj
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1377|1392|createExplosion|method|net.minecraft.world.World|createExplosion|(Lnet/minecraft/entity/Entity;DDDFZ)Lnet/minecraft/world/Explosion;
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1418|1422|posX|field|net.minecraft.entity.Entity|posX
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1434|1438|posY|field|net.minecraft.entity.Entity|posY
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1450|1454|posZ|field|net.minecraft.entity.Entity|posZ
+      @|org/devoxx4kids/forge/mods/BiggerTNTExplosions.java|1460|1465|power|field|org.devoxx4kids.forge.mods.BiggerTNTExplosions|power
+   Method End: explode(Lnet/minecraftforge/event/entity/item/ItemExpireEvent;)V
+Class End  : org.devoxx4kids.forge.mods.BiggerTNTExplosions
+endProcessing org/devoxx4kids/forge/mods/BiggerTNTExplosions.java
+
+processing org/devoxx4kids/forge/mods/BlockBreakMessage.java
+@|org/devoxx4kids/forge/mods/BlockBreakMessage.java|8|34|org.devoxx4kids.forge.mods|package|org.devoxx4kids.forge.mods|(file)
+Class Start: org.devoxx4kids.forge.mods.BlockBreakMessage
+   Method Start: sendMessage(Lnet/minecraftforge/event/world/BlockEvent$BreakEvent;)V
+      @|org/devoxx4kids/forge/mods/BlockBreakMessage.java|320|331|sendMessage|method|org.devoxx4kids.forge.mods.BlockBreakMessage|sendMessage|(Lnet/minecraftforge/event/world/BlockEvent$BreakEvent;)V
+      @|org/devoxx4kids/forge/mods/BlockBreakMessage.java|332|342|BreakEvent|class|net.minecraftforge.event.world.BlockEvent.BreakEvent
+      @|org/devoxx4kids/forge/mods/BlockBreakMessage.java|343|348|event|param|org.devoxx4kids.forge.mods.BlockBreakMessage|sendMessage|(Lnet/minecraftforge/event/world/BlockEvent$BreakEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BlockBreakMessage.java|355|360|event|param|org.devoxx4kids.forge.mods.BlockBreakMessage|sendMessage|(Lnet/minecraftforge/event/world/BlockEvent$BreakEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BlockBreakMessage.java|365|374|getPlayer|method|net.minecraftforge.event.world.BlockEvent.BreakEvent|getPlayer|()Lnet/minecraft/entity/player/EntityPlayer;
+      @|org/devoxx4kids/forge/mods/BlockBreakMessage.java|381|404|addChatComponentMessage|method|net.minecraft.entity.player.EntityPlayer|addChatComponentMessage|(Lnet/minecraft/util/IChatComponent;)V
+      @|org/devoxx4kids/forge/mods/BlockBreakMessage.java|414|431|ChatComponentText|class|net.minecraft.util.ChatComponentText
+      @|org/devoxx4kids/forge/mods/BlockBreakMessage.java|438|456|EnumChatFormatting|class|net.minecraft.util.EnumChatFormatting
+      @|org/devoxx4kids/forge/mods/BlockBreakMessage.java|457|461|GOLD|field|net.minecraft.util.EnumChatFormatting|GOLD
+   Method End: sendMessage(Lnet/minecraftforge/event/world/BlockEvent$BreakEvent;)V
+Class End  : org.devoxx4kids.forge.mods.BlockBreakMessage
+endProcessing org/devoxx4kids/forge/mods/BlockBreakMessage.java
+
+processing org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java
+@|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|8|34|org.devoxx4kids.forge.mods|package|org.devoxx4kids.forge.mods|(file)
+Class Start: org.devoxx4kids.forge.mods.BlockFillerPositionSelector
+   @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|477|484|Integer|class|java.lang.Integer
+   @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|472|476|List|class|java.util.List
+   @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|486|490|pos1|field|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|pos1|
+   @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|497|506|ArrayList|class|java.util.ArrayList
+   @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|523|530|Integer|class|java.lang.Integer
+   @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|518|522|List|class|java.util.List
+   @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|532|536|pos2|field|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|pos2|
+   @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|543|552|ArrayList|class|java.util.ArrayList
+   Method Start: choosePotitions(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|588|603|choosePotitions|method|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|choosePotitions|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|604|623|PlayerInteractEvent|class|net.minecraftforge.event.entity.player.PlayerInteractEvent
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|624|629|event|param|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|choosePotitions|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|639|644|event|param|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|choosePotitions|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|645|657|entityPlayer|field|net.minecraftforge.event.entity.player.PlayerEvent|entityPlayer
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|658|669|getHeldItem|method|net.minecraft.entity.EntityLivingBase|getHeldItem|()Lnet/minecraft/item/ItemStack;
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|686|691|event|param|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|choosePotitions|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|692|704|entityPlayer|field|net.minecraftforge.event.entity.player.PlayerEvent|entityPlayer
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|705|716|getHeldItem|method|net.minecraft.entity.EntityLivingBase|getHeldItem|()Lnet/minecraft/item/ItemStack;
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|719|726|getItem|method|net.minecraft.item.ItemStack|getItem|()Lnet/minecraft/item/Item;
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|736|741|Items|class|net.minecraft.init.Items
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|742|752|wooden_axe|field|net.minecraft.init.Items|wooden_axe
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|761|766|event|param|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|choosePotitions|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|767|779|entityPlayer|field|net.minecraftforge.event.entity.player.PlayerEvent|entityPlayer
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|780|792|capabilities|field|net.minecraft.entity.player.EntityPlayer|capabilities
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|793|807|isCreativeMode|field|net.minecraft.entity.player.PlayerCapabilities|isCreativeMode
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|838|843|event|param|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|choosePotitions|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|844|850|action|field|net.minecraftforge.event.entity.player.PlayerInteractEvent|action
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|854|860|Action|class|net.minecraftforge.event.entity.player.PlayerInteractEvent.Action
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|861|878|RIGHT_CLICK_BLOCK|field|net.minecraftforge.event.entity.player.PlayerInteractEvent.Action|RIGHT_CLICK_BLOCK
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|886|890|pos1|field|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|pos1
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|891|896|clear|method|java.util.Collection|clear|()V
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|904|908|pos1|field|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|pos1
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|909|912|add|method|java.util.Collection|add|(Ljava/lang/Object;)Z
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|913|918|event|param|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|choosePotitions|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|919|922|pos|field|net.minecraftforge.event.entity.player.PlayerInteractEvent|pos
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|923|927|getX|method|net.minecraft.util.Vec3i|getX|()I
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|936|940|pos1|field|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|pos1
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|941|944|add|method|java.util.Collection|add|(Ljava/lang/Object;)Z
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|945|950|event|param|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|choosePotitions|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|951|954|pos|field|net.minecraftforge.event.entity.player.PlayerInteractEvent|pos
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|955|959|getY|method|net.minecraft.util.Vec3i|getY|()I
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|968|972|pos1|field|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|pos1
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|973|976|add|method|java.util.Collection|add|(Ljava/lang/Object;)Z
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|977|982|event|param|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|choosePotitions|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|983|986|pos|field|net.minecraftforge.event.entity.player.PlayerInteractEvent|pos
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|987|991|getZ|method|net.minecraft.util.Vec3i|getZ|()I
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1000|1005|event|param|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|choosePotitions|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1006|1018|entityPlayer|field|net.minecraftforge.event.entity.player.PlayerEvent|entityPlayer
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1019|1033|addChatMessage|method|net.minecraft.command.ICommandSender|addChatMessage|(Lnet/minecraft/util/IChatComponent;)V
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1038|1055|ChatComponentText|class|net.minecraft.util.ChatComponentText
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1066|1084|EnumChatFormatting|class|net.minecraft.util.EnumChatFormatting
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1085|1090|GREEN|field|net.minecraft.util.EnumChatFormatting|GREEN
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1134|1139|event|param|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|choosePotitions|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1140|1143|pos|field|net.minecraftforge.event.entity.player.PlayerInteractEvent|pos
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1144|1148|getX|method|net.minecraft.util.Vec3i|getX|()I
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1169|1174|event|param|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|choosePotitions|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1175|1178|pos|field|net.minecraftforge.event.entity.player.PlayerInteractEvent|pos
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1179|1183|getY|method|net.minecraft.util.Vec3i|getY|()I
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1204|1209|event|param|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|choosePotitions|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1210|1213|pos|field|net.minecraftforge.event.entity.player.PlayerInteractEvent|pos
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1214|1218|getZ|method|net.minecraft.util.Vec3i|getZ|()I
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1234|1239|event|param|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|choosePotitions|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1240|1251|setCanceled|method|net.minecraftforge.fml.common.eventhandler.Event|setCanceled|(Z)V
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1282|1287|event|param|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|choosePotitions|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1288|1294|action|field|net.minecraftforge.event.entity.player.PlayerInteractEvent|action
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1298|1304|Action|class|net.minecraftforge.event.entity.player.PlayerInteractEvent.Action
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1305|1321|LEFT_CLICK_BLOCK|field|net.minecraftforge.event.entity.player.PlayerInteractEvent.Action|LEFT_CLICK_BLOCK
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1329|1333|pos2|field|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|pos2
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1334|1339|clear|method|java.util.Collection|clear|()V
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1347|1351|pos2|field|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|pos2
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1352|1355|add|method|java.util.Collection|add|(Ljava/lang/Object;)Z
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1356|1361|event|param|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|choosePotitions|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1362|1365|pos|field|net.minecraftforge.event.entity.player.PlayerInteractEvent|pos
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1366|1370|getX|method|net.minecraft.util.Vec3i|getX|()I
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1379|1383|pos2|field|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|pos2
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1384|1387|add|method|java.util.Collection|add|(Ljava/lang/Object;)Z
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1388|1393|event|param|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|choosePotitions|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1394|1397|pos|field|net.minecraftforge.event.entity.player.PlayerInteractEvent|pos
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1398|1402|getY|method|net.minecraft.util.Vec3i|getY|()I
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1411|1415|pos2|field|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|pos2
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1416|1419|add|method|java.util.Collection|add|(Ljava/lang/Object;)Z
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1420|1425|event|param|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|choosePotitions|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1426|1429|pos|field|net.minecraftforge.event.entity.player.PlayerInteractEvent|pos
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1430|1434|getZ|method|net.minecraft.util.Vec3i|getZ|()I
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1443|1448|event|param|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|choosePotitions|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1449|1461|entityPlayer|field|net.minecraftforge.event.entity.player.PlayerEvent|entityPlayer
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1462|1476|addChatMessage|method|net.minecraft.command.ICommandSender|addChatMessage|(Lnet/minecraft/util/IChatComponent;)V
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1481|1498|ChatComponentText|class|net.minecraft.util.ChatComponentText
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1510|1528|EnumChatFormatting|class|net.minecraft.util.EnumChatFormatting
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1529|1534|GREEN|field|net.minecraft.util.EnumChatFormatting|GREEN
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1578|1583|event|param|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|choosePotitions|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1584|1587|pos|field|net.minecraftforge.event.entity.player.PlayerInteractEvent|pos
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1588|1592|getX|method|net.minecraft.util.Vec3i|getX|()I
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1613|1618|event|param|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|choosePotitions|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1619|1622|pos|field|net.minecraftforge.event.entity.player.PlayerInteractEvent|pos
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1623|1627|getY|method|net.minecraft.util.Vec3i|getY|()I
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1648|1653|event|param|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|choosePotitions|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1654|1657|pos|field|net.minecraftforge.event.entity.player.PlayerInteractEvent|pos
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1658|1662|getZ|method|net.minecraft.util.Vec3i|getZ|()I
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1678|1683|event|param|org.devoxx4kids.forge.mods.BlockFillerPositionSelector|choosePotitions|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java|1684|1695|setCanceled|method|net.minecraftforge.fml.common.eventhandler.Event|setCanceled|(Z)V
+   Method End: choosePotitions(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V
+Class End  : org.devoxx4kids.forge.mods.BlockFillerPositionSelector
+endProcessing org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java
+
+processing org/devoxx4kids/forge/mods/CreeperReinforcements.java
+@|org/devoxx4kids/forge/mods/CreeperReinforcements.java|8|34|org.devoxx4kids.forge.mods|package|org.devoxx4kids.forge.mods|(file)
+Class Start: org.devoxx4kids.forge.mods.CreeperReinforcements
+   Method Start: spawnReinforcements(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|286|305|spawnReinforcements|method|org.devoxx4kids.forge.mods.CreeperReinforcements|spawnReinforcements|(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|306|322|LivingDeathEvent|class|net.minecraftforge.event.entity.living.LivingDeathEvent
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|323|328|event|param|org.devoxx4kids.forge.mods.CreeperReinforcements|spawnReinforcements|(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|339|344|event|param|org.devoxx4kids.forge.mods.CreeperReinforcements|spawnReinforcements|(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|345|351|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|363|376|EntityCreeper|class|net.minecraft.entity.monster.EntityCreeper
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|436|449|EntityCreeper|class|net.minecraft.entity.monster.EntityCreeper
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|464|477|EntityCreeper|class|net.minecraft.entity.monster.EntityCreeper
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|478|483|event|param|org.devoxx4kids.forge.mods.CreeperReinforcements|spawnReinforcements|(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|484|490|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|491|499|worldObj|field|net.minecraft.entity.Entity|worldObj
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|513|533|setLocationAndAngles|method|net.minecraft.entity.Entity|setLocationAndAngles|(DDDFF)V
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|534|539|event|param|org.devoxx4kids.forge.mods.CreeperReinforcements|spawnReinforcements|(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|540|546|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|547|551|posX|field|net.minecraft.entity.Entity|posX
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|558|563|event|param|org.devoxx4kids.forge.mods.CreeperReinforcements|spawnReinforcements|(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|564|570|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|571|575|posY|field|net.minecraft.entity.Entity|posY
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|582|587|event|param|org.devoxx4kids.forge.mods.CreeperReinforcements|spawnReinforcements|(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|588|594|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|595|599|posZ|field|net.minecraft.entity.Entity|posZ
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|626|631|event|param|org.devoxx4kids.forge.mods.CreeperReinforcements|spawnReinforcements|(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|632|638|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|639|647|worldObj|field|net.minecraft.entity.Entity|worldObj
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|648|656|isRemote|field|net.minecraft.world.World|isRemote
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|664|669|event|param|org.devoxx4kids.forge.mods.CreeperReinforcements|spawnReinforcements|(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|670|676|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|677|685|worldObj|field|net.minecraft.entity.Entity|worldObj
+      @|org/devoxx4kids/forge/mods/CreeperReinforcements.java|686|704|spawnEntityInWorld|method|net.minecraft.world.World|spawnEntityInWorld|(Lnet/minecraft/entity/Entity;)Z
+   Method End: spawnReinforcements(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V
+Class End  : org.devoxx4kids.forge.mods.CreeperReinforcements
+endProcessing org/devoxx4kids/forge/mods/CreeperReinforcements.java
+
+processing org/devoxx4kids/forge/mods/DiamondOreTrap.java
+@|org/devoxx4kids/forge/mods/DiamondOreTrap.java|8|34|org.devoxx4kids.forge.mods|package|org.devoxx4kids.forge.mods|(file)
+Class Start: org.devoxx4kids.forge.mods.DiamondOreTrap
+   Method Start: explode(Lnet/minecraftforge/event/world/BlockEvent$BreakEvent;)V
+      @|org/devoxx4kids/forge/mods/DiamondOreTrap.java|260|267|explode|method|org.devoxx4kids.forge.mods.DiamondOreTrap|explode|(Lnet/minecraftforge/event/world/BlockEvent$BreakEvent;)V
+      @|org/devoxx4kids/forge/mods/DiamondOreTrap.java|268|278|BreakEvent|class|net.minecraftforge.event.world.BlockEvent.BreakEvent
+      @|org/devoxx4kids/forge/mods/DiamondOreTrap.java|279|284|event|param|org.devoxx4kids.forge.mods.DiamondOreTrap|explode|(Lnet/minecraftforge/event/world/BlockEvent$BreakEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/DiamondOreTrap.java|294|299|event|param|org.devoxx4kids.forge.mods.DiamondOreTrap|explode|(Lnet/minecraftforge/event/world/BlockEvent$BreakEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/DiamondOreTrap.java|300|305|state|field|net.minecraftforge.event.world.BlockEvent|state
+      @|org/devoxx4kids/forge/mods/DiamondOreTrap.java|306|314|getBlock|method|net.minecraft.block.state.IBlockState|getBlock|()Lnet/minecraft/block/Block;
+      @|org/devoxx4kids/forge/mods/DiamondOreTrap.java|320|326|Blocks|class|net.minecraft.init.Blocks
+      @|org/devoxx4kids/forge/mods/DiamondOreTrap.java|327|338|diamond_ore|field|net.minecraft.init.Blocks|diamond_ore
+      @|org/devoxx4kids/forge/mods/DiamondOreTrap.java|362|367|event|param|org.devoxx4kids.forge.mods.DiamondOreTrap|explode|(Lnet/minecraftforge/event/world/BlockEvent$BreakEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/DiamondOreTrap.java|368|373|world|field|net.minecraftforge.event.world.BlockEvent|world
+      @|org/devoxx4kids/forge/mods/DiamondOreTrap.java|374|389|createExplosion|method|net.minecraft.world.World|createExplosion|(Lnet/minecraft/entity/Entity;DDDFZ)Lnet/minecraft/world/Explosion;
+      @|org/devoxx4kids/forge/mods/DiamondOreTrap.java|400|405|event|param|org.devoxx4kids.forge.mods.DiamondOreTrap|explode|(Lnet/minecraftforge/event/world/BlockEvent$BreakEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/DiamondOreTrap.java|406|409|pos|field|net.minecraftforge.event.world.BlockEvent|pos
+      @|org/devoxx4kids/forge/mods/DiamondOreTrap.java|410|414|getX|method|net.minecraft.util.Vec3i|getX|()I
+      @|org/devoxx4kids/forge/mods/DiamondOreTrap.java|422|427|event|param|org.devoxx4kids.forge.mods.DiamondOreTrap|explode|(Lnet/minecraftforge/event/world/BlockEvent$BreakEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/DiamondOreTrap.java|428|431|pos|field|net.minecraftforge.event.world.BlockEvent|pos
+      @|org/devoxx4kids/forge/mods/DiamondOreTrap.java|432|436|getY|method|net.minecraft.util.Vec3i|getY|()I
+      @|org/devoxx4kids/forge/mods/DiamondOreTrap.java|444|449|event|param|org.devoxx4kids.forge.mods.DiamondOreTrap|explode|(Lnet/minecraftforge/event/world/BlockEvent$BreakEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/DiamondOreTrap.java|450|453|pos|field|net.minecraftforge.event.world.BlockEvent|pos
+      @|org/devoxx4kids/forge/mods/DiamondOreTrap.java|454|458|getZ|method|net.minecraft.util.Vec3i|getZ|()I
+   Method End: explode(Lnet/minecraftforge/event/world/BlockEvent$BreakEvent;)V
+Class End  : org.devoxx4kids.forge.mods.DiamondOreTrap
+endProcessing org/devoxx4kids/forge/mods/DiamondOreTrap.java
+
+processing org/devoxx4kids/forge/mods/EnderBlock.java
+@|org/devoxx4kids/forge/mods/EnderBlock.java|8|34|org.devoxx4kids.forge.mods|package|org.devoxx4kids.forge.mods|(file)
+Class Start: org.devoxx4kids.forge.mods.EnderBlock
+   Method Start: EnderBlock()V
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|707|717|EnderBlock|method|org.devoxx4kids.forge.mods.EnderBlock|EnderBlock|()V
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|731|739|Material|class|net.minecraft.block.material.Material
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|740|744|iron|field|net.minecraft.block.material.Material|iron
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|755|773|setUnlocalizedName|method|net.minecraft.block.Block|setUnlocalizedName|(Ljava/lang/String;)Lnet/minecraft/block/Block;
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|797|811|setCreativeTab|method|net.minecraft.block.Block|setCreativeTab|(Lnet/minecraft/creativetab/CreativeTabs;)Lnet/minecraft/block/Block;
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|812|824|CreativeTabs|class|net.minecraft.creativetab.CreativeTabs
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|825|833|tabBlock|field|net.minecraft.creativetab.CreativeTabs|tabBlock
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|844|857|setResistance|method|net.minecraft.block.Block|setResistance|(F)Lnet/minecraft/block/Block;
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|873|884|setHardness|method|net.minecraft.block.Block|setHardness|(F)Lnet/minecraft/block/Block;
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|901|914|setLightLevel|method|net.minecraft.block.Block|setLightLevel|(F)Lnet/minecraft/block/Block;
+   Method End: EnderBlock()V
+   Method Start: onBlockAdded(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;)V
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|955|967|onBlockAdded|method|net.minecraft.block.Block|onBlockAdded|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;)V
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|968|973|World|class|net.minecraft.world.World
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|974|979|world|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockAdded|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;)V|world|0
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|981|989|BlockPos|class|net.minecraft.util.BlockPos
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|990|993|pos|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockAdded|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;)V|pos|1
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|995|1006|IBlockState|class|net.minecraft.block.state.IBlockState
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1007|1012|state|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockAdded|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;)V|state|2
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1019|1030|IBlockState|class|net.minecraft.block.state.IBlockState
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1039|1044|world|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockAdded|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;)V|world|0
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1045|1058|getBlockState|method|net.minecraft.world.IBlockAccess|getBlockState|(Lnet/minecraft/util/BlockPos;)Lnet/minecraft/block/state/IBlockState;
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1059|1062|pos|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockAdded|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;)V|pos|1
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1063|1066|add|method|net.minecraft.util.BlockPos|add|(III)Lnet/minecraft/util/BlockPos;
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1094|1102|getBlock|method|net.minecraft.block.state.IBlockState|getBlock|()Lnet/minecraft/block/Block;
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1108|1114|Blocks|class|net.minecraft.init.Blocks
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1115|1123|obsidian|field|net.minecraft.init.Blocks|obsidian
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1133|1141|getBlock|method|net.minecraft.block.state.IBlockState|getBlock|()Lnet/minecraft/block/Block;
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1147|1153|Blocks|class|net.minecraft.init.Blocks
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1154|1157|air|field|net.minecraft.init.Blocks|air
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1165|1170|world|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockAdded|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;)V|world|0
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1171|1184|setBlockState|method|net.minecraft.world.World|setBlockState|(Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;)Z
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1185|1188|pos|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockAdded|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;)V|pos|1
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1201|1220|EntityLightningBolt|class|net.minecraft.entity.effect.EntityLightningBolt
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1237|1256|EntityLightningBolt|class|net.minecraft.entity.effect.EntityLightningBolt
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1257|1262|world|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockAdded|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;)V|world|0
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1275|1278|pos|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockAdded|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;)V|pos|1
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1279|1283|getX|method|net.minecraft.util.Vec3i|getX|()I
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1287|1290|pos|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockAdded|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;)V|pos|1
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1291|1295|getY|method|net.minecraft.util.Vec3i|getY|()I
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1299|1302|pos|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockAdded|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;)V|pos|1
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1303|1307|getZ|method|net.minecraft.util.Vec3i|getZ|()I
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1315|1320|world|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockAdded|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;)V|world|0
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1321|1337|addWeatherEffect|method|net.minecraft.world.World|addWeatherEffect|(Lnet/minecraft/entity/Entity;)Z
+   Method End: onBlockAdded(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;)V
+   Method Start: onBlockActivated(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumFacing;FFF)Z
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1422|1438|onBlockActivated|method|net.minecraft.block.Block|onBlockActivated|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumFacing;FFF)Z
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1439|1444|World|class|net.minecraft.world.World
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1445|1450|world|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockActivated|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumFacing;FFF)Z|world|0
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1452|1460|BlockPos|class|net.minecraft.util.BlockPos
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1461|1464|pos|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockActivated|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumFacing;FFF)Z|pos|1
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1466|1477|IBlockState|class|net.minecraft.block.state.IBlockState
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1478|1483|state|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockActivated|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumFacing;FFF)Z|state|2
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1495|1507|EntityPlayer|class|net.minecraft.entity.player.EntityPlayer
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1508|1514|player|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockActivated|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumFacing;FFF)Z|player|3
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1516|1526|EnumFacing|class|net.minecraft.util.EnumFacing
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1527|1531|side|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockActivated|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumFacing;FFF)Z|side|4
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1549|1553|hitX|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockActivated|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumFacing;FFF)Z|hitX|5
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1561|1565|hitY|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockActivated|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumFacing;FFF)Z|hitY|6
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1573|1577|hitZ|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockActivated|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumFacing;FFF)Z|hitZ|7
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1589|1594|world|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockActivated|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumFacing;FFF)Z|world|0
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1595|1603|isRemote|field|net.minecraft.world.World|isRemote
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1627|1633|player|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockActivated|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumFacing;FFF)Z|player|3
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1634|1648|addChatMessage|method|net.minecraft.command.ICommandSender|addChatMessage|(Lnet/minecraft/util/IChatComponent;)V
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1653|1670|ChatComponentText|class|net.minecraft.util.ChatComponentText
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1678|1696|EnumChatFormatting|class|net.minecraft.util.EnumChatFormatting
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1697|1708|DARK_PURPLE|field|net.minecraft.util.EnumChatFormatting|DARK_PURPLE
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1890|1904|EntityEnderEye|class|net.minecraft.entity.item.EntityEnderEye
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1915|1929|EntityEnderEye|class|net.minecraft.entity.item.EntityEnderEye
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1930|1935|world|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockActivated|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumFacing;FFF)Z|world|0
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1940|1943|pos|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockActivated|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumFacing;FFF)Z|pos|1
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1944|1948|getX|method|net.minecraft.util.Vec3i|getX|()I
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1961|1964|pos|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockActivated|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumFacing;FFF)Z|pos|1
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1965|1969|getY|method|net.minecraft.util.Vec3i|getY|()I
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1982|1985|pos|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockActivated|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumFacing;FFF)Z|pos|1
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|1986|1990|getZ|method|net.minecraft.util.Vec3i|getZ|()I
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|2009|2016|motionY|field|net.minecraft.entity.Entity|motionY
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|2027|2032|world|param|org.devoxx4kids.forge.mods.EnderBlock|onBlockActivated|(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumFacing;FFF)Z|world|0
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|2033|2051|spawnEntityInWorld|method|net.minecraft.world.World|spawnEntityInWorld|(Lnet/minecraft/entity/Entity;)Z
+   Method End: onBlockActivated(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumFacing;FFF)Z
+   Method Start: getItemDropped(Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;I)Lnet/minecraft/item/Item;
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|2097|2111|getItemDropped|method|net.minecraft.block.Block|getItemDropped|(Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;I)Lnet/minecraft/item/Item;
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|2092|2096|Item|class|net.minecraft.item.Item
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|2112|2123|IBlockState|class|net.minecraft.block.state.IBlockState
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|2124|2129|state|param|org.devoxx4kids.forge.mods.EnderBlock|getItemDropped|(Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;I)Lnet/minecraft/item/Item;|state|0
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|2131|2137|Random|class|java.util.Random
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|2138|2144|random|param|org.devoxx4kids.forge.mods.EnderBlock|getItemDropped|(Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;I)Lnet/minecraft/item/Item;|random|1
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|2150|2152|i2|param|org.devoxx4kids.forge.mods.EnderBlock|getItemDropped|(Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;I)Lnet/minecraft/item/Item;|i2|2
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|2166|2170|Main|class|org.devoxx4kids.forge.mods.Main
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|2171|2181|enderIngot|field|org.devoxx4kids.forge.mods.Main|enderIngot
+   Method End: getItemDropped(Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;I)Lnet/minecraft/item/Item;
+   Method Start: quantityDropped(Ljava/util/Random;)I
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|2203|2218|quantityDropped|method|net.minecraft.block.Block|quantityDropped|(Ljava/util/Random;)I
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|2219|2225|Random|class|java.util.Random
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|2226|2232|random|param|org.devoxx4kids.forge.mods.EnderBlock|quantityDropped|(Ljava/util/Random;)I|random|0
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|2246|2252|random|param|org.devoxx4kids.forge.mods.EnderBlock|quantityDropped|(Ljava/util/Random;)I|random|0
+      @|org/devoxx4kids/forge/mods/EnderBlock.java|2253|2260|nextInt|method|java.util.Random|nextInt|(I)I
+   Method End: quantityDropped(Ljava/util/Random;)I
+Class End  : org.devoxx4kids.forge.mods.EnderBlock
+endProcessing org/devoxx4kids/forge/mods/EnderBlock.java
+
+processing org/devoxx4kids/forge/mods/EnderEye.java
+@|org/devoxx4kids/forge/mods/EnderEye.java|8|34|org.devoxx4kids.forge.mods|package|org.devoxx4kids.forge.mods|(file)
+Class Start: org.devoxx4kids.forge.mods.EnderEye
+   Method Start: EnderEye()V
+      @|org/devoxx4kids/forge/mods/EnderEye.java|171|179|EnderEye|method|org.devoxx4kids.forge.mods.EnderEye|EnderEye|()V
+      @|org/devoxx4kids/forge/mods/EnderEye.java|217|232|setPotionEffect|method|net.minecraft.item.ItemFood|setPotionEffect|(IIIF)Lnet/minecraft/item/ItemFood;
+      @|org/devoxx4kids/forge/mods/EnderEye.java|257|272|setAlwaysEdible|method|net.minecraft.item.ItemFood|setAlwaysEdible|()Lnet/minecraft/item/ItemFood;
+      @|org/devoxx4kids/forge/mods/EnderEye.java|283|301|setUnlocalizedName|method|net.minecraft.item.Item|setUnlocalizedName|(Ljava/lang/String;)Lnet/minecraft/item/Item;
+      @|org/devoxx4kids/forge/mods/EnderEye.java|322|336|setCreativeTab|method|net.minecraft.item.Item|setCreativeTab|(Lnet/minecraft/creativetab/CreativeTabs;)Lnet/minecraft/item/Item;
+      @|org/devoxx4kids/forge/mods/EnderEye.java|337|349|CreativeTabs|class|net.minecraft.creativetab.CreativeTabs
+      @|org/devoxx4kids/forge/mods/EnderEye.java|350|357|tabFood|field|net.minecraft.creativetab.CreativeTabs|tabFood
+   Method End: EnderEye()V
+Class End  : org.devoxx4kids.forge.mods.EnderEye
+endProcessing org/devoxx4kids/forge/mods/EnderEye.java
+
+processing org/devoxx4kids/forge/mods/EnderIngot.java
+@|org/devoxx4kids/forge/mods/EnderIngot.java|8|34|org.devoxx4kids.forge.mods|package|org.devoxx4kids.forge.mods|(file)
+Class Start: org.devoxx4kids.forge.mods.EnderIngot
+   Method Start: EnderIngot()V
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|337|347|EnderIngot|method|org.devoxx4kids.forge.mods.EnderIngot|EnderIngot|()V
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|370|388|setUnlocalizedName|method|net.minecraft.item.Item|setUnlocalizedName|(Ljava/lang/String;)Lnet/minecraft/item/Item;
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|411|425|setCreativeTab|method|net.minecraft.item.Item|setCreativeTab|(Lnet/minecraft/creativetab/CreativeTabs;)Lnet/minecraft/item/Item;
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|426|438|CreativeTabs|class|net.minecraft.creativetab.CreativeTabs
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|439|451|tabMaterials|field|net.minecraft.creativetab.CreativeTabs|tabMaterials
+   Method End: EnderIngot()V
+   Method Start: onItemRightClick(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|475|491|onItemRightClick|method|net.minecraft.item.Item|onItemRightClick|(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|465|474|ItemStack|class|net.minecraft.item.ItemStack
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|492|501|ItemStack|class|net.minecraft.item.ItemStack
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|502|507|stack|param|org.devoxx4kids.forge.mods.EnderIngot|onItemRightClick|(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;|stack|0
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|513|518|World|class|net.minecraft.world.World
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|519|524|world|param|org.devoxx4kids.forge.mods.EnderIngot|onItemRightClick|(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;|world|1
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|526|538|EntityPlayer|class|net.minecraft.entity.player.EntityPlayer
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|539|545|player|param|org.devoxx4kids.forge.mods.EnderIngot|onItemRightClick|(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;|player|2
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|554|568|EntityEnderman|class|net.minecraft.entity.monster.EntityEnderman
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|584|598|EntityEnderman|class|net.minecraft.entity.monster.EntityEnderman
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|599|604|world|param|org.devoxx4kids.forge.mods.EnderIngot|onItemRightClick|(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;|world|1
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|618|638|setLocationAndAngles|method|net.minecraft.entity.Entity|setLocationAndAngles|(DDDFF)V
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|640|646|player|param|org.devoxx4kids.forge.mods.EnderIngot|onItemRightClick|(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;|player|2
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|647|651|posX|field|net.minecraft.entity.Entity|posX
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|658|664|player|param|org.devoxx4kids.forge.mods.EnderIngot|onItemRightClick|(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;|player|2
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|665|669|posY|field|net.minecraft.entity.Entity|posY
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|671|677|player|param|org.devoxx4kids.forge.mods.EnderIngot|onItemRightClick|(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;|player|2
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|678|682|posZ|field|net.minecraft.entity.Entity|posZ
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|696|701|world|param|org.devoxx4kids.forge.mods.EnderIngot|onItemRightClick|(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;|world|1
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|702|720|spawnEntityInWorld|method|net.minecraft.world.World|spawnEntityInWorld|(Lnet/minecraft/entity/Entity;)Z
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|742|748|player|param|org.devoxx4kids.forge.mods.EnderIngot|onItemRightClick|(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;|player|2
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|749|761|capabilities|field|net.minecraft.entity.player.EntityPlayer|capabilities
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|762|776|isCreativeMode|field|net.minecraft.entity.player.PlayerCapabilities|isCreativeMode
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|783|788|stack|param|org.devoxx4kids.forge.mods.EnderIngot|onItemRightClick|(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;|stack|0
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|789|798|stackSize|field|net.minecraft.item.ItemStack|stackSize
+      @|org/devoxx4kids/forge/mods/EnderIngot.java|815|820|stack|param|org.devoxx4kids.forge.mods.EnderIngot|onItemRightClick|(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;|stack|0
+   Method End: onItemRightClick(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;
+Class End  : org.devoxx4kids.forge.mods.EnderIngot
+endProcessing org/devoxx4kids/forge/mods/EnderIngot.java
+
+processing org/devoxx4kids/forge/mods/EndermanDropEyes.java
+@|org/devoxx4kids/forge/mods/EndermanDropEyes.java|8|34|org.devoxx4kids.forge.mods|package|org.devoxx4kids.forge.mods|(file)
+Class Start: org.devoxx4kids.forge.mods.EndermanDropEyes
+   Method Start: dropEyes(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V
+      @|org/devoxx4kids/forge/mods/EndermanDropEyes.java|309|317|dropEyes|method|org.devoxx4kids.forge.mods.EndermanDropEyes|dropEyes|(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V
+      @|org/devoxx4kids/forge/mods/EndermanDropEyes.java|319|335|LivingDeathEvent|class|net.minecraftforge.event.entity.living.LivingDeathEvent
+      @|org/devoxx4kids/forge/mods/EndermanDropEyes.java|336|341|event|param|org.devoxx4kids.forge.mods.EndermanDropEyes|dropEyes|(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/EndermanDropEyes.java|353|358|event|param|org.devoxx4kids.forge.mods.EndermanDropEyes|dropEyes|(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/EndermanDropEyes.java|359|365|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/EndermanDropEyes.java|377|391|EntityEnderman|class|net.minecraft.entity.monster.EntityEnderman
+      @|org/devoxx4kids/forge/mods/EndermanDropEyes.java|423|429|Random|class|java.util.Random
+      @|org/devoxx4kids/forge/mods/EndermanDropEyes.java|443|449|Random|class|java.util.Random
+      @|org/devoxx4kids/forge/mods/EndermanDropEyes.java|465|470|event|param|org.devoxx4kids.forge.mods.EndermanDropEyes|dropEyes|(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/EndermanDropEyes.java|471|477|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/EndermanDropEyes.java|478|486|worldObj|field|net.minecraft.entity.Entity|worldObj
+      @|org/devoxx4kids/forge/mods/EndermanDropEyes.java|487|495|isRemote|field|net.minecraft.world.World|isRemote
+      @|org/devoxx4kids/forge/mods/EndermanDropEyes.java|503|508|event|param|org.devoxx4kids.forge.mods.EndermanDropEyes|dropEyes|(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/EndermanDropEyes.java|509|515|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/EndermanDropEyes.java|516|524|dropItem|method|net.minecraft.entity.Entity|dropItem|(Lnet/minecraft/item/Item;I)Lnet/minecraft/entity/item/EntityItem;
+      @|org/devoxx4kids/forge/mods/EndermanDropEyes.java|525|529|Main|class|org.devoxx4kids.forge.mods.Main
+      @|org/devoxx4kids/forge/mods/EndermanDropEyes.java|530|538|enderEye|field|org.devoxx4kids.forge.mods.Main|enderEye
+      @|org/devoxx4kids/forge/mods/EndermanDropEyes.java|547|554|nextInt|method|java.util.Random|nextInt|(I)I
+   Method End: dropEyes(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V
+Class End  : org.devoxx4kids.forge.mods.EndermanDropEyes
+endProcessing org/devoxx4kids/forge/mods/EndermanDropEyes.java
+
+processing org/devoxx4kids/forge/mods/ExplodingAnvils.java
+@|org/devoxx4kids/forge/mods/ExplodingAnvils.java|8|34|org.devoxx4kids.forge.mods|package|org.devoxx4kids.forge.mods|(file)
+Class Start: org.devoxx4kids.forge.mods.ExplodingAnvils
+   Method Start: explode(Lnet/minecraftforge/event/entity/living/LivingHurtEvent;)V
+      @|org/devoxx4kids/forge/mods/ExplodingAnvils.java|305|312|explode|method|org.devoxx4kids.forge.mods.ExplodingAnvils|explode|(Lnet/minecraftforge/event/entity/living/LivingHurtEvent;)V
+      @|org/devoxx4kids/forge/mods/ExplodingAnvils.java|313|328|LivingHurtEvent|class|net.minecraftforge.event.entity.living.LivingHurtEvent
+      @|org/devoxx4kids/forge/mods/ExplodingAnvils.java|329|334|event|param|org.devoxx4kids.forge.mods.ExplodingAnvils|explode|(Lnet/minecraftforge/event/entity/living/LivingHurtEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/ExplodingAnvils.java|344|349|event|param|org.devoxx4kids.forge.mods.ExplodingAnvils|explode|(Lnet/minecraftforge/event/entity/living/LivingHurtEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/ExplodingAnvils.java|350|356|source|field|net.minecraftforge.event.entity.living.LivingHurtEvent|source
+      @|org/devoxx4kids/forge/mods/ExplodingAnvils.java|360|372|DamageSource|class|net.minecraft.util.DamageSource
+      @|org/devoxx4kids/forge/mods/ExplodingAnvils.java|373|378|anvil|field|net.minecraft.util.DamageSource|anvil
+      @|org/devoxx4kids/forge/mods/ExplodingAnvils.java|402|408|Entity|class|net.minecraft.entity.Entity
+      @|org/devoxx4kids/forge/mods/ExplodingAnvils.java|418|423|event|param|org.devoxx4kids.forge.mods.ExplodingAnvils|explode|(Lnet/minecraftforge/event/entity/living/LivingHurtEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/ExplodingAnvils.java|424|430|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/ExplodingAnvils.java|434|439|event|param|org.devoxx4kids.forge.mods.ExplodingAnvils|explode|(Lnet/minecraftforge/event/entity/living/LivingHurtEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/ExplodingAnvils.java|440|446|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/ExplodingAnvils.java|447|455|worldObj|field|net.minecraft.entity.Entity|worldObj
+      @|org/devoxx4kids/forge/mods/ExplodingAnvils.java|456|471|createExplosion|method|net.minecraft.world.World|createExplosion|(Lnet/minecraft/entity/Entity;DDDFZ)Lnet/minecraft/world/Explosion;
+      @|org/devoxx4kids/forge/mods/ExplodingAnvils.java|496|500|posX|field|net.minecraft.entity.Entity|posX
+      @|org/devoxx4kids/forge/mods/ExplodingAnvils.java|513|517|posY|field|net.minecraft.entity.Entity|posY
+      @|org/devoxx4kids/forge/mods/ExplodingAnvils.java|530|534|posZ|field|net.minecraft.entity.Entity|posZ
+   Method End: explode(Lnet/minecraftforge/event/entity/living/LivingHurtEvent;)V
+Class End  : org.devoxx4kids.forge.mods.ExplodingAnvils
+endProcessing org/devoxx4kids/forge/mods/ExplodingAnvils.java
+
+processing org/devoxx4kids/forge/mods/ExplodingMinecarts.java
+@|org/devoxx4kids/forge/mods/ExplodingMinecarts.java|8|34|org.devoxx4kids.forge.mods|package|org.devoxx4kids.forge.mods|(file)
+Class Start: org.devoxx4kids.forge.mods.ExplodingMinecarts
+   Method Start: explode(Lnet/minecraftforge/event/entity/minecart/MinecartCollisionEvent;)V
+      @|org/devoxx4kids/forge/mods/ExplodingMinecarts.java|290|297|explode|method|org.devoxx4kids.forge.mods.ExplodingMinecarts|explode|(Lnet/minecraftforge/event/entity/minecart/MinecartCollisionEvent;)V
+      @|org/devoxx4kids/forge/mods/ExplodingMinecarts.java|298|320|MinecartCollisionEvent|class|net.minecraftforge.event.entity.minecart.MinecartCollisionEvent
+      @|org/devoxx4kids/forge/mods/ExplodingMinecarts.java|321|326|event|param|org.devoxx4kids.forge.mods.ExplodingMinecarts|explode|(Lnet/minecraftforge/event/entity/minecart/MinecartCollisionEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/ExplodingMinecarts.java|332|346|EntityMinecart|class|net.minecraft.entity.item.EntityMinecart
+      @|org/devoxx4kids/forge/mods/ExplodingMinecarts.java|358|363|event|param|org.devoxx4kids.forge.mods.ExplodingMinecarts|explode|(Lnet/minecraftforge/event/entity/minecart/MinecartCollisionEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/ExplodingMinecarts.java|364|372|minecart|field|net.minecraftforge.event.entity.minecart.MinecartEvent|minecart
+      @|org/devoxx4kids/forge/mods/ExplodingMinecarts.java|385|393|worldObj|field|net.minecraft.entity.Entity|worldObj
+      @|org/devoxx4kids/forge/mods/ExplodingMinecarts.java|394|409|createExplosion|method|net.minecraft.world.World|createExplosion|(Lnet/minecraft/entity/Entity;DDDFZ)Lnet/minecraft/world/Explosion;
+      @|org/devoxx4kids/forge/mods/ExplodingMinecarts.java|436|440|posX|field|net.minecraft.entity.Entity|posX
+      @|org/devoxx4kids/forge/mods/ExplodingMinecarts.java|454|458|posY|field|net.minecraft.entity.Entity|posY
+      @|org/devoxx4kids/forge/mods/ExplodingMinecarts.java|472|476|posZ|field|net.minecraft.entity.Entity|posZ
+   Method End: explode(Lnet/minecraftforge/event/entity/minecart/MinecartCollisionEvent;)V
+Class End  : org.devoxx4kids.forge.mods.ExplodingMinecarts
+endProcessing org/devoxx4kids/forge/mods/ExplodingMinecarts.java
+
+processing org/devoxx4kids/forge/mods/GetHandheldItem.java
+@|org/devoxx4kids/forge/mods/GetHandheldItem.java|8|34|org.devoxx4kids.forge.mods|package|org.devoxx4kids.forge.mods|(file)
+Class Start: org.devoxx4kids.forge.mods.GetHandheldItem
+   @|org/devoxx4kids/forge/mods/GetHandheldItem.java|351|355|Item|class|net.minecraft.item.Item
+   @|org/devoxx4kids/forge/mods/GetHandheldItem.java|356|364|handItem|field|org.devoxx4kids.forge.mods.GetHandheldItem|handItem|
+   @|org/devoxx4kids/forge/mods/GetHandheldItem.java|374|379|Block|class|net.minecraft.block.Block
+   @|org/devoxx4kids/forge/mods/GetHandheldItem.java|380|389|HandBlock|field|org.devoxx4kids.forge.mods.GetHandheldItem|HandBlock|
+   Method Start: handItems(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|422|431|handItems|method|org.devoxx4kids.forge.mods.GetHandheldItem|handItems|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|432|451|PlayerInteractEvent|class|net.minecraftforge.event.entity.player.PlayerInteractEvent
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|452|457|event|param|org.devoxx4kids.forge.mods.GetHandheldItem|handItems|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|467|472|event|param|org.devoxx4kids.forge.mods.GetHandheldItem|handItems|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|473|485|entityPlayer|field|net.minecraftforge.event.entity.player.PlayerEvent|entityPlayer
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|486|497|getHeldItem|method|net.minecraft.entity.EntityLivingBase|getHeldItem|()Lnet/minecraft/item/ItemStack;
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|516|521|event|param|org.devoxx4kids.forge.mods.GetHandheldItem|handItems|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|522|534|entityPlayer|field|net.minecraftforge.event.entity.player.PlayerEvent|entityPlayer
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|535|547|capabilities|field|net.minecraft.entity.player.EntityPlayer|capabilities
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|548|562|isCreativeMode|field|net.minecraft.entity.player.PlayerCapabilities|isCreativeMode
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|594|602|handItem|field|org.devoxx4kids.forge.mods.GetHandheldItem|handItem
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|605|610|event|param|org.devoxx4kids.forge.mods.GetHandheldItem|handItems|(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|611|623|entityPlayer|field|net.minecraftforge.event.entity.player.PlayerEvent|entityPlayer
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|624|635|getHeldItem|method|net.minecraft.entity.EntityLivingBase|getHeldItem|()Lnet/minecraft/item/ItemStack;
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|638|645|getItem|method|net.minecraft.item.ItemStack|getItem|()Lnet/minecraft/item/Item;
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|652|658|System|class|java.lang.System
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|659|662|out|field|java.lang.System|out
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|663|670|println|method|java.io.PrintStream|println|(Ljava/lang/String;)V
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|702|710|handItem|field|org.devoxx4kids.forge.mods.GetHandheldItem|handItem
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|716|725|HandBlock|field|org.devoxx4kids.forge.mods.GetHandheldItem|HandBlock
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|728|733|Block|class|net.minecraft.block.Block
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|734|750|getBlockFromItem|method|net.minecraft.block.Block|getBlockFromItem|(Lnet/minecraft/item/Item;)Lnet/minecraft/block/Block;
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|751|759|handItem|field|org.devoxx4kids.forge.mods.GetHandheldItem|handItem
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|765|771|System|class|java.lang.System
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|772|775|out|field|java.lang.System|out
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|776|783|println|method|java.io.PrintStream|println|(Ljava/lang/String;)V
+      @|org/devoxx4kids/forge/mods/GetHandheldItem.java|825|834|HandBlock|field|org.devoxx4kids.forge.mods.GetHandheldItem|HandBlock
+   Method End: handItems(Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V
+Class End  : org.devoxx4kids.forge.mods.GetHandheldItem
+endProcessing org/devoxx4kids/forge/mods/GetHandheldItem.java
+
+processing org/devoxx4kids/forge/mods/GolemWallClimb.java
+@|org/devoxx4kids/forge/mods/GolemWallClimb.java|8|34|org.devoxx4kids.forge.mods|package|org.devoxx4kids.forge.mods|(file)
+Class Start: org.devoxx4kids.forge.mods.GolemWallClimb
+   Method Start: climWall(Lnet/minecraftforge/event/entity/living/LivingEvent$LivingUpdateEvent;)V
+      @|org/devoxx4kids/forge/mods/GolemWallClimb.java|347|355|climWall|method|org.devoxx4kids.forge.mods.GolemWallClimb|climWall|(Lnet/minecraftforge/event/entity/living/LivingEvent$LivingUpdateEvent;)V
+      @|org/devoxx4kids/forge/mods/GolemWallClimb.java|356|373|LivingUpdateEvent|class|net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent
+      @|org/devoxx4kids/forge/mods/GolemWallClimb.java|374|379|event|param|org.devoxx4kids.forge.mods.GolemWallClimb|climWall|(Lnet/minecraftforge/event/entity/living/LivingEvent$LivingUpdateEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/GolemWallClimb.java|391|396|event|param|org.devoxx4kids.forge.mods.GolemWallClimb|climWall|(Lnet/minecraftforge/event/entity/living/LivingEvent$LivingUpdateEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/GolemWallClimb.java|397|403|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/GolemWallClimb.java|415|428|EntitySnowman|class|net.minecraft.entity.monster.EntitySnowman
+      @|org/devoxx4kids/forge/mods/GolemWallClimb.java|439|444|event|param|org.devoxx4kids.forge.mods.GolemWallClimb|climWall|(Lnet/minecraftforge/event/entity/living/LivingEvent$LivingUpdateEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/GolemWallClimb.java|445|451|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/GolemWallClimb.java|463|478|EntityIronGolem|class|net.minecraft.entity.monster.EntityIronGolem
+      @|org/devoxx4kids/forge/mods/GolemWallClimb.java|508|513|event|param|org.devoxx4kids.forge.mods.GolemWallClimb|climWall|(Lnet/minecraftforge/event/entity/living/LivingEvent$LivingUpdateEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/GolemWallClimb.java|514|520|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/GolemWallClimb.java|521|543|isCollidedHorizontally|field|net.minecraft.entity.Entity|isCollidedHorizontally
+      @|org/devoxx4kids/forge/mods/GolemWallClimb.java|567|572|event|param|org.devoxx4kids.forge.mods.GolemWallClimb|climWall|(Lnet/minecraftforge/event/entity/living/LivingEvent$LivingUpdateEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/GolemWallClimb.java|573|579|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/GolemWallClimb.java|580|587|motionY|field|net.minecraft.entity.Entity|motionY
+   Method End: climWall(Lnet/minecraftforge/event/entity/living/LivingEvent$LivingUpdateEvent;)V
+Class End  : org.devoxx4kids.forge.mods.GolemWallClimb
+endProcessing org/devoxx4kids/forge/mods/GolemWallClimb.java
+
+processing org/devoxx4kids/forge/mods/Main.java
+@|org/devoxx4kids/forge/mods/Main.java|8|34|org.devoxx4kids.forge.mods|package|org.devoxx4kids.forge.mods|(file)
+Class Start: org.devoxx4kids.forge.mods.Main
+   @|org/devoxx4kids/forge/mods/Main.java|843|849|String|class|java.lang.String
+   @|org/devoxx4kids/forge/mods/Main.java|850|855|MODID|field|org.devoxx4kids.forge.mods.Main|MODID|
+   @|org/devoxx4kids/forge/mods/Main.java|900|906|String|class|java.lang.String
+   @|org/devoxx4kids/forge/mods/Main.java|907|914|VERSION|field|org.devoxx4kids.forge.mods.Main|VERSION|
+   @|org/devoxx4kids/forge/mods/Main.java|939|944|Block|class|net.minecraft.block.Block
+   @|org/devoxx4kids/forge/mods/Main.java|945|955|enderBlock|field|org.devoxx4kids.forge.mods.Main|enderBlock|
+   @|org/devoxx4kids/forge/mods/Main.java|972|976|Item|class|net.minecraft.item.Item
+   @|org/devoxx4kids/forge/mods/Main.java|977|987|enderIngot|field|org.devoxx4kids.forge.mods.Main|enderIngot|
+   @|org/devoxx4kids/forge/mods/Main.java|1004|1008|Item|class|net.minecraft.item.Item
+   @|org/devoxx4kids/forge/mods/Main.java|1009|1017|enderEye|field|org.devoxx4kids.forge.mods.Main|enderEye|
+   Method Start: init(Lnet/minecraftforge/fml/common/event/FMLInitializationEvent;)V
+      @|org/devoxx4kids/forge/mods/Main.java|1049|1053|init|method|org.devoxx4kids.forge.mods.Main|init|(Lnet/minecraftforge/fml/common/event/FMLInitializationEvent;)V
+      @|org/devoxx4kids/forge/mods/Main.java|1054|1076|FMLInitializationEvent|class|net.minecraftforge.fml.common.event.FMLInitializationEvent
+      @|org/devoxx4kids/forge/mods/Main.java|1077|1082|event|param|org.devoxx4kids.forge.mods.Main|init|(Lnet/minecraftforge/fml/common/event/FMLInitializationEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/Main.java|1089|1103|MinecraftForge|class|net.minecraftforge.common.MinecraftForge
+      @|org/devoxx4kids/forge/mods/Main.java|1104|1113|EVENT_BUS|field|net.minecraftforge.common.MinecraftForge|EVENT_BUS
+      @|org/devoxx4kids/forge/mods/Main.java|1114|1122|register|method|net.minecraftforge.fml.common.eventhandler.EventBus|register|(Ljava/lang/Object;)V
+      @|org/devoxx4kids/forge/mods/Main.java|1127|1144|BlockBreakMessage|class|org.devoxx4kids.forge.mods.BlockBreakMessage
+      @|org/devoxx4kids/forge/mods/Main.java|1151|1165|MinecraftForge|class|net.minecraftforge.common.MinecraftForge
+      @|org/devoxx4kids/forge/mods/Main.java|1166|1175|EVENT_BUS|field|net.minecraftforge.common.MinecraftForge|EVENT_BUS
+      @|org/devoxx4kids/forge/mods/Main.java|1176|1184|register|method|net.minecraftforge.fml.common.eventhandler.EventBus|register|(Ljava/lang/Object;)V
+      @|org/devoxx4kids/forge/mods/Main.java|1189|1207|ExplodingMinecarts|class|org.devoxx4kids.forge.mods.ExplodingMinecarts
+      @|org/devoxx4kids/forge/mods/Main.java|1214|1228|MinecraftForge|class|net.minecraftforge.common.MinecraftForge
+      @|org/devoxx4kids/forge/mods/Main.java|1229|1238|EVENT_BUS|field|net.minecraftforge.common.MinecraftForge|EVENT_BUS
+      @|org/devoxx4kids/forge/mods/Main.java|1239|1247|register|method|net.minecraftforge.fml.common.eventhandler.EventBus|register|(Ljava/lang/Object;)V
+      @|org/devoxx4kids/forge/mods/Main.java|1252|1267|ExplodingAnvils|class|org.devoxx4kids.forge.mods.ExplodingAnvils
+      @|org/devoxx4kids/forge/mods/Main.java|1274|1288|MinecraftForge|class|net.minecraftforge.common.MinecraftForge
+      @|org/devoxx4kids/forge/mods/Main.java|1289|1298|EVENT_BUS|field|net.minecraftforge.common.MinecraftForge|EVENT_BUS
+      @|org/devoxx4kids/forge/mods/Main.java|1299|1307|register|method|net.minecraftforge.fml.common.eventhandler.EventBus|register|(Ljava/lang/Object;)V
+      @|org/devoxx4kids/forge/mods/Main.java|1312|1326|DiamondOreTrap|class|org.devoxx4kids.forge.mods.DiamondOreTrap
+      @|org/devoxx4kids/forge/mods/Main.java|1333|1347|MinecraftForge|class|net.minecraftforge.common.MinecraftForge
+      @|org/devoxx4kids/forge/mods/Main.java|1348|1357|EVENT_BUS|field|net.minecraftforge.common.MinecraftForge|EVENT_BUS
+      @|org/devoxx4kids/forge/mods/Main.java|1358|1366|register|method|net.minecraftforge.fml.common.eventhandler.EventBus|register|(Ljava/lang/Object;)V
+      @|org/devoxx4kids/forge/mods/Main.java|1371|1390|BiggerTNTExplosions|class|org.devoxx4kids.forge.mods.BiggerTNTExplosions
+      @|org/devoxx4kids/forge/mods/Main.java|1397|1411|MinecraftForge|class|net.minecraftforge.common.MinecraftForge
+      @|org/devoxx4kids/forge/mods/Main.java|1412|1421|EVENT_BUS|field|net.minecraftforge.common.MinecraftForge|EVENT_BUS
+      @|org/devoxx4kids/forge/mods/Main.java|1422|1430|register|method|net.minecraftforge.fml.common.eventhandler.EventBus|register|(Ljava/lang/Object;)V
+      @|org/devoxx4kids/forge/mods/Main.java|1435|1455|PigsDroppingDiamonds|class|org.devoxx4kids.forge.mods.PigsDroppingDiamonds
+      @|org/devoxx4kids/forge/mods/Main.java|1462|1476|MinecraftForge|class|net.minecraftforge.common.MinecraftForge
+      @|org/devoxx4kids/forge/mods/Main.java|1477|1486|EVENT_BUS|field|net.minecraftforge.common.MinecraftForge|EVENT_BUS
+      @|org/devoxx4kids/forge/mods/Main.java|1487|1495|register|method|net.minecraftforge.fml.common.eventhandler.EventBus|register|(Ljava/lang/Object;)V
+      @|org/devoxx4kids/forge/mods/Main.java|1500|1513|ZombieKnights|class|org.devoxx4kids.forge.mods.ZombieKnights
+      @|org/devoxx4kids/forge/mods/Main.java|1520|1534|MinecraftForge|class|net.minecraftforge.common.MinecraftForge
+      @|org/devoxx4kids/forge/mods/Main.java|1535|1544|EVENT_BUS|field|net.minecraftforge.common.MinecraftForge|EVENT_BUS
+      @|org/devoxx4kids/forge/mods/Main.java|1545|1553|register|method|net.minecraftforge.fml.common.eventhandler.EventBus|register|(Ljava/lang/Object;)V
+      @|org/devoxx4kids/forge/mods/Main.java|1558|1579|CreeperReinforcements|class|org.devoxx4kids.forge.mods.CreeperReinforcements
+      @|org/devoxx4kids/forge/mods/Main.java|1586|1600|MinecraftForge|class|net.minecraftforge.common.MinecraftForge
+      @|org/devoxx4kids/forge/mods/Main.java|1601|1610|EVENT_BUS|field|net.minecraftforge.common.MinecraftForge|EVENT_BUS
+      @|org/devoxx4kids/forge/mods/Main.java|1611|1619|register|method|net.minecraftforge.fml.common.eventhandler.EventBus|register|(Ljava/lang/Object;)V
+      @|org/devoxx4kids/forge/mods/Main.java|1624|1633|SuperJump|class|org.devoxx4kids.forge.mods.SuperJump
+      @|org/devoxx4kids/forge/mods/Main.java|1640|1656|FMLCommonHandler|class|net.minecraftforge.fml.common.FMLCommonHandler
+      @|org/devoxx4kids/forge/mods/Main.java|1657|1665|instance|method|net.minecraftforge.fml.common.FMLCommonHandler|instance|()Lnet/minecraftforge/fml/common/FMLCommonHandler;
+      @|org/devoxx4kids/forge/mods/Main.java|1668|1671|bus|method|net.minecraftforge.fml.common.FMLCommonHandler|bus|()Lnet/minecraftforge/fml/common/eventhandler/EventBus;
+      @|org/devoxx4kids/forge/mods/Main.java|1674|1682|register|method|net.minecraftforge.fml.common.eventhandler.EventBus|register|(Ljava/lang/Object;)V
+      @|org/devoxx4kids/forge/mods/Main.java|1687|1696|Parachute|class|org.devoxx4kids.forge.mods.Parachute
+      @|org/devoxx4kids/forge/mods/Main.java|1703|1717|MinecraftForge|class|net.minecraftforge.common.MinecraftForge
+      @|org/devoxx4kids/forge/mods/Main.java|1718|1727|EVENT_BUS|field|net.minecraftforge.common.MinecraftForge|EVENT_BUS
+      @|org/devoxx4kids/forge/mods/Main.java|1728|1736|register|method|net.minecraftforge.fml.common.eventhandler.EventBus|register|(Ljava/lang/Object;)V
+      @|org/devoxx4kids/forge/mods/Main.java|1741|1750|Parachute|class|org.devoxx4kids.forge.mods.Parachute
+      @|org/devoxx4kids/forge/mods/Main.java|1757|1771|MinecraftForge|class|net.minecraftforge.common.MinecraftForge
+      @|org/devoxx4kids/forge/mods/Main.java|1772|1781|EVENT_BUS|field|net.minecraftforge.common.MinecraftForge|EVENT_BUS
+      @|org/devoxx4kids/forge/mods/Main.java|1782|1790|register|method|net.minecraftforge.fml.common.eventhandler.EventBus|register|(Ljava/lang/Object;)V
+      @|org/devoxx4kids/forge/mods/Main.java|1795|1809|GolemWallClimb|class|org.devoxx4kids.forge.mods.GolemWallClimb
+      @|org/devoxx4kids/forge/mods/Main.java|1816|1830|MinecraftForge|class|net.minecraftforge.common.MinecraftForge
+      @|org/devoxx4kids/forge/mods/Main.java|1831|1840|EVENT_BUS|field|net.minecraftforge.common.MinecraftForge|EVENT_BUS
+      @|org/devoxx4kids/forge/mods/Main.java|1841|1849|register|method|net.minecraftforge.fml.common.eventhandler.EventBus|register|(Ljava/lang/Object;)V
+      @|org/devoxx4kids/forge/mods/Main.java|1854|1881|BlockFillerPositionSelector|class|org.devoxx4kids.forge.mods.BlockFillerPositionSelector
+      @|org/devoxx4kids/forge/mods/Main.java|1888|1902|MinecraftForge|class|net.minecraftforge.common.MinecraftForge
+      @|org/devoxx4kids/forge/mods/Main.java|1903|1912|EVENT_BUS|field|net.minecraftforge.common.MinecraftForge|EVENT_BUS
+      @|org/devoxx4kids/forge/mods/Main.java|1913|1921|register|method|net.minecraftforge.fml.common.eventhandler.EventBus|register|(Ljava/lang/Object;)V
+      @|org/devoxx4kids/forge/mods/Main.java|1926|1942|EndermanDropEyes|class|org.devoxx4kids.forge.mods.EndermanDropEyes
+      @|org/devoxx4kids/forge/mods/Main.java|1949|1959|enderBlock|field|org.devoxx4kids.forge.mods.Main|enderBlock
+      @|org/devoxx4kids/forge/mods/Main.java|1966|1976|EnderBlock|class|org.devoxx4kids.forge.mods.EnderBlock
+      @|org/devoxx4kids/forge/mods/Main.java|1982|1994|GameRegistry|class|net.minecraftforge.fml.common.registry.GameRegistry
+      @|org/devoxx4kids/forge/mods/Main.java|1995|2008|registerBlock|method|net.minecraftforge.fml.common.registry.GameRegistry|registerBlock|(Lnet/minecraft/block/Block;Ljava/lang/String;)Lnet/minecraft/block/Block;
+      @|org/devoxx4kids/forge/mods/Main.java|2009|2019|enderBlock|field|org.devoxx4kids.forge.mods.Main|enderBlock
+      @|org/devoxx4kids/forge/mods/Main.java|2038|2048|enderIngot|field|org.devoxx4kids.forge.mods.Main|enderIngot
+      @|org/devoxx4kids/forge/mods/Main.java|2055|2065|EnderIngot|class|org.devoxx4kids.forge.mods.EnderIngot
+      @|org/devoxx4kids/forge/mods/Main.java|2071|2083|GameRegistry|class|net.minecraftforge.fml.common.registry.GameRegistry
+      @|org/devoxx4kids/forge/mods/Main.java|2084|2096|registerItem|method|net.minecraftforge.fml.common.registry.GameRegistry|registerItem|(Lnet/minecraft/item/Item;Ljava/lang/String;)V
+      @|org/devoxx4kids/forge/mods/Main.java|2097|2107|enderIngot|field|org.devoxx4kids.forge.mods.Main|enderIngot
+      @|org/devoxx4kids/forge/mods/Main.java|2126|2134|enderEye|field|org.devoxx4kids.forge.mods.Main|enderEye
+      @|org/devoxx4kids/forge/mods/Main.java|2141|2149|EnderEye|class|org.devoxx4kids.forge.mods.EnderEye
+      @|org/devoxx4kids/forge/mods/Main.java|2155|2167|GameRegistry|class|net.minecraftforge.fml.common.registry.GameRegistry
+      @|org/devoxx4kids/forge/mods/Main.java|2168|2180|registerItem|method|net.minecraftforge.fml.common.registry.GameRegistry|registerItem|(Lnet/minecraft/item/Item;Ljava/lang/String;)V
+      @|org/devoxx4kids/forge/mods/Main.java|2181|2189|enderEye|field|org.devoxx4kids.forge.mods.Main|enderEye
+      @|org/devoxx4kids/forge/mods/Main.java|2206|2218|GameRegistry|class|net.minecraftforge.fml.common.registry.GameRegistry
+      @|org/devoxx4kids/forge/mods/Main.java|2219|2228|addRecipe|method|net.minecraftforge.fml.common.registry.GameRegistry|addRecipe|(Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V
+      @|org/devoxx4kids/forge/mods/Main.java|2238|2247|ItemStack|class|net.minecraft.item.ItemStack
+      @|org/devoxx4kids/forge/mods/Main.java|2248|2254|Blocks|class|net.minecraft.init.Blocks
+      @|org/devoxx4kids/forge/mods/Main.java|2255|2266|cobblestone|field|net.minecraft.init.Blocks|cobblestone
+      @|org/devoxx4kids/forge/mods/Main.java|2301|2307|Blocks|class|net.minecraft.init.Blocks
+      @|org/devoxx4kids/forge/mods/Main.java|2308|2312|dirt|field|net.minecraft.init.Blocks|dirt
+      @|org/devoxx4kids/forge/mods/Main.java|2317|2329|GameRegistry|class|net.minecraftforge.fml.common.registry.GameRegistry
+      @|org/devoxx4kids/forge/mods/Main.java|2330|2339|addRecipe|method|net.minecraftforge.fml.common.registry.GameRegistry|addRecipe|(Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V
+      @|org/devoxx4kids/forge/mods/Main.java|2349|2358|ItemStack|class|net.minecraft.item.ItemStack
+      @|org/devoxx4kids/forge/mods/Main.java|2359|2369|enderBlock|field|org.devoxx4kids.forge.mods.Main|enderBlock
+      @|org/devoxx4kids/forge/mods/Main.java|2417|2427|enderIngot|field|org.devoxx4kids.forge.mods.Main|enderIngot
+      @|org/devoxx4kids/forge/mods/Main.java|2432|2444|GameRegistry|class|net.minecraftforge.fml.common.registry.GameRegistry
+      @|org/devoxx4kids/forge/mods/Main.java|2445|2454|addRecipe|method|net.minecraftforge.fml.common.registry.GameRegistry|addRecipe|(Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V
+      @|org/devoxx4kids/forge/mods/Main.java|2464|2473|ItemStack|class|net.minecraft.item.ItemStack
+      @|org/devoxx4kids/forge/mods/Main.java|2474|2484|enderBlock|field|org.devoxx4kids.forge.mods.Main|enderBlock
+      @|org/devoxx4kids/forge/mods/Main.java|2529|2534|Items|class|net.minecraft.init.Items
+      @|org/devoxx4kids/forge/mods/Main.java|2535|2544|ender_eye|field|net.minecraft.init.Items|ender_eye
+      @|org/devoxx4kids/forge/mods/Main.java|2555|2561|Blocks|class|net.minecraft.init.Blocks
+      @|org/devoxx4kids/forge/mods/Main.java|2562|2570|obsidian|field|net.minecraft.init.Blocks|obsidian
+      @|org/devoxx4kids/forge/mods/Main.java|2575|2587|GameRegistry|class|net.minecraftforge.fml.common.registry.GameRegistry
+      @|org/devoxx4kids/forge/mods/Main.java|2588|2606|addShapelessRecipe|method|net.minecraftforge.fml.common.registry.GameRegistry|addShapelessRecipe|(Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V
+      @|org/devoxx4kids/forge/mods/Main.java|2616|2625|ItemStack|class|net.minecraft.item.ItemStack
+      @|org/devoxx4kids/forge/mods/Main.java|2626|2636|enderIngot|field|org.devoxx4kids.forge.mods.Main|enderIngot
+      @|org/devoxx4kids/forge/mods/Main.java|2650|2659|ItemStack|class|net.minecraft.item.ItemStack
+      @|org/devoxx4kids/forge/mods/Main.java|2660|2670|enderBlock|field|org.devoxx4kids.forge.mods.Main|enderBlock
+      @|org/devoxx4kids/forge/mods/Main.java|2676|2688|GameRegistry|class|net.minecraftforge.fml.common.registry.GameRegistry
+      @|org/devoxx4kids/forge/mods/Main.java|2689|2707|addShapelessRecipe|method|net.minecraftforge.fml.common.registry.GameRegistry|addShapelessRecipe|(Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V
+      @|org/devoxx4kids/forge/mods/Main.java|2717|2726|ItemStack|class|net.minecraft.item.ItemStack
+      @|org/devoxx4kids/forge/mods/Main.java|2727|2737|enderIngot|field|org.devoxx4kids.forge.mods.Main|enderIngot
+      @|org/devoxx4kids/forge/mods/Main.java|2752|2761|ItemStack|class|net.minecraft.item.ItemStack
+      @|org/devoxx4kids/forge/mods/Main.java|2762|2772|enderBlock|field|org.devoxx4kids.forge.mods.Main|enderBlock
+      @|org/devoxx4kids/forge/mods/Main.java|2786|2795|ItemStack|class|net.minecraft.item.ItemStack
+      @|org/devoxx4kids/forge/mods/Main.java|2796|2801|Items|class|net.minecraft.init.Items
+      @|org/devoxx4kids/forge/mods/Main.java|2802|2812|iron_ingot|field|net.minecraft.init.Items|iron_ingot
+      @|org/devoxx4kids/forge/mods/Main.java|2823|2832|ItemStack|class|net.minecraft.item.ItemStack
+      @|org/devoxx4kids/forge/mods/Main.java|2833|2838|Items|class|net.minecraft.init.Items
+      @|org/devoxx4kids/forge/mods/Main.java|2839|2849|gold_ingot|field|net.minecraft.init.Items|gold_ingot
+      @|org/devoxx4kids/forge/mods/Main.java|2855|2867|GameRegistry|class|net.minecraftforge.fml.common.registry.GameRegistry
+      @|org/devoxx4kids/forge/mods/Main.java|2868|2879|addSmelting|method|net.minecraftforge.fml.common.registry.GameRegistry|addSmelting|(Lnet/minecraft/item/Item;Lnet/minecraft/item/ItemStack;F)V
+      @|org/devoxx4kids/forge/mods/Main.java|2885|2890|Items|class|net.minecraft.init.Items
+      @|org/devoxx4kids/forge/mods/Main.java|2891|2902|ender_pearl|field|net.minecraft.init.Items|ender_pearl
+      @|org/devoxx4kids/forge/mods/Main.java|2912|2921|ItemStack|class|net.minecraft.item.ItemStack
+      @|org/devoxx4kids/forge/mods/Main.java|2922|2932|enderIngot|field|org.devoxx4kids.forge.mods.Main|enderIngot
+      @|org/devoxx4kids/forge/mods/Main.java|2951|2956|Items|class|net.minecraft.init.Items
+      @|org/devoxx4kids/forge/mods/Main.java|2957|2961|cake|field|net.minecraft.init.Items|cake
+      @|org/devoxx4kids/forge/mods/Main.java|2962|2977|setPotionEffect|method|net.minecraft.item.Item|setPotionEffect|(Ljava/lang/String;)Lnet/minecraft/item/Item;
+      @|org/devoxx4kids/forge/mods/Main.java|2978|2990|PotionHelper|class|net.minecraft.potion.PotionHelper
+      @|org/devoxx4kids/forge/mods/Main.java|2991|3008|blazePowderEffect|field|net.minecraft.potion.PotionHelper|blazePowderEffect
+      @|org/devoxx4kids/forge/mods/Main.java|3035|3039|Item|class|net.minecraft.item.Item
+      @|org/devoxx4kids/forge/mods/Main.java|3057|3069|GameRegistry|class|net.minecraftforge.fml.common.registry.GameRegistry
+      @|org/devoxx4kids/forge/mods/Main.java|3070|3078|findItem|method|net.minecraftforge.fml.common.registry.GameRegistry|findItem|(Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/item/Item;
+      @|org/devoxx4kids/forge/mods/Main.java|3107|3128|ModelResourceLocation|class|net.minecraft.client.resources.model.ModelResourceLocation
+      @|org/devoxx4kids/forge/mods/Main.java|3154|3175|ModelResourceLocation|class|net.minecraft.client.resources.model.ModelResourceLocation
+      @|org/devoxx4kids/forge/mods/Main.java|3214|3223|Minecraft|class|net.minecraft.client.Minecraft
+      @|org/devoxx4kids/forge/mods/Main.java|3224|3236|getMinecraft|method|net.minecraft.client.Minecraft|getMinecraft|()Lnet/minecraft/client/Minecraft;
+      @|org/devoxx4kids/forge/mods/Main.java|3239|3252|getRenderItem|method|net.minecraft.client.Minecraft|getRenderItem|()Lnet/minecraft/client/renderer/entity/RenderItem;
+      @|org/devoxx4kids/forge/mods/Main.java|3255|3273|getItemModelMesher|method|net.minecraft.client.renderer.entity.RenderItem|getItemModelMesher|()Lnet/minecraft/client/renderer/ItemModelMesher;
+      @|org/devoxx4kids/forge/mods/Main.java|3280|3288|register|method|net.minecraft.client.renderer.ItemModelMesher|register|(Lnet/minecraft/item/Item;ILnet/minecraft/client/resources/model/ModelResourceLocation;)V
+      @|org/devoxx4kids/forge/mods/Main.java|3330|3334|Item|class|net.minecraft.item.Item
+      @|org/devoxx4kids/forge/mods/Main.java|3352|3364|GameRegistry|class|net.minecraftforge.fml.common.registry.GameRegistry
+      @|org/devoxx4kids/forge/mods/Main.java|3365|3373|findItem|method|net.minecraftforge.fml.common.registry.GameRegistry|findItem|(Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/item/Item;
+      @|org/devoxx4kids/forge/mods/Main.java|3402|3423|ModelResourceLocation|class|net.minecraft.client.resources.model.ModelResourceLocation
+      @|org/devoxx4kids/forge/mods/Main.java|3449|3470|ModelResourceLocation|class|net.minecraft.client.resources.model.ModelResourceLocation
+      @|org/devoxx4kids/forge/mods/Main.java|3508|3517|Minecraft|class|net.minecraft.client.Minecraft
+      @|org/devoxx4kids/forge/mods/Main.java|3518|3530|getMinecraft|method|net.minecraft.client.Minecraft|getMinecraft|()Lnet/minecraft/client/Minecraft;
+      @|org/devoxx4kids/forge/mods/Main.java|3533|3546|getRenderItem|method|net.minecraft.client.Minecraft|getRenderItem|()Lnet/minecraft/client/renderer/entity/RenderItem;
+      @|org/devoxx4kids/forge/mods/Main.java|3549|3567|getItemModelMesher|method|net.minecraft.client.renderer.entity.RenderItem|getItemModelMesher|()Lnet/minecraft/client/renderer/ItemModelMesher;
+      @|org/devoxx4kids/forge/mods/Main.java|3574|3582|register|method|net.minecraft.client.renderer.ItemModelMesher|register|(Lnet/minecraft/item/Item;ILnet/minecraft/client/resources/model/ModelResourceLocation;)V
+      @|org/devoxx4kids/forge/mods/Main.java|3625|3629|Item|class|net.minecraft.item.Item
+      @|org/devoxx4kids/forge/mods/Main.java|3645|3657|GameRegistry|class|net.minecraftforge.fml.common.registry.GameRegistry
+      @|org/devoxx4kids/forge/mods/Main.java|3658|3666|findItem|method|net.minecraftforge.fml.common.registry.GameRegistry|findItem|(Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/item/Item;
+      @|org/devoxx4kids/forge/mods/Main.java|3692|3713|ModelResourceLocation|class|net.minecraft.client.resources.model.ModelResourceLocation
+      @|org/devoxx4kids/forge/mods/Main.java|3737|3758|ModelResourceLocation|class|net.minecraft.client.resources.model.ModelResourceLocation
+      @|org/devoxx4kids/forge/mods/Main.java|3794|3803|Minecraft|class|net.minecraft.client.Minecraft
+      @|org/devoxx4kids/forge/mods/Main.java|3804|3816|getMinecraft|method|net.minecraft.client.Minecraft|getMinecraft|()Lnet/minecraft/client/Minecraft;
+      @|org/devoxx4kids/forge/mods/Main.java|3819|3832|getRenderItem|method|net.minecraft.client.Minecraft|getRenderItem|()Lnet/minecraft/client/renderer/entity/RenderItem;
+      @|org/devoxx4kids/forge/mods/Main.java|3835|3853|getItemModelMesher|method|net.minecraft.client.renderer.entity.RenderItem|getItemModelMesher|()Lnet/minecraft/client/renderer/ItemModelMesher;
+      @|org/devoxx4kids/forge/mods/Main.java|3860|3868|register|method|net.minecraft.client.renderer.ItemModelMesher|register|(Lnet/minecraft/item/Item;ILnet/minecraft/client/resources/model/ModelResourceLocation;)V
+   Method End: init(Lnet/minecraftforge/fml/common/event/FMLInitializationEvent;)V
+   Method Start: registerCommands(Lnet/minecraftforge/fml/common/event/FMLServerStartingEvent;)V
+      @|org/devoxx4kids/forge/mods/Main.java|3936|3952|registerCommands|method|org.devoxx4kids.forge.mods.Main|registerCommands|(Lnet/minecraftforge/fml/common/event/FMLServerStartingEvent;)V
+      @|org/devoxx4kids/forge/mods/Main.java|3953|3975|FMLServerStartingEvent|class|net.minecraftforge.fml.common.event.FMLServerStartingEvent
+      @|org/devoxx4kids/forge/mods/Main.java|3976|3981|event|param|org.devoxx4kids.forge.mods.Main|registerCommands|(Lnet/minecraftforge/fml/common/event/FMLServerStartingEvent;)V|event|0
+   Method End: registerCommands(Lnet/minecraftforge/fml/common/event/FMLServerStartingEvent;)V
+Class End  : org.devoxx4kids.forge.mods.Main
+endProcessing org/devoxx4kids/forge/mods/Main.java
+
+processing org/devoxx4kids/forge/mods/Parachute.java
+@|org/devoxx4kids/forge/mods/Parachute.java|8|34|org.devoxx4kids.forge.mods|package|org.devoxx4kids.forge.mods|(file)
+Class Start: org.devoxx4kids.forge.mods.Parachute
+   Method Start: deployParachute(Lnet/minecraftforge/fml/common/gameevent/TickEvent$PlayerTickEvent;)V
+      @|org/devoxx4kids/forge/mods/Parachute.java|345|360|deployParachute|method|org.devoxx4kids.forge.mods.Parachute|deployParachute|(Lnet/minecraftforge/fml/common/gameevent/TickEvent$PlayerTickEvent;)V
+      @|org/devoxx4kids/forge/mods/Parachute.java|361|376|PlayerTickEvent|class|net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent
+      @|org/devoxx4kids/forge/mods/Parachute.java|377|382|event|param|org.devoxx4kids.forge.mods.Parachute|deployParachute|(Lnet/minecraftforge/fml/common/gameevent/TickEvent$PlayerTickEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/Parachute.java|388|400|EntityPlayer|class|net.minecraft.entity.player.EntityPlayer
+      @|org/devoxx4kids/forge/mods/Parachute.java|410|415|event|param|org.devoxx4kids.forge.mods.Parachute|deployParachute|(Lnet/minecraftforge/fml/common/gameevent/TickEvent$PlayerTickEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/Parachute.java|416|422|player|field|net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent|player
+      @|org/devoxx4kids/forge/mods/Parachute.java|438|448|isAirBorne|field|net.minecraft.entity.Entity|isAirBorne
+      @|org/devoxx4kids/forge/mods/Parachute.java|460|470|isSneaking|method|net.minecraft.entity.Entity|isSneaking|()Z
+      @|org/devoxx4kids/forge/mods/Parachute.java|503|510|motionY|field|net.minecraft.entity.Entity|motionY
+   Method End: deployParachute(Lnet/minecraftforge/fml/common/gameevent/TickEvent$PlayerTickEvent;)V
+   Method Start: negateFallDamage(Lnet/minecraftforge/event/entity/living/LivingFallEvent;)V
+      @|org/devoxx4kids/forge/mods/Parachute.java|555|571|negateFallDamage|method|org.devoxx4kids.forge.mods.Parachute|negateFallDamage|(Lnet/minecraftforge/event/entity/living/LivingFallEvent;)V
+      @|org/devoxx4kids/forge/mods/Parachute.java|572|587|LivingFallEvent|class|net.minecraftforge.event.entity.living.LivingFallEvent
+      @|org/devoxx4kids/forge/mods/Parachute.java|588|593|event|param|org.devoxx4kids.forge.mods.Parachute|negateFallDamage|(Lnet/minecraftforge/event/entity/living/LivingFallEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/Parachute.java|604|609|event|param|org.devoxx4kids.forge.mods.Parachute|negateFallDamage|(Lnet/minecraftforge/event/entity/living/LivingFallEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/Parachute.java|610|616|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/Parachute.java|628|640|EntityPlayer|class|net.minecraft.entity.player.EntityPlayer
+      @|org/devoxx4kids/forge/mods/Parachute.java|665|677|EntityPlayer|class|net.minecraft.entity.player.EntityPlayer
+      @|org/devoxx4kids/forge/mods/Parachute.java|688|700|EntityPlayer|class|net.minecraft.entity.player.EntityPlayer
+      @|org/devoxx4kids/forge/mods/Parachute.java|702|707|event|param|org.devoxx4kids.forge.mods.Parachute|negateFallDamage|(Lnet/minecraftforge/event/entity/living/LivingFallEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/Parachute.java|708|714|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/Parachute.java|733|743|isSneaking|method|net.minecraft.entity.Entity|isSneaking|()Z
+      @|org/devoxx4kids/forge/mods/Parachute.java|766|771|event|param|org.devoxx4kids.forge.mods.Parachute|negateFallDamage|(Lnet/minecraftforge/event/entity/living/LivingFallEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/Parachute.java|772|783|setCanceled|method|net.minecraftforge.fml.common.eventhandler.Event|setCanceled|(Z)V
+   Method End: negateFallDamage(Lnet/minecraftforge/event/entity/living/LivingFallEvent;)V
+Class End  : org.devoxx4kids.forge.mods.Parachute
+endProcessing org/devoxx4kids/forge/mods/Parachute.java
+
+processing org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java
+@|org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java|8|34|org.devoxx4kids.forge.mods|package|org.devoxx4kids.forge.mods|(file)
+Class Start: org.devoxx4kids.forge.mods.PigsDroppingDiamonds
+   Method Start: dropDiamonds(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V
+      @|org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java|374|386|dropDiamonds|method|org.devoxx4kids.forge.mods.PigsDroppingDiamonds|dropDiamonds|(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V
+      @|org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java|387|403|LivingDeathEvent|class|net.minecraftforge.event.entity.living.LivingDeathEvent
+      @|org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java|404|409|event|param|org.devoxx4kids.forge.mods.PigsDroppingDiamonds|dropDiamonds|(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java|421|426|event|param|org.devoxx4kids.forge.mods.PigsDroppingDiamonds|dropDiamonds|(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java|427|433|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java|445|454|EntityPig|class|net.minecraft.entity.passive.EntityPig
+      @|org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java|478|484|Random|class|java.util.Random
+      @|org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java|498|504|Random|class|java.util.Random
+      @|org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java|516|521|event|param|org.devoxx4kids.forge.mods.PigsDroppingDiamonds|dropDiamonds|(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java|522|528|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java|529|537|worldObj|field|net.minecraft.entity.Entity|worldObj
+      @|org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java|538|546|isRemote|field|net.minecraft.world.World|isRemote
+      @|org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java|553|558|event|param|org.devoxx4kids.forge.mods.PigsDroppingDiamonds|dropDiamonds|(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java|559|565|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java|566|574|dropItem|method|net.minecraft.entity.Entity|dropItem|(Lnet/minecraft/item/Item;I)Lnet/minecraft/entity/item/EntityItem;
+      @|org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java|575|579|Item|class|net.minecraft.item.Item
+      @|org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java|580|596|getItemFromBlock|method|net.minecraft.item.Item|getItemFromBlock|(Lnet/minecraft/block/Block;)Lnet/minecraft/item/Item;
+      @|org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java|597|603|Blocks|class|net.minecraft.init.Blocks
+      @|org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java|604|611|bedrock|field|net.minecraft.init.Blocks|bedrock
+      @|org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java|621|628|nextInt|method|java.util.Random|nextInt|(I)I
+   Method End: dropDiamonds(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)V
+Class End  : org.devoxx4kids.forge.mods.PigsDroppingDiamonds
+endProcessing org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java
+
+processing org/devoxx4kids/forge/mods/SuperJump.java
+@|org/devoxx4kids/forge/mods/SuperJump.java|8|34|org.devoxx4kids.forge.mods|package|org.devoxx4kids.forge.mods|(file)
+Class Start: org.devoxx4kids.forge.mods.SuperJump
+   Method Start: makeJumpHigher(Lnet/minecraftforge/event/entity/living/LivingEvent$LivingJumpEvent;)V
+      @|org/devoxx4kids/forge/mods/SuperJump.java|353|367|makeJumpHigher|method|org.devoxx4kids.forge.mods.SuperJump|makeJumpHigher|(Lnet/minecraftforge/event/entity/living/LivingEvent$LivingJumpEvent;)V
+      @|org/devoxx4kids/forge/mods/SuperJump.java|368|383|LivingJumpEvent|class|net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent
+      @|org/devoxx4kids/forge/mods/SuperJump.java|384|389|event|param|org.devoxx4kids.forge.mods.SuperJump|makeJumpHigher|(Lnet/minecraftforge/event/entity/living/LivingEvent$LivingJumpEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/SuperJump.java|400|405|event|param|org.devoxx4kids.forge.mods.SuperJump|makeJumpHigher|(Lnet/minecraftforge/event/entity/living/LivingEvent$LivingJumpEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/SuperJump.java|406|412|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/SuperJump.java|424|436|EntityPlayer|class|net.minecraft.entity.player.EntityPlayer
+      @|org/devoxx4kids/forge/mods/SuperJump.java|458|466|BlockPos|class|net.minecraft.util.BlockPos
+      @|org/devoxx4kids/forge/mods/SuperJump.java|477|485|BlockPos|class|net.minecraft.util.BlockPos
+      @|org/devoxx4kids/forge/mods/SuperJump.java|486|491|event|param|org.devoxx4kids.forge.mods.SuperJump|makeJumpHigher|(Lnet/minecraftforge/event/entity/living/LivingEvent$LivingJumpEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/SuperJump.java|492|498|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/SuperJump.java|499|503|posX|field|net.minecraft.entity.Entity|posX
+      @|org/devoxx4kids/forge/mods/SuperJump.java|505|510|event|param|org.devoxx4kids.forge.mods.SuperJump|makeJumpHigher|(Lnet/minecraftforge/event/entity/living/LivingEvent$LivingJumpEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/SuperJump.java|511|517|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/SuperJump.java|518|522|posY|field|net.minecraft.entity.Entity|posY
+      @|org/devoxx4kids/forge/mods/SuperJump.java|533|538|event|param|org.devoxx4kids.forge.mods.SuperJump|makeJumpHigher|(Lnet/minecraftforge/event/entity/living/LivingEvent$LivingJumpEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/SuperJump.java|539|545|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/SuperJump.java|546|550|posZ|field|net.minecraft.entity.Entity|posZ
+      @|org/devoxx4kids/forge/mods/SuperJump.java|562|567|event|param|org.devoxx4kids.forge.mods.SuperJump|makeJumpHigher|(Lnet/minecraftforge/event/entity/living/LivingEvent$LivingJumpEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/SuperJump.java|568|574|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/SuperJump.java|575|583|worldObj|field|net.minecraft.entity.Entity|worldObj
+      @|org/devoxx4kids/forge/mods/SuperJump.java|584|597|getBlockState|method|net.minecraft.world.IBlockAccess|getBlockState|(Lnet/minecraft/util/BlockPos;)Lnet/minecraft/block/state/IBlockState;
+      @|org/devoxx4kids/forge/mods/SuperJump.java|603|611|getBlock|method|net.minecraft.block.state.IBlockState|getBlock|()Lnet/minecraft/block/Block;
+      @|org/devoxx4kids/forge/mods/SuperJump.java|617|623|Blocks|class|net.minecraft.init.Blocks
+      @|org/devoxx4kids/forge/mods/SuperJump.java|624|630|sponge|field|net.minecraft.init.Blocks|sponge
+      @|org/devoxx4kids/forge/mods/SuperJump.java|654|659|event|param|org.devoxx4kids.forge.mods.SuperJump|makeJumpHigher|(Lnet/minecraftforge/event/entity/living/LivingEvent$LivingJumpEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/SuperJump.java|660|666|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/SuperJump.java|667|674|motionY|field|net.minecraft.entity.Entity|motionY
+   Method End: makeJumpHigher(Lnet/minecraftforge/event/entity/living/LivingEvent$LivingJumpEvent;)V
+Class End  : org.devoxx4kids.forge.mods.SuperJump
+endProcessing org/devoxx4kids/forge/mods/SuperJump.java
+
+processing org/devoxx4kids/forge/mods/ZombieKnights.java
+@|org/devoxx4kids/forge/mods/ZombieKnights.java|8|34|org.devoxx4kids.forge.mods|package|org.devoxx4kids.forge.mods|(file)
+Class Start: org.devoxx4kids.forge.mods.ZombieKnights
+   Method Start: giveArmor(Lnet/minecraftforge/event/entity/EntityJoinWorldEvent;)V
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|345|354|giveArmor|method|org.devoxx4kids.forge.mods.ZombieKnights|giveArmor|(Lnet/minecraftforge/event/entity/EntityJoinWorldEvent;)V
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|355|375|EntityJoinWorldEvent|class|net.minecraftforge.event.entity.EntityJoinWorldEvent
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|376|381|event|param|org.devoxx4kids.forge.mods.ZombieKnights|giveArmor|(Lnet/minecraftforge/event/entity/EntityJoinWorldEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|393|398|event|param|org.devoxx4kids.forge.mods.ZombieKnights|giveArmor|(Lnet/minecraftforge/event/entity/EntityJoinWorldEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|399|405|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|417|429|EntityZombie|class|net.minecraft.entity.monster.EntityZombie
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|454|466|EntityZombie|class|net.minecraft.entity.monster.EntityZombie
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|477|489|EntityZombie|class|net.minecraft.entity.monster.EntityZombie
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|491|496|event|param|org.devoxx4kids.forge.mods.ZombieKnights|giveArmor|(Lnet/minecraftforge/event/entity/EntityJoinWorldEvent;)V|event|0
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|497|503|entity|field|net.minecraftforge.event.entity.EntityEvent|entity
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|517|538|setCurrentItemOrArmor|method|net.minecraft.entity.Entity|setCurrentItemOrArmor|(ILnet/minecraft/item/ItemStack;)V
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|546|555|ItemStack|class|net.minecraft.item.ItemStack
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|556|561|Items|class|net.minecraft.init.Items
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|562|573|diamond_axe|field|net.minecraft.init.Items|diamond_axe
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|586|607|setCurrentItemOrArmor|method|net.minecraft.entity.Entity|setCurrentItemOrArmor|(ILnet/minecraft/item/ItemStack;)V
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|615|624|ItemStack|class|net.minecraft.item.ItemStack
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|625|630|Items|class|net.minecraft.init.Items
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|631|649|diamond_chestplate|field|net.minecraft.init.Items|diamond_chestplate
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|662|683|setCurrentItemOrArmor|method|net.minecraft.entity.Entity|setCurrentItemOrArmor|(ILnet/minecraft/item/ItemStack;)V
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|691|700|ItemStack|class|net.minecraft.item.ItemStack
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|701|706|Items|class|net.minecraft.init.Items
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|707|723|diamond_leggings|field|net.minecraft.init.Items|diamond_leggings
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|736|757|setCurrentItemOrArmor|method|net.minecraft.entity.Entity|setCurrentItemOrArmor|(ILnet/minecraft/item/ItemStack;)V
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|765|774|ItemStack|class|net.minecraft.item.ItemStack
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|775|780|Items|class|net.minecraft.init.Items
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|781|795|diamond_helmet|field|net.minecraft.init.Items|diamond_helmet
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|808|829|setCurrentItemOrArmor|method|net.minecraft.entity.Entity|setCurrentItemOrArmor|(ILnet/minecraft/item/ItemStack;)V
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|837|846|ItemStack|class|net.minecraft.item.ItemStack
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|847|852|Items|class|net.minecraft.init.Items
+      @|org/devoxx4kids/forge/mods/ZombieKnights.java|853|866|diamond_boots|field|net.minecraft.init.Items|diamond_boots
+   Method End: giveArmor(Lnet/minecraftforge/event/entity/EntityJoinWorldEvent;)V
+Class End  : org.devoxx4kids.forge.mods.ZombieKnights
+endProcessing org/devoxx4kids/forge/mods/ZombieKnights.java
+

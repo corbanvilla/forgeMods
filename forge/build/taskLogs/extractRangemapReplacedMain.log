@@ -1,0 +1,21 @@
+Symbol range map extraction starting
+Processing 19 files
+processing com/example/examplemod/ExampleMod.java
+processing org/devoxx4kids/forge/mods/BiggerTNTExplosions.java
+processing org/devoxx4kids/forge/mods/BlockBreakMessage.java
+processing org/devoxx4kids/forge/mods/BlockFillerPositionSelector.java
+processing org/devoxx4kids/forge/mods/CreeperReinforcements.java
+processing org/devoxx4kids/forge/mods/DiamondOreTrap.java
+processing org/devoxx4kids/forge/mods/EnderBlock.java
+processing org/devoxx4kids/forge/mods/EnderEye.java
+processing org/devoxx4kids/forge/mods/EnderIngot.java
+processing org/devoxx4kids/forge/mods/EndermanDropEyes.java
+processing org/devoxx4kids/forge/mods/ExplodingAnvils.java
+processing org/devoxx4kids/forge/mods/ExplodingMinecarts.java
+processing org/devoxx4kids/forge/mods/GetHandheldItem.java
+processing org/devoxx4kids/forge/mods/GolemWallClimb.java
+processing org/devoxx4kids/forge/mods/Main.java
+processing org/devoxx4kids/forge/mods/Parachute.java
+processing org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java
+processing org/devoxx4kids/forge/mods/SuperJump.java
+processing org/devoxx4kids/forge/mods/ZombieKnights.java
