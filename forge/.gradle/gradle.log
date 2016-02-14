@@ -15,7 +15,7 @@ This set of MCP mappings was designed for MC 1.8.8. Use at your own peril.This s
 :compileApiJava UP-TO-DATE
 :processApiResources UP-TO-DATE
 :apiClasses UP-TO-DATE
-:sourceMainJava
+:sourceMainJava UP-TO-DATE
 :compileJavawarning: [options] bootstrap class path not set in conjunction with -source 1.6
 Note: /Users/Corban/github/forgeMods/forge/build/sources/main/java/org/devoxx4kids/forge/mods/Main.java uses or overrides a deprecated API.
 Note: Recompile with -Xlint:deprecation for details.
@@ -39,13 +39,12 @@ Note: Recompile with -Xlint:unchecked for details.
 :reobfJar
 :extractRangemapReplacedMain
 /Users/Corban/github/forgeMods/forge/build/sources/main/java
-:retromapReplacedMain
-remapping source...
-:sourceJar
+:retromapReplacedMain UP-TO-DATE
+:sourceJar UP-TO-DATE
 :assemble
 :check UP-TO-DATE
 :build
 
 BUILD SUCCESSFUL
 
-Total time: 20.849 secs
+Total time: 18.28 secs
