@@ -1,0 +1,11 @@
+package org.devoxx4kids.forge.mods;
+
+import net.minecraft.item.ItemFood;
+
+public class EnderEye extends ItemFood {
+
+	public EnderEye() {
+	super(5, 1.0F, false);
+	
+	}
+}
