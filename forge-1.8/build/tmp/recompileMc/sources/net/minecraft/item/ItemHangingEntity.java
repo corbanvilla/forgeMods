@@ -11,10 +11,9 @@ import net.minecraft.world.World;
 
 public class ItemHangingEntity extends Item
 {
-    private final Class hangingEntityClass;
-    private static final String __OBFID = "CL_00000038";
+    private final Class <? extends EntityHanging > hangingEntityClass;
 
-    public ItemHangingEntity(Class entityClass)
+    public ItemHangingEntity(Class <? extends EntityHanging > entityClass)
     {
         this.hangingEntityClass = entityClass;
         this.setCreativeTab(CreativeTabs.tabDecorations);
@@ -22,9 +21,6 @@ public class ItemHangingEntity extends Item
 
     /**
      * Called when a Block is right-clicked with this Item
-     *  
-     * @param pos The block being right-clicked
-     * @param side The side being right-clicked
      */
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
@@ -38,15 +34,15 @@ public class ItemHangingEntity extends Item
         }
         else
         {
-            BlockPos blockpos1 = pos.offset(side);
+            BlockPos blockpos = pos.offset(side);
 
-            if (!playerIn.canPlayerEdit(blockpos1, side, stack))
+            if (!playerIn.canPlayerEdit(blockpos, side, stack))
             {
                 return false;
             }
             else
             {
-                EntityHanging entityhanging = this.createEntity(worldIn, blockpos1, side);
+                EntityHanging entityhanging = this.createEntity(worldIn, blockpos, side);
 
                 if (entityhanging != null && entityhanging.onValidSurface())
                 {

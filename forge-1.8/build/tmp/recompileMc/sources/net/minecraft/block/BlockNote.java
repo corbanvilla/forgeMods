@@ -6,6 +6,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityNote;
 import net.minecraft.util.BlockPos;
@@ -15,8 +16,7 @@ import net.minecraft.world.World;
 
 public class BlockNote extends BlockContainer
 {
-    private static final List INSTRUMENTS = Lists.newArrayList(new String[] {"harp", "bd", "snare", "hat", "bassattack"});
-    private static final String __OBFID = "CL_00000278";
+    private static final List<String> INSTRUMENTS = Lists.newArrayList(new String[] {"harp", "bd", "snare", "hat", "bassattack"});
 
     public BlockNote()
     {
@@ -65,6 +65,7 @@ public class BlockNote extends BlockContainer
                 tileentitynote.changePitch();
                 if (old == tileentitynote.note) return false;
                 tileentitynote.triggerNote(worldIn, pos);
+                playerIn.triggerAchievement(StatList.field_181735_S);
             }
 
             return true;
@@ -80,6 +81,7 @@ public class BlockNote extends BlockContainer
             if (tileentity instanceof TileEntityNote)
             {
                 ((TileEntityNote)tileentity).triggerNote(worldIn, pos);
+                playerIn.triggerAchievement(StatList.field_181734_R);
             }
         }
     }
@@ -118,7 +120,7 @@ public class BlockNote extends BlockContainer
     }
 
     /**
-     * The type of render function that is called for this block
+     * The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render
      */
     public int getRenderType()
     {

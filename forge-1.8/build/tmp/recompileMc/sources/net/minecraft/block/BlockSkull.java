@@ -1,7 +1,6 @@
 package net.minecraft.block;
 
 import com.google.common.base.Predicate;
-import java.util.Iterator;
 import java.util.Random;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -29,6 +28,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.StatCollector;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -39,21 +39,15 @@ public class BlockSkull extends BlockContainer
 {
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
     public static final PropertyBool NODROP = PropertyBool.create("nodrop");
-    private static final Predicate IS_WITHER_SKELETON = new Predicate()
+    private static final Predicate<BlockWorldState> IS_WITHER_SKELETON = new Predicate<BlockWorldState>()
     {
-        private static final String __OBFID = "CL_00002065";
-        public boolean apply(BlockWorldState state)
+        public boolean apply(BlockWorldState p_apply_1_)
         {
-            return state.getBlockState().getBlock() == Blocks.skull && state.getTileEntity() instanceof TileEntitySkull && ((TileEntitySkull)state.getTileEntity()).getSkullType() == 1;
-        }
-        public boolean apply(Object p_apply_1_)
-        {
-            return this.apply((BlockWorldState)p_apply_1_);
+            return p_apply_1_.getBlockState() != null && p_apply_1_.getBlockState().getBlock() == Blocks.skull && p_apply_1_.getTileEntity() instanceof TileEntitySkull && ((TileEntitySkull)p_apply_1_.getTileEntity()).getSkullType() == 1;
         }
     };
     private BlockPattern witherBasePattern;
     private BlockPattern witherPattern;
-    private static final String __OBFID = "CL_00000307";
 
     protected BlockSkull()
     {
@@ -62,6 +56,17 @@ public class BlockSkull extends BlockContainer
         this.setBlockBounds(0.25F, 0.0F, 0.25F, 0.75F, 0.5F, 0.75F);
     }
 
+    /**
+     * Gets the localized name of this block. Used for the statistics page.
+     */
+    public String getLocalizedName()
+    {
+        return StatCollector.translateToLocal("tile.skull.skeleton.name");
+    }
+
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -74,22 +79,22 @@ public class BlockSkull extends BlockContainer
 
     public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
     {
-        switch (BlockSkull.SwitchEnumFacing.FACING_LOOKUP[((EnumFacing)worldIn.getBlockState(pos).getValue(FACING)).ordinal()])
+        switch ((EnumFacing)worldIn.getBlockState(pos).getValue(FACING))
         {
-            case 1:
+            case UP:
             default:
                 this.setBlockBounds(0.25F, 0.0F, 0.25F, 0.75F, 0.5F, 0.75F);
                 break;
-            case 2:
+            case NORTH:
                 this.setBlockBounds(0.25F, 0.25F, 0.5F, 0.75F, 0.75F, 1.0F);
                 break;
-            case 3:
+            case SOUTH:
                 this.setBlockBounds(0.25F, 0.25F, 0.0F, 0.75F, 0.75F, 0.5F);
                 break;
-            case 4:
+            case WEST:
                 this.setBlockBounds(0.5F, 0.25F, 0.25F, 1.0F, 0.75F, 0.75F);
                 break;
-            case 5:
+            case EAST:
                 this.setBlockBounds(0.0F, 0.25F, 0.25F, 0.5F, 0.75F, 0.75F);
         }
     }
@@ -100,6 +105,10 @@ public class BlockSkull extends BlockContainer
         return super.getCollisionBoundingBox(worldIn, pos, state);
     }
 
+    /**
+     * Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the
+     * IBlockstate
+     */
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
         return this.getDefaultState().withProperty(FACING, placer.getHorizontalFacing()).withProperty(NODROP, Boolean.valueOf(false));
@@ -171,8 +180,6 @@ public class BlockSkull extends BlockContainer
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -189,54 +196,49 @@ public class BlockSkull extends BlockContainer
         if (te.getSkullType() == 1 && pos.getY() >= 2 && worldIn.getDifficulty() != EnumDifficulty.PEACEFUL && !worldIn.isRemote)
         {
             BlockPattern blockpattern = this.getWitherPattern();
-            BlockPattern.PatternHelper patternhelper = blockpattern.match(worldIn, pos);
+            BlockPattern.PatternHelper blockpattern$patternhelper = blockpattern.match(worldIn, pos);
 
-            if (patternhelper != null)
+            if (blockpattern$patternhelper != null)
             {
-                int i;
-
-                for (i = 0; i < 3; ++i)
+                for (int i = 0; i < 3; ++i)
                 {
-                    BlockWorldState blockworldstate = patternhelper.translateOffset(i, 0, 0);
+                    BlockWorldState blockworldstate = blockpattern$patternhelper.translateOffset(i, 0, 0);
                     worldIn.setBlockState(blockworldstate.getPos(), blockworldstate.getBlockState().withProperty(NODROP, Boolean.valueOf(true)), 2);
                 }
 
-                for (i = 0; i < blockpattern.getPalmLength(); ++i)
+                for (int j = 0; j < blockpattern.getPalmLength(); ++j)
                 {
-                    for (int j = 0; j < blockpattern.getThumbLength(); ++j)
+                    for (int k = 0; k < blockpattern.getThumbLength(); ++k)
                     {
-                        BlockWorldState blockworldstate1 = patternhelper.translateOffset(i, j, 0);
+                        BlockWorldState blockworldstate1 = blockpattern$patternhelper.translateOffset(j, k, 0);
                         worldIn.setBlockState(blockworldstate1.getPos(), Blocks.air.getDefaultState(), 2);
                     }
                 }
 
-                BlockPos blockpos1 = patternhelper.translateOffset(1, 0, 0).getPos();
+                BlockPos blockpos = blockpattern$patternhelper.translateOffset(1, 0, 0).getPos();
                 EntityWither entitywither = new EntityWither(worldIn);
-                BlockPos blockpos2 = patternhelper.translateOffset(1, 2, 0).getPos();
-                entitywither.setLocationAndAngles((double)blockpos2.getX() + 0.5D, (double)blockpos2.getY() + 0.55D, (double)blockpos2.getZ() + 0.5D, patternhelper.getFinger().getAxis() == EnumFacing.Axis.X ? 0.0F : 90.0F, 0.0F);
-                entitywither.renderYawOffset = patternhelper.getFinger().getAxis() == EnumFacing.Axis.X ? 0.0F : 90.0F;
+                BlockPos blockpos1 = blockpattern$patternhelper.translateOffset(1, 2, 0).getPos();
+                entitywither.setLocationAndAngles((double)blockpos1.getX() + 0.5D, (double)blockpos1.getY() + 0.55D, (double)blockpos1.getZ() + 0.5D, blockpattern$patternhelper.getFinger().getAxis() == EnumFacing.Axis.X ? 0.0F : 90.0F, 0.0F);
+                entitywither.renderYawOffset = blockpattern$patternhelper.getFinger().getAxis() == EnumFacing.Axis.X ? 0.0F : 90.0F;
                 entitywither.func_82206_m();
-                Iterator iterator = worldIn.getEntitiesWithinAABB(EntityPlayer.class, entitywither.getEntityBoundingBox().expand(50.0D, 50.0D, 50.0D)).iterator();
 
-                while (iterator.hasNext())
+                for (EntityPlayer entityplayer : worldIn.getEntitiesWithinAABB(EntityPlayer.class, entitywither.getEntityBoundingBox().expand(50.0D, 50.0D, 50.0D)))
                 {
-                    EntityPlayer entityplayer = (EntityPlayer)iterator.next();
                     entityplayer.triggerAchievement(AchievementList.spawnWither);
                 }
 
                 worldIn.spawnEntityInWorld(entitywither);
-                int k;
 
-                for (k = 0; k < 120; ++k)
+                for (int l = 0; l < 120; ++l)
                 {
-                    worldIn.spawnParticle(EnumParticleTypes.SNOWBALL, (double)blockpos1.getX() + worldIn.rand.nextDouble(), (double)(blockpos1.getY() - 2) + worldIn.rand.nextDouble() * 3.9D, (double)blockpos1.getZ() + worldIn.rand.nextDouble(), 0.0D, 0.0D, 0.0D, new int[0]);
+                    worldIn.spawnParticle(EnumParticleTypes.SNOWBALL, (double)blockpos.getX() + worldIn.rand.nextDouble(), (double)(blockpos.getY() - 2) + worldIn.rand.nextDouble() * 3.9D, (double)blockpos.getZ() + worldIn.rand.nextDouble(), 0.0D, 0.0D, 0.0D, new int[0]);
                 }
 
-                for (k = 0; k < blockpattern.getPalmLength(); ++k)
+                for (int i1 = 0; i1 < blockpattern.getPalmLength(); ++i1)
                 {
-                    for (int l = 0; l < blockpattern.getThumbLength(); ++l)
+                    for (int j1 = 0; j1 < blockpattern.getThumbLength(); ++j1)
                     {
-                        BlockWorldState blockworldstate2 = patternhelper.translateOffset(k, l, 0);
+                        BlockWorldState blockworldstate2 = blockpattern$patternhelper.translateOffset(i1, j1, 0);
                         worldIn.notifyNeighborsRespectDebug(blockworldstate2.getPos(), Blocks.air);
                     }
                 }
@@ -257,8 +259,8 @@ public class BlockSkull extends BlockContainer
      */
     public int getMetaFromState(IBlockState state)
     {
-        byte b0 = 0;
-        int i = b0 | ((EnumFacing)state.getValue(FACING)).getIndex();
+        int i = 0;
+        i = i | ((EnumFacing)state.getValue(FACING)).getIndex();
 
         if (((Boolean)state.getValue(NODROP)).booleanValue())
         {
@@ -292,58 +294,4 @@ public class BlockSkull extends BlockContainer
 
         return this.witherPattern;
     }
-
-    static final class SwitchEnumFacing
-        {
-            static final int[] FACING_LOOKUP = new int[EnumFacing.values().length];
-            private static final String __OBFID = "CL_00002064";
-
-            static
-            {
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.UP.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var5)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.NORTH.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var4)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.SOUTH.ordinal()] = 3;
-                }
-                catch (NoSuchFieldError var3)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.WEST.ordinal()] = 4;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.EAST.ordinal()] = 5;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
-            }
-        }
 }

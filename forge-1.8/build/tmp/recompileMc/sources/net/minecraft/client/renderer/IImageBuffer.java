@@ -7,7 +7,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public interface IImageBuffer
 {
-    BufferedImage parseUserSkin(BufferedImage p_78432_1_);
+    BufferedImage parseUserSkin(BufferedImage image);
 
     void skinAvailable();
 }

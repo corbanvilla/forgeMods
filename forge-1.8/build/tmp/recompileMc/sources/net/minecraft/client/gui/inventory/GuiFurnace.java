@@ -16,7 +16,6 @@ public class GuiFurnace extends GuiContainer
     /** The player inventory bound to this GUI. */
     private final InventoryPlayer playerInventory;
     private IInventory tileFurnace;
-    private static final String __OBFID = "CL_00000758";
 
     public GuiFurnace(InventoryPlayer playerInv, IInventory furnaceInv)
     {
@@ -42,37 +41,36 @@ public class GuiFurnace extends GuiContainer
     {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(furnaceGuiTextures);
-        int k = (this.width - this.xSize) / 2;
-        int l = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(k, l, 0, 0, this.xSize, this.ySize);
-        int i1;
+        int i = (this.width - this.xSize) / 2;
+        int j = (this.height - this.ySize) / 2;
+        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
 
         if (TileEntityFurnace.isBurning(this.tileFurnace))
         {
-            i1 = this.func_175382_i(13);
-            this.drawTexturedModalRect(k + 56, l + 36 + 12 - i1, 176, 12 - i1, 14, i1 + 1);
+            int k = this.getBurnLeftScaled(13);
+            this.drawTexturedModalRect(i + 56, j + 36 + 12 - k, 176, 12 - k, 14, k + 1);
         }
 
-        i1 = this.func_175381_h(24);
-        this.drawTexturedModalRect(k + 79, l + 34, 176, 14, i1 + 1, 16);
+        int l = this.getCookProgressScaled(24);
+        this.drawTexturedModalRect(i + 79, j + 34, 176, 14, l + 1, 16);
     }
 
-    private int func_175381_h(int p_175381_1_)
+    private int getCookProgressScaled(int pixels)
     {
-        int j = this.tileFurnace.getField(2);
-        int k = this.tileFurnace.getField(3);
-        return k != 0 && j != 0 ? j * p_175381_1_ / k : 0;
+        int i = this.tileFurnace.getField(2);
+        int j = this.tileFurnace.getField(3);
+        return j != 0 && i != 0 ? i * pixels / j : 0;
     }
 
-    private int func_175382_i(int p_175382_1_)
+    private int getBurnLeftScaled(int pixels)
     {
-        int j = this.tileFurnace.getField(1);
+        int i = this.tileFurnace.getField(1);
 
-        if (j == 0)
+        if (i == 0)
         {
-            j = 200;
+            i = 200;
         }
 
-        return this.tileFurnace.getField(0) * p_175382_1_ / j;
+        return this.tileFurnace.getField(0) * pixels / i;
     }
 }

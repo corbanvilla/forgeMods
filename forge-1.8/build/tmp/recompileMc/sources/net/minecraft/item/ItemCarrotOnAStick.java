@@ -11,8 +11,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemCarrotOnAStick extends Item
 {
-    private static final String __OBFID = "CL_00000001";
-
     public ItemCarrotOnAStick()
     {
         this.setCreativeTab(CreativeTabs.tabTransport);
@@ -55,9 +53,9 @@ public class ItemCarrotOnAStick extends Item
 
                 if (itemStackIn.stackSize == 0)
                 {
-                    ItemStack itemstack1 = new ItemStack(Items.fishing_rod);
-                    itemstack1.setTagCompound(itemStackIn.getTagCompound());
-                    return itemstack1;
+                    ItemStack itemstack = new ItemStack(Items.fishing_rod);
+                    itemstack.setTagCompound(itemStackIn.getTagCompound());
+                    return itemstack;
                 }
             }
         }

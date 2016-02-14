@@ -1,7 +1,6 @@
 package net.minecraft.network.play.client;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
@@ -10,15 +9,16 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class C07PacketPlayerDigging implements Packet
+public class C07PacketPlayerDigging implements Packet<INetHandlerPlayServer>
 {
     private BlockPos position;
     private EnumFacing facing;
     /** Status of the digging (started, ongoing, broken). */
     private C07PacketPlayerDigging.Action status;
-    private static final String __OBFID = "CL_00001365";
 
-    public C07PacketPlayerDigging() {}
+    public C07PacketPlayerDigging()
+    {
+    }
 
     @SideOnly(Side.CLIENT)
     public C07PacketPlayerDigging(C07PacketPlayerDigging.Action statusIn, BlockPos posIn, EnumFacing facingIn)
@@ -48,12 +48,15 @@ public class C07PacketPlayerDigging implements Packet
         buf.writeByte(this.facing.getIndex());
     }
 
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
     public void processPacket(INetHandlerPlayServer handler)
     {
         handler.processPlayerDigging(this);
     }
 
-    public BlockPos func_179715_a()
+    public BlockPos getPosition()
     {
         return this.position;
     }
@@ -68,14 +71,6 @@ public class C07PacketPlayerDigging implements Packet
         return this.status;
     }
 
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayServer)handler);
-    }
-
     public static enum Action
     {
         START_DESTROY_BLOCK,
@@ -84,7 +79,5 @@ public class C07PacketPlayerDigging implements Packet
         DROP_ALL_ITEMS,
         DROP_ITEM,
         RELEASE_USE_ITEM;
-
-        private static final String __OBFID = "CL_00002284";
     }
 }

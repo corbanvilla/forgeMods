@@ -23,7 +23,6 @@ public class RConThreadClient extends RConThreadBase
     private byte[] buffer = new byte[1460];
     /** The RCon password */
     private String rconPassword;
-    private static final String __OBFID = "CL_00001804";
 
     RConThreadClient(IServer p_i1537_1_, Socket socket)
     {
@@ -34,7 +33,7 @@ public class RConThreadClient extends RConThreadBase
         {
             this.clientSocket.setSoTimeout(0);
         }
-        catch (Exception exception)
+        catch (Exception var4)
         {
             this.running = false;
         }
@@ -51,7 +50,7 @@ public class RConThreadClient extends RConThreadBase
             {
                 if (!this.running)
                 {
-                    break;
+                    return;
                 }
 
                 BufferedInputStream bufferedinputstream = new BufferedInputStream(this.clientSocket.getInputStream());
@@ -59,34 +58,35 @@ public class RConThreadClient extends RConThreadBase
 
                 if (10 <= i)
                 {
-                    byte b0 = 0;
-                    int j = RConUtils.getBytesAsLEInt(this.buffer, 0, i);
+                    int j = 0;
+                    int k = RConUtils.getBytesAsLEInt(this.buffer, 0, i);
 
-                    if (j != i - 4)
+                    if (k != i - 4)
                     {
                         return;
                     }
 
-                    int i1 = b0 + 4;
-                    int k = RConUtils.getBytesAsLEInt(this.buffer, i1, i);
-                    i1 += 4;
-                    int l = RConUtils.getRemainingBytesAsLEInt(this.buffer, i1);
-                    i1 += 4;
+                    j = j + 4;
+                    int l = RConUtils.getBytesAsLEInt(this.buffer, j, i);
+                    j = j + 4;
+                    int i1 = RConUtils.getRemainingBytesAsLEInt(this.buffer, j);
+                    j = j + 4;
 
-                    switch (l)
+                    switch (i1)
                     {
                         case 2:
+
                             if (this.loggedIn)
                             {
-                                String s1 = RConUtils.getBytesAsString(this.buffer, i1, i);
+                                String s1 = RConUtils.getBytesAsString(this.buffer, j, i);
 
                                 try
                                 {
-                                    this.sendMultipacketResponse(k, this.server.handleRConCommand(s1));
+                                    this.sendMultipacketResponse(l, this.server.handleRConCommand(s1));
                                 }
                                 catch (Exception exception)
                                 {
-                                    this.sendMultipacketResponse(k, "Error executing: " + s1 + " (" + exception.getMessage() + ")");
+                                    this.sendMultipacketResponse(l, "Error executing: " + s1 + " (" + exception.getMessage() + ")");
                                 }
 
                                 continue;
@@ -95,13 +95,13 @@ public class RConThreadClient extends RConThreadBase
                             this.sendLoginFailedResponse();
                             continue;
                         case 3:
-                            String s = RConUtils.getBytesAsString(this.buffer, i1, i);
-                            int j1 = i1 + s.length();
+                            String s = RConUtils.getBytesAsString(this.buffer, j, i);
+                            int j1 = j + s.length();
 
                             if (0 != s.length() && s.equals(this.rconPassword))
                             {
                                 this.loggedIn = true;
-                                this.sendResponse(k, 2, "");
+                                this.sendResponse(l, 2, "");
                                 continue;
                             }
 
@@ -109,23 +109,23 @@ public class RConThreadClient extends RConThreadBase
                             this.sendLoginFailedResponse();
                             continue;
                         default:
-                            this.sendMultipacketResponse(k, String.format("Unknown request %s", new Object[] {Integer.toHexString(l)}));
+                            this.sendMultipacketResponse(l, String.format("Unknown request %s", new Object[] {Integer.toHexString(i1)}));
                             continue;
                     }
                 }
             }
-            catch (SocketTimeoutException sockettimeoutexception)
+            catch (SocketTimeoutException var17)
             {
-                break;
+                return;
             }
-            catch (IOException ioexception)
+            catch (IOException var18)
             {
-                break;
+                return;
             }
             catch (Exception exception1)
             {
-                LOGGER.error("Exception whilst parsing RCON input", exception1);
-                break;
+                LOGGER.error((String)"Exception whilst parsing RCON input", (Throwable)exception1);
+                return;
             }
             finally
             {
@@ -166,16 +166,20 @@ public class RConThreadClient extends RConThreadBase
      */
     private void sendMultipacketResponse(int p_72655_1_, String p_72655_2_) throws IOException
     {
-        int j = p_72655_2_.length();
+        int i = p_72655_2_.length();
 
-        do
+        while (true)
         {
-            int k = 4096 <= j ? 4096 : j;
-            this.sendResponse(p_72655_1_, 0, p_72655_2_.substring(0, k));
-            p_72655_2_ = p_72655_2_.substring(k);
-            j = p_72655_2_.length();
+            int j = 4096 <= i ? 4096 : i;
+            this.sendResponse(p_72655_1_, 0, p_72655_2_.substring(0, j));
+            p_72655_2_ = p_72655_2_.substring(j);
+            i = p_72655_2_.length();
+
+            if (0 == i)
+            {
+                break;
+            }
         }
-        while (0 != j);
     }
 
     /**

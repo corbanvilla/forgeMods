@@ -1,7 +1,6 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -9,14 +8,15 @@ import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S25PacketBlockBreakAnim implements Packet
+public class S25PacketBlockBreakAnim implements Packet<INetHandlerPlayClient>
 {
     private int breakerId;
     private BlockPos position;
     private int progress;
-    private static final String __OBFID = "CL_00001284";
 
-    public S25PacketBlockBreakAnim() {}
+    public S25PacketBlockBreakAnim()
+    {
+    }
 
     public S25PacketBlockBreakAnim(int breakerId, BlockPos pos, int progress)
     {
@@ -45,33 +45,28 @@ public class S25PacketBlockBreakAnim implements Packet
         buf.writeByte(this.progress);
     }
 
-    public void handle(INetHandlerPlayClient handler)
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
+    public void processPacket(INetHandlerPlayClient handler)
     {
         handler.handleBlockBreakAnim(this);
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_148845_c()
+    public int getBreakerId()
     {
         return this.breakerId;
     }
 
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.handle((INetHandlerPlayClient)handler);
-    }
-
     @SideOnly(Side.CLIENT)
-    public BlockPos func_179821_b()
+    public BlockPos getPosition()
     {
         return this.position;
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_148846_g()
+    public int getProgress()
     {
         return this.progress;
     }

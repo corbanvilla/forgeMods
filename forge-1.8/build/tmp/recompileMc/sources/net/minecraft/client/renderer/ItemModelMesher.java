@@ -1,7 +1,6 @@
 package net.minecraft.client.renderer;
 
 import com.google.common.collect.Maps;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -16,11 +15,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class ItemModelMesher
 {
-    private final Map simpleShapes = Maps.newHashMap();
-    private final Map simpleShapesCache = Maps.newHashMap();
-    private final Map shapers = Maps.newHashMap();
+    private final Map<Integer, ModelResourceLocation> simpleShapes = Maps.<Integer, ModelResourceLocation>newHashMap();
+    private final Map<Integer, IBakedModel> simpleShapesCache = Maps.<Integer, IBakedModel>newHashMap();
+    private final Map<Item, ItemMeshDefinition> shapers = Maps.<Item, ItemMeshDefinition>newHashMap();
     private final ModelManager modelManager;
-    private static final String __OBFID = "CL_00002536";
 
     public ItemModelMesher(ModelManager modelManager)
     {
@@ -34,7 +32,7 @@ public class ItemModelMesher
 
     public TextureAtlasSprite getParticleIcon(Item item, int meta)
     {
-        return this.getItemModel(new ItemStack(item, 1, meta)).getTexture();
+        return this.getItemModel(new ItemStack(item, 1, meta)).getParticleTexture();
     }
 
     public IBakedModel getItemModel(ItemStack stack)
@@ -99,11 +97,9 @@ public class ItemModelMesher
     public void rebuildCache()
     {
         this.simpleShapesCache.clear();
-        Iterator iterator = this.simpleShapes.entrySet().iterator();
 
-        while (iterator.hasNext())
+        for (Entry<Integer, ModelResourceLocation> entry : this.simpleShapes.entrySet())
         {
-            Entry entry = (Entry)iterator.next();
             this.simpleShapesCache.put(entry.getKey(), this.modelManager.getModel((ModelResourceLocation)entry.getValue()));
         }
     }

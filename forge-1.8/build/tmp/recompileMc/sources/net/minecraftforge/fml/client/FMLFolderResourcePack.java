@@ -27,9 +27,9 @@ public class FMLFolderResourcePack extends FolderResourcePack implements FMLCont
     }
 
     @Override
-    protected boolean hasResourceName(String p_110593_1_)
+    protected boolean hasResourceName(String name)
     {
-        return super.hasResourceName(p_110593_1_);
+        return super.hasResourceName(name);
     }
     @Override
     public String getPackName()

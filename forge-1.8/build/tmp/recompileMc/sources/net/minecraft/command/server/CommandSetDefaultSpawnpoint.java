@@ -11,12 +11,10 @@ import net.minecraft.util.BlockPos;
 
 public class CommandSetDefaultSpawnpoint extends CommandBase
 {
-    private static final String __OBFID = "CL_00000973";
-
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
-    public String getName()
+    public String getCommandName()
     {
         return "setworldspawn";
     }
@@ -29,15 +27,23 @@ public class CommandSetDefaultSpawnpoint extends CommandBase
         return 2;
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.setworldspawn.usage";
     }
 
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
-    public void execute(ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         BlockPos blockpos;
 
@@ -52,7 +58,7 @@ public class CommandSetDefaultSpawnpoint extends CommandBase
                 throw new WrongUsageException("commands.setworldspawn.usage", new Object[0]);
             }
 
-            blockpos = func_175757_a(sender, args, 0, true);
+            blockpos = parseBlockPos(sender, args, 0, true);
         }
 
         sender.getEntityWorld().setSpawnPoint(blockpos);
@@ -60,7 +66,7 @@ public class CommandSetDefaultSpawnpoint extends CommandBase
         notifyOperators(sender, this, "commands.setworldspawn.success", new Object[] {Integer.valueOf(blockpos.getX()), Integer.valueOf(blockpos.getY()), Integer.valueOf(blockpos.getZ())});
     }
 
-    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
         return args.length > 0 && args.length <= 3 ? func_175771_a(args, 0, pos) : null;
     }

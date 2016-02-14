@@ -2,30 +2,27 @@ package net.minecraft.entity.ai.attributes;
 
 import com.google.common.collect.Sets;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import net.minecraft.server.management.LowerStringMap;
 
 public class ServersideAttributeMap extends BaseAttributeMap
 {
-    private final Set attributeInstanceSet = Sets.newHashSet();
-    protected final Map descriptionToAttributeInstanceMap = new LowerStringMap();
-    private static final String __OBFID = "CL_00001569";
+    private final Set<IAttributeInstance> attributeInstanceSet = Sets.<IAttributeInstance>newHashSet();
+    protected final Map<String, IAttributeInstance> descriptionToAttributeInstanceMap = new LowerStringMap();
 
-    public ModifiableAttributeInstance func_180795_e(IAttribute p_180795_1_)
+    public ModifiableAttributeInstance getAttributeInstance(IAttribute attribute)
     {
-        return (ModifiableAttributeInstance)super.getAttributeInstance(p_180795_1_);
+        return (ModifiableAttributeInstance)super.getAttributeInstance(attribute);
     }
 
-    public ModifiableAttributeInstance func_180796_b(String p_180796_1_)
+    public ModifiableAttributeInstance getAttributeInstanceByName(String attributeName)
     {
-        IAttributeInstance iattributeinstance = super.getAttributeInstanceByName(p_180796_1_);
+        IAttributeInstance iattributeinstance = super.getAttributeInstanceByName(attributeName);
 
         if (iattributeinstance == null)
         {
-            iattributeinstance = (IAttributeInstance)this.descriptionToAttributeInstanceMap.get(p_180796_1_);
+            iattributeinstance = (IAttributeInstance)this.descriptionToAttributeInstanceMap.get(attributeName);
         }
 
         return (ModifiableAttributeInstance)iattributeinstance;
@@ -34,13 +31,13 @@ public class ServersideAttributeMap extends BaseAttributeMap
     /**
      * Registers an attribute with this AttributeMap, returns a modifiable AttributeInstance associated with this map
      */
-    public IAttributeInstance registerAttribute(IAttribute p_111150_1_)
+    public IAttributeInstance registerAttribute(IAttribute attribute)
     {
-        IAttributeInstance iattributeinstance = super.registerAttribute(p_111150_1_);
+        IAttributeInstance iattributeinstance = super.registerAttribute(attribute);
 
-        if (p_111150_1_ instanceof RangedAttribute && ((RangedAttribute)p_111150_1_).getDescription() != null)
+        if (attribute instanceof RangedAttribute && ((RangedAttribute)attribute).getDescription() != null)
         {
-            this.descriptionToAttributeInstanceMap.put(((RangedAttribute)p_111150_1_).getDescription(), iattributeinstance);
+            this.descriptionToAttributeInstanceMap.put(((RangedAttribute)attribute).getDescription(), iattributeinstance);
         }
 
         return iattributeinstance;
@@ -58,12 +55,9 @@ public class ServersideAttributeMap extends BaseAttributeMap
             this.attributeInstanceSet.add(p_180794_1_);
         }
 
-        Iterator iterator = this.field_180377_c.get(p_180794_1_.getAttribute()).iterator();
-
-        while (iterator.hasNext())
+        for (IAttribute iattribute : this.field_180377_c.get(p_180794_1_.getAttribute()))
         {
-            IAttribute iattribute = (IAttribute)iterator.next();
-            ModifiableAttributeInstance modifiableattributeinstance = this.func_180795_e(iattribute);
+            ModifiableAttributeInstance modifiableattributeinstance = this.getAttributeInstance(iattribute);
 
             if (modifiableattributeinstance != null)
             {
@@ -72,36 +66,23 @@ public class ServersideAttributeMap extends BaseAttributeMap
         }
     }
 
-    public Set getAttributeInstanceSet()
+    public Set<IAttributeInstance> getAttributeInstanceSet()
     {
         return this.attributeInstanceSet;
     }
 
-    public Collection getWatchedAttributes()
+    public Collection<IAttributeInstance> getWatchedAttributes()
     {
-        HashSet hashset = Sets.newHashSet();
-        Iterator iterator = this.getAllAttributes().iterator();
+        Set<IAttributeInstance> set = Sets.<IAttributeInstance>newHashSet();
 
-        while (iterator.hasNext())
+        for (IAttributeInstance iattributeinstance : this.getAllAttributes())
         {
-            IAttributeInstance iattributeinstance = (IAttributeInstance)iterator.next();
-
             if (iattributeinstance.getAttribute().getShouldWatch())
             {
-                hashset.add(iattributeinstance);
+                set.add(iattributeinstance);
             }
         }
 
-        return hashset;
-    }
-
-    public IAttributeInstance getAttributeInstanceByName(String p_111152_1_)
-    {
-        return this.func_180796_b(p_111152_1_);
-    }
-
-    public IAttributeInstance getAttributeInstance(IAttribute p_111151_1_)
-    {
-        return this.func_180795_e(p_111151_1_);
+        return set;
     }
 }

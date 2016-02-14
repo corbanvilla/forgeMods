@@ -18,7 +18,6 @@ public class EntityLightningBolt extends EntityWeatherEffect
     public long boltVertex;
     /** Determines the time before the EntityLightningBolt is destroyed. It is a random integer decremented over time. */
     private int boltLivingTime;
-    private static final String __OBFID = "CL_00001666";
 
     public EntityLightningBolt(World worldIn, double posX, double posY, double posZ)
     {
@@ -27,11 +26,10 @@ public class EntityLightningBolt extends EntityWeatherEffect
         this.lightningState = 2;
         this.boltVertex = this.rand.nextLong();
         this.boltLivingTime = this.rand.nextInt(3) + 1;
+        BlockPos blockpos = new BlockPos(this);
 
-        if (!worldIn.isRemote && worldIn.getGameRules().getGameRuleBooleanValue("doFireTick") && (worldIn.getDifficulty() == EnumDifficulty.NORMAL || worldIn.getDifficulty() == EnumDifficulty.HARD) && worldIn.isAreaLoaded(new BlockPos(this), 10))
+        if (!worldIn.isRemote && worldIn.getGameRules().getBoolean("doFireTick") && (worldIn.getDifficulty() == EnumDifficulty.NORMAL || worldIn.getDifficulty() == EnumDifficulty.HARD) && worldIn.isAreaLoaded(blockpos, 10))
         {
-            BlockPos blockpos = new BlockPos(this);
-
             if (worldIn.getBlockState(blockpos).getBlock().getMaterial() == Material.air && Blocks.fire.canPlaceBlockAt(worldIn, blockpos))
             {
                 worldIn.setBlockState(blockpos, Blocks.fire.getDefaultState());
@@ -77,7 +75,7 @@ public class EntityLightningBolt extends EntityWeatherEffect
                 this.boltVertex = this.rand.nextLong();
                 BlockPos blockpos = new BlockPos(this);
 
-                if (!this.worldObj.isRemote && this.worldObj.getGameRules().getGameRuleBooleanValue("doFireTick") && this.worldObj.isAreaLoaded(blockpos, 10) && this.worldObj.getBlockState(blockpos).getBlock().getMaterial() == Material.air && Blocks.fire.canPlaceBlockAt(this.worldObj, blockpos))
+                if (!this.worldObj.isRemote && this.worldObj.getGameRules().getBoolean("doFireTick") && this.worldObj.isAreaLoaded(blockpos, 10) && this.worldObj.getBlockState(blockpos).getBlock().getMaterial() == Material.air && Blocks.fire.canPlaceBlockAt(this.worldObj, blockpos))
                 {
                     this.worldObj.setBlockState(blockpos, Blocks.fire.getDefaultState());
                 }
@@ -93,7 +91,7 @@ public class EntityLightningBolt extends EntityWeatherEffect
             else
             {
                 double d0 = 3.0D;
-                List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, new AxisAlignedBB(this.posX - d0, this.posY - d0, this.posZ - d0, this.posX + d0, this.posY + 6.0D + d0, this.posZ + d0));
+                List<Entity> list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, new AxisAlignedBB(this.posX - d0, this.posY - d0, this.posZ - d0, this.posX + d0, this.posY + 6.0D + d0, this.posZ + d0));
 
                 for (int i = 0; i < list.size(); ++i)
                 {
@@ -105,15 +103,21 @@ public class EntityLightningBolt extends EntityWeatherEffect
         }
     }
 
-    protected void entityInit() {}
+    protected void entityInit()
+    {
+    }
 
     /**
      * (abstract) Protected helper method to read subclass entity data from NBT.
      */
-    protected void readEntityFromNBT(NBTTagCompound tagCompund) {}
+    protected void readEntityFromNBT(NBTTagCompound tagCompund)
+    {
+    }
 
     /**
      * (abstract) Protected helper method to write subclass entity data to NBT.
      */
-    protected void writeEntityToNBT(NBTTagCompound tagCompound) {}
+    protected void writeEntityToNBT(NBTTagCompound tagCompound)
+    {
+    }
 }

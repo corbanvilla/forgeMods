@@ -1,32 +1,35 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S32PacketConfirmTransaction implements Packet
+public class S32PacketConfirmTransaction implements Packet<INetHandlerPlayClient>
 {
-    private int field_148894_a;
-    private short field_148892_b;
+    private int windowId;
+    private short actionNumber;
     private boolean field_148893_c;
-    private static final String __OBFID = "CL_00001291";
 
-    public S32PacketConfirmTransaction() {}
-
-    public S32PacketConfirmTransaction(int p_i45182_1_, short p_i45182_2_, boolean p_i45182_3_)
+    public S32PacketConfirmTransaction()
     {
-        this.field_148894_a = p_i45182_1_;
-        this.field_148892_b = p_i45182_2_;
+    }
+
+    public S32PacketConfirmTransaction(int windowIdIn, short actionNumberIn, boolean p_i45182_3_)
+    {
+        this.windowId = windowIdIn;
+        this.actionNumber = actionNumberIn;
         this.field_148893_c = p_i45182_3_;
     }
 
-    public void func_180730_a(INetHandlerPlayClient p_180730_1_)
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
+    public void processPacket(INetHandlerPlayClient handler)
     {
-        p_180730_1_.handleConfirmTransaction(this);
+        handler.handleConfirmTransaction(this);
     }
 
     /**
@@ -34,8 +37,8 @@ public class S32PacketConfirmTransaction implements Packet
      */
     public void readPacketData(PacketBuffer buf) throws IOException
     {
-        this.field_148894_a = buf.readUnsignedByte();
-        this.field_148892_b = buf.readShort();
+        this.windowId = buf.readUnsignedByte();
+        this.actionNumber = buf.readShort();
         this.field_148893_c = buf.readBoolean();
     }
 
@@ -44,29 +47,21 @@ public class S32PacketConfirmTransaction implements Packet
      */
     public void writePacketData(PacketBuffer buf) throws IOException
     {
-        buf.writeByte(this.field_148894_a);
-        buf.writeShort(this.field_148892_b);
+        buf.writeByte(this.windowId);
+        buf.writeShort(this.actionNumber);
         buf.writeBoolean(this.field_148893_c);
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_148889_c()
+    public int getWindowId()
     {
-        return this.field_148894_a;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.func_180730_a((INetHandlerPlayClient)handler);
+        return this.windowId;
     }
 
     @SideOnly(Side.CLIENT)
-    public short func_148890_d()
+    public short getActionNumber()
     {
-        return this.field_148892_b;
+        return this.actionNumber;
     }
 
     @SideOnly(Side.CLIENT)

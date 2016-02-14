@@ -1,5 +1,6 @@
 package net.minecraft.client.shader;
 
+import java.io.IOException;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.util.JsonException;
 import net.minecraftforge.fml.relauncher.Side;
@@ -12,7 +13,6 @@ public class ShaderLinkHelper
 {
     private static final Logger logger = LogManager.getLogger();
     private static ShaderLinkHelper staticShaderLinkHelper;
-    private static final String __OBFID = "CL_00001045";
 
     public static void setNewStaticShaderLinkHelper()
     {
@@ -45,7 +45,7 @@ public class ShaderLinkHelper
         }
     }
 
-    public void linkProgram(ShaderManager manager)
+    public void linkProgram(ShaderManager manager) throws IOException
     {
         manager.getFragmentShaderLoader().attachShader(manager);
         manager.getVertexShaderLoader().attachShader(manager);

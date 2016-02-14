@@ -25,7 +25,8 @@ public class GuiWrongMinecraft extends GuiErrorScreen
         this.wrongMC = wrongMC;
     }
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
     @Override
     public void initGui()
@@ -48,6 +49,6 @@ public class GuiWrongMinecraft extends GuiErrorScreen
         offset+=10;
         this.drawCenteredString(this.fontRendererObj, String.format("%s (%s) wants Minecraft %s", wrongMC.mod.getName(), wrongMC.mod.getModId(), wrongMC.mod.acceptableMinecraftVersionRange()), this.width / 2, offset, 0xEEEEEE);
         offset+=20;
-        this.drawCenteredString(this.fontRendererObj, "The file 'ForgeModLoader-client-0.log' contains more information", this.width / 2, offset, 0xFFFFFF);
+        this.drawCenteredString(this.fontRendererObj, "The file 'fml-client-latest.log' contains more information", this.width / 2, offset, 0xFFFFFF);
     }
 }

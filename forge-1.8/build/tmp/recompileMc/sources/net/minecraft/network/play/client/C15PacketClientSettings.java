@@ -2,32 +2,32 @@ package net.minecraft.network.play.client;
 
 import java.io.IOException;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class C15PacketClientSettings implements Packet
+public class C15PacketClientSettings implements Packet<INetHandlerPlayServer>
 {
     private String lang;
     private int view;
     private EntityPlayer.EnumChatVisibility chatVisibility;
     private boolean enableColors;
     private int modelPartFlags;
-    private static final String __OBFID = "CL_00001350";
 
-    public C15PacketClientSettings() {}
+    public C15PacketClientSettings()
+    {
+    }
 
     @SideOnly(Side.CLIENT)
-    public C15PacketClientSettings(String p_i45946_1_, int p_i45946_2_, EntityPlayer.EnumChatVisibility p_i45946_3_, boolean p_i45946_4_, int p_i45946_5_)
+    public C15PacketClientSettings(String langIn, int viewIn, EntityPlayer.EnumChatVisibility chatVisibilityIn, boolean enableColorsIn, int modelPartFlagsIn)
     {
-        this.lang = p_i45946_1_;
-        this.view = p_i45946_2_;
-        this.chatVisibility = p_i45946_3_;
-        this.enableColors = p_i45946_4_;
-        this.modelPartFlags = p_i45946_5_;
+        this.lang = langIn;
+        this.view = viewIn;
+        this.chatVisibility = chatVisibilityIn;
+        this.enableColors = enableColorsIn;
+        this.modelPartFlags = modelPartFlagsIn;
     }
 
     /**
@@ -80,13 +80,5 @@ public class C15PacketClientSettings implements Packet
     public int getModelPartFlags()
     {
         return this.modelPartFlags;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayServer)handler);
     }
 }

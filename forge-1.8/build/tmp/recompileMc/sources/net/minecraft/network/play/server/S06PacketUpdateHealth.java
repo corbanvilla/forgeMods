@@ -1,21 +1,21 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S06PacketUpdateHealth implements Packet
+public class S06PacketUpdateHealth implements Packet<INetHandlerPlayClient>
 {
     private float health;
     private int foodLevel;
     private float saturationLevel;
-    private static final String __OBFID = "CL_00001332";
 
-    public S06PacketUpdateHealth() {}
+    public S06PacketUpdateHealth()
+    {
+    }
 
     public S06PacketUpdateHealth(float healthIn, int foodLevelIn, float saturationIn)
     {
@@ -44,23 +44,18 @@ public class S06PacketUpdateHealth implements Packet
         buf.writeFloat(this.saturationLevel);
     }
 
-    public void func_180750_a(INetHandlerPlayClient p_180750_1_)
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
+    public void processPacket(INetHandlerPlayClient handler)
     {
-        p_180750_1_.handleUpdateHealth(this);
+        handler.handleUpdateHealth(this);
     }
 
     @SideOnly(Side.CLIENT)
     public float getHealth()
     {
         return this.health;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.func_180750_a((INetHandlerPlayClient)handler);
     }
 
     @SideOnly(Side.CLIENT)

@@ -19,18 +19,17 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class DefaultResourcePack implements IResourcePack
 {
-    public static final Set defaultResourceDomains = ImmutableSet.of("minecraft", "realms");
-    private final Map mapAssets;
-    private static final String __OBFID = "CL_00001073";
+    public static final Set<String> defaultResourceDomains = ImmutableSet.<String>of("minecraft", "realms");
+    private final Map<String, File> mapAssets;
 
-    public DefaultResourcePack(Map p_i46346_1_)
+    public DefaultResourcePack(Map<String, File> mapAssetsIn)
     {
-        this.mapAssets = p_i46346_1_;
+        this.mapAssets = mapAssetsIn;
     }
 
-    public InputStream getInputStream(ResourceLocation p_110590_1_) throws IOException
+    public InputStream getInputStream(ResourceLocation location) throws IOException
     {
-        InputStream inputstream = this.getResourceStream(p_110590_1_);
+        InputStream inputstream = this.getResourceStream(location);
 
         if (inputstream != null)
         {
@@ -38,7 +37,7 @@ public class DefaultResourcePack implements IResourcePack
         }
         else
         {
-            InputStream inputstream1 = this.getInputStreamAssets(p_110590_1_);
+            InputStream inputstream1 = this.getInputStreamAssets(location);
 
             if (inputstream1 != null)
             {
@@ -46,46 +45,46 @@ public class DefaultResourcePack implements IResourcePack
             }
             else
             {
-                throw new FileNotFoundException(p_110590_1_.getResourcePath());
+                throw new FileNotFoundException(location.getResourcePath());
             }
         }
     }
 
-    public InputStream getInputStreamAssets(ResourceLocation p_152780_1_) throws IOException
+    public InputStream getInputStreamAssets(ResourceLocation location) throws IOException, FileNotFoundException
     {
-        File file1 = (File)this.mapAssets.get(p_152780_1_.toString());
+        File file1 = (File)this.mapAssets.get(location.toString());
         return file1 != null && file1.isFile() ? new FileInputStream(file1) : null;
     }
 
-    private InputStream getResourceStream(ResourceLocation p_110605_1_)
+    private InputStream getResourceStream(ResourceLocation location)
     {
-        return DefaultResourcePack.class.getResourceAsStream("/assets/" + p_110605_1_.getResourceDomain() + "/" + p_110605_1_.getResourcePath());
+        return DefaultResourcePack.class.getResourceAsStream("/assets/" + location.getResourceDomain() + "/" + location.getResourcePath());
     }
 
-    public boolean resourceExists(ResourceLocation p_110589_1_)
+    public boolean resourceExists(ResourceLocation location)
     {
-        return this.getResourceStream(p_110589_1_) != null || this.mapAssets.containsKey(p_110589_1_.toString());
+        return this.getResourceStream(location) != null || this.mapAssets.containsKey(location.toString());
     }
 
-    public Set getResourceDomains()
+    public Set<String> getResourceDomains()
     {
         return defaultResourceDomains;
     }
 
-    public IMetadataSection getPackMetadata(IMetadataSerializer p_135058_1_, String p_135058_2_) throws IOException
+    public <T extends IMetadataSection> T getPackMetadata(IMetadataSerializer p_135058_1_, String p_135058_2_) throws IOException
     {
         try
         {
-            FileInputStream fileinputstream = new FileInputStream((File)this.mapAssets.get("pack.mcmeta"));
-            return AbstractResourcePack.readMetadata(p_135058_1_, fileinputstream, p_135058_2_);
+            InputStream inputstream = new FileInputStream((File)this.mapAssets.get("pack.mcmeta"));
+            return AbstractResourcePack.readMetadata(p_135058_1_, inputstream, p_135058_2_);
         }
-        catch (RuntimeException runtimeexception)
+        catch (RuntimeException var4)
         {
-            return null;
+            return (T)null;
         }
-        catch (FileNotFoundException filenotfoundexception)
+        catch (FileNotFoundException var5)
         {
-            return null;
+            return (T)null;
         }
     }
 

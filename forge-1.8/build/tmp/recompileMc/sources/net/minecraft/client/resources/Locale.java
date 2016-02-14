@@ -6,7 +6,6 @@ import com.google.common.collect.Maps;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.IllegalFormatException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -22,33 +21,27 @@ public class Locale
     /** Splits on "=" */
     private static final Splitter splitter = Splitter.on('=').limit(2);
     private static final Pattern pattern = Pattern.compile("%(\\d+\\$)?[\\d\\.]*[df]");
-    Map properties = Maps.newHashMap();
+    Map<String, String> properties = Maps.<String, String>newHashMap();
     private boolean unicode;
-    private static final String __OBFID = "CL_00001097";
 
     /**
      * par2 is a list of languages. For each language $L and domain $D, attempts to load the resource $D:lang/$L.lang
      */
-    public synchronized void loadLocaleDataFiles(IResourceManager p_135022_1_, List p_135022_2_)
+    public synchronized void loadLocaleDataFiles(IResourceManager resourceManager, List<String> p_135022_2_)
     {
         this.properties.clear();
-        Iterator iterator = p_135022_2_.iterator();
 
-        while (iterator.hasNext())
+        for (String s : p_135022_2_)
         {
-            String s = (String)iterator.next();
             String s1 = String.format("lang/%s.lang", new Object[] {s});
-            Iterator iterator1 = p_135022_1_.getResourceDomains().iterator();
 
-            while (iterator1.hasNext())
+            for (String s2 : resourceManager.getResourceDomains())
             {
-                String s2 = (String)iterator1.next();
-
                 try
                 {
-                    this.loadLocaleData(p_135022_1_.getAllResources(new ResourceLocation(s2, s1)));
+                    this.loadLocaleData(resourceManager.getAllResources(new ResourceLocation(s2, s1)));
                 }
-                catch (IOException ioexception)
+                catch (IOException var9)
                 {
                     ;
                 }
@@ -68,11 +61,9 @@ public class Locale
         this.unicode = false;
         int i = 0;
         int j = 0;
-        Iterator iterator = this.properties.values().iterator();
 
-        while (iterator.hasNext())
+        for (String s : this.properties.values())
         {
-            String s = (String)iterator.next();
             int k = s.length();
             j += k;
 
@@ -92,13 +83,10 @@ public class Locale
     /**
      * par1 is a list of Resources
      */
-    private void loadLocaleData(List p_135028_1_) throws IOException
+    private void loadLocaleData(List<IResource> p_135028_1_) throws IOException
     {
-        Iterator iterator = p_135028_1_.iterator();
-
-        while (iterator.hasNext())
+        for (IResource iresource : p_135028_1_)
         {
-            IResource iresource = (IResource)iterator.next();
             InputStream inputstream = iresource.getInputStream();
 
             try
@@ -116,12 +104,8 @@ public class Locale
     {
         p_135021_1_ = net.minecraftforge.fml.common.FMLCommonHandler.instance().loadLanguage(properties, p_135021_1_);
         if (p_135021_1_ == null) return;
-        Iterator iterator = IOUtils.readLines(p_135021_1_, Charsets.UTF_8).iterator();
-
-        while (iterator.hasNext())
+        for (String s : IOUtils.readLines(p_135021_1_, Charsets.UTF_8))
         {
-            String s = (String)iterator.next();
-
             if (!s.isEmpty() && s.charAt(0) != 35)
             {
                 String[] astring = (String[])Iterables.toArray(splitter.split(s), String.class);
@@ -141,24 +125,24 @@ public class Locale
      */
     private String translateKeyPrivate(String p_135026_1_)
     {
-        String s1 = (String)this.properties.get(p_135026_1_);
-        return s1 == null ? p_135026_1_ : s1;
+        String s = (String)this.properties.get(p_135026_1_);
+        return s == null ? p_135026_1_ : s;
     }
 
     /**
      * Calls String.format(translateKey(key), params)
      */
-    public String formatMessage(String p_135023_1_, Object[] p_135023_2_)
+    public String formatMessage(String translateKey, Object[] parameters)
     {
-        String s1 = this.translateKeyPrivate(p_135023_1_);
+        String s = this.translateKeyPrivate(translateKey);
 
         try
         {
-            return String.format(s1, p_135023_2_);
+            return String.format(s, parameters);
         }
-        catch (IllegalFormatException illegalformatexception)
+        catch (IllegalFormatException var5)
         {
-            return "Format error: " + s1;
+            return "Format error: " + s;
         }
     }
 }

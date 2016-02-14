@@ -12,12 +12,11 @@ public class EntityAILeapAtTarget extends EntityAIBase
     EntityLivingBase leapTarget;
     /** The entity's motionY after leaping. */
     float leapMotionY;
-    private static final String __OBFID = "CL_00001591";
 
-    public EntityAILeapAtTarget(EntityLiving leapingEntity, float p_i1630_2_)
+    public EntityAILeapAtTarget(EntityLiving leapingEntity, float leapMotionYIn)
     {
         this.leaper = leapingEntity;
-        this.leapMotionY = p_i1630_2_;
+        this.leapMotionY = leapMotionYIn;
         this.setMutexBits(5);
     }
 

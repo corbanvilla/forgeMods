@@ -8,9 +8,10 @@ public class NBTTagByte extends NBTBase.NBTPrimitive
 {
     /** The byte value for the tag. */
     private byte data;
-    private static final String __OBFID = "CL_00001214";
 
-    NBTTagByte() {}
+    NBTTagByte()
+    {
+    }
 
     public NBTTagByte(byte data)
     {
@@ -27,7 +28,7 @@ public class NBTTagByte extends NBTBase.NBTPrimitive
 
     void read(DataInput input, int depth, NBTSizeTracker sizeTracker) throws IOException
     {
-        sizeTracker.read(8L);
+        sizeTracker.read(72L);
         this.data = input.readByte();
     }
 

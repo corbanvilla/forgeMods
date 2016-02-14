@@ -8,7 +8,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class RealmsScrolledSelectionList
 {
     private final GuiSlotRealmsProxy proxy;
-    private static final String __OBFID = "CL_00001863";
 
     public RealmsScrolledSelectionList(int p_i1119_1_, int p_i1119_2_, int p_i1119_3_, int p_i1119_4_, int p_i1119_5_)
     {
@@ -22,20 +21,22 @@ public class RealmsScrolledSelectionList
 
     public int width()
     {
-        return this.proxy.func_154338_k();
+        return this.proxy.getWidth();
     }
 
     public int ym()
     {
-        return this.proxy.func_154339_l();
+        return this.proxy.getMouseY();
     }
 
     public int xm()
     {
-        return this.proxy.func_154337_m();
+        return this.proxy.getMouseX();
     }
 
-    protected void renderItem(int p_renderItem_1_, int p_renderItem_2_, int p_renderItem_3_, int p_renderItem_4_, Tezzelator p_renderItem_5_, int p_renderItem_6_, int p_renderItem_7_) {}
+    protected void renderItem(int p_renderItem_1_, int p_renderItem_2_, int p_renderItem_3_, int p_renderItem_4_, Tezzelator p_renderItem_5_, int p_renderItem_6_, int p_renderItem_7_)
+    {
+    }
 
     public void renderItem(int p_renderItem_1_, int p_renderItem_2_, int p_renderItem_3_, int p_renderItem_4_, int p_renderItem_5_, int p_renderItem_6_)
     {
@@ -47,14 +48,18 @@ public class RealmsScrolledSelectionList
         return 0;
     }
 
-    public void selectItem(int p_selectItem_1_, boolean p_selectItem_2_, int p_selectItem_3_, int p_selectItem_4_) {}
+    public void selectItem(int p_selectItem_1_, boolean p_selectItem_2_, int p_selectItem_3_, int p_selectItem_4_)
+    {
+    }
 
     public boolean isSelectedItem(int p_isSelectedItem_1_)
     {
         return false;
     }
 
-    public void renderBackground() {}
+    public void renderBackground()
+    {
+    }
 
     public int getMaxPosition()
     {
@@ -63,7 +68,7 @@ public class RealmsScrolledSelectionList
 
     public int getScrollbarPosition()
     {
-        return this.proxy.func_154338_k() / 2 + 124;
+        return this.proxy.getWidth() / 2 + 124;
     }
 
     public void mouseEvent()
@@ -81,5 +86,7 @@ public class RealmsScrolledSelectionList
         return this.proxy.getAmountScrolled();
     }
 
-    protected void renderList(int p_renderList_1_, int p_renderList_2_, int p_renderList_3_, int p_renderList_4_) {}
+    protected void renderList(int p_renderList_1_, int p_renderList_2_, int p_renderList_3_, int p_renderList_4_)
+    {
+    }
 }

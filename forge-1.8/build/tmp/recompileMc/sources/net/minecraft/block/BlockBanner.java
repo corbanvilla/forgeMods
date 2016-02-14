@@ -17,6 +17,7 @@ import net.minecraft.tileentity.TileEntityBanner;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.StatCollector;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -26,7 +27,6 @@ public class BlockBanner extends BlockContainer
 {
     public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
     public static final PropertyInteger ROTATION = PropertyInteger.create("rotation", 0, 15);
-    private static final String __OBFID = "CL_00002143";
 
     protected BlockBanner()
     {
@@ -34,6 +34,14 @@ public class BlockBanner extends BlockContainer
         float f = 0.25F;
         float f1 = 1.0F;
         this.setBlockBounds(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, f1, 0.5F + f);
+    }
+
+    /**
+     * Gets the localized name of this block. Used for the statistics page.
+     */
+    public String getLocalizedName()
+    {
+        return StatCollector.translateToLocal("item.banner.white.name");
     }
 
     public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state)
@@ -58,9 +66,17 @@ public class BlockBanner extends BlockContainer
         return true;
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
+    }
+
+    public boolean func_181623_g()
+    {
+        return true;
     }
 
     /**
@@ -73,8 +89,6 @@ public class BlockBanner extends BlockContainer
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -83,49 +97,11 @@ public class BlockBanner extends BlockContainer
 
     /**
      * Spawns this Block's drops into the World as EntityItems.
-     *  
-     * @param chance The chance that each Item is actually spawned (1.0 = always, 0.0 = never)
-     * @param fortune The player's fortune level
      */
     public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune)
     {
-        TileEntity tileentity = worldIn.getTileEntity(pos);
-
-        if (tileentity instanceof TileEntityBanner)
-        {
-            ItemStack itemstack = new ItemStack(Items.banner, 1, ((TileEntityBanner)tileentity).getBaseColor());
-            NBTTagCompound nbttagcompound = new NBTTagCompound();
-            tileentity.writeToNBT(nbttagcompound);
-            nbttagcompound.removeTag("x");
-            nbttagcompound.removeTag("y");
-            nbttagcompound.removeTag("z");
-            nbttagcompound.removeTag("id");
-            itemstack.setTagInfo("BlockEntityTag", nbttagcompound);
-            spawnAsEntity(worldIn, pos, itemstack);
-        }
-        else
         {
             super.dropBlockAsItemWithChance(worldIn, pos, state, chance, fortune);
-        }
-    }
-
-    public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, TileEntity te)
-    {
-        if (te instanceof TileEntityBanner)
-        {
-            ItemStack itemstack = new ItemStack(Items.banner, 1, ((TileEntityBanner)te).getBaseColor());
-            NBTTagCompound nbttagcompound = new NBTTagCompound();
-            te.writeToNBT(nbttagcompound);
-            nbttagcompound.removeTag("x");
-            nbttagcompound.removeTag("y");
-            nbttagcompound.removeTag("z");
-            nbttagcompound.removeTag("id");
-            itemstack.setTagInfo("BlockEntityTag", nbttagcompound);
-            spawnAsEntity(worldIn, pos, itemstack);
-        }
-        else
-        {
-            super.harvestBlock(worldIn, player, pos, state, (TileEntity)null);
         }
     }
 
@@ -135,10 +111,52 @@ public class BlockBanner extends BlockContainer
         return Items.banner;
     }
 
+    public boolean canPlaceBlockAt(World worldIn, BlockPos pos)
+    {
+        return !this.func_181087_e(worldIn, pos) && super.canPlaceBlockAt(worldIn, pos);
+    }
+
+    public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, TileEntity te)
+    {
+        if (te instanceof TileEntityBanner)
+        {
+            TileEntityBanner tileentitybanner = (TileEntityBanner)te;
+            ItemStack itemstack = new ItemStack(Items.banner, 1, ((TileEntityBanner)te).getBaseColor());
+            NBTTagCompound nbttagcompound = new NBTTagCompound();
+            TileEntityBanner.func_181020_a(nbttagcompound, tileentitybanner.getBaseColor(), tileentitybanner.func_181021_d());
+            itemstack.setTagInfo("BlockEntityTag", nbttagcompound);
+            spawnAsEntity(worldIn, pos, itemstack);
+        }
+        else
+        {
+            super.harvestBlock(worldIn, player, pos, state, (TileEntity)null);
+        }
+    }
+
+    @Override
+    public java.util.List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune)
+    {
+        TileEntity te = world.getTileEntity(pos);
+
+        java.util.List<ItemStack> ret = new java.util.ArrayList<ItemStack>();
+        if (te instanceof TileEntityBanner)
+        {
+            TileEntityBanner banner = (TileEntityBanner)te;
+            ItemStack item = new ItemStack(Items.banner, 1, banner.getBaseColor());
+            NBTTagCompound nbt = new NBTTagCompound();
+            TileEntityBanner.func_181020_a(nbt, banner.getBaseColor(), banner.func_181021_d());
+            item.setTagInfo("BlockEntityTag", nbt);
+            ret.add(item);
+        }
+        else
+        {
+            ret.add(new ItemStack(Items.banner, 1, 0));
+        }
+        return ret;
+    }
+
     public static class BlockBannerHanging extends BlockBanner
         {
-            private static final String __OBFID = "CL_00002140";
-
             public BlockBannerHanging()
             {
                 this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
@@ -154,19 +172,19 @@ public class BlockBanner extends BlockContainer
                 float f4 = 0.125F;
                 this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 
-                switch (BlockBanner.SwitchEnumFacing.FACING_LOOKUP[enumfacing.ordinal()])
+                switch (enumfacing)
                 {
-                    case 1:
+                    case NORTH:
                     default:
                         this.setBlockBounds(f2, f, 1.0F - f4, f3, f1, 1.0F);
                         break;
-                    case 2:
+                    case SOUTH:
                         this.setBlockBounds(f2, f, 0.0F, f3, f1, f4);
                         break;
-                    case 3:
+                    case WEST:
                         this.setBlockBounds(1.0F - f4, f, f2, 1.0F, f1, f3);
                         break;
-                    case 4:
+                    case EAST:
                         this.setBlockBounds(0.0F, f, f2, f4, f1, f3);
                 }
             }
@@ -218,8 +236,6 @@ public class BlockBanner extends BlockContainer
 
     public static class BlockBannerStanding extends BlockBanner
         {
-            private static final String __OBFID = "CL_00002141";
-
             public BlockBannerStanding()
             {
                 this.setDefaultState(this.blockState.getBaseState().withProperty(ROTATION, Integer.valueOf(0)));
@@ -258,51 +274,6 @@ public class BlockBanner extends BlockContainer
             protected BlockState createBlockState()
             {
                 return new BlockState(this, new IProperty[] {ROTATION});
-            }
-        }
-
-    static final class SwitchEnumFacing
-        {
-            static final int[] FACING_LOOKUP = new int[EnumFacing.values().length];
-            private static final String __OBFID = "CL_00002142";
-
-            static
-            {
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.NORTH.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var4)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.SOUTH.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var3)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.WEST.ordinal()] = 3;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.EAST.ordinal()] = 4;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
             }
         }
 }

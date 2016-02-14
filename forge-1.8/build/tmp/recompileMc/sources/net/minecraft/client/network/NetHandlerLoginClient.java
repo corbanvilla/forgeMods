@@ -37,7 +37,6 @@ public class NetHandlerLoginClient implements INetHandlerLoginClient
     private final GuiScreen previousGuiScreen;
     private final NetworkManager networkManager;
     private GameProfile gameProfile;
-    private static final String __OBFID = "CL_00000876";
 
     public NetHandlerLoginClient(NetworkManager p_i45059_1_, Minecraft mcIn, GuiScreen p_i45059_3_)
     {
@@ -53,30 +52,43 @@ public class NetHandlerLoginClient implements INetHandlerLoginClient
         PublicKey publickey = packetIn.getPublicKey();
         String s1 = (new BigInteger(CryptManager.getServerIdHash(s, publickey, secretkey))).toString(16);
 
-        try
+        if (this.mc.getCurrentServerData() != null && this.mc.getCurrentServerData().func_181041_d())
         {
-            this.getSessionService().joinServer(this.mc.getSession().getProfile(), this.mc.getSession().getToken(), s1);
+            try
+            {
+                this.getSessionService().joinServer(this.mc.getSession().getProfile(), this.mc.getSession().getToken(), s1);
+            }
+            catch (AuthenticationException var10)
+            {
+                logger.warn("Couldn\'t connect to auth servers but will continue to join LAN");
+            }
         }
-        catch (AuthenticationUnavailableException authenticationunavailableexception)
+        else
         {
-            this.networkManager.closeChannel(new ChatComponentTranslation("disconnect.loginFailedInfo", new Object[] {new ChatComponentTranslation("disconnect.loginFailedInfo.serversUnavailable", new Object[0])}));
-            return;
-        }
-        catch (InvalidCredentialsException invalidcredentialsexception)
-        {
-            this.networkManager.closeChannel(new ChatComponentTranslation("disconnect.loginFailedInfo", new Object[] {new ChatComponentTranslation("disconnect.loginFailedInfo.invalidSession", new Object[0])}));
-            return;
-        }
-        catch (AuthenticationException authenticationexception)
-        {
-            this.networkManager.closeChannel(new ChatComponentTranslation("disconnect.loginFailedInfo", new Object[] {authenticationexception.getMessage()}));
-            return;
+            try
+            {
+                this.getSessionService().joinServer(this.mc.getSession().getProfile(), this.mc.getSession().getToken(), s1);
+            }
+            catch (AuthenticationUnavailableException var7)
+            {
+                this.networkManager.closeChannel(new ChatComponentTranslation("disconnect.loginFailedInfo", new Object[] {new ChatComponentTranslation("disconnect.loginFailedInfo.serversUnavailable", new Object[0])}));
+                return;
+            }
+            catch (InvalidCredentialsException var8)
+            {
+                this.networkManager.closeChannel(new ChatComponentTranslation("disconnect.loginFailedInfo", new Object[] {new ChatComponentTranslation("disconnect.loginFailedInfo.invalidSession", new Object[0])}));
+                return;
+            }
+            catch (AuthenticationException authenticationexception)
+            {
+                this.networkManager.closeChannel(new ChatComponentTranslation("disconnect.loginFailedInfo", new Object[] {authenticationexception.getMessage()}));
+                return;
+            }
         }
 
-        this.networkManager.sendPacket(new C01PacketEncryptionResponse(secretkey, publickey, packetIn.getVerifyToken()), new GenericFutureListener()
+        this.networkManager.sendPacket(new C01PacketEncryptionResponse(secretkey, publickey, packetIn.getVerifyToken()), new GenericFutureListener < Future <? super Void >> ()
         {
-            private static final String __OBFID = "CL_00000877";
-            public void operationComplete(Future p_operationComplete_1_)
+            public void operationComplete(Future <? super Void > p_operationComplete_1_) throws Exception
             {
                 NetHandlerLoginClient.this.networkManager.enableEncryption(secretkey);
             }

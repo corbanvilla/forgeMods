@@ -9,16 +9,14 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class EnumTypeAdapterFactory implements TypeAdapterFactory
 {
-    private static final String __OBFID = "CL_00001494";
-
-    public TypeAdapter create(Gson p_create_1_, TypeToken p_create_2_)
+    public <T> TypeAdapter<T> create(Gson p_create_1_, TypeToken<T> p_create_2_)
     {
-        Class oclass = p_create_2_.getRawType();
+        Class<T> oclass = (Class<T>)p_create_2_.getRawType();
 
         if (!oclass.isEnum())
         {
@@ -26,20 +24,16 @@ public class EnumTypeAdapterFactory implements TypeAdapterFactory
         }
         else
         {
-            final HashMap hashmap = Maps.newHashMap();
-            Object[] aobject = oclass.getEnumConstants();
-            int i = aobject.length;
+            final Map<String, T> map = Maps.<String, T>newHashMap();
 
-            for (int j = 0; j < i; ++j)
+            for (T t : oclass.getEnumConstants())
             {
-                Object object = aobject[j];
-                hashmap.put(this.func_151232_a(object), object);
+                map.put(this.func_151232_a(t), t);
             }
 
-            return new TypeAdapter()
+            return new TypeAdapter<T>()
             {
-                private static final String __OBFID = "CL_00001495";
-                public void write(JsonWriter p_write_1_, Object p_write_2_) throws IOException
+                public void write(JsonWriter p_write_1_, T p_write_2_) throws IOException
                 {
                     if (p_write_2_ == null)
                     {
@@ -50,16 +44,16 @@ public class EnumTypeAdapterFactory implements TypeAdapterFactory
                         p_write_1_.value(EnumTypeAdapterFactory.this.func_151232_a(p_write_2_));
                     }
                 }
-                public Object read(JsonReader p_read_1_) throws IOException
+                public T read(JsonReader p_read_1_) throws IOException
                 {
                     if (p_read_1_.peek() == JsonToken.NULL)
                     {
                         p_read_1_.nextNull();
-                        return null;
+                        return (T)null;
                     }
                     else
                     {
-                        return hashmap.get(p_read_1_.nextString());
+                        return (T)map.get(p_read_1_.nextString());
                     }
                 }
             };

@@ -1,7 +1,6 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -9,17 +8,18 @@ import net.minecraft.util.IChatComponent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S47PacketPlayerListHeaderFooter implements Packet
+public class S47PacketPlayerListHeaderFooter implements Packet<INetHandlerPlayClient>
 {
-    private IChatComponent field_179703_a;
-    private IChatComponent field_179702_b;
-    private static final String __OBFID = "CL_00002285";
+    private IChatComponent header;
+    private IChatComponent footer;
 
-    public S47PacketPlayerListHeaderFooter() {}
-
-    public S47PacketPlayerListHeaderFooter(IChatComponent p_i45950_1_)
+    public S47PacketPlayerListHeaderFooter()
     {
-        this.field_179703_a = p_i45950_1_;
+    }
+
+    public S47PacketPlayerListHeaderFooter(IChatComponent headerIn)
+    {
+        this.header = headerIn;
     }
 
     /**
@@ -27,8 +27,8 @@ public class S47PacketPlayerListHeaderFooter implements Packet
      */
     public void readPacketData(PacketBuffer buf) throws IOException
     {
-        this.field_179703_a = buf.readChatComponent();
-        this.field_179702_b = buf.readChatComponent();
+        this.header = buf.readChatComponent();
+        this.footer = buf.readChatComponent();
     }
 
     /**
@@ -36,32 +36,27 @@ public class S47PacketPlayerListHeaderFooter implements Packet
      */
     public void writePacketData(PacketBuffer buf) throws IOException
     {
-        buf.writeChatComponent(this.field_179703_a);
-        buf.writeChatComponent(this.field_179702_b);
-    }
-
-    public void func_179699_a(INetHandlerPlayClient p_179699_1_)
-    {
-        p_179699_1_.handlePlayerListHeaderFooter(this);
-    }
-
-    @SideOnly(Side.CLIENT)
-    public IChatComponent func_179700_a()
-    {
-        return this.field_179703_a;
+        buf.writeChatComponent(this.header);
+        buf.writeChatComponent(this.footer);
     }
 
     /**
      * Passes this Packet on to the NetHandler for processing.
      */
-    public void processPacket(INetHandler handler)
+    public void processPacket(INetHandlerPlayClient handler)
     {
-        this.func_179699_a((INetHandlerPlayClient)handler);
+        handler.handlePlayerListHeaderFooter(this);
     }
 
     @SideOnly(Side.CLIENT)
-    public IChatComponent func_179701_b()
+    public IChatComponent getHeader()
     {
-        return this.field_179702_b;
+        return this.header;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public IChatComponent getFooter()
+    {
+        return this.footer;
     }
 }

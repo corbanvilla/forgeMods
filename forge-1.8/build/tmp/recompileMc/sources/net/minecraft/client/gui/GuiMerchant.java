@@ -39,7 +39,6 @@ public class GuiMerchant extends GuiContainer
     private int selectedMerchantRecipe;
     /** The chat component utilized by this GuiMerchant instance. */
     private IChatComponent chatComponent;
-    private static final String __OBFID = "CL_00000762";
 
     public GuiMerchant(InventoryPlayer p_i45500_1_, IMerchant p_i45500_2_, World worldIn)
     {
@@ -49,7 +48,8 @@ public class GuiMerchant extends GuiContainer
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
     public void initGui()
     {
@@ -87,6 +87,9 @@ public class GuiMerchant extends GuiContainer
         }
     }
 
+    /**
+     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
+     */
     protected void actionPerformed(GuiButton button) throws IOException
     {
         boolean flag = false;
@@ -131,21 +134,21 @@ public class GuiMerchant extends GuiContainer
     {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(MERCHANT_GUI_TEXTURE);
-        int k = (this.width - this.xSize) / 2;
-        int l = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(k, l, 0, 0, this.xSize, this.ySize);
+        int i = (this.width - this.xSize) / 2;
+        int j = (this.height - this.ySize) / 2;
+        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
         MerchantRecipeList merchantrecipelist = this.merchant.getRecipes(this.mc.thePlayer);
 
         if (merchantrecipelist != null && !merchantrecipelist.isEmpty())
         {
-            int i1 = this.selectedMerchantRecipe;
+            int k = this.selectedMerchantRecipe;
 
-            if (i1 < 0 || i1 >= merchantrecipelist.size())
+            if (k < 0 || k >= merchantrecipelist.size())
             {
                 return;
             }
 
-            MerchantRecipe merchantrecipe = (MerchantRecipe)merchantrecipelist.get(i1);
+            MerchantRecipe merchantrecipe = (MerchantRecipe)merchantrecipelist.get(k);
 
             if (merchantrecipe.isRecipeDisabled())
             {
@@ -168,10 +171,10 @@ public class GuiMerchant extends GuiContainer
 
         if (merchantrecipelist != null && !merchantrecipelist.isEmpty())
         {
-            int k = (this.width - this.xSize) / 2;
-            int l = (this.height - this.ySize) / 2;
-            int i1 = this.selectedMerchantRecipe;
-            MerchantRecipe merchantrecipe = (MerchantRecipe)merchantrecipelist.get(i1);
+            int i = (this.width - this.xSize) / 2;
+            int j = (this.height - this.ySize) / 2;
+            int k = this.selectedMerchantRecipe;
+            MerchantRecipe merchantrecipe = (MerchantRecipe)merchantrecipelist.get(k);
             ItemStack itemstack = merchantrecipe.getItemToBuy();
             ItemStack itemstack1 = merchantrecipe.getSecondItemToBuy();
             ItemStack itemstack2 = merchantrecipe.getItemToSell();
@@ -182,17 +185,17 @@ public class GuiMerchant extends GuiContainer
             GlStateManager.enableColorMaterial();
             GlStateManager.enableLighting();
             this.itemRender.zLevel = 100.0F;
-            this.itemRender.renderItemAndEffectIntoGUI(itemstack, k + 36, l + 24);
-            this.itemRender.renderItemOverlays(this.fontRendererObj, itemstack, k + 36, l + 24);
+            this.itemRender.renderItemAndEffectIntoGUI(itemstack, i + 36, j + 24);
+            this.itemRender.renderItemOverlays(this.fontRendererObj, itemstack, i + 36, j + 24);
 
             if (itemstack1 != null)
             {
-                this.itemRender.renderItemAndEffectIntoGUI(itemstack1, k + 62, l + 24);
-                this.itemRender.renderItemOverlays(this.fontRendererObj, itemstack1, k + 62, l + 24);
+                this.itemRender.renderItemAndEffectIntoGUI(itemstack1, i + 62, j + 24);
+                this.itemRender.renderItemOverlays(this.fontRendererObj, itemstack1, i + 62, j + 24);
             }
 
-            this.itemRender.renderItemAndEffectIntoGUI(itemstack2, k + 120, l + 24);
-            this.itemRender.renderItemOverlays(this.fontRendererObj, itemstack2, k + 120, l + 24);
+            this.itemRender.renderItemAndEffectIntoGUI(itemstack2, i + 120, j + 24);
+            this.itemRender.renderItemOverlays(this.fontRendererObj, itemstack2, i + 120, j + 24);
             this.itemRender.zLevel = 0.0F;
             GlStateManager.disableLighting();
 
@@ -229,7 +232,6 @@ public class GuiMerchant extends GuiContainer
     static class MerchantButton extends GuiButton
         {
             private final boolean field_146157_o;
-            private static final String __OBFID = "CL_00000763";
 
             public MerchantButton(int buttonID, int x, int y, boolean p_i1095_4_)
             {
@@ -247,24 +249,24 @@ public class GuiMerchant extends GuiContainer
                     mc.getTextureManager().bindTexture(GuiMerchant.MERCHANT_GUI_TEXTURE);
                     GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                     boolean flag = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
-                    int k = 0;
-                    int l = 176;
+                    int i = 0;
+                    int j = 176;
 
                     if (!this.enabled)
                     {
-                        l += this.width * 2;
+                        j += this.width * 2;
                     }
                     else if (flag)
                     {
-                        l += this.width;
+                        j += this.width;
                     }
 
                     if (!this.field_146157_o)
                     {
-                        k += this.height;
+                        i += this.height;
                     }
 
-                    this.drawTexturedModalRect(this.xPosition, this.yPosition, l, k, this.width, this.height);
+                    this.drawTexturedModalRect(this.xPosition, this.yPosition, j, i, this.width, this.height);
                 }
             }
         }

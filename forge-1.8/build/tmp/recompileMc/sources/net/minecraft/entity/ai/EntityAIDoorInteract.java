@@ -12,18 +12,16 @@ import net.minecraft.util.BlockPos;
 public abstract class EntityAIDoorInteract extends EntityAIBase
 {
     protected EntityLiving theEntity;
-    protected BlockPos doorPosition;
+    protected BlockPos doorPosition = BlockPos.ORIGIN;
     /** The wooden door block */
     protected BlockDoor doorBlock;
     /** If is true then the Entity has stopped Door Interaction and compoleted the task. */
     boolean hasStoppedDoorInteraction;
     float entityPositionX;
     float entityPositionZ;
-    private static final String __OBFID = "CL_00001581";
 
     public EntityAIDoorInteract(EntityLiving entityIn)
     {
-        this.doorPosition = BlockPos.ORIGIN;
         this.theEntity = entityIn;
 
         if (!(entityIn.getNavigator() instanceof PathNavigateGround))
@@ -46,7 +44,7 @@ public abstract class EntityAIDoorInteract extends EntityAIBase
             PathNavigateGround pathnavigateground = (PathNavigateGround)this.theEntity.getNavigator();
             PathEntity pathentity = pathnavigateground.getPath();
 
-            if (pathentity != null && !pathentity.isFinished() && pathnavigateground.func_179686_g())
+            if (pathentity != null && !pathentity.isFinished() && pathnavigateground.getEnterDoors())
             {
                 for (int i = 0; i < Math.min(pathentity.getCurrentPathIndex() + 2, pathentity.getCurrentPathLength()); ++i)
                 {
@@ -55,7 +53,7 @@ public abstract class EntityAIDoorInteract extends EntityAIBase
 
                     if (this.theEntity.getDistanceSq((double)this.doorPosition.getX(), this.theEntity.posY, (double)this.doorPosition.getZ()) <= 2.25D)
                     {
-                        this.doorBlock = this.func_179506_a(this.doorPosition);
+                        this.doorBlock = this.getBlockDoor(this.doorPosition);
 
                         if (this.doorBlock != null)
                         {
@@ -65,7 +63,7 @@ public abstract class EntityAIDoorInteract extends EntityAIBase
                 }
 
                 this.doorPosition = (new BlockPos(this.theEntity)).up();
-                this.doorBlock = this.func_179506_a(this.doorPosition);
+                this.doorBlock = this.getBlockDoor(this.doorPosition);
                 return this.doorBlock != null;
             }
             else
@@ -108,9 +106,9 @@ public abstract class EntityAIDoorInteract extends EntityAIBase
         }
     }
 
-    private BlockDoor func_179506_a(BlockPos p_179506_1_)
+    private BlockDoor getBlockDoor(BlockPos pos)
     {
-        Block block = this.theEntity.worldObj.getBlockState(p_179506_1_).getBlock();
+        Block block = this.theEntity.worldObj.getBlockState(pos).getBlock();
         return block instanceof BlockDoor && block.getMaterial() == Material.wood ? (BlockDoor)block : null;
     }
 }

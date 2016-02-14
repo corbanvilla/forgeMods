@@ -9,25 +9,24 @@ import net.minecraft.world.World;
 
 public class WorldGenLiquids extends WorldGenerator
 {
-    private Block field_150521_a;
-    private static final String __OBFID = "CL_00000434";
+    private Block block;
 
     public WorldGenLiquids(Block p_i45465_1_)
     {
-        this.field_150521_a = p_i45465_1_;
+        this.block = p_i45465_1_;
     }
 
-    public boolean generate(World worldIn, Random p_180709_2_, BlockPos p_180709_3_)
+    public boolean generate(World worldIn, Random rand, BlockPos position)
     {
-        if (worldIn.getBlockState(p_180709_3_.up()).getBlock() != Blocks.stone)
+        if (worldIn.getBlockState(position.up()).getBlock() != Blocks.stone)
         {
             return false;
         }
-        else if (worldIn.getBlockState(p_180709_3_.down()).getBlock() != Blocks.stone)
+        else if (worldIn.getBlockState(position.down()).getBlock() != Blocks.stone)
         {
             return false;
         }
-        else if (worldIn.getBlockState(p_180709_3_).getBlock().getMaterial() != Material.air && worldIn.getBlockState(p_180709_3_).getBlock() != Blocks.stone)
+        else if (worldIn.getBlockState(position).getBlock().getMaterial() != Material.air && worldIn.getBlockState(position).getBlock() != Blocks.stone)
         {
             return false;
         }
@@ -35,52 +34,52 @@ public class WorldGenLiquids extends WorldGenerator
         {
             int i = 0;
 
-            if (worldIn.getBlockState(p_180709_3_.west()).getBlock() == Blocks.stone)
+            if (worldIn.getBlockState(position.west()).getBlock() == Blocks.stone)
             {
                 ++i;
             }
 
-            if (worldIn.getBlockState(p_180709_3_.east()).getBlock() == Blocks.stone)
+            if (worldIn.getBlockState(position.east()).getBlock() == Blocks.stone)
             {
                 ++i;
             }
 
-            if (worldIn.getBlockState(p_180709_3_.north()).getBlock() == Blocks.stone)
+            if (worldIn.getBlockState(position.north()).getBlock() == Blocks.stone)
             {
                 ++i;
             }
 
-            if (worldIn.getBlockState(p_180709_3_.south()).getBlock() == Blocks.stone)
+            if (worldIn.getBlockState(position.south()).getBlock() == Blocks.stone)
             {
                 ++i;
             }
 
             int j = 0;
 
-            if (worldIn.isAirBlock(p_180709_3_.west()))
+            if (worldIn.isAirBlock(position.west()))
             {
                 ++j;
             }
 
-            if (worldIn.isAirBlock(p_180709_3_.east()))
+            if (worldIn.isAirBlock(position.east()))
             {
                 ++j;
             }
 
-            if (worldIn.isAirBlock(p_180709_3_.north()))
+            if (worldIn.isAirBlock(position.north()))
             {
                 ++j;
             }
 
-            if (worldIn.isAirBlock(p_180709_3_.south()))
+            if (worldIn.isAirBlock(position.south()))
             {
                 ++j;
             }
 
             if (i == 3 && j == 1)
             {
-                worldIn.setBlockState(p_180709_3_, this.field_150521_a.getDefaultState(), 2);
-                worldIn.forceBlockUpdateTick(this.field_150521_a, p_180709_3_, p_180709_2_);
+                worldIn.setBlockState(position, this.block.getDefaultState(), 2);
+                worldIn.forceBlockUpdateTick(this.block, position, rand);
             }
 
             return true;

@@ -2,6 +2,7 @@ package net.minecraft.block;
 
 import java.util.List;
 import java.util.Random;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyInteger;
@@ -16,6 +17,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemBanner;
 import net.minecraft.item.ItemStack;
+import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntityBanner;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
@@ -28,20 +30,17 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BlockCauldron extends Block
 {
     public static final PropertyInteger LEVEL = PropertyInteger.create("level", 0, 3);
-    private static final String __OBFID = "CL_00000213";
 
     public BlockCauldron()
     {
-        super(Material.iron);
+        super(Material.iron, MapColor.stoneColor);
         this.setDefaultState(this.blockState.getBaseState().withProperty(LEVEL, Integer.valueOf(0)));
     }
 
     /**
      * Add all collision boxes of this Block to the list that intersect with the given mask.
-     *  
-     * @param collidingEntity the Entity colliding with this Block
      */
-    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List list, Entity collidingEntity)
+    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity)
     {
         this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.3125F, 1.0F);
         super.addCollisionBoxesToList(worldIn, pos, state, mask, list, collidingEntity);
@@ -65,6 +64,9 @@ public class BlockCauldron extends Block
         this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -118,40 +120,89 @@ public class BlockCauldron extends Block
                             playerIn.inventory.setInventorySlotContents(playerIn.inventory.currentItem, new ItemStack(Items.bucket));
                         }
 
+                        playerIn.triggerAchievement(StatList.field_181725_I);
                         this.setWaterLevel(worldIn, pos, state, 3);
+                    }
+
+                    return true;
+                }
+                else if (item == Items.glass_bottle)
+                {
+                    if (i > 0)
+                    {
+                        if (!playerIn.capabilities.isCreativeMode)
+                        {
+                            ItemStack itemstack2 = new ItemStack(Items.potionitem, 1, 0);
+
+                            if (!playerIn.inventory.addItemStackToInventory(itemstack2))
+                            {
+                                worldIn.spawnEntityInWorld(new EntityItem(worldIn, (double)pos.getX() + 0.5D, (double)pos.getY() + 1.5D, (double)pos.getZ() + 0.5D, itemstack2));
+                            }
+                            else if (playerIn instanceof EntityPlayerMP)
+                            {
+                                ((EntityPlayerMP)playerIn).sendContainerToPlayer(playerIn.inventoryContainer);
+                            }
+
+                            playerIn.triggerAchievement(StatList.field_181726_J);
+                            --itemstack.stackSize;
+
+                            if (itemstack.stackSize <= 0)
+                            {
+                                playerIn.inventory.setInventorySlotContents(playerIn.inventory.currentItem, (ItemStack)null);
+                            }
+                        }
+
+                        this.setWaterLevel(worldIn, pos, state, i - 1);
                     }
 
                     return true;
                 }
                 else
                 {
-                    ItemStack itemstack1;
-
-                    if (item == Items.glass_bottle)
+                    if (i > 0 && item instanceof ItemArmor)
                     {
-                        if (i > 0)
+                        ItemArmor itemarmor = (ItemArmor)item;
+
+                        if (itemarmor.getArmorMaterial() == ItemArmor.ArmorMaterial.LEATHER && itemarmor.hasColor(itemstack))
                         {
-                            if (!playerIn.capabilities.isCreativeMode)
+                            itemarmor.removeColor(itemstack);
+                            this.setWaterLevel(worldIn, pos, state, i - 1);
+                            playerIn.triggerAchievement(StatList.field_181727_K);
+                            return true;
+                        }
+                    }
+
+                    if (i > 0 && item instanceof ItemBanner && TileEntityBanner.getPatterns(itemstack) > 0)
+                    {
+                        ItemStack itemstack1 = itemstack.copy();
+                        itemstack1.stackSize = 1;
+                        TileEntityBanner.removeBannerData(itemstack1);
+
+                        if (itemstack.stackSize <= 1 && !playerIn.capabilities.isCreativeMode)
+                        {
+                            playerIn.inventory.setInventorySlotContents(playerIn.inventory.currentItem, itemstack1);
+                        }
+                        else
+                        {
+                            if (!playerIn.inventory.addItemStackToInventory(itemstack1))
                             {
-                                itemstack1 = new ItemStack(Items.potionitem, 1, 0);
-
-                                if (!playerIn.inventory.addItemStackToInventory(itemstack1))
-                                {
-                                    worldIn.spawnEntityInWorld(new EntityItem(worldIn, (double)pos.getX() + 0.5D, (double)pos.getY() + 1.5D, (double)pos.getZ() + 0.5D, itemstack1));
-                                }
-                                else if (playerIn instanceof EntityPlayerMP)
-                                {
-                                    ((EntityPlayerMP)playerIn).sendContainerToPlayer(playerIn.inventoryContainer);
-                                }
-
-                                --itemstack.stackSize;
-
-                                if (itemstack.stackSize <= 0)
-                                {
-                                    playerIn.inventory.setInventorySlotContents(playerIn.inventory.currentItem, (ItemStack)null);
-                                }
+                                worldIn.spawnEntityInWorld(new EntityItem(worldIn, (double)pos.getX() + 0.5D, (double)pos.getY() + 1.5D, (double)pos.getZ() + 0.5D, itemstack1));
+                            }
+                            else if (playerIn instanceof EntityPlayerMP)
+                            {
+                                ((EntityPlayerMP)playerIn).sendContainerToPlayer(playerIn.inventoryContainer);
                             }
 
+                            playerIn.triggerAchievement(StatList.field_181728_L);
+
+                            if (!playerIn.capabilities.isCreativeMode)
+                            {
+                                --itemstack.stackSize;
+                            }
+                        }
+
+                        if (!playerIn.capabilities.isCreativeMode)
+                        {
                             this.setWaterLevel(worldIn, pos, state, i - 1);
                         }
 
@@ -159,56 +210,7 @@ public class BlockCauldron extends Block
                     }
                     else
                     {
-                        if (i > 0 && item instanceof ItemArmor)
-                        {
-                            ItemArmor itemarmor = (ItemArmor)item;
-
-                            if (itemarmor.getArmorMaterial() == ItemArmor.ArmorMaterial.LEATHER && itemarmor.hasColor(itemstack))
-                            {
-                                itemarmor.removeColor(itemstack);
-                                this.setWaterLevel(worldIn, pos, state, i - 1);
-                                return true;
-                            }
-                        }
-
-                        if (i > 0 && item instanceof ItemBanner && TileEntityBanner.getPatterns(itemstack) > 0)
-                        {
-                            itemstack1 = itemstack.copy();
-                            itemstack1.stackSize = 1;
-                            TileEntityBanner.removeBannerData(itemstack1);
-
-                            if (itemstack.stackSize <= 1 && !playerIn.capabilities.isCreativeMode)
-                            {
-                                playerIn.inventory.setInventorySlotContents(playerIn.inventory.currentItem, itemstack1);
-                            }
-                            else
-                            {
-                                if (!playerIn.inventory.addItemStackToInventory(itemstack1))
-                                {
-                                    worldIn.spawnEntityInWorld(new EntityItem(worldIn, (double)pos.getX() + 0.5D, (double)pos.getY() + 1.5D, (double)pos.getZ() + 0.5D, itemstack1));
-                                }
-                                else if (playerIn instanceof EntityPlayerMP)
-                                {
-                                    ((EntityPlayerMP)playerIn).sendContainerToPlayer(playerIn.inventoryContainer);
-                                }
-
-                                if (!playerIn.capabilities.isCreativeMode)
-                                {
-                                    --itemstack.stackSize;
-                                }
-                            }
-
-                            if (!playerIn.capabilities.isCreativeMode)
-                            {
-                                this.setWaterLevel(worldIn, pos, state, i - 1);
-                            }
-
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
+                        return false;
                     }
                 }
             }
@@ -239,8 +241,6 @@ public class BlockCauldron extends Block
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {

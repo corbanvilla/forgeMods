@@ -1,31 +1,31 @@
 package net.minecraft.network.play.client;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class C19PacketResourcePackStatus implements Packet
+public class C19PacketResourcePackStatus implements Packet<INetHandlerPlayServer>
 {
     private String hash;
     private C19PacketResourcePackStatus.Action status;
-    private static final String __OBFID = "CL_00002282";
 
-    public C19PacketResourcePackStatus() {}
+    public C19PacketResourcePackStatus()
+    {
+    }
 
     @SideOnly(Side.CLIENT)
-    public C19PacketResourcePackStatus(String p_i45935_1_, C19PacketResourcePackStatus.Action p_i45935_2_)
+    public C19PacketResourcePackStatus(String hashIn, C19PacketResourcePackStatus.Action statusIn)
     {
-        if (p_i45935_1_.length() > 40)
+        if (hashIn.length() > 40)
         {
-            p_i45935_1_ = p_i45935_1_.substring(0, 40);
+            hashIn = hashIn.substring(0, 40);
         }
 
-        this.hash = p_i45935_1_;
-        this.status = p_i45935_2_;
+        this.hash = hashIn;
+        this.status = statusIn;
     }
 
     /**
@@ -46,17 +46,12 @@ public class C19PacketResourcePackStatus implements Packet
         buf.writeEnumValue(this.status);
     }
 
-    public void handle(INetHandlerPlayServer handler)
-    {
-        handler.handleResourcePackStatus(this);
-    }
-
     /**
      * Passes this Packet on to the NetHandler for processing.
      */
-    public void processPacket(INetHandler handler)
+    public void processPacket(INetHandlerPlayServer handler)
     {
-        this.handle((INetHandlerPlayServer)handler);
+        handler.handleResourcePackStatus(this);
     }
 
     public static enum Action
@@ -65,7 +60,5 @@ public class C19PacketResourcePackStatus implements Packet
         DECLINED,
         FAILED_DOWNLOAD,
         ACCEPTED;
-
-        private static final String __OBFID = "CL_00002281";
     }
 }

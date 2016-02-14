@@ -1,17 +1,15 @@
 package net.minecraft.block;
 
-import java.util.Iterator;
 import java.util.Random;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenBigMushroom;
+import net.minecraft.world.gen.feature.WorldGenerator;
 
 public class BlockMushroom extends BlockBush implements IGrowable
 {
-    private static final String __OBFID = "CL_00000272";
-
     protected BlockMushroom()
     {
         float f = 0.2F;
@@ -24,14 +22,11 @@ public class BlockMushroom extends BlockBush implements IGrowable
         if (rand.nextInt(25) == 0)
         {
             int i = 5;
-            boolean flag = true;
-            Iterator iterator = BlockPos.getAllInBoxMutable(pos.add(-4, -1, -4), pos.add(4, 1, 4)).iterator();
+            int j = 4;
 
-            while (iterator.hasNext())
+            for (BlockPos blockpos : BlockPos.getAllInBoxMutable(pos.add(-4, -1, -4), pos.add(4, 1, 4)))
             {
-                BlockPos blockpos1 = (BlockPos)iterator.next();
-
-                if (worldIn.getBlockState(blockpos1).getBlock() == this)
+                if (worldIn.getBlockState(blockpos).getBlock() == this)
                 {
                     --i;
 
@@ -42,21 +37,21 @@ public class BlockMushroom extends BlockBush implements IGrowable
                 }
             }
 
-            BlockPos blockpos2 = pos.add(rand.nextInt(3) - 1, rand.nextInt(2) - rand.nextInt(2), rand.nextInt(3) - 1);
+            BlockPos blockpos1 = pos.add(rand.nextInt(3) - 1, rand.nextInt(2) - rand.nextInt(2), rand.nextInt(3) - 1);
 
-            for (int j = 0; j < 4; ++j)
+            for (int k = 0; k < 4; ++k)
             {
-                if (worldIn.isAirBlock(blockpos2) && this.canBlockStay(worldIn, blockpos2, this.getDefaultState()))
+                if (worldIn.isAirBlock(blockpos1) && this.canBlockStay(worldIn, blockpos1, this.getDefaultState()))
                 {
-                    pos = blockpos2;
+                    pos = blockpos1;
                 }
 
-                blockpos2 = pos.add(rand.nextInt(3) - 1, rand.nextInt(2) - rand.nextInt(2), rand.nextInt(3) - 1);
+                blockpos1 = pos.add(rand.nextInt(3) - 1, rand.nextInt(2) - rand.nextInt(2), rand.nextInt(3) - 1);
             }
 
-            if (worldIn.isAirBlock(blockpos2) && this.canBlockStay(worldIn, blockpos2, this.getDefaultState()))
+            if (worldIn.isAirBlock(blockpos1) && this.canBlockStay(worldIn, blockpos1, this.getDefaultState()))
             {
-                worldIn.setBlockState(blockpos2, this.getDefaultState(), 2);
+                worldIn.setBlockState(blockpos1, this.getDefaultState(), 2);
             }
         }
     }
@@ -78,8 +73,8 @@ public class BlockMushroom extends BlockBush implements IGrowable
     {
         if (pos.getY() >= 0 && pos.getY() < 256)
         {
-            IBlockState iblockstate1 = worldIn.getBlockState(pos.down());
-            return iblockstate1.getBlock() == Blocks.mycelium ? true : (iblockstate1.getBlock() == Blocks.dirt && iblockstate1.getValue(BlockDirt.VARIANT) == BlockDirt.DirtType.PODZOL ? true : worldIn.getLight(pos) < 13 && iblockstate1.getBlock().canSustainPlant(worldIn, pos.down(), net.minecraft.util.EnumFacing.UP, this));
+            IBlockState iblockstate = worldIn.getBlockState(pos.down());
+            return iblockstate.getBlock() == Blocks.mycelium ? true : (iblockstate.getBlock() == Blocks.dirt && iblockstate.getValue(BlockDirt.VARIANT) == BlockDirt.DirtType.PODZOL ? true : worldIn.getLight(pos) < 13 && iblockstate.getBlock().canSustainPlant(worldIn, pos.down(), net.minecraft.util.EnumFacing.UP, this));
         }
         else
         {
@@ -90,18 +85,18 @@ public class BlockMushroom extends BlockBush implements IGrowable
     public boolean generateBigMushroom(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
         worldIn.setBlockToAir(pos);
-        WorldGenBigMushroom worldgenbigmushroom = null;
+        WorldGenerator worldgenerator = null;
 
         if (this == Blocks.brown_mushroom)
         {
-            worldgenbigmushroom = new WorldGenBigMushroom(0);
+            worldgenerator = new WorldGenBigMushroom(Blocks.brown_mushroom_block);
         }
         else if (this == Blocks.red_mushroom)
         {
-            worldgenbigmushroom = new WorldGenBigMushroom(1);
+            worldgenerator = new WorldGenBigMushroom(Blocks.red_mushroom_block);
         }
 
-        if (worldgenbigmushroom != null && worldgenbigmushroom.generate(worldIn, rand, pos))
+        if (worldgenerator != null && worldgenerator.generate(worldIn, rand, pos))
         {
             return true;
         }

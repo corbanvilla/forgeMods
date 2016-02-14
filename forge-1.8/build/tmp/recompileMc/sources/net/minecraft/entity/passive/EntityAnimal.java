@@ -17,15 +17,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public abstract class EntityAnimal extends EntityAgeable implements IAnimals
 {
-    protected Block field_175506_bl;
+    protected Block spawnableBlock = Blocks.grass;
     private int inLove;
     private EntityPlayer playerInLove;
-    private static final String __OBFID = "CL_00001638";
 
     public EntityAnimal(World worldIn)
     {
         super(worldIn);
-        this.field_175506_bl = Blocks.grass;
     }
 
     protected void updateAITasks()
@@ -81,9 +79,9 @@ public abstract class EntityAnimal extends EntityAgeable implements IAnimals
         }
     }
 
-    public float func_180484_a(BlockPos p_180484_1_)
+    public float getBlockPathWeight(BlockPos pos)
     {
-        return this.worldObj.getBlockState(p_180484_1_.down()).getBlock() == Blocks.grass ? 10.0F : this.worldObj.getLightBrightness(p_180484_1_) - 0.5F;
+        return this.worldObj.getBlockState(pos.down()).getBlock() == Blocks.grass ? 10.0F : this.worldObj.getLightBrightness(pos) - 0.5F;
     }
 
     /**
@@ -113,7 +111,7 @@ public abstract class EntityAnimal extends EntityAgeable implements IAnimals
         int j = MathHelper.floor_double(this.getEntityBoundingBox().minY);
         int k = MathHelper.floor_double(this.posZ);
         BlockPos blockpos = new BlockPos(i, j, k);
-        return this.worldObj.getBlockState(blockpos.down()).getBlock() == this.field_175506_bl && this.worldObj.getLight(blockpos) > 8 && super.getCanSpawnHere();
+        return this.worldObj.getBlockState(blockpos.down()).getBlock() == this.spawnableBlock && this.worldObj.getLight(blockpos) > 8 && super.getCanSpawnHere();
     }
 
     /**
@@ -160,14 +158,14 @@ public abstract class EntityAnimal extends EntityAgeable implements IAnimals
         {
             if (this.isBreedingItem(itemstack) && this.getGrowingAge() == 0 && this.inLove <= 0)
             {
-                this.func_175505_a(player, itemstack);
+                this.consumeItemFromStack(player, itemstack);
                 this.setInLove(player);
                 return true;
             }
 
             if (this.isChild() && this.isBreedingItem(itemstack))
             {
-                this.func_175505_a(player, itemstack);
+                this.consumeItemFromStack(player, itemstack);
                 this.func_175501_a((int)((float)(-this.getGrowingAge() / 20) * 0.1F), true);
                 return true;
             }
@@ -176,27 +174,30 @@ public abstract class EntityAnimal extends EntityAgeable implements IAnimals
         return super.interact(player);
     }
 
-    protected void func_175505_a(EntityPlayer p_175505_1_, ItemStack p_175505_2_)
+    /**
+     * Decreases ItemStack size by one
+     */
+    protected void consumeItemFromStack(EntityPlayer player, ItemStack stack)
     {
-        if (!p_175505_1_.capabilities.isCreativeMode)
+        if (!player.capabilities.isCreativeMode)
         {
-            --p_175505_2_.stackSize;
+            --stack.stackSize;
 
-            if (p_175505_2_.stackSize <= 0)
+            if (stack.stackSize <= 0)
             {
-                p_175505_1_.inventory.setInventorySlotContents(p_175505_1_.inventory.currentItem, (ItemStack)null);
+                player.inventory.setInventorySlotContents(player.inventory.currentItem, (ItemStack)null);
             }
         }
     }
 
-    public void setInLove(EntityPlayer p_146082_1_)
+    public void setInLove(EntityPlayer player)
     {
         this.inLove = 600;
-        this.playerInLove = p_146082_1_;
+        this.playerInLove = player;
         this.worldObj.setEntityState(this, (byte)18);
     }
 
-    public EntityPlayer func_146083_cb()
+    public EntityPlayer getPlayerInLove()
     {
         return this.playerInLove;
     }
@@ -223,9 +224,9 @@ public abstract class EntityAnimal extends EntityAgeable implements IAnimals
     }
 
     @SideOnly(Side.CLIENT)
-    public void handleHealthUpdate(byte p_70103_1_)
+    public void handleStatusUpdate(byte id)
     {
-        if (p_70103_1_ == 18)
+        if (id == 18)
         {
             for (int i = 0; i < 7; ++i)
             {
@@ -237,7 +238,7 @@ public abstract class EntityAnimal extends EntityAgeable implements IAnimals
         }
         else
         {
-            super.handleHealthUpdate(p_70103_1_);
+            super.handleStatusUpdate(id);
         }
     }
 }

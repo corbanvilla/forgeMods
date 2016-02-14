@@ -37,17 +37,83 @@ public class ChatController
     protected String field_153007_e = "";
     protected Core field_175992_e = null;
     protected Chat field_153008_f = null;
-    protected ChatController.ChatState field_153011_i;
-    protected AuthToken field_153012_j;
-    protected HashMap field_175998_i;
-    protected int field_153015_m;
-    protected ChatController.EnumEmoticonMode field_175997_k;
-    protected ChatController.EnumEmoticonMode field_175995_l;
-    protected ChatEmoticonData field_175996_m;
-    protected int field_175993_n;
-    protected int field_175994_o;
-    protected IChatAPIListener field_175999_p;
-    private static final String __OBFID = "CL_00001819";
+    protected ChatController.ChatState field_153011_i = ChatController.ChatState.Uninitialized;
+    protected AuthToken field_153012_j = new AuthToken();
+    protected HashMap<String, ChatController.ChatChannelListener> field_175998_i = new HashMap();
+    protected int field_153015_m = 128;
+    protected ChatController.EnumEmoticonMode field_175997_k = ChatController.EnumEmoticonMode.None;
+    protected ChatController.EnumEmoticonMode field_175995_l = ChatController.EnumEmoticonMode.None;
+    protected ChatEmoticonData field_175996_m = null;
+    protected int field_175993_n = 500;
+    protected int field_175994_o = 2000;
+    protected IChatAPIListener field_175999_p = new IChatAPIListener()
+    {
+        public void chatInitializationCallback(ErrorCode p_chatInitializationCallback_1_)
+        {
+            if (ErrorCode.succeeded(p_chatInitializationCallback_1_))
+            {
+                ChatController.this.field_153008_f.setMessageFlushInterval(ChatController.this.field_175993_n);
+                ChatController.this.field_153008_f.setUserChangeEventInterval(ChatController.this.field_175994_o);
+                ChatController.this.func_153001_r();
+                ChatController.this.func_175985_a(ChatController.ChatState.Initialized);
+            }
+            else
+            {
+                ChatController.this.func_175985_a(ChatController.ChatState.Uninitialized);
+            }
+
+            try
+            {
+                if (ChatController.this.field_153003_a != null)
+                {
+                    ChatController.this.field_153003_a.func_176023_d(p_chatInitializationCallback_1_);
+                }
+            }
+            catch (Exception exception)
+            {
+                ChatController.this.func_152995_h(exception.toString());
+            }
+        }
+        public void chatShutdownCallback(ErrorCode p_chatShutdownCallback_1_)
+        {
+            if (ErrorCode.succeeded(p_chatShutdownCallback_1_))
+            {
+                ErrorCode errorcode = ChatController.this.field_175992_e.shutdown();
+
+                if (ErrorCode.failed(errorcode))
+                {
+                    String s = ErrorCode.getString(errorcode);
+                    ChatController.this.func_152995_h(String.format("Error shutting down the Twitch sdk: %s", new Object[] {s}));
+                }
+
+                ChatController.this.func_175985_a(ChatController.ChatState.Uninitialized);
+            }
+            else
+            {
+                ChatController.this.func_175985_a(ChatController.ChatState.Initialized);
+                ChatController.this.func_152995_h(String.format("Error shutting down Twith chat: %s", new Object[] {p_chatShutdownCallback_1_}));
+            }
+
+            try
+            {
+                if (ChatController.this.field_153003_a != null)
+                {
+                    ChatController.this.field_153003_a.func_176022_e(p_chatShutdownCallback_1_);
+                }
+            }
+            catch (Exception exception)
+            {
+                ChatController.this.func_152995_h(exception.toString());
+            }
+        }
+        public void chatEmoticonDataDownloadCallback(ErrorCode p_chatEmoticonDataDownloadCallback_1_)
+        {
+            if (ErrorCode.succeeded(p_chatEmoticonDataDownloadCallback_1_))
+            {
+                ChatController.this.func_152988_s();
+            }
+        }
+    };
 
     public void func_152990_a(ChatController.ChatListener p_152990_1_)
     {
@@ -82,8 +148,8 @@ public class ChatController
         }
         else
         {
-            ChatController.ChatChannelListener chatchannellistener = (ChatController.ChatChannelListener)this.field_175998_i.get(p_175990_1_);
-            return chatchannellistener.func_176040_a() == ChatController.EnumChannelState.Connected;
+            ChatController.ChatChannelListener chatcontroller$chatchannellistener = (ChatController.ChatChannelListener)this.field_175998_i.get(p_175990_1_);
+            return chatcontroller$chatchannellistener.func_176040_a() == ChatController.EnumChannelState.Connected;
         }
     }
 
@@ -95,91 +161,13 @@ public class ChatController
         }
         else
         {
-            ChatController.ChatChannelListener chatchannellistener = (ChatController.ChatChannelListener)this.field_175998_i.get(p_175989_1_);
-            return chatchannellistener.func_176040_a();
+            ChatController.ChatChannelListener chatcontroller$chatchannellistener = (ChatController.ChatChannelListener)this.field_175998_i.get(p_175989_1_);
+            return chatcontroller$chatchannellistener.func_176040_a();
         }
     }
 
     public ChatController()
     {
-        this.field_153011_i = ChatController.ChatState.Uninitialized;
-        this.field_153012_j = new AuthToken();
-        this.field_175998_i = new HashMap();
-        this.field_153015_m = 128;
-        this.field_175997_k = ChatController.EnumEmoticonMode.None;
-        this.field_175995_l = ChatController.EnumEmoticonMode.None;
-        this.field_175996_m = null;
-        this.field_175993_n = 500;
-        this.field_175994_o = 2000;
-        this.field_175999_p = new IChatAPIListener()
-        {
-            private static final String __OBFID = "CL_00002373";
-            public void chatInitializationCallback(ErrorCode p_chatInitializationCallback_1_)
-            {
-                if (ErrorCode.succeeded(p_chatInitializationCallback_1_))
-                {
-                    ChatController.this.field_153008_f.setMessageFlushInterval(ChatController.this.field_175993_n);
-                    ChatController.this.field_153008_f.setUserChangeEventInterval(ChatController.this.field_175994_o);
-                    ChatController.this.func_153001_r();
-                    ChatController.this.func_175985_a(ChatController.ChatState.Initialized);
-                }
-                else
-                {
-                    ChatController.this.func_175985_a(ChatController.ChatState.Uninitialized);
-                }
-
-                try
-                {
-                    if (ChatController.this.field_153003_a != null)
-                    {
-                        ChatController.this.field_153003_a.func_176023_d(p_chatInitializationCallback_1_);
-                    }
-                }
-                catch (Exception exception)
-                {
-                    ChatController.this.func_152995_h(exception.toString());
-                }
-            }
-            public void chatShutdownCallback(ErrorCode p_chatShutdownCallback_1_)
-            {
-                if (ErrorCode.succeeded(p_chatShutdownCallback_1_))
-                {
-                    ErrorCode errorcode1 = ChatController.this.field_175992_e.shutdown();
-
-                    if (ErrorCode.failed(errorcode1))
-                    {
-                        String s = ErrorCode.getString(errorcode1);
-                        ChatController.this.func_152995_h(String.format("Error shutting down the Twitch sdk: %s", new Object[] {s}));
-                    }
-
-                    ChatController.this.func_175985_a(ChatController.ChatState.Uninitialized);
-                }
-                else
-                {
-                    ChatController.this.func_175985_a(ChatController.ChatState.Initialized);
-                    ChatController.this.func_152995_h(String.format("Error shutting down Twith chat: %s", new Object[] {p_chatShutdownCallback_1_}));
-                }
-
-                try
-                {
-                    if (ChatController.this.field_153003_a != null)
-                    {
-                        ChatController.this.field_153003_a.func_176022_e(p_chatShutdownCallback_1_);
-                    }
-                }
-                catch (Exception exception)
-                {
-                    ChatController.this.func_152995_h(exception.toString());
-                }
-            }
-            public void chatEmoticonDataDownloadCallback(ErrorCode p_chatEmoticonDataDownloadCallback_1_)
-            {
-                if (ErrorCode.succeeded(p_chatEmoticonDataDownloadCallback_1_))
-                {
-                    ChatController.this.func_152988_s();
-                }
-            }
-        };
         this.field_175992_e = Core.getInstance();
 
         if (this.field_175992_e == null)
@@ -211,17 +199,17 @@ public class ChatController
             else
             {
                 this.field_175995_l = this.field_175997_k;
-                HashSet hashset = new HashSet();
+                HashSet<ChatTokenizationOption> hashset = new HashSet();
 
-                switch (ChatController.SwitchEnumEmoticonMode.field_175975_c[this.field_175997_k.ordinal()])
+                switch (this.field_175997_k)
                 {
-                    case 1:
+                    case None:
                         hashset.add(ChatTokenizationOption.TTV_CHAT_TOKENIZATION_OPTION_NONE);
                         break;
-                    case 2:
+                    case Url:
                         hashset.add(ChatTokenizationOption.TTV_CHAT_TOKENIZATION_OPTION_EMOTICON_URLS);
                         break;
-                    case 3:
+                    case TextureAtlas:
                         hashset.add(ChatTokenizationOption.TTV_CHAT_TOKENIZATION_OPTION_EMOTICON_TEXTURES);
                 }
 
@@ -262,16 +250,16 @@ public class ChatController
         }
         else if (p_175987_1_ != null && !p_175987_1_.equals(""))
         {
-            ChatController.ChatChannelListener chatchannellistener = new ChatController.ChatChannelListener(p_175987_1_);
-            this.field_175998_i.put(p_175987_1_, chatchannellistener);
-            boolean flag1 = chatchannellistener.func_176038_a(p_175987_2_);
+            ChatController.ChatChannelListener chatcontroller$chatchannellistener = new ChatController.ChatChannelListener(p_175987_1_);
+            this.field_175998_i.put(p_175987_1_, chatcontroller$chatchannellistener);
+            boolean flag = chatcontroller$chatchannellistener.func_176038_a(p_175987_2_);
 
-            if (!flag1)
+            if (!flag)
             {
                 this.field_175998_i.remove(p_175987_1_);
             }
 
-            return flag1;
+            return flag;
         }
         else
         {
@@ -292,8 +280,8 @@ public class ChatController
         }
         else
         {
-            ChatController.ChatChannelListener chatchannellistener = (ChatController.ChatChannelListener)this.field_175998_i.get(p_175991_1_);
-            return chatchannellistener.func_176034_g();
+            ChatController.ChatChannelListener chatcontroller$chatchannellistener = (ChatController.ChatChannelListener)this.field_175998_i.get(p_175991_1_);
+            return chatcontroller$chatchannellistener.func_176034_g();
         }
     }
 
@@ -337,7 +325,7 @@ public class ChatController
                         Thread.sleep(200L);
                         this.func_152997_n();
                     }
-                    catch (InterruptedException interruptedexception)
+                    catch (InterruptedException var2)
                     {
                         ;
                     }
@@ -373,8 +361,8 @@ public class ChatController
         }
         else
         {
-            ChatController.ChatChannelListener chatchannellistener = (ChatController.ChatChannelListener)this.field_175998_i.get(p_175986_1_);
-            return chatchannellistener.func_176037_b(p_175986_2_);
+            ChatController.ChatChannelListener chatcontroller$chatchannellistener = (ChatController.ChatChannelListener)this.field_175998_i.get(p_175986_1_);
+            return chatcontroller$chatchannellistener.func_176037_b(p_175986_2_);
         }
     }
 
@@ -474,7 +462,7 @@ public class ChatController
 
     protected void func_152995_h(String p_152995_1_)
     {
-        LOGGER.error(TwitchStream.field_152949_a, "[Chat controller] {}", new Object[] {p_152995_1_});
+        LOGGER.error(TwitchStream.STREAM_MARKER, "[Chat controller] {}", new Object[] {p_152995_1_});
     }
 
     @SideOnly(Side.CLIENT)
@@ -482,20 +470,14 @@ public class ChatController
     {
         protected String field_176048_a = null;
         protected boolean field_176046_b = false;
-        protected ChatController.EnumChannelState field_176047_c;
-        protected List field_176044_d;
-        protected LinkedList field_176045_e;
-        protected LinkedList field_176042_f;
-        protected ChatBadgeData field_176043_g;
-        private static final String __OBFID = "CL_00002370";
+        protected ChatController.EnumChannelState field_176047_c = ChatController.EnumChannelState.Created;
+        protected List<ChatUserInfo> field_176044_d = Lists.<ChatUserInfo>newArrayList();
+        protected LinkedList<ChatRawMessage> field_176045_e = new LinkedList();
+        protected LinkedList<ChatTokenizedMessage> field_176042_f = new LinkedList();
+        protected ChatBadgeData field_176043_g = null;
 
         public ChatChannelListener(String p_i46061_2_)
         {
-            this.field_176047_c = ChatController.EnumChannelState.Created;
-            this.field_176044_d = Lists.newArrayList();
-            this.field_176045_e = new LinkedList();
-            this.field_176042_f = new LinkedList();
-            this.field_176043_g = null;
             this.field_176048_a = p_i46061_2_;
         }
 
@@ -535,10 +517,10 @@ public class ChatController
 
         public boolean func_176034_g()
         {
-            switch (ChatController.SwitchEnumEmoticonMode.field_175976_a[this.field_176047_c.ordinal()])
+            switch (this.field_176047_c)
             {
-                case 1:
-                case 2:
+                case Connected:
+                case Connecting:
                     ErrorCode errorcode = ChatController.this.field_153008_f.disconnect(this.field_176048_a);
 
                     if (ErrorCode.failed(errorcode))
@@ -550,9 +532,9 @@ public class ChatController
 
                     this.func_176035_a(ChatController.EnumChannelState.Disconnecting);
                     return true;
-                case 3:
-                case 4:
-                case 5:
+                case Created:
+                case Disconnected:
+                case Disconnecting:
                 default:
                     return false;
             }
@@ -575,11 +557,9 @@ public class ChatController
             }
             else
             {
-                ListIterator listiterator;
-
                 if (this.field_176045_e.size() > 0)
                 {
-                    listiterator = this.field_176045_e.listIterator();
+                    ListIterator<ChatRawMessage> listiterator = this.field_176045_e.listIterator();
 
                     while (listiterator.hasNext())
                     {
@@ -594,15 +574,15 @@ public class ChatController
 
                 if (this.field_176042_f.size() > 0)
                 {
-                    listiterator = this.field_176042_f.listIterator();
+                    ListIterator<ChatTokenizedMessage> listiterator1 = this.field_176042_f.listIterator();
 
-                    while (listiterator.hasNext())
+                    while (listiterator1.hasNext())
                     {
-                        ChatTokenizedMessage chattokenizedmessage = (ChatTokenizedMessage)listiterator.next();
+                        ChatTokenizedMessage chattokenizedmessage = (ChatTokenizedMessage)listiterator1.next();
 
                         if (chattokenizedmessage.displayName.equals(p_176032_1_))
                         {
-                            listiterator.remove();
+                            listiterator1.remove();
                         }
                     }
                 }
@@ -633,8 +613,8 @@ public class ChatController
 
                 if (ErrorCode.failed(errorcode))
                 {
-                    String s1 = ErrorCode.getString(errorcode);
-                    ChatController.this.func_152995_h(String.format("Error sending chat message: %s", new Object[] {s1}));
+                    String s = ErrorCode.getString(errorcode);
+                    ChatController.this.func_152995_h(String.format("Error sending chat message: %s", new Object[] {s}));
                     return false;
                 }
                 else
@@ -769,25 +749,22 @@ public class ChatController
 
         public void chatChannelMembershipCallback(String p_chatChannelMembershipCallback_1_, ChatEvent p_chatChannelMembershipCallback_2_, ChatChannelInfo p_chatChannelMembershipCallback_3_)
         {
-            switch (ChatController.SwitchEnumEmoticonMode.field_175974_b[p_chatChannelMembershipCallback_2_.ordinal()])
+            switch (p_chatChannelMembershipCallback_2_)
             {
-                case 1:
+                case TTV_CHAT_JOINED_CHANNEL:
                     this.func_176035_a(ChatController.EnumChannelState.Connected);
                     this.func_176031_c(p_chatChannelMembershipCallback_1_);
                     break;
-                case 2:
+                case TTV_CHAT_LEFT_CHANNEL:
                     this.func_176030_k();
             }
         }
 
         public void chatChannelUserChangeCallback(String p_chatChannelUserChangeCallback_1_, ChatUserInfo[] p_chatChannelUserChangeCallback_2_, ChatUserInfo[] p_chatChannelUserChangeCallback_3_, ChatUserInfo[] p_chatChannelUserChangeCallback_4_)
         {
-            int i;
-            int j;
-
-            for (i = 0; i < p_chatChannelUserChangeCallback_3_.length; ++i)
+            for (int i = 0; i < p_chatChannelUserChangeCallback_3_.length; ++i)
             {
-                j = this.field_176044_d.indexOf(p_chatChannelUserChangeCallback_3_[i]);
+                int j = this.field_176044_d.indexOf(p_chatChannelUserChangeCallback_3_[i]);
 
                 if (j >= 0)
                 {
@@ -795,21 +772,21 @@ public class ChatController
                 }
             }
 
-            for (i = 0; i < p_chatChannelUserChangeCallback_4_.length; ++i)
+            for (int k = 0; k < p_chatChannelUserChangeCallback_4_.length; ++k)
             {
-                j = this.field_176044_d.indexOf(p_chatChannelUserChangeCallback_4_[i]);
+                int i1 = this.field_176044_d.indexOf(p_chatChannelUserChangeCallback_4_[k]);
 
-                if (j >= 0)
+                if (i1 >= 0)
                 {
-                    this.field_176044_d.remove(j);
+                    this.field_176044_d.remove(i1);
                 }
 
-                this.field_176044_d.add(p_chatChannelUserChangeCallback_4_[i]);
+                this.field_176044_d.add(p_chatChannelUserChangeCallback_4_[k]);
             }
 
-            for (i = 0; i < p_chatChannelUserChangeCallback_2_.length; ++i)
+            for (int l = 0; l < p_chatChannelUserChangeCallback_2_.length; ++l)
             {
-                this.field_176044_d.add(p_chatChannelUserChangeCallback_2_[i]);
+                this.field_176044_d.add(p_chatChannelUserChangeCallback_2_[l]);
             }
 
             try
@@ -926,8 +903,6 @@ public class ChatController
         Initializing,
         Initialized,
         ShuttingDown;
-
-        private static final String __OBFID = "CL_00001817";
     }
 
     @SideOnly(Side.CLIENT)
@@ -938,8 +913,6 @@ public class ChatController
         Connected,
         Disconnecting,
         Disconnected;
-
-        private static final String __OBFID = "CL_00002371";
     }
 
     @SideOnly(Side.CLIENT)
@@ -948,116 +921,5 @@ public class ChatController
         None,
         Url,
         TextureAtlas;
-
-        private static final String __OBFID = "CL_00002369";
     }
-
-    @SideOnly(Side.CLIENT)
-
-    static final class SwitchEnumEmoticonMode
-        {
-            static final int[] field_175976_a;
-
-            static final int[] field_175974_b;
-
-            static final int[] field_175975_c = new int[ChatController.EnumEmoticonMode.values().length];
-            private static final String __OBFID = "CL_00002372";
-
-            static
-            {
-                try
-                {
-                    field_175975_c[ChatController.EnumEmoticonMode.None.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var10)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_175975_c[ChatController.EnumEmoticonMode.Url.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var9)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_175975_c[ChatController.EnumEmoticonMode.TextureAtlas.ordinal()] = 3;
-                }
-                catch (NoSuchFieldError var8)
-                {
-                    ;
-                }
-
-                field_175974_b = new int[ChatEvent.values().length];
-
-                try
-                {
-                    field_175974_b[ChatEvent.TTV_CHAT_JOINED_CHANNEL.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var7)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_175974_b[ChatEvent.TTV_CHAT_LEFT_CHANNEL.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var6)
-                {
-                    ;
-                }
-
-                field_175976_a = new int[ChatController.EnumChannelState.values().length];
-
-                try
-                {
-                    field_175976_a[ChatController.EnumChannelState.Connected.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var5)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_175976_a[ChatController.EnumChannelState.Connecting.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var4)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_175976_a[ChatController.EnumChannelState.Created.ordinal()] = 3;
-                }
-                catch (NoSuchFieldError var3)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_175976_a[ChatController.EnumChannelState.Disconnected.ordinal()] = 4;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_175976_a[ChatController.EnumChannelState.Disconnecting.ordinal()] = 5;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
-            }
-        }
 }

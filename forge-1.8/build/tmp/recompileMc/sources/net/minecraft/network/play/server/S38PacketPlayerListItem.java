@@ -1,13 +1,12 @@
 package net.minecraft.network.play.server;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -16,36 +15,32 @@ import net.minecraft.world.WorldSettings;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S38PacketPlayerListItem implements Packet
+public class S38PacketPlayerListItem implements Packet<INetHandlerPlayClient>
 {
-    private S38PacketPlayerListItem.Action field_179770_a;
-    private final List field_179769_b = Lists.newArrayList();
-    private static final String __OBFID = "CL_00001318";
+    private S38PacketPlayerListItem.Action action;
+    private final List<S38PacketPlayerListItem.AddPlayerData> players = Lists.<S38PacketPlayerListItem.AddPlayerData>newArrayList();
 
-    public S38PacketPlayerListItem() {}
-
-    public S38PacketPlayerListItem(S38PacketPlayerListItem.Action p_i45967_1_, EntityPlayerMP ... p_i45967_2_)
+    public S38PacketPlayerListItem()
     {
-        this.field_179770_a = p_i45967_1_;
-        EntityPlayerMP[] aentityplayermp = p_i45967_2_;
-        int i = p_i45967_2_.length;
+    }
 
-        for (int j = 0; j < i; ++j)
+    public S38PacketPlayerListItem(S38PacketPlayerListItem.Action actionIn, EntityPlayerMP... players)
+    {
+        this.action = actionIn;
+
+        for (EntityPlayerMP entityplayermp : players)
         {
-            EntityPlayerMP entityplayermp1 = aentityplayermp[j];
-            this.field_179769_b.add(new S38PacketPlayerListItem.AddPlayerData(entityplayermp1.getGameProfile(), entityplayermp1.ping, entityplayermp1.theItemInWorldManager.getGameType(), entityplayermp1.getTabListDisplayName()));
+            this.players.add(new S38PacketPlayerListItem.AddPlayerData(entityplayermp.getGameProfile(), entityplayermp.ping, entityplayermp.theItemInWorldManager.getGameType(), entityplayermp.getTabListDisplayName()));
         }
     }
 
-    public S38PacketPlayerListItem(S38PacketPlayerListItem.Action p_i45968_1_, Iterable p_i45968_2_)
+    public S38PacketPlayerListItem(S38PacketPlayerListItem.Action actionIn, Iterable<EntityPlayerMP> players)
     {
-        this.field_179770_a = p_i45968_1_;
-        Iterator iterator = p_i45968_2_.iterator();
+        this.action = actionIn;
 
-        while (iterator.hasNext())
+        for (EntityPlayerMP entityplayermp : players)
         {
-            EntityPlayerMP entityplayermp = (EntityPlayerMP)iterator.next();
-            this.field_179769_b.add(new S38PacketPlayerListItem.AddPlayerData(entityplayermp.getGameProfile(), entityplayermp.ping, entityplayermp.theItemInWorldManager.getGameType(), entityplayermp.getTabListDisplayName()));
+            this.players.add(new S38PacketPlayerListItem.AddPlayerData(entityplayermp.getGameProfile(), entityplayermp.ping, entityplayermp.theItemInWorldManager.getGameType(), entityplayermp.getTabListDisplayName()));
         }
     }
 
@@ -54,23 +49,24 @@ public class S38PacketPlayerListItem implements Packet
      */
     public void readPacketData(PacketBuffer buf) throws IOException
     {
-        this.field_179770_a = (S38PacketPlayerListItem.Action)buf.readEnumValue(S38PacketPlayerListItem.Action.class);
+        this.action = (S38PacketPlayerListItem.Action)buf.readEnumValue(S38PacketPlayerListItem.Action.class);
         int i = buf.readVarIntFromBuffer();
 
         for (int j = 0; j < i; ++j)
         {
             GameProfile gameprofile = null;
             int k = 0;
-            WorldSettings.GameType gametype = null;
+            WorldSettings.GameType worldsettings$gametype = null;
             IChatComponent ichatcomponent = null;
 
-            switch (S38PacketPlayerListItem.SwitchAction.field_179938_a[this.field_179770_a.ordinal()])
+            switch (this.action)
             {
-                case 1:
+                case ADD_PLAYER:
                     gameprofile = new GameProfile(buf.readUuid(), buf.readStringFromBuffer(16));
                     int l = buf.readVarIntFromBuffer();
+                    int i1 = 0;
 
-                    for (int i1 = 0; i1 < l; ++i1)
+                    for (; i1 < l; ++i1)
                     {
                         String s = buf.readStringFromBuffer(32767);
                         String s1 = buf.readStringFromBuffer(32767);
@@ -85,7 +81,7 @@ public class S38PacketPlayerListItem implements Packet
                         }
                     }
 
-                    gametype = WorldSettings.GameType.getByID(buf.readVarIntFromBuffer());
+                    worldsettings$gametype = WorldSettings.GameType.getByID(buf.readVarIntFromBuffer());
                     k = buf.readVarIntFromBuffer();
 
                     if (buf.readBoolean())
@@ -94,15 +90,15 @@ public class S38PacketPlayerListItem implements Packet
                     }
 
                     break;
-                case 2:
+                case UPDATE_GAME_MODE:
                     gameprofile = new GameProfile(buf.readUuid(), (String)null);
-                    gametype = WorldSettings.GameType.getByID(buf.readVarIntFromBuffer());
+                    worldsettings$gametype = WorldSettings.GameType.getByID(buf.readVarIntFromBuffer());
                     break;
-                case 3:
+                case UPDATE_LATENCY:
                     gameprofile = new GameProfile(buf.readUuid(), (String)null);
                     k = buf.readVarIntFromBuffer();
                     break;
-                case 4:
+                case UPDATE_DISPLAY_NAME:
                     gameprofile = new GameProfile(buf.readUuid(), (String)null);
 
                     if (buf.readBoolean())
@@ -111,11 +107,11 @@ public class S38PacketPlayerListItem implements Packet
                     }
 
                     break;
-                case 5:
+                case REMOVE_PLAYER:
                     gameprofile = new GameProfile(buf.readUuid(), (String)null);
             }
 
-            this.field_179769_b.add(new S38PacketPlayerListItem.AddPlayerData(gameprofile, k, gametype, ichatcomponent));
+            this.players.add(new S38PacketPlayerListItem.AddPlayerData(gameprofile, k, worldsettings$gametype, ichatcomponent));
         }
     }
 
@@ -124,25 +120,20 @@ public class S38PacketPlayerListItem implements Packet
      */
     public void writePacketData(PacketBuffer buf) throws IOException
     {
-        buf.writeEnumValue(this.field_179770_a);
-        buf.writeVarIntToBuffer(this.field_179769_b.size());
-        Iterator iterator = this.field_179769_b.iterator();
+        buf.writeEnumValue(this.action);
+        buf.writeVarIntToBuffer(this.players.size());
 
-        while (iterator.hasNext())
+        for (S38PacketPlayerListItem.AddPlayerData s38packetplayerlistitem$addplayerdata : this.players)
         {
-            S38PacketPlayerListItem.AddPlayerData addplayerdata = (S38PacketPlayerListItem.AddPlayerData)iterator.next();
-
-            switch (S38PacketPlayerListItem.SwitchAction.field_179938_a[this.field_179770_a.ordinal()])
+            switch (this.action)
             {
-                case 1:
-                    buf.writeUuid(addplayerdata.func_179962_a().getId());
-                    buf.writeString(addplayerdata.func_179962_a().getName());
-                    buf.writeVarIntToBuffer(addplayerdata.func_179962_a().getProperties().size());
-                    Iterator iterator1 = addplayerdata.func_179962_a().getProperties().values().iterator();
+                case ADD_PLAYER:
+                    buf.writeUuid(s38packetplayerlistitem$addplayerdata.getProfile().getId());
+                    buf.writeString(s38packetplayerlistitem$addplayerdata.getProfile().getName());
+                    buf.writeVarIntToBuffer(s38packetplayerlistitem$addplayerdata.getProfile().getProperties().size());
 
-                    while (iterator1.hasNext())
+                    for (Property property : s38packetplayerlistitem$addplayerdata.getProfile().getProperties().values())
                     {
-                        Property property = (Property)iterator1.next();
                         buf.writeString(property.getName());
                         buf.writeString(property.getValue());
 
@@ -157,71 +148,71 @@ public class S38PacketPlayerListItem implements Packet
                         }
                     }
 
-                    buf.writeVarIntToBuffer(addplayerdata.func_179960_c().getID());
-                    buf.writeVarIntToBuffer(addplayerdata.func_179963_b());
+                    buf.writeVarIntToBuffer(s38packetplayerlistitem$addplayerdata.getGameMode().getID());
+                    buf.writeVarIntToBuffer(s38packetplayerlistitem$addplayerdata.getPing());
 
-                    if (addplayerdata.func_179961_d() == null)
+                    if (s38packetplayerlistitem$addplayerdata.getDisplayName() == null)
                     {
                         buf.writeBoolean(false);
                     }
                     else
                     {
                         buf.writeBoolean(true);
-                        buf.writeChatComponent(addplayerdata.func_179961_d());
+                        buf.writeChatComponent(s38packetplayerlistitem$addplayerdata.getDisplayName());
                     }
 
                     break;
-                case 2:
-                    buf.writeUuid(addplayerdata.func_179962_a().getId());
-                    buf.writeVarIntToBuffer(addplayerdata.func_179960_c().getID());
+                case UPDATE_GAME_MODE:
+                    buf.writeUuid(s38packetplayerlistitem$addplayerdata.getProfile().getId());
+                    buf.writeVarIntToBuffer(s38packetplayerlistitem$addplayerdata.getGameMode().getID());
                     break;
-                case 3:
-                    buf.writeUuid(addplayerdata.func_179962_a().getId());
-                    buf.writeVarIntToBuffer(addplayerdata.func_179963_b());
+                case UPDATE_LATENCY:
+                    buf.writeUuid(s38packetplayerlistitem$addplayerdata.getProfile().getId());
+                    buf.writeVarIntToBuffer(s38packetplayerlistitem$addplayerdata.getPing());
                     break;
-                case 4:
-                    buf.writeUuid(addplayerdata.func_179962_a().getId());
+                case UPDATE_DISPLAY_NAME:
+                    buf.writeUuid(s38packetplayerlistitem$addplayerdata.getProfile().getId());
 
-                    if (addplayerdata.func_179961_d() == null)
+                    if (s38packetplayerlistitem$addplayerdata.getDisplayName() == null)
                     {
                         buf.writeBoolean(false);
                     }
                     else
                     {
                         buf.writeBoolean(true);
-                        buf.writeChatComponent(addplayerdata.func_179961_d());
+                        buf.writeChatComponent(s38packetplayerlistitem$addplayerdata.getDisplayName());
                     }
 
                     break;
-                case 5:
-                    buf.writeUuid(addplayerdata.func_179962_a().getId());
+                case REMOVE_PLAYER:
+                    buf.writeUuid(s38packetplayerlistitem$addplayerdata.getProfile().getId());
             }
         }
-    }
-
-    public void func_180743_a(INetHandlerPlayClient p_180743_1_)
-    {
-        p_180743_1_.handlePlayerListItem(this);
-    }
-
-    @SideOnly(Side.CLIENT)
-    public List func_179767_a()
-    {
-        return this.field_179769_b;
     }
 
     /**
      * Passes this Packet on to the NetHandler for processing.
      */
-    public void processPacket(INetHandler handler)
+    public void processPacket(INetHandlerPlayClient handler)
     {
-        this.func_180743_a((INetHandlerPlayClient)handler);
+        handler.handlePlayerListItem(this);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public List<S38PacketPlayerListItem.AddPlayerData> func_179767_a()
+    {
+        return this.players;
     }
 
     @SideOnly(Side.CLIENT)
     public S38PacketPlayerListItem.Action func_179768_b()
     {
-        return this.field_179770_a;
+        return this.action;
+    }
+
+    public String toString()
+    {
+        return Objects.toStringHelper(this).add("action", this.action).add("entries", this.players).toString();
     }
 
     public static enum Action
@@ -231,98 +222,46 @@ public class S38PacketPlayerListItem implements Packet
         UPDATE_LATENCY,
         UPDATE_DISPLAY_NAME,
         REMOVE_PLAYER;
-
-        private static final String __OBFID = "CL_00002295";
     }
 
     public class AddPlayerData
     {
-        private final int field_179966_b;
-        private final WorldSettings.GameType field_179967_c;
-        private final GameProfile field_179964_d;
-        private final IChatComponent field_179965_e;
-        private static final String __OBFID = "CL_00002294";
+        private final int ping;
+        private final WorldSettings.GameType gamemode;
+        private final GameProfile profile;
+        private final IChatComponent displayName;
 
-        public AddPlayerData(GameProfile p_i45965_2_, int p_i45965_3_, WorldSettings.GameType p_i45965_4_, IChatComponent p_i45965_5_)
+        public AddPlayerData(GameProfile profile, int pingIn, WorldSettings.GameType gamemodeIn, IChatComponent displayNameIn)
         {
-            this.field_179964_d = p_i45965_2_;
-            this.field_179966_b = p_i45965_3_;
-            this.field_179967_c = p_i45965_4_;
-            this.field_179965_e = p_i45965_5_;
+            this.profile = profile;
+            this.ping = pingIn;
+            this.gamemode = gamemodeIn;
+            this.displayName = displayNameIn;
         }
 
-        public GameProfile func_179962_a()
+        public GameProfile getProfile()
         {
-            return this.field_179964_d;
+            return this.profile;
         }
 
-        public int func_179963_b()
+        public int getPing()
         {
-            return this.field_179966_b;
+            return this.ping;
         }
 
-        public WorldSettings.GameType func_179960_c()
+        public WorldSettings.GameType getGameMode()
         {
-            return this.field_179967_c;
+            return this.gamemode;
         }
 
-        public IChatComponent func_179961_d()
+        public IChatComponent getDisplayName()
         {
-            return this.field_179965_e;
+            return this.displayName;
+        }
+
+        public String toString()
+        {
+            return Objects.toStringHelper(this).add("latency", this.ping).add("gameMode", this.gamemode).add("profile", this.profile).add("displayName", this.displayName == null ? null : IChatComponent.Serializer.componentToJson(this.displayName)).toString();
         }
     }
-
-    static final class SwitchAction
-        {
-            static final int[] field_179938_a = new int[S38PacketPlayerListItem.Action.values().length];
-            private static final String __OBFID = "CL_00002296";
-
-            static
-            {
-                try
-                {
-                    field_179938_a[S38PacketPlayerListItem.Action.ADD_PLAYER.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var5)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_179938_a[S38PacketPlayerListItem.Action.UPDATE_GAME_MODE.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var4)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_179938_a[S38PacketPlayerListItem.Action.UPDATE_LATENCY.ordinal()] = 3;
-                }
-                catch (NoSuchFieldError var3)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_179938_a[S38PacketPlayerListItem.Action.UPDATE_DISPLAY_NAME.ordinal()] = 4;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_179938_a[S38PacketPlayerListItem.Action.REMOVE_PLAYER.ordinal()] = 5;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
-            }
-        }
 }

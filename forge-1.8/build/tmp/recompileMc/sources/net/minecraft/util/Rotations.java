@@ -11,7 +11,6 @@ public class Rotations
     protected final float y;
     /** Rotation on the Z axis */
     protected final float z;
-    private static final String __OBFID = "CL_00002316";
 
     public Rotations(float x, float y, float z)
     {
@@ -22,9 +21,9 @@ public class Rotations
 
     public Rotations(NBTTagList nbt)
     {
-        this.x = nbt.getFloat(0);
-        this.y = nbt.getFloat(1);
-        this.z = nbt.getFloat(2);
+        this.x = nbt.getFloatAt(0);
+        this.y = nbt.getFloatAt(1);
+        this.z = nbt.getFloatAt(2);
     }
 
     public NBTTagList writeToNBT()

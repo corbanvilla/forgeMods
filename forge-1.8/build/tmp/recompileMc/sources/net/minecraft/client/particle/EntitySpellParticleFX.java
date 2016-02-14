@@ -11,14 +11,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class EntitySpellParticleFX extends EntityFX
 {
-    private static final Random field_174848_a = new Random();
+    private static final Random RANDOM = new Random();
     /** Base spell texture index */
     private int baseSpellTextureIndex = 128;
-    private static final String __OBFID = "CL_00000926";
 
-    protected EntitySpellParticleFX(World worldIn, double p_i1229_2_, double p_i1229_4_, double p_i1229_6_, double p_i1229_8_, double p_i1229_10_, double p_i1229_12_)
+    protected EntitySpellParticleFX(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double p_i1229_8_, double p_i1229_10_, double p_i1229_12_)
     {
-        super(worldIn, p_i1229_2_, p_i1229_4_, p_i1229_6_, 0.5D - field_174848_a.nextDouble(), p_i1229_10_, 0.5D - field_174848_a.nextDouble());
+        super(worldIn, xCoordIn, yCoordIn, zCoordIn, 0.5D - RANDOM.nextDouble(), p_i1229_10_, 0.5D - RANDOM.nextDouble());
         this.motionY *= 0.20000000298023224D;
 
         if (p_i1229_8_ == 0.0D && p_i1229_12_ == 0.0D)
@@ -32,11 +31,14 @@ public class EntitySpellParticleFX extends EntityFX
         this.noClip = false;
     }
 
-    public void func_180434_a(WorldRenderer p_180434_1_, Entity p_180434_2_, float p_180434_3_, float p_180434_4_, float p_180434_5_, float p_180434_6_, float p_180434_7_, float p_180434_8_)
+    /**
+     * Renders the particle
+     */
+    public void renderParticle(WorldRenderer worldRendererIn, Entity entityIn, float partialTicks, float p_180434_4_, float p_180434_5_, float p_180434_6_, float p_180434_7_, float p_180434_8_)
     {
-        float f6 = ((float)this.particleAge + p_180434_3_) / (float)this.particleMaxAge * 32.0F;
-        f6 = MathHelper.clamp_float(f6, 0.0F, 1.0F);
-        super.func_180434_a(p_180434_1_, p_180434_2_, p_180434_3_, p_180434_4_, p_180434_5_, p_180434_6_, p_180434_7_, p_180434_8_);
+        float f = ((float)this.particleAge + partialTicks) / (float)this.particleMaxAge * 32.0F;
+        f = MathHelper.clamp_float(f, 0.0F, 1.0F);
+        super.renderParticle(worldRendererIn, entityIn, partialTicks, p_180434_4_, p_180434_5_, p_180434_6_, p_180434_7_, p_180434_8_);
     }
 
     /**
@@ -77,74 +79,64 @@ public class EntitySpellParticleFX extends EntityFX
     /**
      * Sets the base spell texture index
      */
-    public void setBaseSpellTextureIndex(int p_70589_1_)
+    public void setBaseSpellTextureIndex(int baseSpellTextureIndexIn)
     {
-        this.baseSpellTextureIndex = p_70589_1_;
+        this.baseSpellTextureIndex = baseSpellTextureIndexIn;
     }
 
     @SideOnly(Side.CLIENT)
     public static class AmbientMobFactory implements IParticleFactory
         {
-            private static final String __OBFID = "CL_00002585";
-
-            public EntityFX getEntityFX(int p_178902_1_, World worldIn, double p_178902_3_, double p_178902_5_, double p_178902_7_, double p_178902_9_, double p_178902_11_, double p_178902_13_, int ... p_178902_15_)
+            public EntityFX getEntityFX(int particleID, World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn, int... p_178902_15_)
             {
-                EntitySpellParticleFX entityspellparticlefx = new EntitySpellParticleFX(worldIn, p_178902_3_, p_178902_5_, p_178902_7_, p_178902_9_, p_178902_11_, p_178902_13_);
-                entityspellparticlefx.setAlphaF(0.15F);
-                entityspellparticlefx.setRBGColorF((float)p_178902_9_, (float)p_178902_11_, (float)p_178902_13_);
-                return entityspellparticlefx;
+                EntityFX entityfx = new EntitySpellParticleFX(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
+                entityfx.setAlphaF(0.15F);
+                entityfx.setRBGColorF((float)xSpeedIn, (float)ySpeedIn, (float)zSpeedIn);
+                return entityfx;
             }
         }
 
     @SideOnly(Side.CLIENT)
     public static class Factory implements IParticleFactory
         {
-            private static final String __OBFID = "CL_00002582";
-
-            public EntityFX getEntityFX(int p_178902_1_, World worldIn, double p_178902_3_, double p_178902_5_, double p_178902_7_, double p_178902_9_, double p_178902_11_, double p_178902_13_, int ... p_178902_15_)
+            public EntityFX getEntityFX(int particleID, World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn, int... p_178902_15_)
             {
-                return new EntitySpellParticleFX(worldIn, p_178902_3_, p_178902_5_, p_178902_7_, p_178902_9_, p_178902_11_, p_178902_13_);
+                return new EntitySpellParticleFX(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
             }
         }
 
     @SideOnly(Side.CLIENT)
     public static class InstantFactory implements IParticleFactory
         {
-            private static final String __OBFID = "CL_00002584";
-
-            public EntityFX getEntityFX(int p_178902_1_, World worldIn, double p_178902_3_, double p_178902_5_, double p_178902_7_, double p_178902_9_, double p_178902_11_, double p_178902_13_, int ... p_178902_15_)
+            public EntityFX getEntityFX(int particleID, World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn, int... p_178902_15_)
             {
-                EntitySpellParticleFX entityspellparticlefx = new EntitySpellParticleFX(worldIn, p_178902_3_, p_178902_5_, p_178902_7_, p_178902_9_, p_178902_11_, p_178902_13_);
-                ((EntitySpellParticleFX)entityspellparticlefx).setBaseSpellTextureIndex(144);
-                return entityspellparticlefx;
+                EntityFX entityfx = new EntitySpellParticleFX(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
+                ((EntitySpellParticleFX)entityfx).setBaseSpellTextureIndex(144);
+                return entityfx;
             }
         }
 
     @SideOnly(Side.CLIENT)
     public static class MobFactory implements IParticleFactory
         {
-            private static final String __OBFID = "CL_00002583";
-
-            public EntityFX getEntityFX(int p_178902_1_, World worldIn, double p_178902_3_, double p_178902_5_, double p_178902_7_, double p_178902_9_, double p_178902_11_, double p_178902_13_, int ... p_178902_15_)
+            public EntityFX getEntityFX(int particleID, World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn, int... p_178902_15_)
             {
-                EntitySpellParticleFX entityspellparticlefx = new EntitySpellParticleFX(worldIn, p_178902_3_, p_178902_5_, p_178902_7_, p_178902_9_, p_178902_11_, p_178902_13_);
-                entityspellparticlefx.setRBGColorF((float)p_178902_9_, (float)p_178902_11_, (float)p_178902_13_);
-                return entityspellparticlefx;
+                EntityFX entityfx = new EntitySpellParticleFX(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
+                entityfx.setRBGColorF((float)xSpeedIn, (float)ySpeedIn, (float)zSpeedIn);
+                return entityfx;
             }
         }
 
     @SideOnly(Side.CLIENT)
     public static class WitchFactory implements IParticleFactory
         {
-            private static final String __OBFID = "CL_00002581";
-
-            public EntityFX getEntityFX(int p_178902_1_, World worldIn, double p_178902_3_, double p_178902_5_, double p_178902_7_, double p_178902_9_, double p_178902_11_, double p_178902_13_, int ... p_178902_15_)
+            public EntityFX getEntityFX(int particleID, World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn, int... p_178902_15_)
             {
-                EntitySpellParticleFX entityspellparticlefx = new EntitySpellParticleFX(worldIn, p_178902_3_, p_178902_5_, p_178902_7_, p_178902_9_, p_178902_11_, p_178902_13_);
-                ((EntitySpellParticleFX)entityspellparticlefx).setBaseSpellTextureIndex(144);
+                EntityFX entityfx = new EntitySpellParticleFX(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
+                ((EntitySpellParticleFX)entityfx).setBaseSpellTextureIndex(144);
                 float f = worldIn.rand.nextFloat() * 0.5F + 0.35F;
-                entityspellparticlefx.setRBGColorF(1.0F * f, 0.0F * f, 1.0F * f);
-                return entityspellparticlefx;
+                entityfx.setRBGColorF(1.0F * f, 0.0F * f, 1.0F * f);
+                return entityfx;
             }
         }
 }

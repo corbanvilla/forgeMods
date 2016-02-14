@@ -16,8 +16,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class EmptyChunk extends Chunk
 {
-    private static final String __OBFID = "CL_00000372";
-
     public EmptyChunk(World worldIn, int x, int z)
     {
         super(worldIn, x, z);
@@ -34,7 +32,7 @@ public class EmptyChunk extends Chunk
     /**
      * Returns the value in the height map at this x, z coordinate in the chunk
      */
-    public int getHeight(int x, int z)
+    public int getHeightValue(int x, int z)
     {
         return 0;
     }
@@ -42,13 +40,17 @@ public class EmptyChunk extends Chunk
     /**
      * Generates the initial skylight map for the chunk upon generation or load.
      */
-    public void generateSkylightMap() {}
+    public void generateSkylightMap()
+    {
+    }
 
     /**
      * Generates the height map for a chunk from scratch
      */
     @SideOnly(Side.CLIENT)
-    public void generateHeightMap() {}
+    public void generateHeightMap()
+    {
+    }
 
     public Block getBlock(BlockPos pos)
     {
@@ -70,9 +72,11 @@ public class EmptyChunk extends Chunk
         return p_177413_1_.defaultLightValue;
     }
 
-    public void setLightFor(EnumSkyBlock p_177431_1_, BlockPos pos, int value) {}
+    public void setLightFor(EnumSkyBlock p_177431_1_, BlockPos pos, int value)
+    {
+    }
 
-    public int setLight(BlockPos pos, int p_177443_2_)
+    public int getLightSubtracted(BlockPos pos, int amount)
     {
         return 0;
     }
@@ -80,17 +84,23 @@ public class EmptyChunk extends Chunk
     /**
      * Adds an entity to the chunk. Args: entity
      */
-    public void addEntity(Entity entityIn) {}
+    public void addEntity(Entity entityIn)
+    {
+    }
 
     /**
      * removes entity using its y chunk coordinate as its index
      */
-    public void removeEntity(Entity p_76622_1_) {}
+    public void removeEntity(Entity entityIn)
+    {
+    }
 
     /**
      * Removes entity at the specified index from the entity array.
      */
-    public void removeEntityAtIndex(Entity p_76608_1_, int p_76608_2_) {}
+    public void removeEntityAtIndex(Entity entityIn, int p_76608_2_)
+    {
+    }
 
     public boolean canSeeSky(BlockPos pos)
     {
@@ -102,36 +112,49 @@ public class EmptyChunk extends Chunk
         return null;
     }
 
-    public void addTileEntity(TileEntity tileEntityIn) {}
+    public void addTileEntity(TileEntity tileEntityIn)
+    {
+    }
 
-    public void addTileEntity(BlockPos pos, TileEntity tileEntityIn) {}
+    public void addTileEntity(BlockPos pos, TileEntity tileEntityIn)
+    {
+    }
 
-    public void removeTileEntity(BlockPos pos) {}
+    public void removeTileEntity(BlockPos pos)
+    {
+    }
 
     /**
      * Called when this Chunk is loaded by the ChunkProvider
      */
-    public void onChunkLoad() {}
+    public void onChunkLoad()
+    {
+    }
 
     /**
      * Called when this Chunk is unloaded by the ChunkProvider
      */
-    public void onChunkUnload() {}
+    public void onChunkUnload()
+    {
+    }
 
     /**
      * Sets the isModified flag for this Chunk
      */
-    public void setChunkModified() {}
+    public void setChunkModified()
+    {
+    }
 
     /**
      * Fills the given list of all entities that intersect within the given bounding box that aren't the passed entity.
      */
-    public void getEntitiesWithinAABBForEntity(Entity entityIn, AxisAlignedBB aabb, List listToFill, Predicate p_177414_4_) {}
+    public void getEntitiesWithinAABBForEntity(Entity entityIn, AxisAlignedBB aabb, List<Entity> listToFill, Predicate <? super Entity > p_177414_4_)
+    {
+    }
 
-    /**
-     * Gets all entities that can be assigned to the specified class.
-     */
-    public void getEntitiesOfTypeWithinAAAB(Class entityClass, AxisAlignedBB aabb, List listToFill, Predicate p_177430_4_) {}
+    public <T extends Entity> void getEntitiesOfTypeWithinAAAB(Class <? extends T > entityClass, AxisAlignedBB aabb, List<T> listToFill, Predicate <? super T > p_177430_4_)
+    {
+    }
 
     /**
      * Returns true if this Chunk needs to be saved

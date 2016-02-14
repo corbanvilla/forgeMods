@@ -13,35 +13,22 @@ public class VertexFormatElement
     private final VertexFormatElement.EnumUsage usage;
     private int index;
     private int elementCount;
-    private int offset;
-    private static final String __OBFID = "CL_00002399";
 
-    public VertexFormatElement(int p_i46096_1_, VertexFormatElement.EnumType p_i46096_2_, VertexFormatElement.EnumUsage p_i46096_3_, int p_i46096_4_)
+    public VertexFormatElement(int indexIn, VertexFormatElement.EnumType typeIn, VertexFormatElement.EnumUsage usageIn, int count)
     {
-        if (!this.func_177372_a(p_i46096_1_, p_i46096_3_))
+        if (!this.func_177372_a(indexIn, usageIn))
         {
             LOGGER.warn("Multiple vertex elements of the same type other than UVs are not supported. Forcing type to UV.");
             this.usage = VertexFormatElement.EnumUsage.UV;
         }
         else
         {
-            this.usage = p_i46096_3_;
+            this.usage = usageIn;
         }
 
-        this.type = p_i46096_2_;
-        this.index = p_i46096_1_;
-        this.elementCount = p_i46096_4_;
-        this.offset = 0;
-    }
-
-    public void setOffset(int p_177371_1_)
-    {
-        this.offset = p_177371_1_;
-    }
-
-    public int getOffset()
-    {
-        return this.offset;
+        this.type = typeIn;
+        this.index = indexIn;
+        this.elementCount = count;
     }
 
     private final boolean func_177372_a(int p_177372_1_, VertexFormatElement.EnumUsage p_177372_2_)
@@ -93,7 +80,7 @@ public class VertexFormatElement
         else if (p_equals_1_ != null && this.getClass() == p_equals_1_.getClass())
         {
             VertexFormatElement vertexformatelement = (VertexFormatElement)p_equals_1_;
-            return this.elementCount != vertexformatelement.elementCount ? false : (this.index != vertexformatelement.index ? false : (this.offset != vertexformatelement.offset ? false : (this.type != vertexformatelement.type ? false : this.usage == vertexformatelement.usage)));
+            return this.elementCount != vertexformatelement.elementCount ? false : (this.index != vertexformatelement.index ? false : (this.type != vertexformatelement.type ? false : this.usage == vertexformatelement.usage));
         }
         else
         {
@@ -107,38 +94,29 @@ public class VertexFormatElement
         i = 31 * i + this.usage.hashCode();
         i = 31 * i + this.index;
         i = 31 * i + this.elementCount;
-        i = 31 * i + this.offset;
         return i;
     }
 
     @SideOnly(Side.CLIENT)
     public static enum EnumType
     {
-        FLOAT(4, "Float", org.lwjgl.opengl.GL11.GL_FLOAT),
-        UBYTE(1, "Unsigned Byte", org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE),
-        BYTE(1, "Byte", org.lwjgl.opengl.GL11.GL_BYTE),
-        USHORT(2, "Unsigned Short", org.lwjgl.opengl.GL11.GL_UNSIGNED_SHORT),
-        SHORT(2, "Short", org.lwjgl.opengl.GL11.GL_SHORT),
-        UINT(4, "Unsigned Int", org.lwjgl.opengl.GL11.GL_UNSIGNED_INT),
-        INT(4, "Int", org.lwjgl.opengl.GL11.GL_INT);
-        // Commented for now, might be added in the future if anyone needs them
-        //HALF_FLOAT(2, "Half Float", org.lwjgl.opengl.GL30.GL_HALF_FLOAT),
-        //DOUBLE(8, "Double", org.lwjgl.opengl.GL11.GL_DOUBLE),
-        //INT_2_10_10_10_REV(4, "Int 2-10-10-10 reversed", org.lwjgl.opengl.GL33.GL_INT_2_10_10_10_REV),
-        //UINT_2_10_10_10_REV(4, "Unsigned Int 2-10-10-10 reversed", org.lwjgl.opengl.GL12.GL_UNSIGNED_INT_2_10_10_10_REV),
-        //UINT_10F_11F_11F_REV(4, "Unsigned Int 10F 11F 11F reversed", GL_UNSIGNED_INT_10F_11F_11F_REV);
+        FLOAT(4, "Float", 5126),
+        UBYTE(1, "Unsigned Byte", 5121),
+        BYTE(1, "Byte", 5120),
+        USHORT(2, "Unsigned Short", 5123),
+        SHORT(2, "Short", 5122),
+        UINT(4, "Unsigned Int", 5125),
+        INT(4, "Int", 5124);
 
         private final int size;
         private final String displayName;
         private final int glConstant;
 
-        private static final String __OBFID = "CL_00002398";
-
-        private EnumType(int p_i46095_3_, String p_i46095_4_, int p_i46095_5_)
+        private EnumType(int sizeIn, String displayNameIn, int glConstantIn)
         {
-            this.size = p_i46095_3_;
-            this.displayName = p_i46095_4_;
-            this.glConstant = p_i46095_5_;
+            this.size = sizeIn;
+            this.displayName = displayNameIn;
+            this.glConstant = glConstantIn;
         }
 
         public int getSize()
@@ -164,24 +142,22 @@ public class VertexFormatElement
         NORMAL("Normal"),
         COLOR("Vertex Color"),
         UV("UV"),
-        // As of 1.8 - unused in vanilla; use GENERIC for now
+        // As of 1.8.8 - unused in vanilla; use GENERIC for now
         @Deprecated
         MATRIX("Bone Matrix"),
         @Deprecated
         BLEND_WEIGHT("Blend Weight"),
         PADDING("Padding"),
-        GENERIC("Generic Attribute");
+        GENERIC("Generic");
 
-        public void preDraw(VertexFormatElement element, int stride, java.nio.ByteBuffer buffer) { net.minecraftforge.client.ForgeHooksClient.preDraw(this, element, stride, buffer); }
-        public void postDraw(VertexFormatElement element, int stride, java.nio.ByteBuffer buffer) { net.minecraftforge.client.ForgeHooksClient.postDraw(this, element, stride, buffer); }
+        public void preDraw(VertexFormat format, int element, int stride, java.nio.ByteBuffer buffer) { net.minecraftforge.client.ForgeHooksClient.preDraw(this, format, element, stride, buffer); }
+        public void postDraw(VertexFormat format, int element, int stride, java.nio.ByteBuffer buffer) { net.minecraftforge.client.ForgeHooksClient.postDraw(this, format, element, stride, buffer); }
 
         private final String displayName;
 
-        private static final String __OBFID = "CL_00002397";
-
-        private EnumUsage(String p_i46094_3_)
+        private EnumUsage(String displayNameIn)
         {
-            this.displayName = p_i46094_3_;
+            this.displayName = displayNameIn;
         }
 
         public String getDisplayName()

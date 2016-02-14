@@ -28,7 +28,6 @@ public class GuiEditSign extends GuiScreen
     private int editLine;
     /** "Done" button for the GUI. */
     private GuiButton doneBtn;
-    private static final String __OBFID = "CL_00000764";
 
     public GuiEditSign(TileEntitySign teSign)
     {
@@ -36,7 +35,8 @@ public class GuiEditSign extends GuiScreen
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
     public void initGui()
     {
@@ -70,6 +70,9 @@ public class GuiEditSign extends GuiScreen
         ++this.updateCounter;
     }
 
+    /**
+     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
+     */
     protected void actionPerformed(GuiButton button) throws IOException
     {
         if (button.enabled)
@@ -83,7 +86,7 @@ public class GuiEditSign extends GuiScreen
     }
 
     /**
-     * Fired when a key is typed (except F11 who toggle full screen). This is the equivalent of
+     * Fired when a key is typed (except F11 which toggles full screen). This is the equivalent of
      * KeyListener.keyTyped(KeyEvent e). Args : character (character on the key), keyCode (lwjgl Keyboard key code)
      */
     protected void keyTyped(char typedChar, int keyCode) throws IOException
@@ -128,38 +131,38 @@ public class GuiEditSign extends GuiScreen
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.pushMatrix();
         GlStateManager.translate((float)(this.width / 2), 0.0F, 50.0F);
-        float f1 = 93.75F;
-        GlStateManager.scale(-f1, -f1, -f1);
+        float f = 93.75F;
+        GlStateManager.scale(-f, -f, -f);
         GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
         Block block = this.tileSign.getBlockType();
 
         if (block == Blocks.standing_sign)
         {
-            float f2 = (float)(this.tileSign.getBlockMetadata() * 360) / 16.0F;
-            GlStateManager.rotate(f2, 0.0F, 1.0F, 0.0F);
+            float f1 = (float)(this.tileSign.getBlockMetadata() * 360) / 16.0F;
+            GlStateManager.rotate(f1, 0.0F, 1.0F, 0.0F);
             GlStateManager.translate(0.0F, -1.0625F, 0.0F);
         }
         else
         {
-            int k = this.tileSign.getBlockMetadata();
-            float f3 = 0.0F;
+            int i = this.tileSign.getBlockMetadata();
+            float f2 = 0.0F;
 
-            if (k == 2)
+            if (i == 2)
             {
-                f3 = 180.0F;
+                f2 = 180.0F;
             }
 
-            if (k == 4)
+            if (i == 4)
             {
-                f3 = 90.0F;
+                f2 = 90.0F;
             }
 
-            if (k == 5)
+            if (i == 5)
             {
-                f3 = -90.0F;
+                f2 = -90.0F;
             }
 
-            GlStateManager.rotate(f3, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(f2, 0.0F, 1.0F, 0.0F);
             GlStateManager.translate(0.0F, -1.0625F, 0.0F);
         }
 

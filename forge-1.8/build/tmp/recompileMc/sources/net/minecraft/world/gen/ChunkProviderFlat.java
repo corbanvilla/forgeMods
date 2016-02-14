@@ -1,7 +1,6 @@
 package net.minecraft.world.gen;
 
 import com.google.common.collect.Lists;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -31,26 +30,25 @@ public class ChunkProviderFlat implements IChunkProvider
     private Random random;
     private final IBlockState[] cachedBlockIDs = new IBlockState[256];
     private final FlatGeneratorInfo flatWorldGenInfo;
-    private final List structureGenerators = Lists.newArrayList();
+    private final List<MapGenStructure> structureGenerators = Lists.<MapGenStructure>newArrayList();
     private final boolean hasDecoration;
     private final boolean hasDungeons;
     private WorldGenLakes waterLakeGenerator;
     private WorldGenLakes lavaLakeGenerator;
-    private static final String __OBFID = "CL_00000391";
 
-    public ChunkProviderFlat(World worldIn, long p_i2004_2_, boolean p_i2004_4_, String p_i2004_5_)
+    public ChunkProviderFlat(World worldIn, long seed, boolean generateStructures, String flatGeneratorSettings)
     {
         this.worldObj = worldIn;
-        this.random = new Random(p_i2004_2_);
-        this.flatWorldGenInfo = FlatGeneratorInfo.createFlatGeneratorFromString(p_i2004_5_);
+        this.random = new Random(seed);
+        this.flatWorldGenInfo = FlatGeneratorInfo.createFlatGeneratorFromString(flatGeneratorSettings);
 
-        if (p_i2004_4_)
+        if (generateStructures)
         {
-            Map map = this.flatWorldGenInfo.getWorldFeatures();
+            Map<String, Map<String, String>> map = this.flatWorldGenInfo.getWorldFeatures();
 
             if (map.containsKey("village"))
             {
-                Map map1 = (Map)map.get("village");
+                Map<String, String> map1 = (Map)map.get("village");
 
                 if (!map1.containsKey("size"))
                 {
@@ -92,26 +90,36 @@ public class ChunkProviderFlat implements IChunkProvider
         }
 
         this.hasDungeons = this.flatWorldGenInfo.getWorldFeatures().containsKey("dungeon");
-        boolean flag1 = true;
-        Iterator iterator = this.flatWorldGenInfo.getFlatLayers().iterator();
+        int j = 0;
+        int k = 0;
+        boolean flag = true;
 
-        while (iterator.hasNext())
+        for (FlatLayerInfo flatlayerinfo : this.flatWorldGenInfo.getFlatLayers())
         {
-            FlatLayerInfo flatlayerinfo = (FlatLayerInfo)iterator.next();
-
-            for (int j = flatlayerinfo.getMinY(); j < flatlayerinfo.getMinY() + flatlayerinfo.getLayerCount(); ++j)
+            for (int i = flatlayerinfo.getMinY(); i < flatlayerinfo.getMinY() + flatlayerinfo.getLayerCount(); ++i)
             {
                 IBlockState iblockstate = flatlayerinfo.func_175900_c();
 
                 if (iblockstate.getBlock() != Blocks.air)
                 {
-                    flag1 = false;
-                    this.cachedBlockIDs[j] = iblockstate;
+                    flag = false;
+                    this.cachedBlockIDs[i] = iblockstate;
                 }
+            }
+
+            if (flatlayerinfo.func_175900_c().getBlock() == Blocks.air)
+            {
+                k += flatlayerinfo.getLayerCount();
+            }
+            else
+            {
+                j += flatlayerinfo.getLayerCount() + k;
+                k = 0;
             }
         }
 
-        this.hasDecoration = flag1 ? false : this.flatWorldGenInfo.getWorldFeatures().containsKey("decoration");
+        worldIn.setSeaLevel(j);
+        this.hasDecoration = flag ? false : this.flatWorldGenInfo.getWorldFeatures().containsKey("decoration");
     }
 
     /**
@@ -121,39 +129,35 @@ public class ChunkProviderFlat implements IChunkProvider
     public Chunk provideChunk(int x, int z)
     {
         ChunkPrimer chunkprimer = new ChunkPrimer();
-        int i1;
 
-        for (int k = 0; k < this.cachedBlockIDs.length; ++k)
+        for (int i = 0; i < this.cachedBlockIDs.length; ++i)
         {
-            IBlockState iblockstate = this.cachedBlockIDs[k];
+            IBlockState iblockstate = this.cachedBlockIDs[i];
 
             if (iblockstate != null)
             {
-                for (int l = 0; l < 16; ++l)
+                for (int j = 0; j < 16; ++j)
                 {
-                    for (i1 = 0; i1 < 16; ++i1)
+                    for (int k = 0; k < 16; ++k)
                     {
-                        chunkprimer.setBlockState(l, k, i1, iblockstate);
+                        chunkprimer.setBlockState(j, i, k, iblockstate);
                     }
                 }
             }
         }
 
-        Iterator iterator = this.structureGenerators.iterator();
-
-        while (iterator.hasNext())
+        for (MapGenBase mapgenbase : this.structureGenerators)
         {
-            MapGenBase mapgenbase = (MapGenBase)iterator.next();
-            mapgenbase.func_175792_a(this, this.worldObj, x, z, chunkprimer);
+            mapgenbase.generate(this, this.worldObj, x, z, chunkprimer);
         }
 
         Chunk chunk = new Chunk(this.worldObj, chunkprimer, x, z);
         BiomeGenBase[] abiomegenbase = this.worldObj.getWorldChunkManager().loadBlockGeneratorData((BiomeGenBase[])null, x * 16, z * 16, 16, 16);
         byte[] abyte = chunk.getBiomeArray();
 
-        for (i1 = 0; i1 < abyte.length; ++i1)
+        for (int l = 0; l < abyte.length; ++l)
         {
-            abyte[i1] = (byte)abiomegenbase[i1].biomeID;
+            abyte[l] = (byte)abiomegenbase[l].biomeID;
         }
 
         chunk.generateSkylightMap();
@@ -173,22 +177,20 @@ public class ChunkProviderFlat implements IChunkProvider
      */
     public void populate(IChunkProvider p_73153_1_, int p_73153_2_, int p_73153_3_)
     {
-        int k = p_73153_2_ * 16;
-        int l = p_73153_3_ * 16;
-        BlockPos blockpos = new BlockPos(k, 0, l);
-        BiomeGenBase biomegenbase = this.worldObj.getBiomeGenForCoords(new BlockPos(k + 16, 0, l + 16));
+        int i = p_73153_2_ * 16;
+        int j = p_73153_3_ * 16;
+        BlockPos blockpos = new BlockPos(i, 0, j);
+        BiomeGenBase biomegenbase = this.worldObj.getBiomeGenForCoords(new BlockPos(i + 16, 0, j + 16));
         boolean flag = false;
         this.random.setSeed(this.worldObj.getSeed());
-        long i1 = this.random.nextLong() / 2L * 2L + 1L;
-        long j1 = this.random.nextLong() / 2L * 2L + 1L;
-        this.random.setSeed((long)p_73153_2_ * i1 + (long)p_73153_3_ * j1 ^ this.worldObj.getSeed());
+        long k = this.random.nextLong() / 2L * 2L + 1L;
+        long l = this.random.nextLong() / 2L * 2L + 1L;
+        this.random.setSeed((long)p_73153_2_ * k + (long)p_73153_3_ * l ^ this.worldObj.getSeed());
         ChunkCoordIntPair chunkcoordintpair = new ChunkCoordIntPair(p_73153_2_, p_73153_3_);
-        Iterator iterator = this.structureGenerators.iterator();
 
-        while (iterator.hasNext())
+        for (MapGenStructure mapgenstructure : this.structureGenerators)
         {
-            MapGenStructure mapgenstructure = (MapGenStructure)iterator.next();
-            boolean flag1 = mapgenstructure.func_175794_a(this.worldObj, this.random, chunkcoordintpair);
+            boolean flag1 = mapgenstructure.generateStructure(this.worldObj, this.random, chunkcoordintpair);
 
             if (mapgenstructure instanceof MapGenVillage)
             {
@@ -205,7 +207,7 @@ public class ChunkProviderFlat implements IChunkProvider
         {
             BlockPos blockpos1 = blockpos.add(this.random.nextInt(16) + 8, this.random.nextInt(this.random.nextInt(248) + 8), this.random.nextInt(16) + 8);
 
-            if (blockpos1.getY() < 63 || this.random.nextInt(10) == 0)
+            if (blockpos1.getY() < this.worldObj.getSeaLevel() || this.random.nextInt(10) == 0)
             {
                 this.lavaLakeGenerator.generate(this.worldObj, this.random, blockpos1);
             }
@@ -213,7 +215,7 @@ public class ChunkProviderFlat implements IChunkProvider
 
         if (this.hasDungeons)
         {
-            for (int k1 = 0; k1 < 8; ++k1)
+            for (int i1 = 0; i1 < 8; ++i1)
             {
                 (new WorldGenDungeons()).generate(this.worldObj, this.random, blockpos.add(this.random.nextInt(16) + 8, this.random.nextInt(256), this.random.nextInt(16) + 8));
             }
@@ -221,7 +223,7 @@ public class ChunkProviderFlat implements IChunkProvider
 
         if (this.hasDecoration)
         {
-            biomegenbase.decorate(this.worldObj, this.random, new BlockPos(k, 0, l));
+            biomegenbase.decorate(this.worldObj, this.random, blockpos);
         }
     }
 
@@ -234,7 +236,7 @@ public class ChunkProviderFlat implements IChunkProvider
      * Two modes of operation: if passed true, save all Chunks in one go.  If passed false, save up to two chunks.
      * Return true if all chunks have been saved.
      */
-    public boolean saveChunks(boolean p_73151_1_, IProgressUpdate p_73151_2_)
+    public boolean saveChunks(boolean p_73151_1_, IProgressUpdate progressCallback)
     {
         return true;
     }
@@ -243,7 +245,9 @@ public class ChunkProviderFlat implements IChunkProvider
      * Save extra data not associated with any Chunk.  Not saved during autosave, only during world unload.  Currently
      * unimplemented.
      */
-    public void saveExtraData() {}
+    public void saveExtraData()
+    {
+    }
 
     /**
      * Unloads chunks that are marked to be unloaded. This is not guaranteed to unload every such chunk.
@@ -269,25 +273,21 @@ public class ChunkProviderFlat implements IChunkProvider
         return "FlatLevelSource";
     }
 
-    public List func_177458_a(EnumCreatureType p_177458_1_, BlockPos p_177458_2_)
+    public List<BiomeGenBase.SpawnListEntry> getPossibleCreatures(EnumCreatureType creatureType, BlockPos pos)
     {
-        BiomeGenBase biomegenbase = this.worldObj.getBiomeGenForCoords(p_177458_2_);
-        return biomegenbase.getSpawnableList(p_177458_1_);
+        BiomeGenBase biomegenbase = this.worldObj.getBiomeGenForCoords(pos);
+        return biomegenbase.getSpawnableList(creatureType);
     }
 
-    public BlockPos getStrongholdGen(World worldIn, String p_180513_2_, BlockPos p_180513_3_)
+    public BlockPos getStrongholdGen(World worldIn, String structureName, BlockPos position)
     {
-        if ("Stronghold".equals(p_180513_2_))
+        if ("Stronghold".equals(structureName))
         {
-            Iterator iterator = this.structureGenerators.iterator();
-
-            while (iterator.hasNext())
+            for (MapGenStructure mapgenstructure : this.structureGenerators)
             {
-                MapGenStructure mapgenstructure = (MapGenStructure)iterator.next();
-
                 if (mapgenstructure instanceof MapGenStronghold)
                 {
-                    return mapgenstructure.getClosestStrongholdPos(worldIn, p_180513_3_);
+                    return mapgenstructure.getClosestStrongholdPos(worldIn, position);
                 }
             }
         }
@@ -302,12 +302,9 @@ public class ChunkProviderFlat implements IChunkProvider
 
     public void recreateStructures(Chunk p_180514_1_, int p_180514_2_, int p_180514_3_)
     {
-        Iterator iterator = this.structureGenerators.iterator();
-
-        while (iterator.hasNext())
+        for (MapGenStructure mapgenstructure : this.structureGenerators)
         {
-            MapGenStructure mapgenstructure = (MapGenStructure)iterator.next();
-            mapgenstructure.func_175792_a(this, this.worldObj, p_180514_2_, p_180514_3_, (ChunkPrimer)null);
+            mapgenstructure.generate(this, this.worldObj, p_180514_2_, p_180514_3_, (ChunkPrimer)null);
         }
     }
 

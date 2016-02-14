@@ -15,6 +15,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.StatCollector;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -27,8 +28,7 @@ public class BlockWall extends Block
     public static final PropertyBool EAST = PropertyBool.create("east");
     public static final PropertyBool SOUTH = PropertyBool.create("south");
     public static final PropertyBool WEST = PropertyBool.create("west");
-    public static final PropertyEnum VARIANT = PropertyEnum.create("variant", BlockWall.EnumType.class);
-    private static final String __OBFID = "CL_00000331";
+    public static final PropertyEnum<BlockWall.EnumType> VARIANT = PropertyEnum.<BlockWall.EnumType>create("variant", BlockWall.EnumType.class);
 
     public BlockWall(Block modelBlock)
     {
@@ -38,6 +38,14 @@ public class BlockWall extends Block
         this.setResistance(modelBlock.blockResistance / 3.0F);
         this.setStepSound(modelBlock.stepSound);
         this.setCreativeTab(CreativeTabs.tabBlock);
+    }
+
+    /**
+     * Gets the localized name of this block. Used for the statistics page.
+     */
+    public String getLocalizedName()
+    {
+        return StatCollector.translateToLocal(this.getUnlocalizedName() + "." + BlockWall.EnumType.NORMAL.getUnlocalizedName() + ".name");
     }
 
     public boolean isFullCube()
@@ -50,6 +58,9 @@ public class BlockWall extends Block
         return false;
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -120,20 +131,17 @@ public class BlockWall extends Block
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
     {
-        BlockWall.EnumType[] aenumtype = BlockWall.EnumType.values();
-        int i = aenumtype.length;
-
-        for (int j = 0; j < i; ++j)
+        for (BlockWall.EnumType blockwall$enumtype : BlockWall.EnumType.values())
         {
-            BlockWall.EnumType enumtype = aenumtype[j];
-            list.add(new ItemStack(itemIn, 1, enumtype.getMetadata()));
+            list.add(new ItemStack(itemIn, 1, blockwall$enumtype.getMetadata()));
         }
     }
 
     /**
-     * Get the damage value that this Block should drop
+     * Gets the metadata of the item this Block can drop. This method is called when the block gets destroyed. It
+     * returns the metadata of the dropped item based on the old metadata of the block.
      */
     public int damageDropped(IBlockState state)
     {
@@ -180,12 +188,11 @@ public class BlockWall extends Block
     {
         NORMAL(0, "cobblestone", "normal"),
         MOSSY(1, "mossy_cobblestone", "mossy");
+
         private static final BlockWall.EnumType[] META_LOOKUP = new BlockWall.EnumType[values().length];
         private final int meta;
         private final String name;
         private String unlocalizedName;
-
-        private static final String __OBFID = "CL_00002048";
 
         private EnumType(int meta, String name, String unlocalizedName)
         {
@@ -226,13 +233,9 @@ public class BlockWall extends Block
 
         static
         {
-            BlockWall.EnumType[] var0 = values();
-            int var1 = var0.length;
-
-            for (int var2 = 0; var2 < var1; ++var2)
+            for (BlockWall.EnumType blockwall$enumtype : values())
             {
-                BlockWall.EnumType var3 = var0[var2];
-                META_LOOKUP[var3.getMetadata()] = var3;
+                META_LOOKUP[blockwall$enumtype.getMetadata()] = blockwall$enumtype;
             }
         }
     }

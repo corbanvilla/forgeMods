@@ -20,8 +20,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockQuartz extends Block
 {
-    public static final PropertyEnum VARIANT = PropertyEnum.create("variant", BlockQuartz.EnumType.class);
-    private static final String __OBFID = "CL_00000292";
+    public static final PropertyEnum<BlockQuartz.EnumType> VARIANT = PropertyEnum.<BlockQuartz.EnumType>create("variant", BlockQuartz.EnumType.class);
 
     public BlockQuartz()
     {
@@ -30,17 +29,21 @@ public class BlockQuartz extends Block
         this.setCreativeTab(CreativeTabs.tabBlock);
     }
 
+    /**
+     * Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the
+     * IBlockstate
+     */
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
         if (meta == BlockQuartz.EnumType.LINES_Y.getMetadata())
         {
-            switch (BlockQuartz.SwitchAxis.AXIS_LOOKUP[facing.getAxis().ordinal()])
+            switch (facing.getAxis())
             {
-                case 1:
+                case Z:
                     return this.getDefaultState().withProperty(VARIANT, BlockQuartz.EnumType.LINES_Z);
-                case 2:
+                case X:
                     return this.getDefaultState().withProperty(VARIANT, BlockQuartz.EnumType.LINES_X);
-                case 3:
+                case Y:
                 default:
                     return this.getDefaultState().withProperty(VARIANT, BlockQuartz.EnumType.LINES_Y);
             }
@@ -52,25 +55,26 @@ public class BlockQuartz extends Block
     }
 
     /**
-     * Get the damage value that this Block should drop
+     * Gets the metadata of the item this Block can drop. This method is called when the block gets destroyed. It
+     * returns the metadata of the dropped item based on the old metadata of the block.
      */
     public int damageDropped(IBlockState state)
     {
-        BlockQuartz.EnumType enumtype = (BlockQuartz.EnumType)state.getValue(VARIANT);
-        return enumtype != BlockQuartz.EnumType.LINES_X && enumtype != BlockQuartz.EnumType.LINES_Z ? enumtype.getMetadata() : BlockQuartz.EnumType.LINES_Y.getMetadata();
+        BlockQuartz.EnumType blockquartz$enumtype = (BlockQuartz.EnumType)state.getValue(VARIANT);
+        return blockquartz$enumtype != BlockQuartz.EnumType.LINES_X && blockquartz$enumtype != BlockQuartz.EnumType.LINES_Z ? blockquartz$enumtype.getMetadata() : BlockQuartz.EnumType.LINES_Y.getMetadata();
     }
 
     protected ItemStack createStackedBlock(IBlockState state)
     {
-        BlockQuartz.EnumType enumtype = (BlockQuartz.EnumType)state.getValue(VARIANT);
-        return enumtype != BlockQuartz.EnumType.LINES_X && enumtype != BlockQuartz.EnumType.LINES_Z ? super.createStackedBlock(state) : new ItemStack(Item.getItemFromBlock(this), 1, BlockQuartz.EnumType.LINES_Y.getMetadata());
+        BlockQuartz.EnumType blockquartz$enumtype = (BlockQuartz.EnumType)state.getValue(VARIANT);
+        return blockquartz$enumtype != BlockQuartz.EnumType.LINES_X && blockquartz$enumtype != BlockQuartz.EnumType.LINES_Z ? super.createStackedBlock(state) : new ItemStack(Item.getItemFromBlock(this), 1, BlockQuartz.EnumType.LINES_Y.getMetadata());
     }
 
     /**
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
     {
         list.add(new ItemStack(itemIn, 1, BlockQuartz.EnumType.DEFAULT.getMetadata()));
         list.add(new ItemStack(itemIn, 1, BlockQuartz.EnumType.CHISELED.getMetadata()));
@@ -133,12 +137,11 @@ public class BlockQuartz extends Block
         LINES_Y(2, "lines_y", "lines"),
         LINES_X(3, "lines_x", "lines"),
         LINES_Z(4, "lines_z", "lines");
+
         private static final BlockQuartz.EnumType[] META_LOOKUP = new BlockQuartz.EnumType[values().length];
         private final int meta;
         private final String field_176805_h;
         private final String unlocalizedName;
-
-        private static final String __OBFID = "CL_00002074";
 
         private EnumType(int meta, String name, String unlocalizedName)
         {
@@ -174,50 +177,10 @@ public class BlockQuartz extends Block
 
         static
         {
-            BlockQuartz.EnumType[] var0 = values();
-            int var1 = var0.length;
-
-            for (int var2 = 0; var2 < var1; ++var2)
+            for (BlockQuartz.EnumType blockquartz$enumtype : values())
             {
-                BlockQuartz.EnumType var3 = var0[var2];
-                META_LOOKUP[var3.getMetadata()] = var3;
+                META_LOOKUP[blockquartz$enumtype.getMetadata()] = blockquartz$enumtype;
             }
         }
     }
-
-    static final class SwitchAxis
-        {
-            static final int[] AXIS_LOOKUP = new int[EnumFacing.Axis.values().length];
-            private static final String __OBFID = "CL_00002075";
-
-            static
-            {
-                try
-                {
-                    AXIS_LOOKUP[EnumFacing.Axis.Z.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var3)
-                {
-                    ;
-                }
-
-                try
-                {
-                    AXIS_LOOKUP[EnumFacing.Axis.X.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
-
-                try
-                {
-                    AXIS_LOOKUP[EnumFacing.Axis.Y.ordinal()] = 3;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
-            }
-        }
 }

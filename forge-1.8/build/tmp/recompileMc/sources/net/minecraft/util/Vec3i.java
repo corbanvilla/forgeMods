@@ -2,7 +2,7 @@ package net.minecraft.util;
 
 import com.google.common.base.Objects;
 
-public class Vec3i implements Comparable
+public class Vec3i implements Comparable<Vec3i>
 {
     /** The Null vector constant (0, 0, 0) */
     public static final Vec3i NULL_VECTOR = new Vec3i(0, 0, 0);
@@ -12,7 +12,6 @@ public class Vec3i implements Comparable
     private final int y;
     /** Z coordinate */
     private final int z;
-    private static final String __OBFID = "CL_00002315";
 
     public Vec3i(int xIn, int yIn, int zIn)
     {
@@ -48,9 +47,9 @@ public class Vec3i implements Comparable
         return (this.getY() + this.getZ() * 31) * 31 + this.getX();
     }
 
-    public int compareTo(Vec3i vec)
+    public int compareTo(Vec3i p_compareTo_1_)
     {
-        return this.getY() == vec.getY() ? (this.getZ() == vec.getZ() ? this.getX() - vec.getX() : this.getZ() - vec.getZ()) : this.getY() - vec.getY();
+        return this.getY() == p_compareTo_1_.getY() ? (this.getZ() == p_compareTo_1_.getZ() ? this.getX() - p_compareTo_1_.getX() : this.getZ() - p_compareTo_1_.getZ()) : this.getY() - p_compareTo_1_.getY();
     }
 
     /**
@@ -87,17 +86,13 @@ public class Vec3i implements Comparable
 
     /**
      * Calculate squared distance to the given coordinates
-     *  
-     * @param toX X Coordinate
-     * @param toY Y Coordinate
-     * @param toZ Z Coordinate
      */
     public double distanceSq(double toX, double toY, double toZ)
     {
-        double d3 = (double)this.getX() - toX;
-        double d4 = (double)this.getY() - toY;
-        double d5 = (double)this.getZ() - toZ;
-        return d3 * d3 + d4 * d4 + d5 * d5;
+        double d0 = (double)this.getX() - toX;
+        double d1 = (double)this.getY() - toY;
+        double d2 = (double)this.getZ() - toZ;
+        return d0 * d0 + d1 * d1 + d2 * d2;
     }
 
     /**
@@ -105,10 +100,10 @@ public class Vec3i implements Comparable
      */
     public double distanceSqToCenter(double xIn, double yIn, double zIn)
     {
-        double d3 = (double)this.getX() + 0.5D - xIn;
-        double d4 = (double)this.getY() + 0.5D - yIn;
-        double d5 = (double)this.getZ() + 0.5D - zIn;
-        return d3 * d3 + d4 * d4 + d5 * d5;
+        double d0 = (double)this.getX() + 0.5D - xIn;
+        double d1 = (double)this.getY() + 0.5D - yIn;
+        double d2 = (double)this.getZ() + 0.5D - zIn;
+        return d0 * d0 + d1 * d1 + d2 * d2;
     }
 
     /**
@@ -122,10 +117,5 @@ public class Vec3i implements Comparable
     public String toString()
     {
         return Objects.toStringHelper(this).add("x", this.getX()).add("y", this.getY()).add("z", this.getZ()).toString();
-    }
-
-    public int compareTo(Object p_compareTo_1_)
-    {
-        return this.compareTo((Vec3i)p_compareTo_1_);
     }
 }

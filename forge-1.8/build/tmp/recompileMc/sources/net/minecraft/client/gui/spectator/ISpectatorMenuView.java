@@ -8,7 +8,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public interface ISpectatorMenuView
 {
-    List func_178669_a();
+    List<ISpectatorMenuObject> func_178669_a();
 
     IChatComponent func_178670_b();
 }

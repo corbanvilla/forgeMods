@@ -2,12 +2,10 @@ package net.minecraft.item.crafting;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.BlockStone;
@@ -26,9 +24,7 @@ public class CraftingManager
 {
     /** The static instance of this class */
     private static final CraftingManager instance = new CraftingManager();
-    /** A list of all the recipes added */
-    private final List recipes = Lists.newArrayList();
-    private static final String __OBFID = "CL_00000090";
+    private final List<IRecipe> recipes = Lists.<IRecipe>newArrayList();
 
     /**
      * Returns the static instance of this class
@@ -54,7 +50,7 @@ public class CraftingManager
         this.recipes.add(new RecipesMapExtending());
         this.recipes.add(new RecipeFireworks());
         this.recipes.add(new RecipeRepairItem());
-        (new RecipesBanners()).func_179534_a(this);
+        (new RecipesBanners()).addRecipes(this);
         this.addRecipe(new ItemStack(Items.paper, 3), new Object[] {"###", '#', Items.reeds});
         this.addShapelessRecipe(new ItemStack(Items.book, 1), new Object[] {Items.paper, Items.paper, Items.paper, Items.leather});
         this.addShapelessRecipe(new ItemStack(Items.writable_book, 1), new Object[] {Items.book, new ItemStack(Items.dye, 1, EnumDyeColor.BLACK.getDyeDamage()), Items.feather});
@@ -147,7 +143,7 @@ public class CraftingManager
         this.addRecipe(new ItemStack(Blocks.acacia_stairs, 4), new Object[] {"#  ", "## ", "###", '#', new ItemStack(Blocks.planks, 1, 4 + BlockPlanks.EnumType.ACACIA.getMetadata() - 4)});
         this.addRecipe(new ItemStack(Blocks.dark_oak_stairs, 4), new Object[] {"#  ", "## ", "###", '#', new ItemStack(Blocks.planks, 1, 4 + BlockPlanks.EnumType.DARK_OAK.getMetadata() - 4)});
         this.addRecipe(new ItemStack(Items.fishing_rod, 1), new Object[] {"  #", " #X", "# X", '#', Items.stick, 'X', Items.string});
-        this.addRecipe(new ItemStack(Items.carrot_on_a_stick, 1), new Object[] {"# ", " X", '#', Items.fishing_rod, 'X', Items.carrot}).func_92100_c();
+        this.addRecipe(new ItemStack(Items.carrot_on_a_stick, 1), new Object[] {"# ", " X", '#', Items.fishing_rod, 'X', Items.carrot});
         this.addRecipe(new ItemStack(Blocks.stone_stairs, 4), new Object[] {"#  ", "## ", "###", '#', Blocks.cobblestone});
         this.addRecipe(new ItemStack(Blocks.brick_stairs, 4), new Object[] {"#  ", "## ", "###", '#', Blocks.brick_block});
         this.addRecipe(new ItemStack(Blocks.stone_brick_stairs, 4), new Object[] {"#  ", "## ", "###", '#', Blocks.stonebrick});
@@ -189,16 +185,11 @@ public class CraftingManager
         this.addRecipe(new ItemStack(Blocks.daylight_detector), new Object[] {"GGG", "QQQ", "WWW", 'G', Blocks.glass, 'Q', Items.quartz, 'W', Blocks.wooden_slab});
         this.addRecipe(new ItemStack(Blocks.hopper), new Object[] {"I I", "ICI", " I ", 'I', Items.iron_ingot, 'C', Blocks.chest});
         this.addRecipe(new ItemStack(Items.armor_stand, 1), new Object[] {"///", " / ", "/_/", '/', Items.stick, '_', new ItemStack(Blocks.stone_slab, 1, BlockStoneSlab.EnumType.STONE.getMetadata())});
-        Collections.sort(this.recipes, new Comparator()
+        Collections.sort(this.recipes, new Comparator<IRecipe>()
         {
-            private static final String __OBFID = "CL_00000091";
             public int compare(IRecipe p_compare_1_, IRecipe p_compare_2_)
             {
                 return p_compare_1_ instanceof ShapelessRecipes && p_compare_2_ instanceof ShapedRecipes ? 1 : (p_compare_2_ instanceof ShapelessRecipes && p_compare_1_ instanceof ShapedRecipes ? -1 : (p_compare_2_.getRecipeSize() < p_compare_1_.getRecipeSize() ? -1 : (p_compare_2_.getRecipeSize() > p_compare_1_.getRecipeSize() ? 1 : 0)));
-            }
-            public int compare(Object p_compare_1_, Object p_compare_2_)
-            {
-                return this.compare((IRecipe)p_compare_1_, (IRecipe)p_compare_2_);
             }
         });
     }
@@ -206,7 +197,7 @@ public class CraftingManager
     /**
      * Adds a shaped recipe to the games recipe list.
      */
-    public ShapedRecipes addRecipe(ItemStack stack, Object ... recipeComponents)
+    public ShapedRecipes addRecipe(ItemStack stack, Object... recipeComponents)
     {
         String s = "";
         int i = 0;
@@ -219,44 +210,44 @@ public class CraftingManager
 
             for (int l = 0; l < astring.length; ++l)
             {
-                String s1 = astring[l];
+                String s2 = astring[l];
                 ++k;
-                j = s1.length();
-                s = s + s1;
+                j = s2.length();
+                s = s + s2;
             }
         }
         else
         {
             while (recipeComponents[i] instanceof String)
             {
-                String s2 = (String)recipeComponents[i++];
+                String s1 = (String)recipeComponents[i++];
                 ++k;
-                j = s2.length();
-                s = s + s2;
+                j = s1.length();
+                s = s + s1;
             }
         }
 
-        HashMap hashmap;
+        Map<Character, ItemStack> map;
 
-        for (hashmap = Maps.newHashMap(); i < recipeComponents.length; i += 2)
+        for (map = Maps.<Character, ItemStack>newHashMap(); i < recipeComponents.length; i += 2)
         {
             Character character = (Character)recipeComponents[i];
-            ItemStack itemstack1 = null;
+            ItemStack itemstack = null;
 
             if (recipeComponents[i + 1] instanceof Item)
             {
-                itemstack1 = new ItemStack((Item)recipeComponents[i + 1]);
+                itemstack = new ItemStack((Item)recipeComponents[i + 1]);
             }
             else if (recipeComponents[i + 1] instanceof Block)
             {
-                itemstack1 = new ItemStack((Block)recipeComponents[i + 1], 1, 32767);
+                itemstack = new ItemStack((Block)recipeComponents[i + 1], 1, 32767);
             }
             else if (recipeComponents[i + 1] instanceof ItemStack)
             {
-                itemstack1 = (ItemStack)recipeComponents[i + 1];
+                itemstack = (ItemStack)recipeComponents[i + 1];
             }
 
-            hashmap.put(character, itemstack1);
+            map.put(character, itemstack);
         }
 
         ItemStack[] aitemstack = new ItemStack[j * k];
@@ -265,9 +256,9 @@ public class CraftingManager
         {
             char c0 = s.charAt(i1);
 
-            if (hashmap.containsKey(Character.valueOf(c0)))
+            if (map.containsKey(Character.valueOf(c0)))
             {
-                aitemstack[i1] = ((ItemStack)hashmap.get(Character.valueOf(c0))).copy();
+                aitemstack[i1] = ((ItemStack)map.get(Character.valueOf(c0))).copy();
             }
             else
             {
@@ -282,45 +273,37 @@ public class CraftingManager
 
     /**
      * Adds a shapeless crafting recipe to the the game.
-     *  
-     * @param recipeComponents An array of ItemStack's Item's and Block's that make up the recipe.
      */
-    public void addShapelessRecipe(ItemStack stack, Object ... recipeComponents)
+    public void addShapelessRecipe(ItemStack stack, Object... recipeComponents)
     {
-        ArrayList arraylist = Lists.newArrayList();
-        Object[] aobject = recipeComponents;
-        int i = recipeComponents.length;
+        List<ItemStack> list = Lists.<ItemStack>newArrayList();
 
-        for (int j = 0; j < i; ++j)
+        for (Object object : recipeComponents)
         {
-            Object object1 = aobject[j];
-
-            if (object1 instanceof ItemStack)
+            if (object instanceof ItemStack)
             {
-                arraylist.add(((ItemStack)object1).copy());
+                list.add(((ItemStack)object).copy());
             }
-            else if (object1 instanceof Item)
+            else if (object instanceof Item)
             {
-                arraylist.add(new ItemStack((Item)object1));
+                list.add(new ItemStack((Item)object));
             }
             else
             {
-                if (!(object1 instanceof Block))
+                if (!(object instanceof Block))
                 {
-                    throw new IllegalArgumentException("Invalid shapeless recipe: unknown type " + object1.getClass().getName() + "!");
+                    throw new IllegalArgumentException("Invalid shapeless recipe: unknown type " + object.getClass().getName() + "!");
                 }
 
-                arraylist.add(new ItemStack((Block)object1));
+                list.add(new ItemStack((Block)object));
             }
         }
 
-        this.recipes.add(new ShapelessRecipes(stack, arraylist));
+        this.recipes.add(new ShapelessRecipes(stack, list));
     }
 
     /**
      * Adds an IRecipe to the list of crafting recipes.
-     *  
-     * @param recipe A recipe that will be added to the recipe list.
      */
     public void addRecipe(IRecipe recipe)
     {
@@ -332,31 +315,21 @@ public class CraftingManager
      */
     public ItemStack findMatchingRecipe(InventoryCrafting p_82787_1_, World worldIn)
     {
-        Iterator iterator = this.recipes.iterator();
-        IRecipe irecipe;
-
-        do
+        for (IRecipe irecipe : this.recipes)
         {
-            if (!iterator.hasNext())
+            if (irecipe.matches(p_82787_1_, worldIn))
             {
-                return null;
+                return irecipe.getCraftingResult(p_82787_1_);
             }
-
-            irecipe = (IRecipe)iterator.next();
         }
-        while (!irecipe.matches(p_82787_1_, worldIn));
 
-        return irecipe.getCraftingResult(p_82787_1_);
+        return null;
     }
 
     public ItemStack[] func_180303_b(InventoryCrafting p_180303_1_, World worldIn)
     {
-        Iterator iterator = this.recipes.iterator();
-
-        while (iterator.hasNext())
+        for (IRecipe irecipe : this.recipes)
         {
-            IRecipe irecipe = (IRecipe)iterator.next();
-
             if (irecipe.matches(p_180303_1_, worldIn))
             {
                 return irecipe.getRemainingItems(p_180303_1_);
@@ -373,10 +346,7 @@ public class CraftingManager
         return aitemstack;
     }
 
-    /**
-     * returns the List<> of all recipes
-     */
-    public List getRecipeList()
+    public List<IRecipe> getRecipeList()
     {
         return this.recipes;
     }

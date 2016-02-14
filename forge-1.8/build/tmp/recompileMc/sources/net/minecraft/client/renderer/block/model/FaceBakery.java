@@ -1,9 +1,5 @@
 package net.minecraft.client.renderer.block.model;
 
-import javax.vecmath.AxisAngle4d;
-import javax.vecmath.Matrix4d;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
 import net.minecraft.client.renderer.EnumFaceDirection;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.ModelRotation;
@@ -12,13 +8,15 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3i;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 @SideOnly(Side.CLIENT)
 public class FaceBakery
 {
-    private static final double field_178418_a = 1.0D / Math.cos(0.39269908169872414D) - 1.0D;
-    private static final double field_178417_b = 1.0D / Math.cos((Math.PI / 4D)) - 1.0D;
-    private static final String __OBFID = "CL_00002490";
+    private static final float field_178418_a = 1.0F / (float)Math.cos(0.39269909262657166D) - 1.0F;
+    private static final float field_178417_b = 1.0F / (float)Math.cos((Math.PI / 4D)) - 1.0F;
 
     public BakedQuad makeBakedQuad(Vector3f posFrom, Vector3f posTo, BlockPartFace face, TextureAtlasSprite sprite, EnumFacing facing, ModelRotation modelRotationIn, BlockPartRotation partRotation, boolean uvLocked, boolean shade)
     {
@@ -28,59 +26,59 @@ public class FaceBakery
     public BakedQuad makeBakedQuad(Vector3f posFrom, Vector3f posTo, BlockPartFace face, TextureAtlasSprite sprite, EnumFacing facing, net.minecraftforge.client.model.ITransformation modelRotationIn, BlockPartRotation partRotation, boolean uvLocked, boolean shade)
     {
         int[] aint = this.makeQuadVertexData(face, sprite, facing, this.getPositionsDiv16(posFrom, posTo), modelRotationIn, partRotation, uvLocked, shade);
-        EnumFacing enumfacing1 = getFacingFromVertexData(aint);
+        EnumFacing enumfacing = getFacingFromVertexData(aint);
 
         if (uvLocked)
         {
-            this.func_178409_a(aint, enumfacing1, face.blockFaceUV, sprite);
+            this.func_178409_a(aint, enumfacing, face.blockFaceUV, sprite);
         }
 
         if (partRotation == null)
         {
-            this.func_178408_a(aint, enumfacing1);
+            this.func_178408_a(aint, enumfacing);
         }
 
-        net.minecraftforge.client.ForgeHooksClient.fillNormal(aint, enumfacing1);
-        return new BakedQuad(aint, face.tintIndex, enumfacing1);
+        net.minecraftforge.client.ForgeHooksClient.fillNormal(aint, enumfacing);
+        return new BakedQuad(aint, face.tintIndex, enumfacing);
     }
 
-    private int[] makeQuadVertexData(BlockPartFace p_178405_1_, TextureAtlasSprite p_178405_2_, EnumFacing p_178405_3_, float[] p_178405_4_, ModelRotation p_178405_5_, BlockPartRotation p_178405_6_, boolean p_178405_7_, boolean shade)
+    private int[] makeQuadVertexData(BlockPartFace partFace, TextureAtlasSprite sprite, EnumFacing facing, float[] p_178405_4_, ModelRotation modelRotationIn, BlockPartRotation partRotation, boolean uvLocked, boolean shade)
     {
-        return makeQuadVertexData(p_178405_1_, p_178405_2_, p_178405_3_, p_178405_4_, (net.minecraftforge.client.model.ITransformation)p_178405_5_, p_178405_6_, p_178405_7_, shade);
+        return makeQuadVertexData(partFace, sprite, facing, p_178405_4_, modelRotationIn, partRotation, uvLocked, shade);
     }
 
-    private int[] makeQuadVertexData(BlockPartFace p_178405_1_, TextureAtlasSprite p_178405_2_, EnumFacing p_178405_3_, float[] p_178405_4_, net.minecraftforge.client.model.ITransformation p_178405_5_, BlockPartRotation p_178405_6_, boolean p_178405_7_, boolean shade)
+    private int[] makeQuadVertexData(BlockPartFace partFace, TextureAtlasSprite sprite, EnumFacing facing, float[] p_178405_4_, net.minecraftforge.client.model.ITransformation modelRotationIn, BlockPartRotation partRotation, boolean uvLocked, boolean shade)
     {
         int[] aint = new int[28];
 
         for (int i = 0; i < 4; ++i)
         {
-            this.fillVertexData(aint, i, p_178405_3_, p_178405_1_, p_178405_4_, p_178405_2_, p_178405_5_, p_178405_6_, p_178405_7_, shade);
+            this.fillVertexData(aint, i, facing, partFace, p_178405_4_, sprite, modelRotationIn, partRotation, uvLocked, shade);
         }
 
         return aint;
     }
 
-    private int getFaceShadeColor(EnumFacing p_178413_1_)
+    private int getFaceShadeColor(EnumFacing facing)
     {
-        float f = this.getFaceBrightness(p_178413_1_);
+        float f = this.getFaceBrightness(facing);
         int i = MathHelper.clamp_int((int)(f * 255.0F), 0, 255);
         return -16777216 | i << 16 | i << 8 | i;
     }
 
-    private float getFaceBrightness(EnumFacing p_178412_1_)
+    private float getFaceBrightness(EnumFacing facing)
     {
-        switch (FaceBakery.SwitchEnumFacing.field_178400_a[p_178412_1_.ordinal()])
+        switch (facing)
         {
-            case 1:
+            case DOWN:
                 return 0.5F;
-            case 2:
+            case UP:
                 return 1.0F;
-            case 3:
-            case 4:
+            case NORTH:
+            case SOUTH:
                 return 0.8F;
-            case 5:
-            case 6:
+            case WEST:
+            case EAST:
                 return 0.6F;
             default:
                 return 1.0F;
@@ -90,92 +88,92 @@ public class FaceBakery
     private float[] getPositionsDiv16(Vector3f pos1, Vector3f pos2)
     {
         float[] afloat = new float[EnumFacing.values().length];
-        afloat[EnumFaceDirection.Constants.field_179176_f] = pos1.x / 16.0F;
-        afloat[EnumFaceDirection.Constants.field_179178_e] = pos1.y / 16.0F;
-        afloat[EnumFaceDirection.Constants.field_179177_d] = pos1.z / 16.0F;
-        afloat[EnumFaceDirection.Constants.field_179180_c] = pos2.x / 16.0F;
-        afloat[EnumFaceDirection.Constants.field_179179_b] = pos2.y / 16.0F;
-        afloat[EnumFaceDirection.Constants.field_179181_a] = pos2.z / 16.0F;
+        afloat[EnumFaceDirection.Constants.WEST_INDEX] = pos1.x / 16.0F;
+        afloat[EnumFaceDirection.Constants.DOWN_INDEX] = pos1.y / 16.0F;
+        afloat[EnumFaceDirection.Constants.NORTH_INDEX] = pos1.z / 16.0F;
+        afloat[EnumFaceDirection.Constants.EAST_INDEX] = pos2.x / 16.0F;
+        afloat[EnumFaceDirection.Constants.UP_INDEX] = pos2.y / 16.0F;
+        afloat[EnumFaceDirection.Constants.SOUTH_INDEX] = pos2.z / 16.0F;
         return afloat;
     }
 
     private void fillVertexData(int[] faceData, int vertexIndex, EnumFacing facing, BlockPartFace partFace, float[] p_178402_5_, TextureAtlasSprite sprite, ModelRotation modelRotationIn, BlockPartRotation partRotation, boolean uvLocked, boolean shade)
     {
-        fillVertexData(faceData, vertexIndex, facing, partFace, p_178402_5_, sprite, (net.minecraftforge.client.model.ITransformation)modelRotationIn, partRotation, uvLocked, shade);
+        fillVertexData(faceData, vertexIndex, facing, partFace, p_178402_5_, sprite, modelRotationIn, partRotation, uvLocked, shade);
     }
 
     private void fillVertexData(int[] faceData, int vertexIndex, EnumFacing facing, BlockPartFace partFace, float[] p_178402_5_, TextureAtlasSprite sprite, net.minecraftforge.client.model.ITransformation modelRotationIn, BlockPartRotation partRotation, boolean uvLocked, boolean shade)
     {
-        EnumFacing enumfacing1 = modelRotationIn.rotate(facing);
-        int j = shade ? this.getFaceShadeColor(enumfacing1) : -1;
-        EnumFaceDirection.VertexInformation vertexinformation = EnumFaceDirection.getFacing(facing).func_179025_a(vertexIndex);
-        Vector3d vector3d = new Vector3d((double)p_178402_5_[vertexinformation.field_179184_a], (double)p_178402_5_[vertexinformation.field_179182_b], (double)p_178402_5_[vertexinformation.field_179183_c]);
-        this.func_178407_a(vector3d, partRotation);
-        int k = this.rotateVertex(vector3d, facing, vertexIndex, modelRotationIn, uvLocked);
-        this.storeVertexData(faceData, k, vertexIndex, vector3d, j, sprite, partFace.blockFaceUV);
+        EnumFacing enumfacing = modelRotationIn.rotate(facing);
+        int i = shade ? this.getFaceShadeColor(enumfacing) : -1;
+        EnumFaceDirection.VertexInformation enumfacedirection$vertexinformation = EnumFaceDirection.getFacing(facing).func_179025_a(vertexIndex);
+        Vector3f vector3f = new Vector3f(p_178402_5_[enumfacedirection$vertexinformation.field_179184_a], p_178402_5_[enumfacedirection$vertexinformation.field_179182_b], p_178402_5_[enumfacedirection$vertexinformation.field_179183_c]);
+        this.func_178407_a(vector3f, partRotation);
+        int j = this.rotateVertex(vector3f, facing, vertexIndex, modelRotationIn, uvLocked);
+        this.storeVertexData(faceData, j, vertexIndex, vector3f, i, sprite, partFace.blockFaceUV);
     }
 
-    private void storeVertexData(int[] faceData, int storeIndex, int vertexIndex, Vector3d position, int shadeColor, TextureAtlasSprite sprite, BlockFaceUV faceUV)
+    private void storeVertexData(int[] faceData, int storeIndex, int vertexIndex, Vector3f position, int shadeColor, TextureAtlasSprite sprite, BlockFaceUV faceUV)
     {
-        int l = storeIndex * 7;
-        faceData[l] = Float.floatToRawIntBits((float)position.x);
-        faceData[l + 1] = Float.floatToRawIntBits((float)position.y);
-        faceData[l + 2] = Float.floatToRawIntBits((float)position.z);
-        faceData[l + 3] = shadeColor;
-        faceData[l + 4] = Float.floatToRawIntBits(sprite.getInterpolatedU((double)faceUV.func_178348_a(vertexIndex)));
-        faceData[l + 4 + 1] = Float.floatToRawIntBits(sprite.getInterpolatedV((double)faceUV.func_178346_b(vertexIndex)));
+        int i = storeIndex * 7;
+        faceData[i] = Float.floatToRawIntBits(position.x);
+        faceData[i + 1] = Float.floatToRawIntBits(position.y);
+        faceData[i + 2] = Float.floatToRawIntBits(position.z);
+        faceData[i + 3] = shadeColor;
+        faceData[i + 4] = Float.floatToRawIntBits(sprite.getInterpolatedU((double)faceUV.func_178348_a(vertexIndex)));
+        faceData[i + 4 + 1] = Float.floatToRawIntBits(sprite.getInterpolatedV((double)faceUV.func_178346_b(vertexIndex)));
     }
 
-    private void func_178407_a(Vector3d p_178407_1_, BlockPartRotation p_178407_2_)
+    private void func_178407_a(Vector3f p_178407_1_, BlockPartRotation partRotation)
     {
-        if (p_178407_2_ != null)
+        if (partRotation != null)
         {
-            Matrix4d matrix4d = this.getMatrixIdentity();
-            Vector3d vector3d1 = new Vector3d(0.0D, 0.0D, 0.0D);
+            Matrix4f matrix4f = this.getMatrixIdentity();
+            Vector3f vector3f = new Vector3f(0.0F, 0.0F, 0.0F);
 
-            switch (FaceBakery.SwitchEnumFacing.field_178399_b[p_178407_2_.axis.ordinal()])
+            switch (partRotation.axis)
             {
-                case 1:
-                    matrix4d.mul(this.getMatrixRotation(new AxisAngle4d(1.0D, 0.0D, 0.0D, (double)p_178407_2_.angle * 0.017453292519943295D)));
-                    vector3d1.set(0.0D, 1.0D, 1.0D);
+                case X:
+                    Matrix4f.rotate(partRotation.angle * 0.017453292F, new Vector3f(1.0F, 0.0F, 0.0F), matrix4f, matrix4f);
+                    vector3f.set(0.0F, 1.0F, 1.0F);
                     break;
-                case 2:
-                    matrix4d.mul(this.getMatrixRotation(new AxisAngle4d(0.0D, 1.0D, 0.0D, (double)p_178407_2_.angle * 0.017453292519943295D)));
-                    vector3d1.set(1.0D, 0.0D, 1.0D);
+                case Y:
+                    Matrix4f.rotate(partRotation.angle * 0.017453292F, new Vector3f(0.0F, 1.0F, 0.0F), matrix4f, matrix4f);
+                    vector3f.set(1.0F, 0.0F, 1.0F);
                     break;
-                case 3:
-                    matrix4d.mul(this.getMatrixRotation(new AxisAngle4d(0.0D, 0.0D, 1.0D, (double)p_178407_2_.angle * 0.017453292519943295D)));
-                    vector3d1.set(1.0D, 1.0D, 0.0D);
+                case Z:
+                    Matrix4f.rotate(partRotation.angle * 0.017453292F, new Vector3f(0.0F, 0.0F, 1.0F), matrix4f, matrix4f);
+                    vector3f.set(1.0F, 1.0F, 0.0F);
             }
 
-            if (p_178407_2_.rescale)
+            if (partRotation.rescale)
             {
-                if (Math.abs(p_178407_2_.angle) == 22.5F)
+                if (Math.abs(partRotation.angle) == 22.5F)
                 {
-                    vector3d1.scale(field_178418_a);
+                    vector3f.scale(field_178418_a);
                 }
                 else
                 {
-                    vector3d1.scale(field_178417_b);
+                    vector3f.scale(field_178417_b);
                 }
 
-                vector3d1.add(new Vector3d(1.0D, 1.0D, 1.0D));
+                Vector3f.add(vector3f, new Vector3f(1.0F, 1.0F, 1.0F), vector3f);
             }
             else
             {
-                vector3d1.set(new Vector3d(1.0D, 1.0D, 1.0D));
+                vector3f.set(1.0F, 1.0F, 1.0F);
             }
 
-            this.rotateScale(p_178407_1_, new Vector3d(p_178407_2_.origin), matrix4d, vector3d1);
+            this.rotateScale(p_178407_1_, new Vector3f(partRotation.origin), matrix4f, vector3f);
         }
     }
 
-    public int rotateVertex(Vector3d position, EnumFacing facing, int vertexIndex, ModelRotation modelRotationIn, boolean uvLocked)
+    public int rotateVertex(Vector3f position, EnumFacing facing, int vertexIndex, ModelRotation modelRotationIn, boolean uvLocked)
     {
-        return rotateVertex(position, facing, vertexIndex, (net.minecraftforge.client.model.ITransformation)modelRotationIn, uvLocked);
+        return rotateVertex(position, facing, vertexIndex, modelRotationIn, uvLocked);
     }
 
-    public int rotateVertex(Vector3d position, EnumFacing facing, int vertexIndex, net.minecraftforge.client.model.ITransformation modelRotationIn, boolean uvLocked)
+    public int rotateVertex(Vector3f position, EnumFacing facing, int vertexIndex, net.minecraftforge.client.model.ITransformation modelRotationIn, boolean uvLocked)
     {
         if (modelRotationIn == ModelRotation.X0_Y0)
         {
@@ -188,57 +186,50 @@ public class FaceBakery
         }
     }
 
-    private void rotateScale(Vector3d position, Vector3d rotationOrigin, Matrix4d rotationMatrix, Vector3d scale)
+    private void rotateScale(Vector3f position, Vector3f rotationOrigin, Matrix4f rotationMatrix, Vector3f scale)
     {
-        position.sub(rotationOrigin);
-        rotationMatrix.transform(position);
-        position.x *= scale.x;
-        position.y *= scale.y;
-        position.z *= scale.z;
-        position.add(rotationOrigin);
+        Vector4f vector4f = new Vector4f(position.x - rotationOrigin.x, position.y - rotationOrigin.y, position.z - rotationOrigin.z, 1.0F);
+        Matrix4f.transform(rotationMatrix, vector4f, vector4f);
+        vector4f.x *= scale.x;
+        vector4f.y *= scale.y;
+        vector4f.z *= scale.z;
+        position.set(vector4f.x + rotationOrigin.x, vector4f.y + rotationOrigin.y, vector4f.z + rotationOrigin.z);
     }
 
-    private Matrix4d getMatrixRotation(AxisAngle4d p_178416_1_)
+    private Matrix4f getMatrixIdentity()
     {
-        Matrix4d matrix4d = this.getMatrixIdentity();
-        matrix4d.setRotation(p_178416_1_);
-        return matrix4d;
+        Matrix4f matrix4f = new Matrix4f();
+        matrix4f.setIdentity();
+        return matrix4f;
     }
 
-    private Matrix4d getMatrixIdentity()
+    public static EnumFacing getFacingFromVertexData(int[] faceData)
     {
-        Matrix4d matrix4d = new Matrix4d();
-        matrix4d.setIdentity();
-        return matrix4d;
-    }
-
-    public static EnumFacing getFacingFromVertexData(int[] p_178410_0_)
-    {
-        Vector3f vector3f = new Vector3f(Float.intBitsToFloat(p_178410_0_[0]), Float.intBitsToFloat(p_178410_0_[1]), Float.intBitsToFloat(p_178410_0_[2]));
-        Vector3f vector3f1 = new Vector3f(Float.intBitsToFloat(p_178410_0_[7]), Float.intBitsToFloat(p_178410_0_[8]), Float.intBitsToFloat(p_178410_0_[9]));
-        Vector3f vector3f2 = new Vector3f(Float.intBitsToFloat(p_178410_0_[14]), Float.intBitsToFloat(p_178410_0_[15]), Float.intBitsToFloat(p_178410_0_[16]));
+        Vector3f vector3f = new Vector3f(Float.intBitsToFloat(faceData[0]), Float.intBitsToFloat(faceData[1]), Float.intBitsToFloat(faceData[2]));
+        Vector3f vector3f1 = new Vector3f(Float.intBitsToFloat(faceData[7]), Float.intBitsToFloat(faceData[8]), Float.intBitsToFloat(faceData[9]));
+        Vector3f vector3f2 = new Vector3f(Float.intBitsToFloat(faceData[14]), Float.intBitsToFloat(faceData[15]), Float.intBitsToFloat(faceData[16]));
         Vector3f vector3f3 = new Vector3f();
         Vector3f vector3f4 = new Vector3f();
         Vector3f vector3f5 = new Vector3f();
-        vector3f3.sub(vector3f, vector3f1);
-        vector3f4.sub(vector3f2, vector3f1);
-        vector3f5.cross(vector3f4, vector3f3);
-        vector3f5.normalize();
+        Vector3f.sub(vector3f, vector3f1, vector3f3);
+        Vector3f.sub(vector3f2, vector3f1, vector3f4);
+        Vector3f.cross(vector3f4, vector3f3, vector3f5);
+        float f = (float)Math.sqrt((double)(vector3f5.x * vector3f5.x + vector3f5.y * vector3f5.y + vector3f5.z * vector3f5.z));
+        vector3f5.x /= f;
+        vector3f5.y /= f;
+        vector3f5.z /= f;
         EnumFacing enumfacing = null;
-        float f = 0.0F;
-        EnumFacing[] aenumfacing = EnumFacing.values();
-        int i = aenumfacing.length;
+        float f1 = 0.0F;
 
-        for (int j = 0; j < i; ++j)
+        for (EnumFacing enumfacing1 : EnumFacing.values())
         {
-            EnumFacing enumfacing1 = aenumfacing[j];
             Vec3i vec3i = enumfacing1.getDirectionVec();
             Vector3f vector3f6 = new Vector3f((float)vec3i.getX(), (float)vec3i.getY(), (float)vec3i.getZ());
-            float f1 = vector3f5.dot(vector3f6);
+            float f2 = Vector3f.dot(vector3f5, vector3f6);
 
-            if (f1 >= 0.0F && f1 > f)
+            if (f2 >= 0.0F && f2 > f1)
             {
-                f = f1;
+                f1 = f2;
                 enumfacing = enumfacing1;
             }
         }
@@ -253,101 +244,99 @@ public class FaceBakery
         }
     }
 
-    public void func_178409_a(int[] p_178409_1_, EnumFacing p_178409_2_, BlockFaceUV p_178409_3_, TextureAtlasSprite p_178409_4_)
+    public void func_178409_a(int[] p_178409_1_, EnumFacing facing, BlockFaceUV p_178409_3_, TextureAtlasSprite p_178409_4_)
     {
         for (int i = 0; i < 4; ++i)
         {
-            this.func_178401_a(i, p_178409_1_, p_178409_2_, p_178409_3_, p_178409_4_);
+            this.func_178401_a(i, p_178409_1_, facing, p_178409_3_, p_178409_4_);
         }
     }
 
     private void func_178408_a(int[] p_178408_1_, EnumFacing p_178408_2_)
     {
-        int[] aint1 = new int[p_178408_1_.length];
-        System.arraycopy(p_178408_1_, 0, aint1, 0, p_178408_1_.length);
+        int[] aint = new int[p_178408_1_.length];
+        System.arraycopy(p_178408_1_, 0, aint, 0, p_178408_1_.length);
         float[] afloat = new float[EnumFacing.values().length];
-        afloat[EnumFaceDirection.Constants.field_179176_f] = 999.0F;
-        afloat[EnumFaceDirection.Constants.field_179178_e] = 999.0F;
-        afloat[EnumFaceDirection.Constants.field_179177_d] = 999.0F;
-        afloat[EnumFaceDirection.Constants.field_179180_c] = -999.0F;
-        afloat[EnumFaceDirection.Constants.field_179179_b] = -999.0F;
-        afloat[EnumFaceDirection.Constants.field_179181_a] = -999.0F;
-        int j;
-        float f2;
+        afloat[EnumFaceDirection.Constants.WEST_INDEX] = 999.0F;
+        afloat[EnumFaceDirection.Constants.DOWN_INDEX] = 999.0F;
+        afloat[EnumFaceDirection.Constants.NORTH_INDEX] = 999.0F;
+        afloat[EnumFaceDirection.Constants.EAST_INDEX] = -999.0F;
+        afloat[EnumFaceDirection.Constants.UP_INDEX] = -999.0F;
+        afloat[EnumFaceDirection.Constants.SOUTH_INDEX] = -999.0F;
 
         for (int i = 0; i < 4; ++i)
         {
-            j = 7 * i;
-            float f = Float.intBitsToFloat(aint1[j]);
-            float f1 = Float.intBitsToFloat(aint1[j + 1]);
-            f2 = Float.intBitsToFloat(aint1[j + 2]);
+            int j = 7 * i;
+            float f = Float.intBitsToFloat(aint[j]);
+            float f1 = Float.intBitsToFloat(aint[j + 1]);
+            float f2 = Float.intBitsToFloat(aint[j + 2]);
 
-            if (f < afloat[EnumFaceDirection.Constants.field_179176_f])
+            if (f < afloat[EnumFaceDirection.Constants.WEST_INDEX])
             {
-                afloat[EnumFaceDirection.Constants.field_179176_f] = f;
+                afloat[EnumFaceDirection.Constants.WEST_INDEX] = f;
             }
 
-            if (f1 < afloat[EnumFaceDirection.Constants.field_179178_e])
+            if (f1 < afloat[EnumFaceDirection.Constants.DOWN_INDEX])
             {
-                afloat[EnumFaceDirection.Constants.field_179178_e] = f1;
+                afloat[EnumFaceDirection.Constants.DOWN_INDEX] = f1;
             }
 
-            if (f2 < afloat[EnumFaceDirection.Constants.field_179177_d])
+            if (f2 < afloat[EnumFaceDirection.Constants.NORTH_INDEX])
             {
-                afloat[EnumFaceDirection.Constants.field_179177_d] = f2;
+                afloat[EnumFaceDirection.Constants.NORTH_INDEX] = f2;
             }
 
-            if (f > afloat[EnumFaceDirection.Constants.field_179180_c])
+            if (f > afloat[EnumFaceDirection.Constants.EAST_INDEX])
             {
-                afloat[EnumFaceDirection.Constants.field_179180_c] = f;
+                afloat[EnumFaceDirection.Constants.EAST_INDEX] = f;
             }
 
-            if (f1 > afloat[EnumFaceDirection.Constants.field_179179_b])
+            if (f1 > afloat[EnumFaceDirection.Constants.UP_INDEX])
             {
-                afloat[EnumFaceDirection.Constants.field_179179_b] = f1;
+                afloat[EnumFaceDirection.Constants.UP_INDEX] = f1;
             }
 
-            if (f2 > afloat[EnumFaceDirection.Constants.field_179181_a])
+            if (f2 > afloat[EnumFaceDirection.Constants.SOUTH_INDEX])
             {
-                afloat[EnumFaceDirection.Constants.field_179181_a] = f2;
+                afloat[EnumFaceDirection.Constants.SOUTH_INDEX] = f2;
             }
         }
 
         EnumFaceDirection enumfacedirection = EnumFaceDirection.getFacing(p_178408_2_);
 
-        for (j = 0; j < 4; ++j)
+        for (int i1 = 0; i1 < 4; ++i1)
         {
-            int i1 = 7 * j;
-            EnumFaceDirection.VertexInformation vertexinformation = enumfacedirection.func_179025_a(j);
-            f2 = afloat[vertexinformation.field_179184_a];
-            float f3 = afloat[vertexinformation.field_179182_b];
-            float f4 = afloat[vertexinformation.field_179183_c];
-            p_178408_1_[i1] = Float.floatToRawIntBits(f2);
-            p_178408_1_[i1 + 1] = Float.floatToRawIntBits(f3);
-            p_178408_1_[i1 + 2] = Float.floatToRawIntBits(f4);
+            int j1 = 7 * i1;
+            EnumFaceDirection.VertexInformation enumfacedirection$vertexinformation = enumfacedirection.func_179025_a(i1);
+            float f8 = afloat[enumfacedirection$vertexinformation.field_179184_a];
+            float f3 = afloat[enumfacedirection$vertexinformation.field_179182_b];
+            float f4 = afloat[enumfacedirection$vertexinformation.field_179183_c];
+            p_178408_1_[j1] = Float.floatToRawIntBits(f8);
+            p_178408_1_[j1 + 1] = Float.floatToRawIntBits(f3);
+            p_178408_1_[j1 + 2] = Float.floatToRawIntBits(f4);
 
             for (int k = 0; k < 4; ++k)
             {
                 int l = 7 * k;
-                float f5 = Float.intBitsToFloat(aint1[l]);
-                float f6 = Float.intBitsToFloat(aint1[l + 1]);
-                float f7 = Float.intBitsToFloat(aint1[l + 2]);
+                float f5 = Float.intBitsToFloat(aint[l]);
+                float f6 = Float.intBitsToFloat(aint[l + 1]);
+                float f7 = Float.intBitsToFloat(aint[l + 2]);
 
-                if (MathHelper.func_180185_a(f2, f5) && MathHelper.func_180185_a(f3, f6) && MathHelper.func_180185_a(f4, f7))
+                if (MathHelper.epsilonEquals(f8, f5) && MathHelper.epsilonEquals(f3, f6) && MathHelper.epsilonEquals(f4, f7))
                 {
-                    p_178408_1_[i1 + 4] = aint1[l + 4];
-                    p_178408_1_[i1 + 4 + 1] = aint1[l + 4 + 1];
+                    p_178408_1_[j1 + 4] = aint[l + 4];
+                    p_178408_1_[j1 + 4 + 1] = aint[l + 4 + 1];
                 }
             }
         }
     }
 
-    private void func_178401_a(int p_178401_1_, int[] p_178401_2_, EnumFacing p_178401_3_, BlockFaceUV p_178401_4_, TextureAtlasSprite p_178401_5_)
+    private void func_178401_a(int p_178401_1_, int[] p_178401_2_, EnumFacing facing, BlockFaceUV p_178401_4_, TextureAtlasSprite p_178401_5_)
     {
-        int j = 7 * p_178401_1_;
-        float f = Float.intBitsToFloat(p_178401_2_[j]);
-        float f1 = Float.intBitsToFloat(p_178401_2_[j + 1]);
-        float f2 = Float.intBitsToFloat(p_178401_2_[j + 2]);
+        int i = 7 * p_178401_1_;
+        float f = Float.intBitsToFloat(p_178401_2_[i]);
+        float f1 = Float.intBitsToFloat(p_178401_2_[i + 1]);
+        float f2 = Float.intBitsToFloat(p_178401_2_[i + 2]);
 
         if (f < -0.1F || f >= 1.1F)
         {
@@ -367,131 +356,35 @@ public class FaceBakery
         float f3 = 0.0F;
         float f4 = 0.0F;
 
-        switch (FaceBakery.SwitchEnumFacing.field_178400_a[p_178401_3_.ordinal()])
+        switch (facing)
         {
-            case 1:
+            case DOWN:
                 f3 = f * 16.0F;
                 f4 = (1.0F - f2) * 16.0F;
                 break;
-            case 2:
+            case UP:
                 f3 = f * 16.0F;
                 f4 = f2 * 16.0F;
                 break;
-            case 3:
+            case NORTH:
                 f3 = (1.0F - f) * 16.0F;
                 f4 = (1.0F - f1) * 16.0F;
                 break;
-            case 4:
+            case SOUTH:
                 f3 = f * 16.0F;
                 f4 = (1.0F - f1) * 16.0F;
                 break;
-            case 5:
+            case WEST:
                 f3 = f2 * 16.0F;
                 f4 = (1.0F - f1) * 16.0F;
                 break;
-            case 6:
+            case EAST:
                 f3 = (1.0F - f2) * 16.0F;
                 f4 = (1.0F - f1) * 16.0F;
         }
 
-        int k = p_178401_4_.func_178345_c(p_178401_1_) * 7;
-        p_178401_2_[k + 4] = Float.floatToRawIntBits(p_178401_5_.getInterpolatedU((double)f3));
-        p_178401_2_[k + 4 + 1] = Float.floatToRawIntBits(p_178401_5_.getInterpolatedV((double)f4));
+        int j = p_178401_4_.func_178345_c(p_178401_1_) * 7;
+        p_178401_2_[j + 4] = Float.floatToRawIntBits(p_178401_5_.getInterpolatedU((double)f3));
+        p_178401_2_[j + 4 + 1] = Float.floatToRawIntBits(p_178401_5_.getInterpolatedV((double)f4));
     }
-
-    @SideOnly(Side.CLIENT)
-
-    static final class SwitchEnumFacing
-        {
-            static final int[] field_178400_a;
-
-            static final int[] field_178399_b = new int[EnumFacing.Axis.values().length];
-            private static final String __OBFID = "CL_00002489";
-
-            static
-            {
-                try
-                {
-                    field_178399_b[EnumFacing.Axis.X.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var9)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_178399_b[EnumFacing.Axis.Y.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var8)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_178399_b[EnumFacing.Axis.Z.ordinal()] = 3;
-                }
-                catch (NoSuchFieldError var7)
-                {
-                    ;
-                }
-
-                field_178400_a = new int[EnumFacing.values().length];
-
-                try
-                {
-                    field_178400_a[EnumFacing.DOWN.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var6)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_178400_a[EnumFacing.UP.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var5)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_178400_a[EnumFacing.NORTH.ordinal()] = 3;
-                }
-                catch (NoSuchFieldError var4)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_178400_a[EnumFacing.SOUTH.ordinal()] = 4;
-                }
-                catch (NoSuchFieldError var3)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_178400_a[EnumFacing.WEST.ordinal()] = 5;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_178400_a[EnumFacing.EAST.ordinal()] = 6;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
-            }
-        }
 }

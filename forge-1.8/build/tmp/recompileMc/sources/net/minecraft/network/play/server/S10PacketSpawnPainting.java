@@ -2,7 +2,6 @@ package net.minecraft.network.play.server;
 
 import java.io.IOException;
 import net.minecraft.entity.item.EntityPainting;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -11,22 +10,23 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S10PacketSpawnPainting implements Packet
+public class S10PacketSpawnPainting implements Packet<INetHandlerPlayClient>
 {
-    private int field_148973_a;
-    private BlockPos field_179838_b;
-    private EnumFacing field_179839_c;
-    private String field_148968_f;
-    private static final String __OBFID = "CL_00001280";
+    private int entityID;
+    private BlockPos position;
+    private EnumFacing facing;
+    private String title;
 
-    public S10PacketSpawnPainting() {}
-
-    public S10PacketSpawnPainting(EntityPainting p_i45170_1_)
+    public S10PacketSpawnPainting()
     {
-        this.field_148973_a = p_i45170_1_.getEntityId();
-        this.field_179838_b = p_i45170_1_.func_174857_n();
-        this.field_179839_c = p_i45170_1_.field_174860_b;
-        this.field_148968_f = p_i45170_1_.art.title;
+    }
+
+    public S10PacketSpawnPainting(EntityPainting painting)
+    {
+        this.entityID = painting.getEntityId();
+        this.position = painting.getHangingPosition();
+        this.facing = painting.facingDirection;
+        this.title = painting.art.title;
     }
 
     /**
@@ -34,10 +34,10 @@ public class S10PacketSpawnPainting implements Packet
      */
     public void readPacketData(PacketBuffer buf) throws IOException
     {
-        this.field_148973_a = buf.readVarIntFromBuffer();
-        this.field_148968_f = buf.readStringFromBuffer(EntityPainting.EnumArt.field_180001_A);
-        this.field_179838_b = buf.readBlockPos();
-        this.field_179839_c = EnumFacing.getHorizontal(buf.readUnsignedByte());
+        this.entityID = buf.readVarIntFromBuffer();
+        this.title = buf.readStringFromBuffer(EntityPainting.EnumArt.field_180001_A);
+        this.position = buf.readBlockPos();
+        this.facing = EnumFacing.getHorizontal(buf.readUnsignedByte());
     }
 
     /**
@@ -45,46 +45,41 @@ public class S10PacketSpawnPainting implements Packet
      */
     public void writePacketData(PacketBuffer buf) throws IOException
     {
-        buf.writeVarIntToBuffer(this.field_148973_a);
-        buf.writeString(this.field_148968_f);
-        buf.writeBlockPos(this.field_179838_b);
-        buf.writeByte(this.field_179839_c.getHorizontalIndex());
-    }
-
-    public void func_180722_a(INetHandlerPlayClient p_180722_1_)
-    {
-        p_180722_1_.handleSpawnPainting(this);
-    }
-
-    @SideOnly(Side.CLIENT)
-    public int func_148965_c()
-    {
-        return this.field_148973_a;
+        buf.writeVarIntToBuffer(this.entityID);
+        buf.writeString(this.title);
+        buf.writeBlockPos(this.position);
+        buf.writeByte(this.facing.getHorizontalIndex());
     }
 
     /**
      * Passes this Packet on to the NetHandler for processing.
      */
-    public void processPacket(INetHandler handler)
+    public void processPacket(INetHandlerPlayClient handler)
     {
-        this.func_180722_a((INetHandlerPlayClient)handler);
+        handler.handleSpawnPainting(this);
     }
 
     @SideOnly(Side.CLIENT)
-    public BlockPos func_179837_b()
+    public int getEntityID()
     {
-        return this.field_179838_b;
+        return this.entityID;
     }
 
     @SideOnly(Side.CLIENT)
-    public EnumFacing func_179836_c()
+    public BlockPos getPosition()
     {
-        return this.field_179839_c;
+        return this.position;
     }
 
     @SideOnly(Side.CLIENT)
-    public String func_148961_h()
+    public EnumFacing getFacing()
     {
-        return this.field_148968_f;
+        return this.facing;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public String getTitle()
+    {
+        return this.title;
     }
 }

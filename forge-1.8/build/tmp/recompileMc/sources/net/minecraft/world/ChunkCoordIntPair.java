@@ -8,7 +8,6 @@ public class ChunkCoordIntPair
     public final int chunkXPos;
     /** The Z position of this Chunk Coordinate Pair */
     public final int chunkZPos;
-    private static final String __OBFID = "CL_00000133";
 
     public ChunkCoordIntPair(int x, int z)
     {
@@ -92,10 +91,6 @@ public class ChunkCoordIntPair
 
     /**
      * Get the World coordinates of the Block with the given Chunk coordinates relative to this chunk
-     *  
-     * @param x X coordinate of the Block in this chunk (0-15)
-     * @param y Y coordinate of the Block
-     * @param z Z coordinate of the Block in this chunk (0-15)
      */
     public BlockPos getBlock(int x, int y, int z)
     {
@@ -104,8 +99,6 @@ public class ChunkCoordIntPair
 
     /**
      * Get the coordinates of the Block in the center of this chunk with the given Y coordinate
-     *  
-     * @param y Y coordinate
      */
     public BlockPos getCenterBlock(int y)
     {

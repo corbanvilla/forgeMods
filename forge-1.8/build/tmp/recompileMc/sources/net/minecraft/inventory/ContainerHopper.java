@@ -7,31 +7,29 @@ import net.minecraft.item.ItemStack;
 public class ContainerHopper extends Container
 {
     private final IInventory hopperInventory;
-    private static final String __OBFID = "CL_00001750";
 
     public ContainerHopper(InventoryPlayer playerInventory, IInventory hopperInventoryIn, EntityPlayer player)
     {
         this.hopperInventory = hopperInventoryIn;
         hopperInventoryIn.openInventory(player);
-        byte b0 = 51;
-        int i;
+        int i = 51;
 
-        for (i = 0; i < hopperInventoryIn.getSizeInventory(); ++i)
+        for (int j = 0; j < hopperInventoryIn.getSizeInventory(); ++j)
         {
-            this.addSlotToContainer(new Slot(hopperInventoryIn, i, 44 + i * 18, 20));
+            this.addSlotToContainer(new Slot(hopperInventoryIn, j, 44 + j * 18, 20));
         }
 
-        for (i = 0; i < 3; ++i)
+        for (int l = 0; l < 3; ++l)
         {
-            for (int j = 0; j < 9; ++j)
+            for (int k = 0; k < 9; ++k)
             {
-                this.addSlotToContainer(new Slot(playerInventory, j + i * 9 + 9, 8 + j * 18, i * 18 + b0));
+                this.addSlotToContainer(new Slot(playerInventory, k + l * 9 + 9, 8 + k * 18, l * 18 + i));
             }
         }
 
-        for (i = 0; i < 9; ++i)
+        for (int i1 = 0; i1 < 9; ++i1)
         {
-            this.addSlotToContainer(new Slot(playerInventory, i, 8 + i * 18, 58 + b0));
+            this.addSlotToContainer(new Slot(playerInventory, i1, 8 + i1 * 18, 58 + i));
         }
     }
 

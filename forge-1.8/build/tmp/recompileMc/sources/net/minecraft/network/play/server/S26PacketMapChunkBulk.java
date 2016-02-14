@@ -2,7 +2,6 @@ package net.minecraft.network.play.server;
 
 import java.io.IOException;
 import java.util.List;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -10,31 +9,32 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S26PacketMapChunkBulk implements Packet
+public class S26PacketMapChunkBulk implements Packet<INetHandlerPlayClient>
 {
-    private int[] field_149266_a;
-    private int[] field_149264_b;
-    private S21PacketChunkData.Extracted[] field_179755_c;
-    private boolean field_149267_h;
-    private static final String __OBFID = "CL_00001306";
+    private int[] xPositions;
+    private int[] zPositions;
+    private S21PacketChunkData.Extracted[] chunksData;
+    private boolean isOverworld;
 
-    public S26PacketMapChunkBulk() {}
+    public S26PacketMapChunkBulk()
+    {
+    }
 
-    public S26PacketMapChunkBulk(List chunks)
+    public S26PacketMapChunkBulk(List<Chunk> chunks)
     {
         int i = chunks.size();
-        this.field_149266_a = new int[i];
-        this.field_149264_b = new int[i];
-        this.field_179755_c = new S21PacketChunkData.Extracted[i];
-        this.field_149267_h = !((Chunk)chunks.get(0)).getWorld().provider.getHasNoSky();
+        this.xPositions = new int[i];
+        this.zPositions = new int[i];
+        this.chunksData = new S21PacketChunkData.Extracted[i];
+        this.isOverworld = !((Chunk)chunks.get(0)).getWorld().provider.getHasNoSky();
 
         for (int j = 0; j < i; ++j)
         {
             Chunk chunk = (Chunk)chunks.get(j);
-            S21PacketChunkData.Extracted extracted = S21PacketChunkData.func_179756_a(chunk, true, this.field_149267_h, 65535);
-            this.field_149266_a[j] = chunk.xPosition;
-            this.field_149264_b[j] = chunk.zPosition;
-            this.field_179755_c[j] = extracted;
+            S21PacketChunkData.Extracted s21packetchunkdata$extracted = S21PacketChunkData.func_179756_a(chunk, true, this.isOverworld, 65535);
+            this.xPositions[j] = chunk.xPosition;
+            this.zPositions[j] = chunk.zPosition;
+            this.chunksData[j] = s21packetchunkdata$extracted;
         }
     }
 
@@ -43,25 +43,24 @@ public class S26PacketMapChunkBulk implements Packet
      */
     public void readPacketData(PacketBuffer buf) throws IOException
     {
-        this.field_149267_h = buf.readBoolean();
+        this.isOverworld = buf.readBoolean();
         int i = buf.readVarIntFromBuffer();
-        this.field_149266_a = new int[i];
-        this.field_149264_b = new int[i];
-        this.field_179755_c = new S21PacketChunkData.Extracted[i];
-        int j;
+        this.xPositions = new int[i];
+        this.zPositions = new int[i];
+        this.chunksData = new S21PacketChunkData.Extracted[i];
 
-        for (j = 0; j < i; ++j)
+        for (int j = 0; j < i; ++j)
         {
-            this.field_149266_a[j] = buf.readInt();
-            this.field_149264_b[j] = buf.readInt();
-            this.field_179755_c[j] = new S21PacketChunkData.Extracted();
-            this.field_179755_c[j].dataSize = buf.readShort() & 65535;
-            this.field_179755_c[j].data = new byte[S21PacketChunkData.func_180737_a(Integer.bitCount(this.field_179755_c[j].dataSize), this.field_149267_h, true)];
+            this.xPositions[j] = buf.readInt();
+            this.zPositions[j] = buf.readInt();
+            this.chunksData[j] = new S21PacketChunkData.Extracted();
+            this.chunksData[j].dataSize = buf.readShort() & 65535;
+            this.chunksData[j].data = new byte[S21PacketChunkData.func_180737_a(Integer.bitCount(this.chunksData[j].dataSize), this.isOverworld, true)];
         }
 
-        for (j = 0; j < i; ++j)
+        for (int k = 0; k < i; ++k)
         {
-            buf.readBytes(this.field_179755_c[j].data);
+            buf.readBytes(this.chunksData[k].data);
         }
     }
 
@@ -70,63 +69,57 @@ public class S26PacketMapChunkBulk implements Packet
      */
     public void writePacketData(PacketBuffer buf) throws IOException
     {
-        buf.writeBoolean(this.field_149267_h);
-        buf.writeVarIntToBuffer(this.field_179755_c.length);
-        int i;
+        buf.writeBoolean(this.isOverworld);
+        buf.writeVarIntToBuffer(this.chunksData.length);
 
-        for (i = 0; i < this.field_149266_a.length; ++i)
+        for (int i = 0; i < this.xPositions.length; ++i)
         {
-            buf.writeInt(this.field_149266_a[i]);
-            buf.writeInt(this.field_149264_b[i]);
-            buf.writeShort((short)(this.field_179755_c[i].dataSize & 65535));
+            buf.writeInt(this.xPositions[i]);
+            buf.writeInt(this.zPositions[i]);
+            buf.writeShort((short)(this.chunksData[i].dataSize & 65535));
         }
 
-        for (i = 0; i < this.field_149266_a.length; ++i)
+        for (int j = 0; j < this.xPositions.length; ++j)
         {
-            buf.writeBytes(this.field_179755_c[i].data);
+            buf.writeBytes(this.chunksData[j].data);
         }
-    }
-
-    public void func_180738_a(INetHandlerPlayClient p_180738_1_)
-    {
-        p_180738_1_.handleMapChunkBulk(this);
-    }
-
-    @SideOnly(Side.CLIENT)
-    public int func_149255_a(int p_149255_1_)
-    {
-        return this.field_149266_a[p_149255_1_];
     }
 
     /**
      * Passes this Packet on to the NetHandler for processing.
      */
-    public void processPacket(INetHandler handler)
+    public void processPacket(INetHandlerPlayClient handler)
     {
-        this.func_180738_a((INetHandlerPlayClient)handler);
+        handler.handleMapChunkBulk(this);
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_149253_b(int p_149253_1_)
+    public int getChunkX(int p_149255_1_)
     {
-        return this.field_149264_b[p_149253_1_];
+        return this.xPositions[p_149255_1_];
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_149254_d()
+    public int getChunkZ(int p_149253_1_)
     {
-        return this.field_149266_a.length;
+        return this.zPositions[p_149253_1_];
     }
 
     @SideOnly(Side.CLIENT)
-    public byte[] func_149256_c(int p_149256_1_)
+    public int getChunkCount()
     {
-        return this.field_179755_c[p_149256_1_].data;
+        return this.xPositions.length;
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_179754_d(int p_179754_1_)
+    public byte[] getChunkBytes(int p_149256_1_)
     {
-        return this.field_179755_c[p_179754_1_].dataSize;
+        return this.chunksData[p_149256_1_].data;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public int getChunkSize(int p_179754_1_)
+    {
+        return this.chunksData[p_179754_1_].dataSize;
     }
 }

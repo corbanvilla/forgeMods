@@ -2,7 +2,6 @@ package net.minecraft.network.login.server;
 
 import java.io.IOException;
 import java.security.PublicKey;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.login.INetHandlerLoginClient;
@@ -10,14 +9,15 @@ import net.minecraft.util.CryptManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S01PacketEncryptionRequest implements Packet
+public class S01PacketEncryptionRequest implements Packet<INetHandlerLoginClient>
 {
     private String hashedServerId;
     private PublicKey publicKey;
     private byte[] verifyToken;
-    private static final String __OBFID = "CL_00001376";
 
-    public S01PacketEncryptionRequest() {}
+    public S01PacketEncryptionRequest()
+    {
+    }
 
     public S01PacketEncryptionRequest(String serverId, PublicKey key, byte[] verifyToken)
     {
@@ -58,14 +58,6 @@ public class S01PacketEncryptionRequest implements Packet
     public String getServerId()
     {
         return this.hashedServerId;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerLoginClient)handler);
     }
 
     @SideOnly(Side.CLIENT)

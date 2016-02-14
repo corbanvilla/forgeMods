@@ -14,7 +14,6 @@ public class RealmsSliderButton extends RealmsButton
     private final float minValue;
     private final float maxValue;
     private int steps;
-    private static final String __OBFID = "CL_00001834";
 
     public RealmsSliderButton(int p_i1056_1_, int p_i1056_2_, int p_i1056_3_, int p_i1056_4_, int p_i1056_5_, int p_i1056_6_)
     {
@@ -97,7 +96,9 @@ public class RealmsSliderButton extends RealmsButton
         this.sliding = true;
     }
 
-    public void clicked(float p_clicked_1_) {}
+    public void clicked(float p_clicked_1_)
+    {
+    }
 
     public void released(int p_released_1_, int p_released_2_)
     {

@@ -9,8 +9,6 @@ import net.minecraft.world.storage.MapData;
 
 public class ItemEmptyMap extends ItemMapBase
 {
-    private static final String __OBFID = "CL_00000024";
-
     protected ItemEmptyMap()
     {
         this.setCreativeTab(CreativeTabs.tabMisc);
@@ -21,25 +19,25 @@ public class ItemEmptyMap extends ItemMapBase
      */
     public ItemStack onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn)
     {
-        ItemStack itemstack1 = new ItemStack(Items.filled_map, 1, worldIn.getUniqueDataId("map"));
-        String s = "map_" + itemstack1.getMetadata();
+        ItemStack itemstack = new ItemStack(Items.filled_map, 1, worldIn.getUniqueDataId("map"));
+        String s = "map_" + itemstack.getMetadata();
         MapData mapdata = new MapData(s);
         worldIn.setItemData(s, mapdata);
         mapdata.scale = 0;
-        mapdata.func_176054_a(playerIn.posX, playerIn.posZ, mapdata.scale);
+        mapdata.calculateMapCenter(playerIn.posX, playerIn.posZ, mapdata.scale);
         mapdata.dimension = worldIn.provider.getDimensionId();
         mapdata.markDirty();
         --itemStackIn.stackSize;
 
         if (itemStackIn.stackSize <= 0)
         {
-            return itemstack1;
+            return itemstack;
         }
         else
         {
-            if (!playerIn.inventory.addItemStackToInventory(itemstack1.copy()))
+            if (!playerIn.inventory.addItemStackToInventory(itemstack.copy()))
             {
-                playerIn.dropPlayerItemWithRandomChoice(itemstack1, false);
+                playerIn.dropPlayerItemWithRandomChoice(itemstack, false);
             }
 
             playerIn.triggerAchievement(StatList.objectUseStats[Item.getIdFromItem(this)]);

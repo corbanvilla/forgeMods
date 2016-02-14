@@ -7,7 +7,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public interface IReloadableResourceManager extends IResourceManager
 {
-    void reloadResources(List p_110541_1_);
+    void reloadResources(List<IResourcePack> p_110541_1_);
 
-    void registerReloadListener(IResourceManagerReloadListener p_110542_1_);
+    void registerReloadListener(IResourceManagerReloadListener reloadListener);
 }

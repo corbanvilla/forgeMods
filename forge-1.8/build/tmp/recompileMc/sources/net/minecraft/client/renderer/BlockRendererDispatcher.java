@@ -27,12 +27,11 @@ public class BlockRendererDispatcher implements IResourceManagerReloadListener
     private final BlockModelRenderer blockModelRenderer = new net.minecraftforge.client.model.pipeline.ForgeBlockModelRenderer();
     private final ChestRenderer chestRenderer = new ChestRenderer();
     private final BlockFluidRenderer fluidRenderer = new BlockFluidRenderer();
-    private static final String __OBFID = "CL_00002520";
 
-    public BlockRendererDispatcher(BlockModelShapes p_i46237_1_, GameSettings p_i46237_2_)
+    public BlockRendererDispatcher(BlockModelShapes blockModelShapesIn, GameSettings gameSettingsIn)
     {
-        this.blockModelShapes = p_i46237_1_;
-        this.gameSettings = p_i46237_2_;
+        this.blockModelShapes = blockModelShapesIn;
+        this.gameSettings = gameSettingsIn;
     }
 
     public BlockModelShapes getBlockModelShapes()
@@ -40,19 +39,19 @@ public class BlockRendererDispatcher implements IResourceManagerReloadListener
         return this.blockModelShapes;
     }
 
-    public void renderBlockDamage(IBlockState p_175020_1_, BlockPos p_175020_2_, TextureAtlasSprite p_175020_3_, IBlockAccess p_175020_4_)
+    public void renderBlockDamage(IBlockState state, BlockPos pos, TextureAtlasSprite texture, IBlockAccess blockAccess)
     {
-        Block block = p_175020_1_.getBlock();
+        Block block = state.getBlock();
         int i = block.getRenderType();
 
         if (i == 3)
         {
-            p_175020_1_ = block.getActualState(p_175020_1_, p_175020_4_, p_175020_2_);
-            IBakedModel ibakedmodel = this.blockModelShapes.getModelForState(p_175020_1_);
+            state = block.getActualState(state, blockAccess, pos);
+            IBakedModel ibakedmodel = this.blockModelShapes.getModelForState(state);
 
             if(ibakedmodel instanceof net.minecraftforge.client.model.ISmartBlockModel)
             {
-                IBlockState extendedState = block.getExtendedState(p_175020_1_, p_175020_4_, p_175020_2_);
+                IBlockState extendedState = block.getExtendedState(state, blockAccess, pos);
                 for ( net.minecraft.util.EnumWorldBlockLayer layer : net.minecraft.util.EnumWorldBlockLayer.values() )
                 {
                     if ( block.canRenderInLayer( layer ) )
@@ -60,23 +59,23 @@ public class BlockRendererDispatcher implements IResourceManagerReloadListener
                         net.minecraftforge.client.ForgeHooksClient.setRenderLayer(layer);
 
                         IBakedModel targetLayer = ((net.minecraftforge.client.model.ISmartBlockModel)ibakedmodel).handleBlockState(extendedState);
-                        IBakedModel damageModel = (new SimpleBakedModel.Builder(targetLayer, p_175020_3_)).makeBakedModel();
-                        this.blockModelRenderer.renderModel(p_175020_4_, damageModel, p_175020_1_, p_175020_2_, Tessellator.getInstance().getWorldRenderer());
+                        IBakedModel damageModel = (new SimpleBakedModel.Builder(targetLayer, texture)).makeBakedModel();
+                        this.blockModelRenderer.renderModel(blockAccess, damageModel, state, pos, Tessellator.getInstance().getWorldRenderer());
                     }
                 }
                 return;
             }
 
-            IBakedModel ibakedmodel1 = (new SimpleBakedModel.Builder(ibakedmodel, p_175020_3_)).makeBakedModel();
-            this.blockModelRenderer.renderModel(p_175020_4_, ibakedmodel1, p_175020_1_, p_175020_2_, Tessellator.getInstance().getWorldRenderer());
+            IBakedModel ibakedmodel1 = (new SimpleBakedModel.Builder(ibakedmodel, texture)).makeBakedModel();
+            this.blockModelRenderer.renderModel(blockAccess, ibakedmodel1, state, pos, Tessellator.getInstance().getWorldRenderer());
         }
     }
 
-    public boolean renderBlock(IBlockState p_175018_1_, BlockPos p_175018_2_, IBlockAccess p_175018_3_, WorldRenderer p_175018_4_)
+    public boolean renderBlock(IBlockState state, BlockPos pos, IBlockAccess blockAccess, WorldRenderer worldRendererIn)
     {
         try
         {
-            int i = p_175018_1_.getBlock().getRenderType();
+            int i = state.getBlock().getRenderType();
 
             if (i == -1)
             {
@@ -87,12 +86,12 @@ public class BlockRendererDispatcher implements IResourceManagerReloadListener
                 switch (i)
                 {
                     case 1:
-                        return this.fluidRenderer.renderFluid(p_175018_3_, p_175018_1_, p_175018_2_, p_175018_4_);
+                        return this.fluidRenderer.renderFluid(blockAccess, state, pos, worldRendererIn);
                     case 2:
                         return false;
                     case 3:
-                        IBakedModel ibakedmodel = this.getModelFromBlockState(p_175018_1_, p_175018_3_, p_175018_2_);
-                        return this.blockModelRenderer.renderModel(p_175018_3_, ibakedmodel, p_175018_1_, p_175018_2_, p_175018_4_);
+                        IBakedModel ibakedmodel = this.getModelFromBlockState(state, blockAccess, pos);
+                        return this.blockModelRenderer.renderModel(blockAccess, ibakedmodel, state, pos, worldRendererIn);
                     default:
                         return false;
                 }
@@ -102,7 +101,7 @@ public class BlockRendererDispatcher implements IResourceManagerReloadListener
         {
             CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Tesselating block in world");
             CrashReportCategory crashreportcategory = crashreport.makeCategory("Block being tesselated");
-            CrashReportCategory.addBlockInfo(crashreportcategory, p_175018_2_, p_175018_1_.getBlock(), p_175018_1_.getBlock().getMetaFromState(p_175018_1_));
+            CrashReportCategory.addBlockInfo(crashreportcategory, pos, state.getBlock(), state.getBlock().getMetaFromState(state));
             throw new ReportedException(crashreport);
         }
     }
@@ -112,53 +111,53 @@ public class BlockRendererDispatcher implements IResourceManagerReloadListener
         return this.blockModelRenderer;
     }
 
-    private IBakedModel getBakedModel(IBlockState p_175017_1_, BlockPos p_175017_2_)
+    private IBakedModel getBakedModel(IBlockState state, BlockPos pos)
     {
-        IBakedModel ibakedmodel = this.blockModelShapes.getModelForState(p_175017_1_);
+        IBakedModel ibakedmodel = this.blockModelShapes.getModelForState(state);
 
-        if (p_175017_2_ != null && this.gameSettings.allowBlockAlternatives && ibakedmodel instanceof WeightedBakedModel)
+        if (pos != null && this.gameSettings.allowBlockAlternatives && ibakedmodel instanceof WeightedBakedModel)
         {
-            ibakedmodel = ((WeightedBakedModel)ibakedmodel).getAlternativeModel(MathHelper.getPositionRandom(p_175017_2_));
+            ibakedmodel = ((WeightedBakedModel)ibakedmodel).getAlternativeModel(MathHelper.getPositionRandom(pos));
         }
 
         return ibakedmodel;
     }
 
-    public IBakedModel getModelFromBlockState(IBlockState p_175022_1_, IBlockAccess p_175022_2_, BlockPos p_175022_3_)
+    public IBakedModel getModelFromBlockState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
     {
-        Block block = p_175022_1_.getBlock();
+        Block block = state.getBlock();
 
-        if (p_175022_2_.getWorldType() != WorldType.DEBUG_WORLD)
+        if (worldIn.getWorldType() != WorldType.DEBUG_WORLD)
         {
             try
             {
-                p_175022_1_ = block.getActualState(p_175022_1_, p_175022_2_, p_175022_3_);
+                state = block.getActualState(state, worldIn, pos);
             }
-            catch (Exception exception)
+            catch (Exception var6)
             {
                 ;
             }
         }
 
-        IBakedModel ibakedmodel = this.blockModelShapes.getModelForState(p_175022_1_);
+        IBakedModel ibakedmodel = this.blockModelShapes.getModelForState(state);
 
-        if (p_175022_3_ != null && this.gameSettings.allowBlockAlternatives && ibakedmodel instanceof WeightedBakedModel)
+        if (pos != null && this.gameSettings.allowBlockAlternatives && ibakedmodel instanceof WeightedBakedModel)
         {
-            ibakedmodel = ((WeightedBakedModel)ibakedmodel).getAlternativeModel(MathHelper.getPositionRandom(p_175022_3_));
+            ibakedmodel = ((WeightedBakedModel)ibakedmodel).getAlternativeModel(MathHelper.getPositionRandom(pos));
         }
 
         if(ibakedmodel instanceof net.minecraftforge.client.model.ISmartBlockModel)
         {
-            IBlockState extendedState = block.getExtendedState(p_175022_1_, p_175022_2_, p_175022_3_);
+            IBlockState extendedState = block.getExtendedState(state, worldIn, pos);
             ibakedmodel = ((net.minecraftforge.client.model.ISmartBlockModel)ibakedmodel).handleBlockState(extendedState);
         }
 
         return ibakedmodel;
     }
 
-    public void renderBlockBrightness(IBlockState p_175016_1_, float p_175016_2_)
+    public void renderBlockBrightness(IBlockState state, float brightness)
     {
-        int i = p_175016_1_.getBlock().getRenderType();
+        int i = state.getBlock().getRenderType();
 
         if (i != -1)
         {
@@ -168,11 +167,11 @@ public class BlockRendererDispatcher implements IResourceManagerReloadListener
                 default:
                     break;
                 case 2:
-                    this.chestRenderer.renderChestBrightness(p_175016_1_.getBlock(), p_175016_2_);
+                    this.chestRenderer.renderChestBrightness(state.getBlock(), brightness);
                     break;
                 case 3:
-                    IBakedModel ibakedmodel = this.getBakedModel(p_175016_1_, (BlockPos)null);
-                    this.blockModelRenderer.renderModelBrightness(ibakedmodel, p_175016_1_, p_175016_2_, true);
+                    IBakedModel ibakedmodel = this.getBakedModel(state, (BlockPos)null);
+                    this.blockModelRenderer.renderModelBrightness(ibakedmodel, state, brightness, true);
             }
         }
     }
@@ -185,8 +184,8 @@ public class BlockRendererDispatcher implements IResourceManagerReloadListener
         }
         else
         {
-            int j = p_175021_1_.getRenderType();
-            return j == 3 ? false : j == 2;
+            int i = p_175021_1_.getRenderType();
+            return i == 3 ? false : i == 2;
         }
     }
 

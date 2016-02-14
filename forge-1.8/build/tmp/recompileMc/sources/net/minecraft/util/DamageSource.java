@@ -40,7 +40,6 @@ public class DamageSource
     private boolean magicDamage;
     private boolean explosion;
     public String damageType;
-    private static final String __OBFID = "CL_00001521";
 
     public static DamageSource causeMobDamage(EntityLivingBase mob)
     {
@@ -201,10 +200,10 @@ public class DamageSource
      */
     public IChatComponent getDeathMessage(EntityLivingBase p_151519_1_)
     {
-        EntityLivingBase entitylivingbase1 = p_151519_1_.func_94060_bK();
+        EntityLivingBase entitylivingbase = p_151519_1_.func_94060_bK();
         String s = "death.attack." + this.damageType;
         String s1 = s + ".player";
-        return entitylivingbase1 != null && StatCollector.canTranslate(s1) ? new ChatComponentTranslation(s1, new Object[] {p_151519_1_.getDisplayName(), entitylivingbase1.getDisplayName()}): new ChatComponentTranslation(s, new Object[] {p_151519_1_.getDisplayName()});
+        return entitylivingbase != null && StatCollector.canTranslate(s1) ? new ChatComponentTranslation(s1, new Object[] {p_151519_1_.getDisplayName(), entitylivingbase.getDisplayName()}): new ChatComponentTranslation(s, new Object[] {p_151519_1_.getDisplayName()});
     }
 
     /**

@@ -6,8 +6,6 @@ import net.minecraft.util.ResourceLocation;
 
 public class EnchantmentDigging extends Enchantment
 {
-    private static final String __OBFID = "CL_00000104";
-
     protected EnchantmentDigging(int enchID, ResourceLocation enchName, int enchWeight)
     {
         super(enchID, enchName, enchWeight, EnumEnchantmentType.DIGGER);
@@ -40,8 +38,6 @@ public class EnchantmentDigging extends Enchantment
 
     /**
      * Determines if this enchantment can be applied to a specific ItemStack.
-     *  
-     * @param stack The ItemStack that is attempting to become enchanted with with enchantment.
      */
     public boolean canApply(ItemStack stack)
     {

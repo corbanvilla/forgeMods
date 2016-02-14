@@ -16,8 +16,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockWeb extends Block
 {
-    private static final String __OBFID = "CL_00000333";
-
     public BlockWeb()
     {
         super(Material.web);
@@ -32,6 +30,9 @@ public class BlockWeb extends Block
         entityIn.setInWeb();
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -49,8 +50,6 @@ public class BlockWeb extends Block
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {

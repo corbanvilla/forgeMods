@@ -2,7 +2,6 @@ package net.minecraft.client.renderer.tileentity;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +10,7 @@ import net.minecraft.client.model.ModelBanner;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.LayeredColorMaskTexture;
 import net.minecraft.init.Blocks;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.tileentity.TileEntityBanner;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
@@ -20,67 +19,65 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class TileEntityBannerRenderer extends TileEntitySpecialRenderer
+public class TileEntityBannerRenderer extends TileEntitySpecialRenderer<TileEntityBanner>
 {
-    private static final Map field_178466_c = Maps.newHashMap();
+    private static final Map<String, TileEntityBannerRenderer.TimedBannerTexture> DESIGNS = Maps.<String, TileEntityBannerRenderer.TimedBannerTexture>newHashMap();
     private static final ResourceLocation BANNERTEXTURES = new ResourceLocation("textures/entity/banner_base.png");
     private ModelBanner bannerModel = new ModelBanner();
-    private static final String __OBFID = "CL_00002473";
 
-    public void renderTileEntityBanner(TileEntityBanner entityBanner, double x, double y, double z, float p_180545_8_, int p_180545_9_)
+    public void renderTileEntityAt(TileEntityBanner te, double x, double y, double z, float partialTicks, int destroyStage)
     {
-        boolean flag = entityBanner.getWorld() != null;
-        boolean flag1 = !flag || entityBanner.getBlockType() == Blocks.standing_banner;
-        int j = flag ? entityBanner.getBlockMetadata() : 0;
-        long k = flag ? entityBanner.getWorld().getTotalWorldTime() : 0L;
+        boolean flag = te.getWorld() != null;
+        boolean flag1 = !flag || te.getBlockType() == Blocks.standing_banner;
+        int i = flag ? te.getBlockMetadata() : 0;
+        long j = flag ? te.getWorld().getTotalWorldTime() : 0L;
         GlStateManager.pushMatrix();
-        float f1 = 0.6666667F;
-        float f3;
+        float f = 0.6666667F;
 
         if (flag1)
         {
-            GlStateManager.translate((float)x + 0.5F, (float)y + 0.75F * f1, (float)z + 0.5F);
-            float f2 = (float)(j * 360) / 16.0F;
-            GlStateManager.rotate(-f2, 0.0F, 1.0F, 0.0F);
+            GlStateManager.translate((float)x + 0.5F, (float)y + 0.75F * f, (float)z + 0.5F);
+            float f1 = (float)(i * 360) / 16.0F;
+            GlStateManager.rotate(-f1, 0.0F, 1.0F, 0.0F);
             this.bannerModel.bannerStand.showModel = true;
         }
         else
         {
-            f3 = 0.0F;
+            float f2 = 0.0F;
 
-            if (j == 2)
+            if (i == 2)
             {
-                f3 = 180.0F;
+                f2 = 180.0F;
             }
 
-            if (j == 4)
+            if (i == 4)
             {
-                f3 = 90.0F;
+                f2 = 90.0F;
             }
 
-            if (j == 5)
+            if (i == 5)
             {
-                f3 = -90.0F;
+                f2 = -90.0F;
             }
 
-            GlStateManager.translate((float)x + 0.5F, (float)y - 0.25F * f1, (float)z + 0.5F);
-            GlStateManager.rotate(-f3, 0.0F, 1.0F, 0.0F);
+            GlStateManager.translate((float)x + 0.5F, (float)y - 0.25F * f, (float)z + 0.5F);
+            GlStateManager.rotate(-f2, 0.0F, 1.0F, 0.0F);
             GlStateManager.translate(0.0F, -0.3125F, -0.4375F);
             this.bannerModel.bannerStand.showModel = false;
         }
 
-        BlockPos blockpos = entityBanner.getPos();
-        f3 = (float)(blockpos.getX() * 7 + blockpos.getY() * 9 + blockpos.getZ() * 13) + (float)k + p_180545_8_;
+        BlockPos blockpos = te.getPos();
+        float f3 = (float)(blockpos.getX() * 7 + blockpos.getY() * 9 + blockpos.getZ() * 13) + (float)j + partialTicks;
         this.bannerModel.bannerSlate.rotateAngleX = (-0.0125F + 0.01F * MathHelper.cos(f3 * (float)Math.PI * 0.02F)) * (float)Math.PI;
         GlStateManager.enableRescaleNormal();
-        ResourceLocation resourcelocation = this.func_178463_a(entityBanner);
+        ResourceLocation resourcelocation = this.func_178463_a(te);
 
         if (resourcelocation != null)
         {
             this.bindTexture(resourcelocation);
             GlStateManager.pushMatrix();
-            GlStateManager.scale(f1, -f1, -f1);
-            this.bannerModel.func_178687_a();
+            GlStateManager.scale(f, -f, -f);
+            this.bannerModel.renderBanner();
             GlStateManager.popMatrix();
         }
 
@@ -88,9 +85,9 @@ public class TileEntityBannerRenderer extends TileEntitySpecialRenderer
         GlStateManager.popMatrix();
     }
 
-    private ResourceLocation func_178463_a(TileEntityBanner p_178463_1_)
+    private ResourceLocation func_178463_a(TileEntityBanner bannerObj)
     {
-        String s = p_178463_1_.func_175116_e();
+        String s = bannerObj.func_175116_e();
 
         if (s.isEmpty())
         {
@@ -98,72 +95,63 @@ public class TileEntityBannerRenderer extends TileEntitySpecialRenderer
         }
         else
         {
-            TileEntityBannerRenderer.TimedBannerTexture timedbannertexture = (TileEntityBannerRenderer.TimedBannerTexture)field_178466_c.get(s);
+            TileEntityBannerRenderer.TimedBannerTexture tileentitybannerrenderer$timedbannertexture = (TileEntityBannerRenderer.TimedBannerTexture)DESIGNS.get(s);
 
-            if (timedbannertexture == null)
+            if (tileentitybannerrenderer$timedbannertexture == null)
             {
-                if (field_178466_c.size() >= 256)
+                if (DESIGNS.size() >= 256)
                 {
                     long i = System.currentTimeMillis();
-                    Iterator iterator = field_178466_c.keySet().iterator();
+                    Iterator<String> iterator = DESIGNS.keySet().iterator();
 
                     while (iterator.hasNext())
                     {
                         String s1 = (String)iterator.next();
-                        TileEntityBannerRenderer.TimedBannerTexture timedbannertexture1 = (TileEntityBannerRenderer.TimedBannerTexture)field_178466_c.get(s1);
+                        TileEntityBannerRenderer.TimedBannerTexture tileentitybannerrenderer$timedbannertexture1 = (TileEntityBannerRenderer.TimedBannerTexture)DESIGNS.get(s1);
 
-                        if (i - timedbannertexture1.field_178472_a > 60000L)
+                        if (i - tileentitybannerrenderer$timedbannertexture1.systemTime > 60000L)
                         {
-                            Minecraft.getMinecraft().getTextureManager().deleteTexture(timedbannertexture1.field_178471_b);
+                            Minecraft.getMinecraft().getTextureManager().deleteTexture(tileentitybannerrenderer$timedbannertexture1.bannerTexture);
                             iterator.remove();
                         }
                     }
 
-                    if (field_178466_c.size() >= 256)
+                    if (DESIGNS.size() >= 256)
                     {
                         return null;
                     }
                 }
 
-                List list1 = p_178463_1_.getPatternList();
-                List list = p_178463_1_.getColorList();
-                ArrayList arraylist = Lists.newArrayList();
-                Iterator iterator1 = list1.iterator();
+                List<TileEntityBanner.EnumBannerPattern> list1 = bannerObj.getPatternList();
+                List<EnumDyeColor> list = bannerObj.getColorList();
+                List<String> list2 = Lists.<String>newArrayList();
 
-                while (iterator1.hasNext())
+                for (TileEntityBanner.EnumBannerPattern tileentitybanner$enumbannerpattern : list1)
                 {
-                    TileEntityBanner.EnumBannerPattern enumbannerpattern = (TileEntityBanner.EnumBannerPattern)iterator1.next();
-                    arraylist.add("textures/entity/banner/" + enumbannerpattern.getPatternName() + ".png");
+                    list2.add("textures/entity/banner/" + tileentitybanner$enumbannerpattern.getPatternName() + ".png");
                 }
 
-                timedbannertexture = new TileEntityBannerRenderer.TimedBannerTexture(null);
-                timedbannertexture.field_178471_b = new ResourceLocation(s);
-                Minecraft.getMinecraft().getTextureManager().loadTexture(timedbannertexture.field_178471_b, new LayeredColorMaskTexture(BANNERTEXTURES, arraylist, list));
-                field_178466_c.put(s, timedbannertexture);
+                tileentitybannerrenderer$timedbannertexture = new TileEntityBannerRenderer.TimedBannerTexture();
+                tileentitybannerrenderer$timedbannertexture.bannerTexture = new ResourceLocation(s);
+                Minecraft.getMinecraft().getTextureManager().loadTexture(tileentitybannerrenderer$timedbannertexture.bannerTexture, new LayeredColorMaskTexture(BANNERTEXTURES, list2, list));
+                DESIGNS.put(s, tileentitybannerrenderer$timedbannertexture);
             }
 
-            timedbannertexture.field_178472_a = System.currentTimeMillis();
-            return timedbannertexture.field_178471_b;
+            tileentitybannerrenderer$timedbannertexture.systemTime = System.currentTimeMillis();
+            return tileentitybannerrenderer$timedbannertexture.bannerTexture;
         }
-    }
-
-    public void renderTileEntityAt(TileEntity p_180535_1_, double posX, double posZ, double p_180535_6_, float p_180535_8_, int p_180535_9_)
-    {
-        this.renderTileEntityBanner((TileEntityBanner)p_180535_1_, posX, posZ, p_180535_6_, p_180535_8_, p_180535_9_);
     }
 
     @SideOnly(Side.CLIENT)
     static class TimedBannerTexture
         {
-            public long field_178472_a;
-            public ResourceLocation field_178471_b;
-            private static final String __OBFID = "CL_00002471";
+            /** The current system time, in milliseconds. */
+            public long systemTime;
+            /** The layered texture for the banner to render out. */
+            public ResourceLocation bannerTexture;
 
-            private TimedBannerTexture() {}
-
-            TimedBannerTexture(Object p_i46209_1_)
+            private TimedBannerTexture()
             {
-                this();
             }
         }
 }

@@ -24,7 +24,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public abstract class AbstractClientPlayer extends EntityPlayer
 {
     private NetworkPlayerInfo playerInfo;
-    private static final String __OBFID = "CL_00000935";
 
     public AbstractClientPlayer(World worldIn, GameProfile playerProfile)
     {
@@ -85,21 +84,19 @@ public abstract class AbstractClientPlayer extends EntityPlayer
     public static ThreadDownloadImageData getDownloadImageSkin(ResourceLocation resourceLocationIn, String username)
     {
         TextureManager texturemanager = Minecraft.getMinecraft().getTextureManager();
-        Object object = texturemanager.getTexture(resourceLocationIn);
+        ITextureObject itextureobject = texturemanager.getTexture(resourceLocationIn);
 
-        if (object == null)
+        if (itextureobject == null)
         {
-            object = new ThreadDownloadImageData((File)null, String.format("http://skins.minecraft.net/MinecraftSkins/%s.png", new Object[] {StringUtils.stripControlCodes(username)}), DefaultPlayerSkin.getDefaultSkin(getOfflineUUID(username)), new ImageBufferDownload());
-            texturemanager.loadTexture(resourceLocationIn, (ITextureObject)object);
+            itextureobject = new ThreadDownloadImageData((File)null, String.format("http://skins.minecraft.net/MinecraftSkins/%s.png", new Object[] {StringUtils.stripControlCodes(username)}), DefaultPlayerSkin.getDefaultSkin(getOfflineUUID(username)), new ImageBufferDownload());
+            texturemanager.loadTexture(resourceLocationIn, itextureobject);
         }
 
-        return (ThreadDownloadImageData)object;
+        return (ThreadDownloadImageData)itextureobject;
     }
 
     /**
      * Returns true if the username has an associated skin.
-     *  
-     * @param username The username of the player being checked.
      */
     public static ResourceLocation getLocationSkin(String username)
     {
@@ -140,7 +137,7 @@ public abstract class AbstractClientPlayer extends EntityPlayer
             }
             else
             {
-                f1 *= f1;
+                f1 = f1 * f1;
             }
 
             f *= 1.0F - f1 * 0.15F;

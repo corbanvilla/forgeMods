@@ -15,37 +15,32 @@ public class ContainerFurnace extends Container
     private int field_178153_g;
     private int field_178154_h;
     private int field_178155_i;
-    private static final String __OBFID = "CL_00001748";
 
-    public ContainerFurnace(InventoryPlayer p_i45794_1_, IInventory furnaceInventory)
+    public ContainerFurnace(InventoryPlayer playerInventory, IInventory furnaceInventory)
     {
         this.tileFurnace = furnaceInventory;
         this.addSlotToContainer(new Slot(furnaceInventory, 0, 56, 17));
         this.addSlotToContainer(new SlotFurnaceFuel(furnaceInventory, 1, 56, 53));
-        this.addSlotToContainer(new SlotFurnaceOutput(p_i45794_1_.player, furnaceInventory, 2, 116, 35));
-        int i;
+        this.addSlotToContainer(new SlotFurnaceOutput(playerInventory.player, furnaceInventory, 2, 116, 35));
 
-        for (i = 0; i < 3; ++i)
+        for (int i = 0; i < 3; ++i)
         {
             for (int j = 0; j < 9; ++j)
             {
-                this.addSlotToContainer(new Slot(p_i45794_1_, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
+                this.addSlotToContainer(new Slot(playerInventory, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
             }
         }
 
-        for (i = 0; i < 9; ++i)
+        for (int k = 0; k < 9; ++k)
         {
-            this.addSlotToContainer(new Slot(p_i45794_1_, i, 8 + i * 18, 142));
+            this.addSlotToContainer(new Slot(playerInventory, k, 8 + k * 18, 142));
         }
     }
 
-    /**
-     * Add the given Listener to the list of Listeners. Method name is for legacy.
-     */
-    public void addCraftingToCrafters(ICrafting listener)
+    public void onCraftGuiOpened(ICrafting listener)
     {
-        super.addCraftingToCrafters(listener);
-        listener.func_175173_a(this, this.tileFurnace);
+        super.onCraftGuiOpened(listener);
+        listener.sendAllWindowProperties(this, this.tileFurnace);
     }
 
     /**

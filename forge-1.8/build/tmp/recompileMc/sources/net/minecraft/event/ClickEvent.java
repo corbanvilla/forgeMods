@@ -7,7 +7,6 @@ public class ClickEvent
 {
     private final ClickEvent.Action action;
     private final String value;
-    private static final String __OBFID = "CL_00001260";
 
     public ClickEvent(ClickEvent.Action theAction, String theValue)
     {
@@ -89,17 +88,16 @@ public class ClickEvent
         TWITCH_USER_INFO("twitch_user_info", false),
         SUGGEST_COMMAND("suggest_command", true),
         CHANGE_PAGE("change_page", true);
-        private static final Map nameMapping = Maps.newHashMap();
+
+        private static final Map<String, ClickEvent.Action> nameMapping = Maps.<String, ClickEvent.Action>newHashMap();
         private final boolean allowedInChat;
         /** The canonical name used to refer to this action. */
         private final String canonicalName;
 
-        private static final String __OBFID = "CL_00001261";
-
-        private Action(String p_i45155_3_, boolean p_i45155_4_)
+        private Action(String canonicalNameIn, boolean allowedInChatIn)
         {
-            this.canonicalName = p_i45155_3_;
-            this.allowedInChat = p_i45155_4_;
+            this.canonicalName = canonicalNameIn;
+            this.allowedInChat = allowedInChatIn;
         }
 
         /**
@@ -121,20 +119,16 @@ public class ClickEvent
         /**
          * Gets a value by its canonical name.
          */
-        public static ClickEvent.Action getValueByCanonicalName(String p_150672_0_)
+        public static ClickEvent.Action getValueByCanonicalName(String canonicalNameIn)
         {
-            return (ClickEvent.Action)nameMapping.get(p_150672_0_);
+            return (ClickEvent.Action)nameMapping.get(canonicalNameIn);
         }
 
         static
         {
-            ClickEvent.Action[] var0 = values();
-            int var1 = var0.length;
-
-            for (int var2 = 0; var2 < var1; ++var2)
+            for (ClickEvent.Action clickevent$action : values())
             {
-                ClickEvent.Action var3 = var0[var2];
-                nameMapping.put(var3.getCanonicalName(), var3);
+                nameMapping.put(clickevent$action.getCanonicalName(), clickevent$action);
             }
         }
     }

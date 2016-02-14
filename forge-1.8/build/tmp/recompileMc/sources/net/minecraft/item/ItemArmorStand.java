@@ -16,8 +16,6 @@ import net.minecraft.world.World;
 
 public class ItemArmorStand extends Item
 {
-    private static final String __OBFID = "CL_00002182";
-
     public ItemArmorStand()
     {
         this.setCreativeTab(CreativeTabs.tabDecorations);
@@ -25,9 +23,6 @@ public class ItemArmorStand extends Item
 
     /**
      * Called when a Block is right-clicked with this Item
-     *  
-     * @param pos The block being right-clicked
-     * @param side The side being right-clicked
      */
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
@@ -38,17 +33,17 @@ public class ItemArmorStand extends Item
         else
         {
             boolean flag = worldIn.getBlockState(pos).getBlock().isReplaceable(worldIn, pos);
-            BlockPos blockpos1 = flag ? pos : pos.offset(side);
+            BlockPos blockpos = flag ? pos : pos.offset(side);
 
-            if (!playerIn.canPlayerEdit(blockpos1, side, stack))
+            if (!playerIn.canPlayerEdit(blockpos, side, stack))
             {
                 return false;
             }
             else
             {
-                BlockPos blockpos2 = blockpos1.up();
-                boolean flag1 = !worldIn.isAirBlock(blockpos1) && !worldIn.getBlockState(blockpos1).getBlock().isReplaceable(worldIn, blockpos1);
-                flag1 |= !worldIn.isAirBlock(blockpos2) && !worldIn.getBlockState(blockpos2).getBlock().isReplaceable(worldIn, blockpos2);
+                BlockPos blockpos1 = blockpos.up();
+                boolean flag1 = !worldIn.isAirBlock(blockpos) && !worldIn.getBlockState(blockpos).getBlock().isReplaceable(worldIn, blockpos);
+                flag1 = flag1 | (!worldIn.isAirBlock(blockpos1) && !worldIn.getBlockState(blockpos1).getBlock().isReplaceable(worldIn, blockpos1));
 
                 if (flag1)
                 {
@@ -56,10 +51,10 @@ public class ItemArmorStand extends Item
                 }
                 else
                 {
-                    double d0 = (double)blockpos1.getX();
-                    double d1 = (double)blockpos1.getY();
-                    double d2 = (double)blockpos1.getZ();
-                    List list = worldIn.getEntitiesWithinAABBExcludingEntity((Entity)null, AxisAlignedBB.fromBounds(d0, d1, d2, d0 + 1.0D, d1 + 2.0D, d2 + 1.0D));
+                    double d0 = (double)blockpos.getX();
+                    double d1 = (double)blockpos.getY();
+                    double d2 = (double)blockpos.getZ();
+                    List<Entity> list = worldIn.getEntitiesWithinAABBExcludingEntity((Entity)null, AxisAlignedBB.fromBounds(d0, d1, d2, d0 + 1.0D, d1 + 2.0D, d2 + 1.0D));
 
                     if (list.size() > 0)
                     {
@@ -69,11 +64,11 @@ public class ItemArmorStand extends Item
                     {
                         if (!worldIn.isRemote)
                         {
+                            worldIn.setBlockToAir(blockpos);
                             worldIn.setBlockToAir(blockpos1);
-                            worldIn.setBlockToAir(blockpos2);
                             EntityArmorStand entityarmorstand = new EntityArmorStand(worldIn, d0 + 0.5D, d1, d2 + 0.5D);
-                            float f3 = (float)MathHelper.floor_float((MathHelper.wrapAngleTo180_float(playerIn.rotationYaw - 180.0F) + 22.5F) / 45.0F) * 45.0F;
-                            entityarmorstand.setLocationAndAngles(d0 + 0.5D, d1, d2 + 0.5D, f3, 0.0F);
+                            float f = (float)MathHelper.floor_float((MathHelper.wrapAngleTo180_float(playerIn.rotationYaw - 180.0F) + 22.5F) / 45.0F) * 45.0F;
+                            entityarmorstand.setLocationAndAngles(d0 + 0.5D, d1, d2 + 0.5D, f, 0.0F);
                             this.applyRandomRotations(entityarmorstand, worldIn.rand);
                             NBTTagCompound nbttagcompound = stack.getTagCompound();
 

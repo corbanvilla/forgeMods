@@ -1,18 +1,14 @@
 package net.minecraftforge.oredict;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
-import java.util.RandomAccess;
-import java.util.Map.Entry;
 import java.util.Set;
 
+import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.Level;
 
 import net.minecraft.block.Block;
@@ -39,10 +35,10 @@ public class OreDictionary
 {
     private static boolean hasInit = false;
     private static List<String>          idToName = new ArrayList<String>();
-    private static Map<String, Integer>  nameToId = new HashMap<String, Integer>();
+    private static Map<String, Integer>  nameToId = new HashMap<String, Integer>(128);
     private static List<List<ItemStack>> idToStack = Lists.newArrayList();
     private static List<List<ItemStack>> idToStackUn = Lists.newArrayList();
-    private static Map<Integer, List<Integer>> stackToId = Maps.newHashMap();
+    private static Map<Integer, List<Integer>> stackToId = Maps.newHashMapWithExpectedSize((int)(128 * 0.75));
     public static final ImmutableList<ItemStack> EMPTY_LIST = ImmutableList.of();
 
     /**
@@ -55,7 +51,6 @@ public class OreDictionary
         initVanillaEntries();
     }
 
-    @SuppressWarnings("unchecked")
     public static void initVanillaEntries()
     {
         if (!hasInit)
@@ -331,7 +326,7 @@ public class OreDictionary
         // HACK: use the registry name's ID. It is unique and it knows about substitutions. Fallback to a -1 value (what Item.getIDForItem would have returned) in the case where the registry is not aware of the item yet
         // IT should be noted that -1 will fail the gate further down, if an entry already exists with value -1 for this name. This is what is broken and being warned about.
         // APPARENTLY it's quite common to do this. OreDictionary should be considered alongside Recipes - you can't make them properly until you've registered with the game.
-        String registryName = stack.getItem().delegate.name();
+        ResourceLocation registryName = stack.getItem().delegate.getResourceName();
         int id;
         if (registryName == null)
         {
@@ -367,6 +362,44 @@ public class OreDictionary
     public static List<ItemStack> getOres(String name)
     {
         return getOres(getOreID(name));
+    }
+
+    /**
+     * Retrieves the List of items that are registered to this ore type at this instant.
+     * If the flag is TRUE, then it will create the list as empty if it did not exist.
+     *
+     * This option should be used by modders who are doing blanket scans in postInit.
+     * It greatly reduces clutter in the OreDictionary is the responsible and proper
+     * way to use the dictionary in a large number of cases.
+     *
+     * The other function above is utilized in OreRecipe and is required for the
+     * operation of that code.
+     *
+     * @param name The ore name, directly calls getOreID if the flag is TRUE
+     * @param alwaysCreateEntry Flag - should a new entry be created if empty
+     * @return An arraylist containing ItemStacks registered for this ore
+     */
+    public static List<ItemStack> getOres(String name, boolean alwaysCreateEntry)
+    {
+        if (alwaysCreateEntry) {
+            return getOres(getOreID(name));
+        }
+        return nameToId.get(name) != null ? getOres(getOreID(name)) : EMPTY_LIST;
+    }
+
+    /**
+     * Returns whether or not an oreName exists in the dictionary.
+     * This function can be used to safely query the Ore Dictionary without
+     * adding needless clutter to the underlying map structure.
+     *
+     * Please use this when possible and appropriate.
+     *
+     * @param name The ore name
+     * @return Whether or not that name is in the Ore Dictionary.
+     */
+    public static boolean doesOreNameExist(String name)
+    {
+        return nameToId.get(name) != null;
     }
 
     /**
@@ -406,7 +439,7 @@ public class OreDictionary
         return false;
     }
 
-    private static boolean containsMatch(boolean strict, List<ItemStack> inputs, ItemStack... targets)
+    public static boolean containsMatch(boolean strict, List<ItemStack> inputs, ItemStack... targets)
     {
         for (ItemStack input : inputs)
         {
@@ -455,7 +488,7 @@ public class OreDictionary
         // HACK: use the registry name's ID. It is unique and it knows about substitutions. Fallback to a -1 value (what Item.getIDForItem would have returned) in the case where the registry is not aware of the item yet
         // IT should be noted that -1 will fail the gate further down, if an entry already exists with value -1 for this name. This is what is broken and being warned about.
         // APPARENTLY it's quite common to do this. OreDictionary should be considered alongside Recipes - you can't make them properly until you've registered with the game.
-        String registryName = ore.getItem().delegate.name();
+        ResourceLocation registryName = ore.getItem().delegate.getResourceName();
         int hash;
         if (registryName == null)
         {
@@ -512,7 +545,7 @@ public class OreDictionary
             for (ItemStack ore : ores)
             {
                 // HACK: use the registry name's ID. It is unique and it knows about substitutions
-                String name = ore.getItem().delegate.name();
+                ResourceLocation name = ore.getItem().delegate.getResourceName();
                 int hash;
                 if (name == null)
                 {

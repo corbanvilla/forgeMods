@@ -9,12 +9,10 @@ import net.minecraft.world.WorldServer;
 
 public class CommandParticle extends CommandBase
 {
-    private static final String __OBFID = "CL_00002341";
-
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
-    public String getName()
+    public String getCommandName()
     {
         return "particle";
     }
@@ -27,15 +25,23 @@ public class CommandParticle extends CommandBase
         return 2;
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.particle.usage";
     }
 
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
-    public void execute(ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 8)
         {
@@ -45,14 +51,10 @@ public class CommandParticle extends CommandBase
         {
             boolean flag = false;
             EnumParticleTypes enumparticletypes = null;
-            EnumParticleTypes[] aenumparticletypes = EnumParticleTypes.values();
-            int i = aenumparticletypes.length;
 
-            for (int j = 0; j < i; ++j)
+            for (EnumParticleTypes enumparticletypes1 : EnumParticleTypes.values())
             {
-                EnumParticleTypes enumparticletypes1 = aenumparticletypes[j];
-
-                if (enumparticletypes1.func_179343_f())
+                if (enumparticletypes1.hasArguments())
                 {
                     if (args[0].startsWith(enumparticletypes1.getParticleName()))
                     {
@@ -77,18 +79,18 @@ public class CommandParticle extends CommandBase
             {
                 String s = args[0];
                 Vec3 vec3 = sender.getPositionVector();
-                double d6 = (double)((float)func_175761_b(vec3.xCoord, args[1], true));
-                double d0 = (double)((float)func_175761_b(vec3.yCoord, args[2], true));
-                double d1 = (double)((float)func_175761_b(vec3.zCoord, args[3], true));
+                double d6 = (double)((float)parseDouble(vec3.xCoord, args[1], true));
+                double d0 = (double)((float)parseDouble(vec3.yCoord, args[2], true));
+                double d1 = (double)((float)parseDouble(vec3.zCoord, args[3], true));
                 double d2 = (double)((float)parseDouble(args[4]));
                 double d3 = (double)((float)parseDouble(args[5]));
                 double d4 = (double)((float)parseDouble(args[6]));
                 double d5 = (double)((float)parseDouble(args[7]));
-                int k = 0;
+                int i = 0;
 
                 if (args.length > 8)
                 {
-                    k = parseInt(args[8], 0);
+                    i = parseInt(args[8], 0);
                 }
 
                 boolean flag1 = false;
@@ -105,32 +107,32 @@ public class CommandParticle extends CommandBase
                     WorldServer worldserver = (WorldServer)world;
                     int[] aint = new int[enumparticletypes.getArgumentCount()];
 
-                    if (enumparticletypes.func_179343_f())
+                    if (enumparticletypes.hasArguments())
                     {
-                        String[] astring1 = args[0].split("_", 3);
+                        String[] astring = args[0].split("_", 3);
 
-                        for (int l = 1; l < astring1.length; ++l)
+                        for (int j = 1; j < astring.length; ++j)
                         {
                             try
                             {
-                                aint[l - 1] = Integer.parseInt(astring1[l]);
+                                aint[j - 1] = Integer.parseInt(astring[j]);
                             }
-                            catch (NumberFormatException numberformatexception)
+                            catch (NumberFormatException var29)
                             {
                                 throw new CommandException("commands.particle.notFound", new Object[] {args[0]});
                             }
                         }
                     }
 
-                    worldserver.spawnParticle(enumparticletypes, flag1, d6, d0, d1, k, d2, d3, d4, d5, aint);
-                    notifyOperators(sender, this, "commands.particle.success", new Object[] {s, Integer.valueOf(Math.max(k, 1))});
+                    worldserver.spawnParticle(enumparticletypes, flag1, d6, d0, d1, i, d2, d3, d4, d5, aint);
+                    notifyOperators(sender, this, "commands.particle.success", new Object[] {s, Integer.valueOf(Math.max(i, 1))});
                 }
             }
         }
     }
 
-    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
-        return args.length == 1 ? getListOfStringsMatchingLastWord(args, EnumParticleTypes.func_179349_a()) : (args.length > 1 && args.length <= 4 ? func_175771_a(args, 1, pos) : (args.length == 9 ? getListOfStringsMatchingLastWord(args, new String[] {"normal", "force"}): null));
+        return args.length == 1 ? getListOfStringsMatchingLastWord(args, EnumParticleTypes.getParticleNames()) : (args.length > 1 && args.length <= 4 ? func_175771_a(args, 1, pos) : (args.length == 10 ? getListOfStringsMatchingLastWord(args, new String[] {"normal", "force"}): null));
     }
 }

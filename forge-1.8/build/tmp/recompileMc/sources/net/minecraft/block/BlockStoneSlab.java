@@ -2,6 +2,7 @@ package net.minecraft.block;
 
 import java.util.List;
 import java.util.Random;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -21,8 +22,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public abstract class BlockStoneSlab extends BlockSlab
 {
     public static final PropertyBool SEAMLESS = PropertyBool.create("seamless");
-    public static final PropertyEnum VARIANT = PropertyEnum.create("variant", BlockStoneSlab.EnumType.class);
-    private static final String __OBFID = "CL_00000320";
+    public static final PropertyEnum<BlockStoneSlab.EnumType> VARIANT = PropertyEnum.<BlockStoneSlab.EnumType>create("variant", BlockStoneSlab.EnumType.class);
 
     public BlockStoneSlab()
     {
@@ -44,8 +44,6 @@ public abstract class BlockStoneSlab extends BlockSlab
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -66,7 +64,7 @@ public abstract class BlockStoneSlab extends BlockSlab
         return super.getUnlocalizedName() + "." + BlockStoneSlab.EnumType.byMetadata(meta).getUnlocalizedName();
     }
 
-    public IProperty getVariantProperty()
+    public IProperty<?> getVariantProperty()
     {
         return VARIANT;
     }
@@ -80,20 +78,15 @@ public abstract class BlockStoneSlab extends BlockSlab
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
     {
         if (itemIn != Item.getItemFromBlock(Blocks.double_stone_slab))
         {
-            BlockStoneSlab.EnumType[] aenumtype = BlockStoneSlab.EnumType.values();
-            int i = aenumtype.length;
-
-            for (int j = 0; j < i; ++j)
+            for (BlockStoneSlab.EnumType blockstoneslab$enumtype : BlockStoneSlab.EnumType.values())
             {
-                BlockStoneSlab.EnumType enumtype = aenumtype[j];
-
-                if (enumtype != BlockStoneSlab.EnumType.WOOD)
+                if (blockstoneslab$enumtype != BlockStoneSlab.EnumType.WOOD)
                 {
-                    list.add(new ItemStack(itemIn, 1, enumtype.getMetadata()));
+                    list.add(new ItemStack(itemIn, 1, blockstoneslab$enumtype.getMetadata()));
                 }
             }
         }
@@ -123,8 +116,8 @@ public abstract class BlockStoneSlab extends BlockSlab
      */
     public int getMetaFromState(IBlockState state)
     {
-        byte b0 = 0;
-        int i = b0 | ((BlockStoneSlab.EnumType)state.getValue(VARIANT)).getMetadata();
+        int i = 0;
+        i = i | ((BlockStoneSlab.EnumType)state.getValue(VARIANT)).getMetadata();
 
         if (this.isDouble())
         {
@@ -147,45 +140,60 @@ public abstract class BlockStoneSlab extends BlockSlab
     }
 
     /**
-     * Get the damage value that this Block should drop
+     * Gets the metadata of the item this Block can drop. This method is called when the block gets destroyed. It
+     * returns the metadata of the dropped item based on the old metadata of the block.
      */
     public int damageDropped(IBlockState state)
     {
         return ((BlockStoneSlab.EnumType)state.getValue(VARIANT)).getMetadata();
     }
 
+    /**
+     * Get the MapColor for this Block and the given BlockState
+     */
+    public MapColor getMapColor(IBlockState state)
+    {
+        return ((BlockStoneSlab.EnumType)state.getValue(VARIANT)).func_181074_c();
+    }
+
     public static enum EnumType implements IStringSerializable
     {
-        STONE(0, "stone"),
-        SAND(1, "sandstone", "sand"),
-        WOOD(2, "wood_old", "wood"),
-        COBBLESTONE(3, "cobblestone", "cobble"),
-        BRICK(4, "brick"),
-        SMOOTHBRICK(5, "stone_brick", "smoothStoneBrick"),
-        NETHERBRICK(6, "nether_brick", "netherBrick"),
-        QUARTZ(7, "quartz");
+        STONE(0, MapColor.stoneColor, "stone"),
+        SAND(1, MapColor.sandColor, "sandstone", "sand"),
+        WOOD(2, MapColor.woodColor, "wood_old", "wood"),
+        COBBLESTONE(3, MapColor.stoneColor, "cobblestone", "cobble"),
+        BRICK(4, MapColor.redColor, "brick"),
+        SMOOTHBRICK(5, MapColor.stoneColor, "stone_brick", "smoothStoneBrick"),
+        NETHERBRICK(6, MapColor.netherrackColor, "nether_brick", "netherBrick"),
+        QUARTZ(7, MapColor.quartzColor, "quartz");
+
         private static final BlockStoneSlab.EnumType[] META_LOOKUP = new BlockStoneSlab.EnumType[values().length];
         private final int meta;
+        private final MapColor field_181075_k;
         private final String name;
         private final String unlocalizedName;
 
-        private static final String __OBFID = "CL_00002056";
-
-        private EnumType(int meta, String name)
+        private EnumType(int p_i46381_3_, MapColor p_i46381_4_, String p_i46381_5_)
         {
-            this(meta, name, name);
+            this(p_i46381_3_, p_i46381_4_, p_i46381_5_, p_i46381_5_);
         }
 
-        private EnumType(int meta, String name, String unlocalizedName)
+        private EnumType(int p_i46382_3_, MapColor p_i46382_4_, String p_i46382_5_, String p_i46382_6_)
         {
-            this.meta = meta;
-            this.name = name;
-            this.unlocalizedName = unlocalizedName;
+            this.meta = p_i46382_3_;
+            this.field_181075_k = p_i46382_4_;
+            this.name = p_i46382_5_;
+            this.unlocalizedName = p_i46382_6_;
         }
 
         public int getMetadata()
         {
             return this.meta;
+        }
+
+        public MapColor func_181074_c()
+        {
+            return this.field_181075_k;
         }
 
         public String toString()
@@ -215,13 +223,9 @@ public abstract class BlockStoneSlab extends BlockSlab
 
         static
         {
-            BlockStoneSlab.EnumType[] var0 = values();
-            int var1 = var0.length;
-
-            for (int var2 = 0; var2 < var1; ++var2)
+            for (BlockStoneSlab.EnumType blockstoneslab$enumtype : values())
             {
-                BlockStoneSlab.EnumType var3 = var0[var2];
-                META_LOOKUP[var3.getMetadata()] = var3;
+                META_LOOKUP[blockstoneslab$enumtype.getMetadata()] = blockstoneslab$enumtype;
             }
         }
     }

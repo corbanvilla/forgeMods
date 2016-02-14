@@ -7,25 +7,24 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public enum EnumFaceDirection
 {
-    DOWN(new EnumFaceDirection.VertexInformation[]{new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.field_179176_f, EnumFaceDirection.Constants.field_179178_e, EnumFaceDirection.Constants.field_179181_a, null), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.field_179176_f, EnumFaceDirection.Constants.field_179178_e, EnumFaceDirection.Constants.field_179177_d, null), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.field_179180_c, EnumFaceDirection.Constants.field_179178_e, EnumFaceDirection.Constants.field_179177_d, null), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.field_179180_c, EnumFaceDirection.Constants.field_179178_e, EnumFaceDirection.Constants.field_179181_a, null)}),
-    UP(new EnumFaceDirection.VertexInformation[]{new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.field_179176_f, EnumFaceDirection.Constants.field_179179_b, EnumFaceDirection.Constants.field_179177_d, null), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.field_179176_f, EnumFaceDirection.Constants.field_179179_b, EnumFaceDirection.Constants.field_179181_a, null), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.field_179180_c, EnumFaceDirection.Constants.field_179179_b, EnumFaceDirection.Constants.field_179181_a, null), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.field_179180_c, EnumFaceDirection.Constants.field_179179_b, EnumFaceDirection.Constants.field_179177_d, null)}),
-    NORTH(new EnumFaceDirection.VertexInformation[]{new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.field_179180_c, EnumFaceDirection.Constants.field_179179_b, EnumFaceDirection.Constants.field_179177_d, null), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.field_179180_c, EnumFaceDirection.Constants.field_179178_e, EnumFaceDirection.Constants.field_179177_d, null), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.field_179176_f, EnumFaceDirection.Constants.field_179178_e, EnumFaceDirection.Constants.field_179177_d, null), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.field_179176_f, EnumFaceDirection.Constants.field_179179_b, EnumFaceDirection.Constants.field_179177_d, null)}),
-    SOUTH(new EnumFaceDirection.VertexInformation[]{new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.field_179176_f, EnumFaceDirection.Constants.field_179179_b, EnumFaceDirection.Constants.field_179181_a, null), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.field_179176_f, EnumFaceDirection.Constants.field_179178_e, EnumFaceDirection.Constants.field_179181_a, null), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.field_179180_c, EnumFaceDirection.Constants.field_179178_e, EnumFaceDirection.Constants.field_179181_a, null), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.field_179180_c, EnumFaceDirection.Constants.field_179179_b, EnumFaceDirection.Constants.field_179181_a, null)}),
-    WEST(new EnumFaceDirection.VertexInformation[]{new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.field_179176_f, EnumFaceDirection.Constants.field_179179_b, EnumFaceDirection.Constants.field_179177_d, null), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.field_179176_f, EnumFaceDirection.Constants.field_179178_e, EnumFaceDirection.Constants.field_179177_d, null), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.field_179176_f, EnumFaceDirection.Constants.field_179178_e, EnumFaceDirection.Constants.field_179181_a, null), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.field_179176_f, EnumFaceDirection.Constants.field_179179_b, EnumFaceDirection.Constants.field_179181_a, null)}),
-    EAST(new EnumFaceDirection.VertexInformation[]{new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.field_179180_c, EnumFaceDirection.Constants.field_179179_b, EnumFaceDirection.Constants.field_179181_a, null), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.field_179180_c, EnumFaceDirection.Constants.field_179178_e, EnumFaceDirection.Constants.field_179181_a, null), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.field_179180_c, EnumFaceDirection.Constants.field_179178_e, EnumFaceDirection.Constants.field_179177_d, null), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.field_179180_c, EnumFaceDirection.Constants.field_179179_b, EnumFaceDirection.Constants.field_179177_d, null)});
+    DOWN(new EnumFaceDirection.VertexInformation[]{new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.WEST_INDEX, EnumFaceDirection.Constants.DOWN_INDEX, EnumFaceDirection.Constants.SOUTH_INDEX), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.WEST_INDEX, EnumFaceDirection.Constants.DOWN_INDEX, EnumFaceDirection.Constants.NORTH_INDEX), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.EAST_INDEX, EnumFaceDirection.Constants.DOWN_INDEX, EnumFaceDirection.Constants.NORTH_INDEX), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.EAST_INDEX, EnumFaceDirection.Constants.DOWN_INDEX, EnumFaceDirection.Constants.SOUTH_INDEX)}),
+    UP(new EnumFaceDirection.VertexInformation[]{new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.WEST_INDEX, EnumFaceDirection.Constants.UP_INDEX, EnumFaceDirection.Constants.NORTH_INDEX), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.WEST_INDEX, EnumFaceDirection.Constants.UP_INDEX, EnumFaceDirection.Constants.SOUTH_INDEX), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.EAST_INDEX, EnumFaceDirection.Constants.UP_INDEX, EnumFaceDirection.Constants.SOUTH_INDEX), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.EAST_INDEX, EnumFaceDirection.Constants.UP_INDEX, EnumFaceDirection.Constants.NORTH_INDEX)}),
+    NORTH(new EnumFaceDirection.VertexInformation[]{new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.EAST_INDEX, EnumFaceDirection.Constants.UP_INDEX, EnumFaceDirection.Constants.NORTH_INDEX), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.EAST_INDEX, EnumFaceDirection.Constants.DOWN_INDEX, EnumFaceDirection.Constants.NORTH_INDEX), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.WEST_INDEX, EnumFaceDirection.Constants.DOWN_INDEX, EnumFaceDirection.Constants.NORTH_INDEX), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.WEST_INDEX, EnumFaceDirection.Constants.UP_INDEX, EnumFaceDirection.Constants.NORTH_INDEX)}),
+    SOUTH(new EnumFaceDirection.VertexInformation[]{new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.WEST_INDEX, EnumFaceDirection.Constants.UP_INDEX, EnumFaceDirection.Constants.SOUTH_INDEX), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.WEST_INDEX, EnumFaceDirection.Constants.DOWN_INDEX, EnumFaceDirection.Constants.SOUTH_INDEX), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.EAST_INDEX, EnumFaceDirection.Constants.DOWN_INDEX, EnumFaceDirection.Constants.SOUTH_INDEX), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.EAST_INDEX, EnumFaceDirection.Constants.UP_INDEX, EnumFaceDirection.Constants.SOUTH_INDEX)}),
+    WEST(new EnumFaceDirection.VertexInformation[]{new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.WEST_INDEX, EnumFaceDirection.Constants.UP_INDEX, EnumFaceDirection.Constants.NORTH_INDEX), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.WEST_INDEX, EnumFaceDirection.Constants.DOWN_INDEX, EnumFaceDirection.Constants.NORTH_INDEX), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.WEST_INDEX, EnumFaceDirection.Constants.DOWN_INDEX, EnumFaceDirection.Constants.SOUTH_INDEX), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.WEST_INDEX, EnumFaceDirection.Constants.UP_INDEX, EnumFaceDirection.Constants.SOUTH_INDEX)}),
+    EAST(new EnumFaceDirection.VertexInformation[]{new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.EAST_INDEX, EnumFaceDirection.Constants.UP_INDEX, EnumFaceDirection.Constants.SOUTH_INDEX), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.EAST_INDEX, EnumFaceDirection.Constants.DOWN_INDEX, EnumFaceDirection.Constants.SOUTH_INDEX), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.EAST_INDEX, EnumFaceDirection.Constants.DOWN_INDEX, EnumFaceDirection.Constants.NORTH_INDEX), new EnumFaceDirection.VertexInformation(EnumFaceDirection.Constants.EAST_INDEX, EnumFaceDirection.Constants.UP_INDEX, EnumFaceDirection.Constants.NORTH_INDEX)});
+
     private static final EnumFaceDirection[] facings = new EnumFaceDirection[6];
     private final EnumFaceDirection.VertexInformation[] vertexInfos;
 
-    private static final String __OBFID = "CL_00002562";
-
-    public static EnumFaceDirection getFacing(EnumFacing p_179027_0_)
+    public static EnumFaceDirection getFacing(EnumFacing facing)
     {
-        return facings[p_179027_0_.getIndex()];
+        return facings[facing.getIndex()];
     }
 
-    private EnumFaceDirection(EnumFaceDirection.VertexInformation ... p_i46272_3_)
+    private EnumFaceDirection(EnumFaceDirection.VertexInformation[] vertexInfosIn)
     {
-        this.vertexInfos = p_i46272_3_;
+        this.vertexInfos = vertexInfosIn;
     }
 
     public EnumFaceDirection.VertexInformation func_179025_a(int p_179025_1_)
@@ -35,24 +34,23 @@ public enum EnumFaceDirection
 
     static
     {
-        facings[EnumFaceDirection.Constants.field_179178_e] = DOWN;
-        facings[EnumFaceDirection.Constants.field_179179_b] = UP;
-        facings[EnumFaceDirection.Constants.field_179177_d] = NORTH;
-        facings[EnumFaceDirection.Constants.field_179181_a] = SOUTH;
-        facings[EnumFaceDirection.Constants.field_179176_f] = WEST;
-        facings[EnumFaceDirection.Constants.field_179180_c] = EAST;
+        facings[EnumFaceDirection.Constants.DOWN_INDEX] = DOWN;
+        facings[EnumFaceDirection.Constants.UP_INDEX] = UP;
+        facings[EnumFaceDirection.Constants.NORTH_INDEX] = NORTH;
+        facings[EnumFaceDirection.Constants.SOUTH_INDEX] = SOUTH;
+        facings[EnumFaceDirection.Constants.WEST_INDEX] = WEST;
+        facings[EnumFaceDirection.Constants.EAST_INDEX] = EAST;
     }
 
     @SideOnly(Side.CLIENT)
     public static final class Constants
         {
-            public static final int field_179181_a = EnumFacing.SOUTH.getIndex();
-            public static final int field_179179_b = EnumFacing.UP.getIndex();
-            public static final int field_179180_c = EnumFacing.EAST.getIndex();
-            public static final int field_179177_d = EnumFacing.NORTH.getIndex();
-            public static final int field_179178_e = EnumFacing.DOWN.getIndex();
-            public static final int field_179176_f = EnumFacing.WEST.getIndex();
-            private static final String __OBFID = "CL_00002560";
+            public static final int SOUTH_INDEX = EnumFacing.SOUTH.getIndex();
+            public static final int UP_INDEX = EnumFacing.UP.getIndex();
+            public static final int EAST_INDEX = EnumFacing.EAST.getIndex();
+            public static final int NORTH_INDEX = EnumFacing.NORTH.getIndex();
+            public static final int DOWN_INDEX = EnumFacing.DOWN.getIndex();
+            public static final int WEST_INDEX = EnumFacing.WEST.getIndex();
         }
 
     @SideOnly(Side.CLIENT)
@@ -61,18 +59,12 @@ public enum EnumFaceDirection
             public final int field_179184_a;
             public final int field_179182_b;
             public final int field_179183_c;
-            private static final String __OBFID = "CL_00002559";
 
             private VertexInformation(int p_i46270_1_, int p_i46270_2_, int p_i46270_3_)
             {
                 this.field_179184_a = p_i46270_1_;
                 this.field_179182_b = p_i46270_2_;
                 this.field_179183_c = p_i46270_3_;
-            }
-
-            VertexInformation(int p_i46271_1_, int p_i46271_2_, int p_i46271_3_, Object p_i46271_4_)
-            {
-                this(p_i46271_1_, p_i46271_2_, p_i46271_3_);
             }
         }
 }

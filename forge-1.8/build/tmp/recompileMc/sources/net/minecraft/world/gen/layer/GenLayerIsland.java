@@ -2,8 +2,6 @@ package net.minecraft.world.gen.layer;
 
 public class GenLayerIsland extends GenLayer
 {
-    private static final String __OBFID = "CL_00000558";
-
     public GenLayerIsland(long p_i2124_1_)
     {
         super(p_i2124_1_);
@@ -17,12 +15,12 @@ public class GenLayerIsland extends GenLayer
     {
         int[] aint = IntCache.getIntCache(areaWidth * areaHeight);
 
-        for (int i1 = 0; i1 < areaHeight; ++i1)
+        for (int i = 0; i < areaHeight; ++i)
         {
-            for (int j1 = 0; j1 < areaWidth; ++j1)
+            for (int j = 0; j < areaWidth; ++j)
             {
-                this.initChunkSeed((long)(areaX + j1), (long)(areaY + i1));
-                aint[j1 + i1 * areaWidth] = this.nextInt(10) == 0 ? 1 : 0;
+                this.initChunkSeed((long)(areaX + j), (long)(areaY + i));
+                aint[j + i * areaWidth] = this.nextInt(10) == 0 ? 1 : 0;
             }
         }
 

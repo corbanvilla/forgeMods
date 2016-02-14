@@ -8,17 +8,15 @@ import net.minecraft.world.World;
 
 public class BehaviorDefaultDispenseItem implements IBehaviorDispenseItem
 {
-    private static final String __OBFID = "CL_00001195";
-
     /**
      * Dispenses the specified ItemStack from a dispenser.
      */
     public final ItemStack dispense(IBlockSource source, ItemStack stack)
     {
-        ItemStack itemstack1 = this.dispenseStack(source, stack);
+        ItemStack itemstack = this.dispenseStack(source, stack);
         this.playDispenseSound(source);
         this.spawnDispenseParticles(source, BlockDispenser.getFacing(source.getBlockMetadata()));
-        return itemstack1;
+        return itemstack;
     }
 
     /**
@@ -28,8 +26,8 @@ public class BehaviorDefaultDispenseItem implements IBehaviorDispenseItem
     {
         EnumFacing enumfacing = BlockDispenser.getFacing(source.getBlockMetadata());
         IPosition iposition = BlockDispenser.getDispensePosition(source);
-        ItemStack itemstack1 = stack.splitStack(1);
-        doDispense(source.getWorld(), itemstack1, 6, enumfacing, iposition);
+        ItemStack itemstack = stack.splitStack(1);
+        doDispense(source.getWorld(), itemstack, 6, enumfacing, iposition);
         return stack;
     }
 
@@ -41,11 +39,11 @@ public class BehaviorDefaultDispenseItem implements IBehaviorDispenseItem
 
         if (facing.getAxis() == EnumFacing.Axis.Y)
         {
-            d1 -= 0.125D;
+            d1 = d1 - 0.125D;
         }
         else
         {
-            d1 -= 0.15625D;
+            d1 = d1 - 0.15625D;
         }
 
         EntityItem entityitem = new EntityItem(worldIn, d0, d1, d2, stack);

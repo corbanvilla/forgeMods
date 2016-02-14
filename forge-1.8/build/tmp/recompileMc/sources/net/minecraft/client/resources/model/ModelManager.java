@@ -11,11 +11,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class ModelManager implements IResourceManagerReloadListener
 {
-    private IRegistry modelRegistry;
+    private IRegistry<ModelResourceLocation, IBakedModel> modelRegistry;
     private final TextureMap texMap;
     private final BlockModelShapes modelProvider;
     private IBakedModel defaultModel;
-    private static final String __OBFID = "CL_00002388";
 
     public ModelManager(TextureMap textures)
     {

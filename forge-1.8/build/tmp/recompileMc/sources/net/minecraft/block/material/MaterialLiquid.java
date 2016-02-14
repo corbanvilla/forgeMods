@@ -2,8 +2,6 @@ package net.minecraft.block.material;
 
 public class MaterialLiquid extends Material
 {
-    private static final String __OBFID = "CL_00000541";
-
     public MaterialLiquid(MapColor color)
     {
         super(color);

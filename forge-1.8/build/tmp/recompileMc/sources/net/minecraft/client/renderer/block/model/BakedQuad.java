@@ -15,13 +15,12 @@ public class BakedQuad implements net.minecraftforge.client.model.pipeline.IVert
     protected final int[] vertexData;
     protected final int tintIndex;
     protected final EnumFacing face;
-    private static final String __OBFID = "CL_00002512";
 
-    public BakedQuad(int[] p_i46232_1_, int p_i46232_2_, EnumFacing p_i46232_3_)
+    public BakedQuad(int[] vertexDataIn, int tintIndexIn, EnumFacing faceIn)
     {
-        this.vertexData = p_i46232_1_;
-        this.tintIndex = p_i46232_2_;
-        this.face = p_i46232_3_;
+        this.vertexData = vertexDataIn;
+        this.tintIndex = tintIndexIn;
+        this.face = faceIn;
     }
 
     public int[] getVertexData()

@@ -11,11 +11,8 @@ public class BiomeCache
     private final WorldChunkManager chunkManager;
     /** The last time this BiomeCache was cleaned, in milliseconds. */
     private long lastCleanupTime;
-    /** The map of keys to BiomeCacheBlocks. Keys are based on the chunk x, z coordinates as (x | z << 32). */
-    private LongHashMap cacheMap = new LongHashMap();
-    /** The list of cached BiomeCacheBlocks */
-    private List cache = Lists.newArrayList();
-    private static final String __OBFID = "CL_00000162";
+    private LongHashMap<BiomeCache.Block> cacheMap = new LongHashMap();
+    private List<BiomeCache.Block> cache = Lists.<BiomeCache.Block>newArrayList();
 
     public BiomeCache(WorldChunkManager chunkManagerIn)
     {
@@ -27,26 +24,26 @@ public class BiomeCache
      */
     public BiomeCache.Block getBiomeCacheBlock(int x, int z)
     {
-        x >>= 4;
-        z >>= 4;
-        long k = (long)x & 4294967295L | ((long)z & 4294967295L) << 32;
-        BiomeCache.Block block = (BiomeCache.Block)this.cacheMap.getValueByKey(k);
+        x = x >> 4;
+        z = z >> 4;
+        long i = (long)x & 4294967295L | ((long)z & 4294967295L) << 32;
+        BiomeCache.Block biomecache$block = (BiomeCache.Block)this.cacheMap.getValueByKey(i);
 
-        if (block == null)
+        if (biomecache$block == null)
         {
-            block = new BiomeCache.Block(x, z);
-            this.cacheMap.add(k, block);
-            this.cache.add(block);
+            biomecache$block = new BiomeCache.Block(x, z);
+            this.cacheMap.add(i, biomecache$block);
+            this.cache.add(biomecache$block);
         }
 
-        block.lastAccessTime = MinecraftServer.getCurrentTimeMillis();
-        return block;
+        biomecache$block.lastAccessTime = MinecraftServer.getCurrentTimeMillis();
+        return biomecache$block;
     }
 
     public BiomeGenBase func_180284_a(int x, int z, BiomeGenBase p_180284_3_)
     {
-        BiomeGenBase biomegenbase1 = this.getBiomeCacheBlock(x, z).getBiomeGenAt(x, z);
-        return biomegenbase1 == null ? p_180284_3_ : biomegenbase1;
+        BiomeGenBase biomegenbase = this.getBiomeCacheBlock(x, z).getBiomeGenAt(x, z);
+        return biomegenbase == null ? p_180284_3_ : biomegenbase;
     }
 
     /**
@@ -63,13 +60,13 @@ public class BiomeCache
 
             for (int k = 0; k < this.cache.size(); ++k)
             {
-                BiomeCache.Block block = (BiomeCache.Block)this.cache.get(k);
-                long l = i - block.lastAccessTime;
+                BiomeCache.Block biomecache$block = (BiomeCache.Block)this.cache.get(k);
+                long l = i - biomecache$block.lastAccessTime;
 
                 if (l > 30000L || l < 0L)
                 {
                     this.cache.remove(k--);
-                    long i1 = (long)block.xPosition & 4294967295L | ((long)block.zPosition & 4294967295L) << 32;
+                    long i1 = (long)biomecache$block.xPosition & 4294967295L | ((long)biomecache$block.zPosition & 4294967295L) << 32;
                     this.cacheMap.remove(i1);
                 }
             }
@@ -96,7 +93,6 @@ public class BiomeCache
         public int zPosition;
         /** The last time this BiomeCacheBlock was accessed, in milliseconds. */
         public long lastAccessTime;
-        private static final String __OBFID = "CL_00000163";
 
         public Block(int x, int z)
         {

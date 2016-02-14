@@ -21,7 +21,6 @@ public class EntityEndermite extends EntityMob
 {
     private int lifetime = 0;
     private boolean playerSpawned = false;
-    private static final String __OBFID = "CL_00002219";
 
     public EntityEndermite(World worldIn)
     {
@@ -83,7 +82,7 @@ public class EntityEndermite extends EntityMob
         return "mob.silverfish.kill";
     }
 
-    protected void playStepSound(BlockPos p_180429_1_, Block p_180429_2_)
+    protected void playStepSound(BlockPos pos, Block blockIn)
     {
         this.playSound("mob.silverfish.step", 0.15F, 1.0F);
     }
@@ -129,8 +128,6 @@ public class EntityEndermite extends EntityMob
 
     /**
      * Sets if this mob was spawned by a player or not.
-     *  
-     * @param spawnedByPlayer If the mob was spawned by a player or not.
      */
     public void setSpawnedByPlayer(boolean spawnedByPlayer)
     {

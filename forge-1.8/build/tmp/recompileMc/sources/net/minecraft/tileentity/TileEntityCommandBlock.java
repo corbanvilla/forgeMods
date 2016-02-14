@@ -17,15 +17,26 @@ public class TileEntityCommandBlock extends TileEntity
 {
     private final CommandBlockLogic commandBlockLogic = new CommandBlockLogic()
     {
-        private static final String __OBFID = "CL_00000348";
+        /**
+         * Get the position in the world. <b>{@code null} is not allowed!</b> If you are not an entity in the world,
+         * return the coordinates 0, 0, 0
+         */
         public BlockPos getPosition()
         {
             return TileEntityCommandBlock.this.pos;
         }
+        /**
+         * Get the position vector. <b>{@code null} is not allowed!</b> If you are not an entity in the world, return
+         * 0.0D, 0.0D, 0.0D
+         */
         public Vec3 getPositionVector()
         {
             return new Vec3((double)TileEntityCommandBlock.this.pos.getX() + 0.5D, (double)TileEntityCommandBlock.this.pos.getY() + 0.5D, (double)TileEntityCommandBlock.this.pos.getZ() + 0.5D);
         }
+        /**
+         * Get the world, if available. <b>{@code null} is not allowed!</b> If you are not an entity in the world,
+         * return the overworld
+         */
         public World getEntityWorld()
         {
             return TileEntityCommandBlock.this.getWorld();
@@ -38,7 +49,7 @@ public class TileEntityCommandBlock extends TileEntity
             super.setCommand(command);
             TileEntityCommandBlock.this.markDirty();
         }
-        public void func_145756_e()
+        public void updateCommand()
         {
             TileEntityCommandBlock.this.getWorld().markBlockForUpdate(TileEntityCommandBlock.this.pos);
         }
@@ -62,7 +73,6 @@ public class TileEntityCommandBlock extends TileEntity
             return null;
         }
     };
-    private static final String __OBFID = "CL_00000347";
 
     public void writeToNBT(NBTTagCompound compound)
     {
@@ -85,6 +95,11 @@ public class TileEntityCommandBlock extends TileEntity
         NBTTagCompound nbttagcompound = new NBTTagCompound();
         this.writeToNBT(nbttagcompound);
         return new S35PacketUpdateTileEntity(this.pos, 2, nbttagcompound);
+    }
+
+    public boolean func_183000_F()
+    {
+        return true;
     }
 
     public CommandBlockLogic getCommandBlockLogic()

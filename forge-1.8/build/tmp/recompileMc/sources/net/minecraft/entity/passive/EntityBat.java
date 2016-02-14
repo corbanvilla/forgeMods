@@ -15,7 +15,6 @@ public class EntityBat extends EntityAmbientCreature
 {
     /** Coordinates of where the bat spawned. */
     private BlockPos spawnPosition;
-    private static final String __OBFID = "CL_00001637";
 
     public EntityBat(World worldIn)
     {
@@ -78,9 +77,13 @@ public class EntityBat extends EntityAmbientCreature
         return false;
     }
 
-    protected void collideWithEntity(Entity p_82167_1_) {}
+    protected void collideWithEntity(Entity p_82167_1_)
+    {
+    }
 
-    protected void collideWithNearbyEntities() {}
+    protected void collideWithNearbyEntities()
+    {
+    }
 
     protected void applyEntityAttributes()
     {
@@ -93,11 +96,11 @@ public class EntityBat extends EntityAmbientCreature
         return (this.dataWatcher.getWatchableObjectByte(16) & 1) != 0;
     }
 
-    public void setIsBatHanging(boolean p_82236_1_)
+    public void setIsBatHanging(boolean isHanging)
     {
         byte b0 = this.dataWatcher.getWatchableObjectByte(16);
 
-        if (p_82236_1_)
+        if (isHanging)
         {
             this.dataWatcher.updateObject(16, Byte.valueOf((byte)(b0 | 1)));
         }
@@ -170,7 +173,7 @@ public class EntityBat extends EntityAmbientCreature
             this.motionX += (Math.signum(d0) * 0.5D - this.motionX) * 0.10000000149011612D;
             this.motionY += (Math.signum(d1) * 0.699999988079071D - this.motionY) * 0.10000000149011612D;
             this.motionZ += (Math.signum(d2) * 0.5D - this.motionZ) * 0.10000000149011612D;
-            float f = (float)(Math.atan2(this.motionZ, this.motionX) * 180.0D / Math.PI) - 90.0F;
+            float f = (float)(MathHelper.atan2(this.motionZ, this.motionX) * 180.0D / Math.PI) - 90.0F;
             float f1 = MathHelper.wrapAngleTo180_float(f - this.rotationYaw);
             this.moveForward = 0.5F;
             this.rotationYaw += f1;
@@ -191,9 +194,13 @@ public class EntityBat extends EntityAmbientCreature
         return false;
     }
 
-    public void fall(float distance, float damageMultiplier) {}
+    public void fall(float distance, float damageMultiplier)
+    {
+    }
 
-    protected void func_180433_a(double p_180433_1_, boolean p_180433_3_, Block p_180433_4_, BlockPos p_180433_5_) {}
+    protected void updateFallState(double y, boolean onGroundIn, Block blockIn, BlockPos pos)
+    {
+    }
 
     /**
      * Return whether this entity should NOT trigger a pressure plate or a tripwire.
@@ -248,29 +255,29 @@ public class EntityBat extends EntityAmbientCreature
     {
         BlockPos blockpos = new BlockPos(this.posX, this.getEntityBoundingBox().minY, this.posZ);
 
-        if (blockpos.getY() >= 63)
+        if (blockpos.getY() >= this.worldObj.getSeaLevel())
         {
             return false;
         }
         else
         {
             int i = this.worldObj.getLightFromNeighbors(blockpos);
-            byte b0 = 4;
+            int j = 4;
 
-            if (this.func_175569_a(this.worldObj.getCurrentDate()))
+            if (this.isDateAroundHalloween(this.worldObj.getCurrentDate()))
             {
-                b0 = 7;
+                j = 7;
             }
             else if (this.rand.nextBoolean())
             {
                 return false;
             }
 
-            return i > this.rand.nextInt(b0) ? false : super.getCanSpawnHere();
+            return i > this.rand.nextInt(j) ? false : super.getCanSpawnHere();
         }
     }
 
-    private boolean func_175569_a(Calendar p_175569_1_)
+    private boolean isDateAroundHalloween(Calendar p_175569_1_)
     {
         return p_175569_1_.get(2) + 1 == 10 && p_175569_1_.get(5) >= 20 || p_175569_1_.get(2) + 1 == 11 && p_175569_1_.get(5) <= 3;
     }

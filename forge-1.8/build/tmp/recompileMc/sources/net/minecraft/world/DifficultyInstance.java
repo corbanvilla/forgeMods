@@ -8,7 +8,6 @@ public class DifficultyInstance
 {
     private final EnumDifficulty worldDifficulty;
     private final float additionalDifficulty;
-    private static final String __OBFID = "CL_00002261";
 
     public DifficultyInstance(EnumDifficulty worldDifficulty, long worldTime, long chunkInhabitedTime, float moonPhaseFactor)
     {
@@ -17,7 +16,7 @@ public class DifficultyInstance
     }
 
     @SideOnly(Side.CLIENT)
-    public float func_180168_b()
+    public float getAdditionalDifficulty()
     {
         return this.additionalDifficulty;
     }
@@ -36,20 +35,20 @@ public class DifficultyInstance
         else
         {
             boolean flag = difficulty == EnumDifficulty.HARD;
-            float f1 = 0.75F;
-            float f2 = MathHelper.clamp_float(((float)worldTime + -72000.0F) / 1440000.0F, 0.0F, 1.0F) * 0.25F;
-            f1 += f2;
-            float f3 = 0.0F;
-            f3 += MathHelper.clamp_float((float)chunkInhabitedTime / 3600000.0F, 0.0F, 1.0F) * (flag ? 1.0F : 0.75F);
-            f3 += MathHelper.clamp_float(moonPhaseFactor * 0.25F, 0.0F, f2);
+            float f = 0.75F;
+            float f1 = MathHelper.clamp_float(((float)worldTime + -72000.0F) / 1440000.0F, 0.0F, 1.0F) * 0.25F;
+            f = f + f1;
+            float f2 = 0.0F;
+            f2 = f2 + MathHelper.clamp_float((float)chunkInhabitedTime / 3600000.0F, 0.0F, 1.0F) * (flag ? 1.0F : 0.75F);
+            f2 = f2 + MathHelper.clamp_float(moonPhaseFactor * 0.25F, 0.0F, f1);
 
             if (difficulty == EnumDifficulty.EASY)
             {
-                f3 *= 0.5F;
+                f2 *= 0.5F;
             }
 
-            f1 += f3;
-            return (float)difficulty.getDifficultyId() * f1;
+            f = f + f2;
+            return (float)difficulty.getDifficultyId() * f;
         }
     }
 }

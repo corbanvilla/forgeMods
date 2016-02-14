@@ -37,6 +37,7 @@ import com.google.common.collect.Maps;
  * @author King Lemming, OvermindDL1
  *
  */
+@SuppressWarnings("unchecked")
 public abstract class BlockFluidBase extends Block implements IFluidBlock
 {
     protected final static Map<Block, Boolean> defaultDisplacements = Maps.newHashMap();
@@ -90,10 +91,11 @@ public abstract class BlockFluidBase extends Block implements IFluidBlock
     public static final PropertyInteger LEVEL = PropertyInteger.create("level", 0, 15);
     public static final PropertyFloat[] LEVEL_CORNERS = new PropertyFloat[4];
     public static final PropertyFloat FLOW_DIRECTION = new PropertyFloat("flow_direction");
-    public static final IUnlistedProperty[] FLUID_RENDER_PROPS;
+    public static final IUnlistedProperty<Float>[] FLUID_RENDER_PROPS;
 
     static
     {
+        @SuppressWarnings("rawtypes")
         ImmutableList.Builder<IUnlistedProperty> builder = ImmutableList.builder();
         builder.add(FLOW_DIRECTION);
         for(int i = 0; i < 4; i++)
@@ -333,8 +335,6 @@ public abstract class BlockFluidBase extends Block implements IFluidBlock
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     @Override
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
@@ -382,6 +382,9 @@ public abstract class BlockFluidBase extends Block implements IFluidBlock
         return (int) (data / quantaPerBlockFloat * maxScaledLight);
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     @Override
     public boolean isOpaqueCube()
     {

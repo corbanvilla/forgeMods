@@ -3,7 +3,7 @@ package net.minecraft.item;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import java.util.ArrayList;
+import com.google.common.collect.Multimap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -28,13 +28,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemPotion extends Item
 {
-    /**
-     * Contains a map from integers to the list of potion effects that potions with that damage value confer (to prevent
-     * recalculating it).
-     */
-    private Map effectCache = Maps.newHashMap();
-    private static final Map SUB_ITEMS_CACHE = Maps.newLinkedHashMap();
-    private static final String __OBFID = "CL_00000055";
+    private Map<Integer, List<PotionEffect>> effectCache = Maps.<Integer, List<PotionEffect>>newHashMap();
+    private static final Map<List<PotionEffect>, Integer> SUB_ITEMS_CACHE = Maps.<List<PotionEffect>, Integer>newLinkedHashMap();
 
     public ItemPotion()
     {
@@ -44,14 +39,11 @@ public class ItemPotion extends Item
         this.setCreativeTab(CreativeTabs.tabBrewing);
     }
 
-    /**
-     * Returns a list of potion effects for the specified itemstack.
-     */
-    public List getEffects(ItemStack stack)
+    public List<PotionEffect> getEffects(ItemStack stack)
     {
         if (stack.hasTagCompound() && stack.getTagCompound().hasKey("CustomPotionEffects", 9))
         {
-            ArrayList arraylist = Lists.newArrayList();
+            List<PotionEffect> list1 = Lists.<PotionEffect>newArrayList();
             NBTTagList nbttaglist = stack.getTagCompound().getTagList("CustomPotionEffects", 10);
 
             for (int i = 0; i < nbttaglist.tagCount(); ++i)
@@ -61,15 +53,15 @@ public class ItemPotion extends Item
 
                 if (potioneffect != null)
                 {
-                    arraylist.add(potioneffect);
+                    list1.add(potioneffect);
                 }
             }
 
-            return arraylist;
+            return list1;
         }
         else
         {
-            List list = (List)this.effectCache.get(Integer.valueOf(stack.getMetadata()));
+            List<PotionEffect> list = (List)this.effectCache.get(Integer.valueOf(stack.getMetadata()));
 
             if (list == null)
             {
@@ -81,12 +73,9 @@ public class ItemPotion extends Item
         }
     }
 
-    /**
-     * Returns a list of effects for the specified potion damage value.
-     */
-    public List getEffects(int meta)
+    public List<PotionEffect> getEffects(int meta)
     {
-        List list = (List)this.effectCache.get(Integer.valueOf(meta));
+        List<PotionEffect> list = (List)this.effectCache.get(Integer.valueOf(meta));
 
         if (list == null)
         {
@@ -110,15 +99,12 @@ public class ItemPotion extends Item
 
         if (!worldIn.isRemote)
         {
-            List list = this.getEffects(stack);
+            List<PotionEffect> list = this.getEffects(stack);
 
             if (list != null)
             {
-                Iterator iterator = list.iterator();
-
-                while (iterator.hasNext())
+                for (PotionEffect potioneffect : list)
                 {
-                    PotionEffect potioneffect = (PotionEffect)iterator.next();
                     playerIn.addPotionEffect(new PotionEffect(potioneffect));
                 }
             }
@@ -219,18 +205,17 @@ public class ItemPotion extends Item
                 s = StatCollector.translateToLocal("potion.prefix.grenade").trim() + " ";
             }
 
-            List list = Items.potionitem.getEffects(stack);
-            String s1;
+            List<PotionEffect> list = Items.potionitem.getEffects(stack);
 
             if (list != null && !list.isEmpty())
             {
-                s1 = ((PotionEffect)list.get(0)).getEffectName();
-                s1 = s1 + ".postfix";
-                return s + StatCollector.translateToLocal(s1).trim();
+                String s2 = ((PotionEffect)list.get(0)).getEffectName();
+                s2 = s2 + ".postfix";
+                return s + StatCollector.translateToLocal(s2).trim();
             }
             else
             {
-                s1 = PotionHelper.getPotionPrefix(stack.getMetadata());
+                String s1 = PotionHelper.getPotionPrefix(stack.getMetadata());
                 return StatCollector.translateToLocal(s1).trim() + " " + super.getItemStackDisplayName(stack);
             }
         }
@@ -239,25 +224,19 @@ public class ItemPotion extends Item
     @SideOnly(Side.CLIENT)
     public boolean isEffectInstant(int meta)
     {
-        List list = this.getEffects(meta);
+        List<PotionEffect> list = this.getEffects(meta);
 
         if (list != null && !list.isEmpty())
         {
-            Iterator iterator = list.iterator();
-            PotionEffect potioneffect;
-
-            do
+            for (PotionEffect potioneffect : list)
             {
-                if (!iterator.hasNext())
+                if (Potion.potionTypes[potioneffect.getPotionID()].isInstant())
                 {
-                    return false;
+                    return true;
                 }
-
-                potioneffect = (PotionEffect)iterator.next();
             }
-            while (!Potion.potionTypes[potioneffect.getPotionID()].isInstant());
 
-            return true;
+            return false;
         }
         else
         {
@@ -267,40 +246,30 @@ public class ItemPotion extends Item
 
     /**
      * allows items to add custom lines of information to the mouseover description
-     *  
-     * @param tooltip All lines to display in the Item's tooltip. This is a List of Strings.
-     * @param advanced Whether the setting "Advanced tooltips" is enabled
      */
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced)
+    public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced)
     {
         if (stack.getMetadata() != 0)
         {
-            List list1 = Items.potionitem.getEffects(stack);
-            HashMultimap hashmultimap = HashMultimap.create();
-            Iterator iterator1;
+            List<PotionEffect> list = Items.potionitem.getEffects(stack);
+            Multimap<String, AttributeModifier> multimap = HashMultimap.<String, AttributeModifier>create();
 
-            if (list1 != null && !list1.isEmpty())
+            if (list != null && !list.isEmpty())
             {
-                iterator1 = list1.iterator();
-
-                while (iterator1.hasNext())
+                for (PotionEffect potioneffect : list)
                 {
-                    PotionEffect potioneffect = (PotionEffect)iterator1.next();
                     String s1 = StatCollector.translateToLocal(potioneffect.getEffectName()).trim();
                     Potion potion = Potion.potionTypes[potioneffect.getPotionID()];
-                    Map map = potion.getAttributeModifierMap();
+                    Map<IAttribute, AttributeModifier> map = potion.getAttributeModifierMap();
 
                     if (map != null && map.size() > 0)
                     {
-                        Iterator iterator = map.entrySet().iterator();
-
-                        while (iterator.hasNext())
+                        for (Entry<IAttribute, AttributeModifier> entry : map.entrySet())
                         {
-                            Entry entry = (Entry)iterator.next();
                             AttributeModifier attributemodifier = (AttributeModifier)entry.getValue();
                             AttributeModifier attributemodifier1 = new AttributeModifier(attributemodifier.getName(), potion.getAttributeModifierAmount(potioneffect.getAmplifier(), attributemodifier), attributemodifier.getOperation());
-                            hashmultimap.put(((IAttribute)entry.getKey()).getAttributeUnlocalizedName(), attributemodifier1);
+                            multimap.put(((IAttribute)entry.getKey()).getAttributeUnlocalizedName(), attributemodifier1);
                         }
                     }
 
@@ -330,15 +299,13 @@ public class ItemPotion extends Item
                 tooltip.add(EnumChatFormatting.GRAY + s);
             }
 
-            if (!hashmultimap.isEmpty())
+            if (!multimap.isEmpty())
             {
                 tooltip.add("");
                 tooltip.add(EnumChatFormatting.DARK_PURPLE + StatCollector.translateToLocal("potion.effects.whenDrank"));
-                iterator1 = hashmultimap.entries().iterator();
 
-                while (iterator1.hasNext())
+                for (Entry<String, AttributeModifier> entry1 : multimap.entries())
                 {
-                    Entry entry1 = (Entry)iterator1.next();
                     AttributeModifier attributemodifier2 = (AttributeModifier)entry1.getValue();
                     double d0 = attributemodifier2.getAmount();
                     double d1;
@@ -358,7 +325,7 @@ public class ItemPotion extends Item
                     }
                     else if (d0 < 0.0D)
                     {
-                        d1 *= -1.0D;
+                        d1 = d1 * -1.0D;
                         tooltip.add(EnumChatFormatting.RED + StatCollector.translateToLocalFormatted("attribute.modifier.take." + attributemodifier2.getOperation(), new Object[] {ItemStack.DECIMALFORMAT.format(d1), StatCollector.translateToLocal("attribute.name." + (String)entry1.getKey())}));
                     }
                 }
@@ -369,59 +336,56 @@ public class ItemPotion extends Item
     @SideOnly(Side.CLIENT)
     public boolean hasEffect(ItemStack stack)
     {
-        List list = this.getEffects(stack);
+        List<PotionEffect> list = this.getEffects(stack);
         return list != null && !list.isEmpty();
     }
 
     /**
      * returns a list of items with the same ID, but different meta (eg: dye returns 16 items)
-     *  
-     * @param subItems The List of sub-items. This is a List of ItemStacks.
      */
     @SideOnly(Side.CLIENT)
-    public void getSubItems(Item itemIn, CreativeTabs tab, List subItems)
+    public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems)
     {
         super.getSubItems(itemIn, tab, subItems);
-        int j;
 
         if (SUB_ITEMS_CACHE.isEmpty())
         {
             for (int i = 0; i <= 15; ++i)
             {
-                for (j = 0; j <= 1; ++j)
+                for (int j = 0; j <= 1; ++j)
                 {
-                    int k;
+                    int lvt_6_1_;
 
                     if (j == 0)
                     {
-                        k = i | 8192;
+                        lvt_6_1_ = i | 8192;
                     }
                     else
                     {
-                        k = i | 16384;
+                        lvt_6_1_ = i | 16384;
                     }
 
                     for (int l = 0; l <= 2; ++l)
                     {
-                        int i1 = k;
+                        int i1 = lvt_6_1_;
 
                         if (l != 0)
                         {
                             if (l == 1)
                             {
-                                i1 = k | 32;
+                                i1 = lvt_6_1_ | 32;
                             }
                             else if (l == 2)
                             {
-                                i1 = k | 64;
+                                i1 = lvt_6_1_ | 64;
                             }
                         }
 
-                        List list1 = PotionHelper.getPotionEffects(i1, false);
+                        List<PotionEffect> list = PotionHelper.getPotionEffects(i1, false);
 
-                        if (list1 != null && !list1.isEmpty())
+                        if (list != null && !list.isEmpty())
                         {
-                            SUB_ITEMS_CACHE.put(list1, Integer.valueOf(i1));
+                            SUB_ITEMS_CACHE.put(list, Integer.valueOf(i1));
                         }
                     }
                 }
@@ -432,8 +396,8 @@ public class ItemPotion extends Item
 
         while (iterator.hasNext())
         {
-            j = ((Integer)iterator.next()).intValue();
-            subItems.add(new ItemStack(itemIn, 1, j));
+            int j1 = ((Integer)iterator.next()).intValue();
+            subItems.add(new ItemStack(itemIn, 1, j1));
         }
     }
 }

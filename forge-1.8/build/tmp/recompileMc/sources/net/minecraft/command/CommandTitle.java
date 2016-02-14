@@ -15,12 +15,11 @@ import org.apache.logging.log4j.Logger;
 public class CommandTitle extends CommandBase
 {
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final String __OBFID = "CL_00002338";
 
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
-    public String getName()
+    public String getCommandName()
     {
         return "title";
     }
@@ -33,15 +32,23 @@ public class CommandTitle extends CommandBase
         return 2;
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.title.usage";
     }
 
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
-    public void execute(ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 2)
         {
@@ -63,11 +70,11 @@ public class CommandTitle extends CommandBase
             }
 
             EntityPlayerMP entityplayermp = getPlayer(sender, args[0]);
-            S45PacketTitle.Type type = S45PacketTitle.Type.byName(args[1]);
+            S45PacketTitle.Type s45packettitle$type = S45PacketTitle.Type.byName(args[1]);
 
-            if (type != S45PacketTitle.Type.CLEAR && type != S45PacketTitle.Type.RESET)
+            if (s45packettitle$type != S45PacketTitle.Type.CLEAR && s45packettitle$type != S45PacketTitle.Type.RESET)
             {
-                if (type == S45PacketTitle.Type.TIMES)
+                if (s45packettitle$type == S45PacketTitle.Type.TIMES)
                 {
                     if (args.length != 5)
                     {
@@ -89,7 +96,7 @@ public class CommandTitle extends CommandBase
                 }
                 else
                 {
-                    String s = func_180529_a(args, 2);
+                    String s = buildString(args, 2);
                     IChatComponent ichatcomponent;
 
                     try
@@ -102,7 +109,7 @@ public class CommandTitle extends CommandBase
                         throw new SyntaxErrorException("commands.tellraw.jsonException", new Object[] {throwable == null ? "" : throwable.getMessage()});
                     }
 
-                    S45PacketTitle s45packettitle1 = new S45PacketTitle(type, ChatComponentProcessor.func_179985_a(sender, ichatcomponent, entityplayermp));
+                    S45PacketTitle s45packettitle1 = new S45PacketTitle(s45packettitle$type, ChatComponentProcessor.processComponent(sender, ichatcomponent, entityplayermp));
                     entityplayermp.playerNetServerHandler.sendPacket(s45packettitle1);
                     notifyOperators(sender, this, "commands.title.success", new Object[0]);
                 }
@@ -113,20 +120,22 @@ public class CommandTitle extends CommandBase
             }
             else
             {
-                S45PacketTitle s45packettitle = new S45PacketTitle(type, (IChatComponent)null);
+                S45PacketTitle s45packettitle = new S45PacketTitle(s45packettitle$type, (IChatComponent)null);
                 entityplayermp.playerNetServerHandler.sendPacket(s45packettitle);
                 notifyOperators(sender, this, "commands.title.success", new Object[0]);
             }
         }
     }
 
-    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
         return args.length == 1 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames()) : (args.length == 2 ? getListOfStringsMatchingLastWord(args, S45PacketTitle.Type.getNames()) : null);
     }
 
     /**
      * Return whether the specified command parameter index is a username parameter.
+     *  
+     * @param args The arguments that were passed
      */
     public boolean isUsernameIndex(String[] args, int index)
     {

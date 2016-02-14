@@ -4,10 +4,8 @@ import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 import java.util.UUID;
 
-public class UserListWhitelistEntry extends UserListEntry
+public class UserListWhitelistEntry extends UserListEntry<GameProfile>
 {
-    private static final String __OBFID = "CL_00001870";
-
     public UserListWhitelistEntry(GameProfile profile)
     {
         super(profile);
@@ -15,7 +13,7 @@ public class UserListWhitelistEntry extends UserListEntry
 
     public UserListWhitelistEntry(JsonObject p_i1130_1_)
     {
-        super(func_152646_b(p_i1130_1_), p_i1130_1_);
+        super(gameProfileFromJsonObject(p_i1130_1_), p_i1130_1_);
     }
 
     protected void onSerialization(JsonObject data)
@@ -28,7 +26,7 @@ public class UserListWhitelistEntry extends UserListEntry
         }
     }
 
-    private static GameProfile func_152646_b(JsonObject p_152646_0_)
+    private static GameProfile gameProfileFromJsonObject(JsonObject p_152646_0_)
     {
         if (p_152646_0_.has("uuid") && p_152646_0_.has("name"))
         {
@@ -39,7 +37,7 @@ public class UserListWhitelistEntry extends UserListEntry
             {
                 uuid = UUID.fromString(s);
             }
-            catch (Throwable throwable)
+            catch (Throwable var4)
             {
                 return null;
             }

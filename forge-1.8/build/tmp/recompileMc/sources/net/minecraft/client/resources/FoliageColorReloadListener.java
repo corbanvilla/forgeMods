@@ -11,7 +11,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class FoliageColorReloadListener implements IResourceManagerReloadListener
 {
     private static final ResourceLocation LOC_FOLIAGE_PNG = new ResourceLocation("textures/colormap/foliage.png");
-    private static final String __OBFID = "CL_00001077";
 
     public void onResourceManagerReload(IResourceManager resourceManager)
     {
@@ -19,7 +18,7 @@ public class FoliageColorReloadListener implements IResourceManagerReloadListene
         {
             ColorizerFoliage.setFoliageBiomeColorizer(TextureUtil.readImageData(resourceManager, LOC_FOLIAGE_PNG));
         }
-        catch (IOException ioexception)
+        catch (IOException var3)
         {
             ;
         }

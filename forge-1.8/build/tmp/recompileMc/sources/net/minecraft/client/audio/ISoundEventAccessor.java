@@ -4,9 +4,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public interface ISoundEventAccessor
+public interface ISoundEventAccessor<T>
 {
     int getWeight();
 
-    Object cloneEntry();
+    T cloneEntry();
 }

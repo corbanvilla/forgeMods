@@ -20,12 +20,10 @@ import net.minecraft.world.World;
 
 public class CommandSummon extends CommandBase
 {
-    private static final String __OBFID = "CL_00001158";
-
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
-    public String getName()
+    public String getCommandName()
     {
         return "summon";
     }
@@ -38,15 +36,23 @@ public class CommandSummon extends CommandBase
         return 2;
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.summon.usage";
     }
 
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
-    public void execute(ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 1)
         {
@@ -63,9 +69,9 @@ public class CommandSummon extends CommandBase
 
             if (args.length >= 4)
             {
-                d0 = func_175761_b(d0, args[1], true);
-                d1 = func_175761_b(d1, args[2], false);
-                d2 = func_175761_b(d2, args[3], true);
+                d0 = parseDouble(d0, args[1], true);
+                d1 = parseDouble(d1, args[2], false);
+                d2 = parseDouble(d2, args[3], true);
                 blockpos = new BlockPos(d0, d1, d2);
             }
 
@@ -91,7 +97,7 @@ public class CommandSummon extends CommandBase
 
                     try
                     {
-                        nbttagcompound = JsonToNBT.func_180713_a(ichatcomponent.getUnformattedText());
+                        nbttagcompound = JsonToNBT.getTagFromJson(ichatcomponent.getUnformattedText());
                         flag = true;
                     }
                     catch (NBTException nbtexception)
@@ -107,7 +113,7 @@ public class CommandSummon extends CommandBase
                 {
                     entity2 = EntityList.createEntityFromNBT(nbttagcompound, world);
                 }
-                catch (RuntimeException runtimeexception)
+                catch (RuntimeException var19)
                 {
                     throw new CommandException("commands.summon.failed", new Object[0]);
                 }
@@ -122,7 +128,7 @@ public class CommandSummon extends CommandBase
 
                     if (!flag && entity2 instanceof EntityLiving)
                     {
-                        ((EntityLiving)entity2).func_180482_a(world.getDifficultyForLocation(new BlockPos(entity2)), (IEntityLivingData)null);
+                        ((EntityLiving)entity2).onInitialSpawn(world.getDifficultyForLocation(new BlockPos(entity2)), (IEntityLivingData)null);
                     }
 
                     world.spawnEntityInWorld(entity2);
@@ -148,8 +154,8 @@ public class CommandSummon extends CommandBase
         }
     }
 
-    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
-        return args.length == 1 ? func_175762_a(args, EntityList.getEntityNameList()) : (args.length > 1 && args.length <= 4 ? func_175771_a(args, 1, pos) : null);
+        return args.length == 1 ? getListOfStringsMatchingLastWord(args, EntityList.getEntityNameList()) : (args.length > 1 && args.length <= 4 ? func_175771_a(args, 1, pos) : null);
     }
 }

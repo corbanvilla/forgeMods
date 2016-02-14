@@ -15,19 +15,18 @@ public enum EnumPlayerModelParts
     LEFT_PANTS_LEG(4, "left_pants_leg"),
     RIGHT_PANTS_LEG(5, "right_pants_leg"),
     HAT(6, "hat");
+
     private final int partId;
     private final int partMask;
     private final String partName;
     private final IChatComponent field_179339_k;
 
-    private static final String __OBFID = "CL_00002187";
-
-    private EnumPlayerModelParts(int p_i45809_3_, String p_i45809_4_)
+    private EnumPlayerModelParts(int partIdIn, String partNameIn)
     {
-        this.partId = p_i45809_3_;
-        this.partMask = 1 << p_i45809_3_;
-        this.partName = p_i45809_4_;
-        this.field_179339_k = new ChatComponentTranslation("options.modelPart." + p_i45809_4_, new Object[0]);
+        this.partId = partIdIn;
+        this.partMask = 1 << partIdIn;
+        this.partName = partNameIn;
+        this.field_179339_k = new ChatComponentTranslation("options.modelPart." + partNameIn, new Object[0]);
     }
 
     public int getPartMask()

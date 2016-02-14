@@ -15,11 +15,17 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class EntityEnderPearl extends EntityThrowable
 {
-    private static final String __OBFID = "CL_00001725";
+    private EntityLivingBase field_181555_c;
+
+    public EntityEnderPearl(World p_i46455_1_)
+    {
+        super(p_i46455_1_);
+    }
 
     public EntityEnderPearl(World worldIn, EntityLivingBase p_i1783_2_)
     {
         super(worldIn, p_i1783_2_);
+        this.field_181555_c = p_i1783_2_;
     }
 
     @SideOnly(Side.CLIENT)
@@ -37,6 +43,11 @@ public class EntityEnderPearl extends EntityThrowable
 
         if (p_70184_1_.entityHit != null)
         {
+            if (p_70184_1_.entityHit == this.field_181555_c)
+            {
+                return;
+            }
+
             p_70184_1_.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, entitylivingbase), 0.0F);
         }
 
@@ -56,7 +67,7 @@ public class EntityEnderPearl extends EntityThrowable
                     net.minecraftforge.event.entity.living.EnderTeleportEvent event = new net.minecraftforge.event.entity.living.EnderTeleportEvent(entityplayermp, this.posX, this.posY, this.posZ, 5.0F);
                     if (!net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event))
                     { // Don't indent to lower patch size
-                    if (this.rand.nextFloat() < 0.05F && this.worldObj.getGameRules().getGameRuleBooleanValue("doMobSpawning"))
+                    if (this.rand.nextFloat() < 0.05F && this.worldObj.getGameRules().getBoolean("doMobSpawning"))
                     {
                         EntityEndermite entityendermite = new EntityEndermite(this.worldObj);
                         entityendermite.setSpawnedByPlayer(true);
@@ -74,6 +85,11 @@ public class EntityEnderPearl extends EntityThrowable
                     entitylivingbase.attackEntityFrom(DamageSource.fall, event.attackDamage);
                     }
                 }
+            }
+            else if (entitylivingbase != null)
+            {
+                entitylivingbase.setPositionAndUpdate(this.posX, this.posY, this.posZ);
+                entitylivingbase.fallDistance = 0.0F;
             }
 
             this.setDead();

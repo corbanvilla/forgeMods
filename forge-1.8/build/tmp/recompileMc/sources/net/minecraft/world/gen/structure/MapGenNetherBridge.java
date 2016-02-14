@@ -12,8 +12,7 @@ import net.minecraft.world.biome.BiomeGenBase;
 
 public class MapGenNetherBridge extends MapGenStructure
 {
-    private List spawnList = Lists.newArrayList();
-    private static final String __OBFID = "CL_00000451";
+    private List<BiomeGenBase.SpawnListEntry> spawnList = Lists.<BiomeGenBase.SpawnListEntry>newArrayList();
 
     public MapGenNetherBridge()
     {
@@ -28,44 +27,44 @@ public class MapGenNetherBridge extends MapGenStructure
         return "Fortress";
     }
 
-    public List getSpawnList()
+    public List<BiomeGenBase.SpawnListEntry> getSpawnList()
     {
         return this.spawnList;
     }
 
-    protected boolean canSpawnStructureAtCoords(int p_75047_1_, int p_75047_2_)
+    protected boolean canSpawnStructureAtCoords(int chunkX, int chunkZ)
     {
-        int k = p_75047_1_ >> 4;
-        int l = p_75047_2_ >> 4;
-        this.rand.setSeed((long)(k ^ l << 4) ^ this.worldObj.getSeed());
+        int i = chunkX >> 4;
+        int j = chunkZ >> 4;
+        this.rand.setSeed((long)(i ^ j << 4) ^ this.worldObj.getSeed());
         this.rand.nextInt();
-        return this.rand.nextInt(3) != 0 ? false : (p_75047_1_ != (k << 4) + 4 + this.rand.nextInt(8) ? false : p_75047_2_ == (l << 4) + 4 + this.rand.nextInt(8));
+        return this.rand.nextInt(3) != 0 ? false : (chunkX != (i << 4) + 4 + this.rand.nextInt(8) ? false : chunkZ == (j << 4) + 4 + this.rand.nextInt(8));
     }
 
-    protected StructureStart getStructureStart(int p_75049_1_, int p_75049_2_)
+    protected StructureStart getStructureStart(int chunkX, int chunkZ)
     {
-        return new MapGenNetherBridge.Start(this.worldObj, this.rand, p_75049_1_, p_75049_2_);
+        return new MapGenNetherBridge.Start(this.worldObj, this.rand, chunkX, chunkZ);
     }
 
     public static class Start extends StructureStart
         {
-            private static final String __OBFID = "CL_00000452";
-
-            public Start() {}
+            public Start()
+            {
+            }
 
             public Start(World worldIn, Random p_i2040_2_, int p_i2040_3_, int p_i2040_4_)
             {
                 super(p_i2040_3_, p_i2040_4_);
-                StructureNetherBridgePieces.Start start = new StructureNetherBridgePieces.Start(p_i2040_2_, (p_i2040_3_ << 4) + 2, (p_i2040_4_ << 4) + 2);
-                this.components.add(start);
-                start.buildComponent(start, this.components, p_i2040_2_);
-                List list = start.field_74967_d;
+                StructureNetherBridgePieces.Start structurenetherbridgepieces$start = new StructureNetherBridgePieces.Start(p_i2040_2_, (p_i2040_3_ << 4) + 2, (p_i2040_4_ << 4) + 2);
+                this.components.add(structurenetherbridgepieces$start);
+                structurenetherbridgepieces$start.buildComponent(structurenetherbridgepieces$start, this.components, p_i2040_2_);
+                List<StructureComponent> list = structurenetherbridgepieces$start.field_74967_d;
 
                 while (!list.isEmpty())
                 {
-                    int k = p_i2040_2_.nextInt(list.size());
-                    StructureComponent structurecomponent = (StructureComponent)list.remove(k);
-                    structurecomponent.buildComponent(start, this.components, p_i2040_2_);
+                    int i = p_i2040_2_.nextInt(list.size());
+                    StructureComponent structurecomponent = (StructureComponent)list.remove(i);
+                    structurecomponent.buildComponent(structurenetherbridgepieces$start, this.components, p_i2040_2_);
                 }
 
                 this.updateBoundingBox();

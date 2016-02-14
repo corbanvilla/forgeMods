@@ -19,7 +19,6 @@ public class EntityMinecartFurnace extends EntityMinecart
     private int fuel;
     public double pushX;
     public double pushZ;
-    private static final String __OBFID = "CL_00001675";
 
     public EntityMinecartFurnace(World worldIn)
     {
@@ -67,7 +66,10 @@ public class EntityMinecartFurnace extends EntityMinecart
         }
     }
 
-    protected double func_174898_m()
+    /**
+     * Get's the maximum speed for a minecart
+     */
+    protected double getMaximumSpeed()
     {
         return 0.2D;
     }
@@ -76,7 +78,7 @@ public class EntityMinecartFurnace extends EntityMinecart
     {
         super.killMinecart(p_94095_1_);
 
-        if (!p_94095_1_.isExplosion())
+        if (!p_94095_1_.isExplosion() && this.worldObj.getGameRules().getBoolean("doEntityDrops"))
         {
             this.entityDropItem(new ItemStack(Blocks.furnace, 1), 0.0F);
         }
@@ -100,7 +102,7 @@ public class EntityMinecartFurnace extends EntityMinecart
             }
             else
             {
-                double d1 = d0 / this.func_174898_m();
+                double d1 = d0 / this.getMaximumSpeed();
                 this.pushX *= d1;
                 this.pushZ *= d1;
             }

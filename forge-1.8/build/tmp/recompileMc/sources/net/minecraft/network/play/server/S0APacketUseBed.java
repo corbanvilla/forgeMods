@@ -2,7 +2,6 @@ package net.minecraft.network.play.server;
 
 import java.io.IOException;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -11,19 +10,20 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S0APacketUseBed implements Packet
+public class S0APacketUseBed implements Packet<INetHandlerPlayClient>
 {
     private int playerID;
     /** Block location of the head part of the bed */
     private BlockPos bedPos;
-    private static final String __OBFID = "CL_00001319";
 
-    public S0APacketUseBed() {}
-
-    public S0APacketUseBed(EntityPlayer p_i45964_1_, BlockPos p_i45964_2_)
+    public S0APacketUseBed()
     {
-        this.playerID = p_i45964_1_.getEntityId();
-        this.bedPos = p_i45964_2_;
+    }
+
+    public S0APacketUseBed(EntityPlayer player, BlockPos bedPosIn)
+    {
+        this.playerID = player.getEntityId();
+        this.bedPos = bedPosIn;
     }
 
     /**
@@ -44,9 +44,12 @@ public class S0APacketUseBed implements Packet
         buf.writeBlockPos(this.bedPos);
     }
 
-    public void func_180744_a(INetHandlerPlayClient p_180744_1_)
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
+    public void processPacket(INetHandlerPlayClient handler)
     {
-        p_180744_1_.handleUseBed(this);
+        handler.handleUseBed(this);
     }
 
     @SideOnly(Side.CLIENT)
@@ -56,16 +59,8 @@ public class S0APacketUseBed implements Packet
     }
 
     @SideOnly(Side.CLIENT)
-    public BlockPos func_179798_a()
+    public BlockPos getBedPosition()
     {
         return this.bedPos;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.func_180744_a((INetHandlerPlayClient)handler);
     }
 }

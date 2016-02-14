@@ -12,16 +12,19 @@ import net.minecraft.util.ChatComponentTranslation;
 
 public class CommandClearInventory extends CommandBase
 {
-    private static final String __OBFID = "CL_00000218";
-
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
-    public String getName()
+    public String getCommandName()
     {
         return "clear";
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.clear.usage";
@@ -36,9 +39,12 @@ public class CommandClearInventory extends CommandBase
     }
 
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
-    public void execute(ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         EntityPlayerMP entityplayermp = args.length == 0 ? getCommandSenderAsPlayer(sender) : getPlayer(sender, args[0]);
         Item item = args.length >= 2 ? getItemByText(sender, args[1]) : null;
@@ -50,7 +56,7 @@ public class CommandClearInventory extends CommandBase
         {
             try
             {
-                nbttagcompound = JsonToNBT.func_180713_a(func_180529_a(args, 4));
+                nbttagcompound = JsonToNBT.getTagFromJson(buildString(args, 4));
             }
             catch (NBTException nbtexception)
             {
@@ -64,7 +70,7 @@ public class CommandClearInventory extends CommandBase
         }
         else
         {
-            int k = entityplayermp.inventory.func_174925_a(item, i, j, nbttagcompound);
+            int k = entityplayermp.inventory.clearMatchingItems(item, i, j, nbttagcompound);
             entityplayermp.inventoryContainer.detectAndSendChanges();
 
             if (!entityplayermp.capabilities.isCreativeMode)
@@ -92,9 +98,9 @@ public class CommandClearInventory extends CommandBase
         }
     }
 
-    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
-        return args.length == 1 ? getListOfStringsMatchingLastWord(args, this.func_147209_d()) : (args.length == 2 ? func_175762_a(args, Item.itemRegistry.getKeys()) : null);
+        return args.length == 1 ? getListOfStringsMatchingLastWord(args, this.func_147209_d()) : (args.length == 2 ? getListOfStringsMatchingLastWord(args, Item.itemRegistry.getKeys()) : null);
     }
 
     protected String[] func_147209_d()
@@ -104,6 +110,8 @@ public class CommandClearInventory extends CommandBase
 
     /**
      * Return whether the specified command parameter index is a username parameter.
+     *  
+     * @param args The arguments that were passed
      */
     public boolean isUsernameIndex(String[] args, int index)
     {

@@ -6,14 +6,14 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ContainerEnchantment;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IChatComponent;
+import net.minecraft.util.ITickable;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.IInteractionObject;
 
-public class TileEntityEnchantmentTable extends TileEntity implements IUpdatePlayerListBox, IInteractionObject
+public class TileEntityEnchantmentTable extends TileEntity implements ITickable, IInteractionObject
 {
     public int tickCount;
     public float pageFlip;
@@ -25,9 +25,8 @@ public class TileEntityEnchantmentTable extends TileEntity implements IUpdatePla
     public float bookRotation;
     public float bookRotationPrev;
     public float field_145924_q;
-    private static Random field_145923_r = new Random();
+    private static Random rand = new Random();
     private String customName;
-    private static final String __OBFID = "CL_00000354";
 
     public void writeToNBT(NBTTagCompound compound)
     {
@@ -50,7 +49,7 @@ public class TileEntityEnchantmentTable extends TileEntity implements IUpdatePla
     }
 
     /**
-     * Updates the JList with a new model.
+     * Like the old updateEntity(), except more generic.
      */
     public void update()
     {
@@ -62,18 +61,22 @@ public class TileEntityEnchantmentTable extends TileEntity implements IUpdatePla
         {
             double d0 = entityplayer.posX - (double)((float)this.pos.getX() + 0.5F);
             double d1 = entityplayer.posZ - (double)((float)this.pos.getZ() + 0.5F);
-            this.field_145924_q = (float)Math.atan2(d1, d0);
+            this.field_145924_q = (float)MathHelper.atan2(d1, d0);
             this.bookSpread += 0.1F;
 
-            if (this.bookSpread < 0.5F || field_145923_r.nextInt(40) == 0)
+            if (this.bookSpread < 0.5F || rand.nextInt(40) == 0)
             {
                 float f1 = this.field_145932_k;
 
-                do
+                while (true)
                 {
-                    this.field_145932_k += (float)(field_145923_r.nextInt(4) - field_145923_r.nextInt(4));
+                    this.field_145932_k += (float)(rand.nextInt(4) - rand.nextInt(4));
+
+                    if (f1 != this.field_145932_k)
+                    {
+                        break;
+                    }
                 }
-                while (f1 == this.field_145932_k);
             }
         }
         else
@@ -126,7 +129,7 @@ public class TileEntityEnchantmentTable extends TileEntity implements IUpdatePla
     }
 
     /**
-     * Gets the name of this command sender (usually username, but possibly "Rcon")
+     * Get the name of this object. For players this returns their username
      */
     public String getName()
     {
@@ -146,6 +149,9 @@ public class TileEntityEnchantmentTable extends TileEntity implements IUpdatePla
         this.customName = customNameIn;
     }
 
+    /**
+     * Get the formatted ChatComponent that will be used for the sender's username in chat
+     */
     public IChatComponent getDisplayName()
     {
         return (IChatComponent)(this.hasCustomName() ? new ChatComponentText(this.getName()) : new ChatComponentTranslation(this.getName(), new Object[0]));

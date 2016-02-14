@@ -1,7 +1,5 @@
 package net.minecraft.tileentity;
 
-import java.util.Iterator;
-import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
 import net.minecraft.entity.player.EntityPlayer;
@@ -13,14 +11,14 @@ import net.minecraft.inventory.InventoryLargeChest;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class TileEntityChest extends TileEntityLockable implements IUpdatePlayerListBox, IInventory
+public class TileEntityChest extends TileEntityLockable implements ITickable, IInventory
 {
     private ItemStack[] chestContents = new ItemStack[27];
     /** Determines if the check for adjacent chests has taken place. */
@@ -43,7 +41,6 @@ public class TileEntityChest extends TileEntityLockable implements IUpdatePlayer
     private int ticksSinceSync;
     private int cachedChestType;
     private String customName;
-    private static final String __OBFID = "CL_00000346";
 
     public TileEntityChest()
     {
@@ -65,7 +62,7 @@ public class TileEntityChest extends TileEntityLockable implements IUpdatePlayer
     }
 
     /**
-     * Returns the stack in slot i
+     * Returns the stack in the given slot.
      */
     public ItemStack getStackInSlot(int index)
     {
@@ -73,25 +70,22 @@ public class TileEntityChest extends TileEntityLockable implements IUpdatePlayer
     }
 
     /**
-     * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a
-     * new stack.
+     * Removes up to a specified number of items from an inventory slot and returns them in a new stack.
      */
     public ItemStack decrStackSize(int index, int count)
     {
         if (this.chestContents[index] != null)
         {
-            ItemStack itemstack;
-
             if (this.chestContents[index].stackSize <= count)
             {
-                itemstack = this.chestContents[index];
+                ItemStack itemstack1 = this.chestContents[index];
                 this.chestContents[index] = null;
                 this.markDirty();
-                return itemstack;
+                return itemstack1;
             }
             else
             {
-                itemstack = this.chestContents[index].splitStack(count);
+                ItemStack itemstack = this.chestContents[index].splitStack(count);
 
                 if (this.chestContents[index].stackSize == 0)
                 {
@@ -109,10 +103,9 @@ public class TileEntityChest extends TileEntityLockable implements IUpdatePlayer
     }
 
     /**
-     * When some containers are closed they call this on each slot, then drop whatever it returns as an EntityItem -
-     * like when you close a workbench GUI.
+     * Removes a stack from the given slot and returns it.
      */
-    public ItemStack getStackInSlotOnClosing(int index)
+    public ItemStack removeStackFromSlot(int index)
     {
         if (this.chestContents[index] != null)
         {
@@ -142,7 +135,7 @@ public class TileEntityChest extends TileEntityLockable implements IUpdatePlayer
     }
 
     /**
-     * Gets the name of this command sender (usually username, but possibly "Rcon")
+     * Get the name of this object. For players this returns their username
      */
     public String getName()
     {
@@ -175,12 +168,12 @@ public class TileEntityChest extends TileEntityLockable implements IUpdatePlayer
 
         for (int i = 0; i < nbttaglist.tagCount(); ++i)
         {
-            NBTTagCompound nbttagcompound1 = nbttaglist.getCompoundTagAt(i);
-            int j = nbttagcompound1.getByte("Slot") & 255;
+            NBTTagCompound nbttagcompound = nbttaglist.getCompoundTagAt(i);
+            int j = nbttagcompound.getByte("Slot") & 255;
 
             if (j >= 0 && j < this.chestContents.length)
             {
-                this.chestContents[j] = ItemStack.loadItemStackFromNBT(nbttagcompound1);
+                this.chestContents[j] = ItemStack.loadItemStackFromNBT(nbttagcompound);
             }
         }
     }
@@ -194,10 +187,10 @@ public class TileEntityChest extends TileEntityLockable implements IUpdatePlayer
         {
             if (this.chestContents[i] != null)
             {
-                NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-                nbttagcompound1.setByte("Slot", (byte)i);
-                this.chestContents[i].writeToNBT(nbttagcompound1);
-                nbttaglist.appendTag(nbttagcompound1);
+                NBTTagCompound nbttagcompound = new NBTTagCompound();
+                nbttagcompound.setByte("Slot", (byte)i);
+                this.chestContents[i].writeToNBT(nbttagcompound);
+                nbttaglist.appendTag(nbttagcompound);
             }
         }
 
@@ -210,8 +203,7 @@ public class TileEntityChest extends TileEntityLockable implements IUpdatePlayer
     }
 
     /**
-     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended. *Isn't
-     * this more of a set than a get?*
+     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended.
      */
     public int getInventoryStackLimit()
     {
@@ -230,41 +222,47 @@ public class TileEntityChest extends TileEntityLockable implements IUpdatePlayer
     {
         super.updateContainingBlockInfo();
         this.adjacentChestChecked = false;
+        doubleChestHandler = null;
     }
 
-    private void func_174910_a(TileEntityChest p_174910_1_, EnumFacing p_174910_2_)
+    @SuppressWarnings("incomplete-switch")
+    private void func_174910_a(TileEntityChest chestTe, EnumFacing side)
     {
-        if (p_174910_1_.isInvalid())
+        if (chestTe.isInvalid())
         {
             this.adjacentChestChecked = false;
         }
         else if (this.adjacentChestChecked)
         {
-            switch (TileEntityChest.SwitchEnumFacing.field_177366_a[p_174910_2_.ordinal()])
+            switch (side)
             {
-                case 1:
-                    if (this.adjacentChestZNeg != p_174910_1_)
+                case NORTH:
+
+                    if (this.adjacentChestZNeg != chestTe)
                     {
                         this.adjacentChestChecked = false;
                     }
 
                     break;
-                case 2:
-                    if (this.adjacentChestZPos != p_174910_1_)
+                case SOUTH:
+
+                    if (this.adjacentChestZPos != chestTe)
                     {
                         this.adjacentChestChecked = false;
                     }
 
                     break;
-                case 3:
-                    if (this.adjacentChestXPos != p_174910_1_)
+                case EAST:
+
+                    if (this.adjacentChestXPos != chestTe)
                     {
                         this.adjacentChestChecked = false;
                     }
 
                     break;
-                case 4:
-                    if (this.adjacentChestXNeg != p_174910_1_)
+                case WEST:
+
+                    if (this.adjacentChestXNeg != chestTe)
                     {
                         this.adjacentChestChecked = false;
                     }
@@ -280,25 +278,25 @@ public class TileEntityChest extends TileEntityLockable implements IUpdatePlayer
         if (!this.adjacentChestChecked)
         {
             this.adjacentChestChecked = true;
-            this.adjacentChestXNeg = this.func_174911_a(EnumFacing.WEST);
-            this.adjacentChestXPos = this.func_174911_a(EnumFacing.EAST);
-            this.adjacentChestZNeg = this.func_174911_a(EnumFacing.NORTH);
-            this.adjacentChestZPos = this.func_174911_a(EnumFacing.SOUTH);
+            this.adjacentChestXNeg = this.getAdjacentChest(EnumFacing.WEST);
+            this.adjacentChestXPos = this.getAdjacentChest(EnumFacing.EAST);
+            this.adjacentChestZNeg = this.getAdjacentChest(EnumFacing.NORTH);
+            this.adjacentChestZPos = this.getAdjacentChest(EnumFacing.SOUTH);
         }
     }
 
-    protected TileEntityChest func_174911_a(EnumFacing p_174911_1_)
+    protected TileEntityChest getAdjacentChest(EnumFacing side)
     {
-        BlockPos blockpos = this.pos.offset(p_174911_1_);
+        BlockPos blockpos = this.pos.offset(side);
 
-        if (this.func_174912_b(blockpos))
+        if (this.isChestAt(blockpos))
         {
             TileEntity tileentity = this.worldObj.getTileEntity(blockpos);
 
             if (tileentity instanceof TileEntityChest)
             {
                 TileEntityChest tileentitychest = (TileEntityChest)tileentity;
-                tileentitychest.func_174910_a(this, p_174911_1_.getOpposite());
+                tileentitychest.func_174910_a(this, side.getOpposite());
                 return tileentitychest;
             }
         }
@@ -306,7 +304,7 @@ public class TileEntityChest extends TileEntityLockable implements IUpdatePlayer
         return null;
     }
 
-    private boolean func_174912_b(BlockPos p_174912_1_)
+    private boolean isChestAt(BlockPos posIn)
     {
         if (this.worldObj == null)
         {
@@ -314,13 +312,13 @@ public class TileEntityChest extends TileEntityLockable implements IUpdatePlayer
         }
         else
         {
-            Block block = this.worldObj.getBlockState(p_174912_1_).getBlock();
+            Block block = this.worldObj.getBlockState(posIn).getBlock();
             return block instanceof BlockChest && ((BlockChest)block).chestType == this.getChestType();
         }
     }
 
     /**
-     * Updates the JList with a new model.
+     * Like the old updateEntity(), except more generic.
      */
     public void update()
     {
@@ -329,19 +327,14 @@ public class TileEntityChest extends TileEntityLockable implements IUpdatePlayer
         int j = this.pos.getY();
         int k = this.pos.getZ();
         ++this.ticksSinceSync;
-        float f;
 
         if (!this.worldObj.isRemote && this.numPlayersUsing != 0 && (this.ticksSinceSync + i + j + k) % 200 == 0)
         {
             this.numPlayersUsing = 0;
-            f = 5.0F;
-            List list = this.worldObj.getEntitiesWithinAABB(EntityPlayer.class, new AxisAlignedBB((double)((float)i - f), (double)((float)j - f), (double)((float)k - f), (double)((float)(i + 1) + f), (double)((float)(j + 1) + f), (double)((float)(k + 1) + f)));
-            Iterator iterator = list.iterator();
+            float f = 5.0F;
 
-            while (iterator.hasNext())
+            for (EntityPlayer entityplayer : this.worldObj.getEntitiesWithinAABB(EntityPlayer.class, new AxisAlignedBB((double)((float)i - f), (double)((float)j - f), (double)((float)k - f), (double)((float)(i + 1) + f), (double)((float)(j + 1) + f), (double)((float)(k + 1) + f))))
             {
-                EntityPlayer entityplayer = (EntityPlayer)iterator.next();
-
                 if (entityplayer.openContainer instanceof ContainerChest)
                 {
                     IInventory iinventory = ((ContainerChest)entityplayer.openContainer).getLowerChestInventory();
@@ -355,13 +348,12 @@ public class TileEntityChest extends TileEntityLockable implements IUpdatePlayer
         }
 
         this.prevLidAngle = this.lidAngle;
-        f = 0.1F;
-        double d2;
+        float f1 = 0.1F;
 
         if (this.numPlayersUsing > 0 && this.lidAngle == 0.0F && this.adjacentChestZNeg == null && this.adjacentChestXNeg == null)
         {
             double d1 = (double)i + 0.5D;
-            d2 = (double)k + 0.5D;
+            double d2 = (double)k + 0.5D;
 
             if (this.adjacentChestZPos != null)
             {
@@ -378,15 +370,15 @@ public class TileEntityChest extends TileEntityLockable implements IUpdatePlayer
 
         if (this.numPlayersUsing == 0 && this.lidAngle > 0.0F || this.numPlayersUsing > 0 && this.lidAngle < 1.0F)
         {
-            float f1 = this.lidAngle;
+            float f2 = this.lidAngle;
 
             if (this.numPlayersUsing > 0)
             {
-                this.lidAngle += f;
+                this.lidAngle += f1;
             }
             else
             {
-                this.lidAngle -= f;
+                this.lidAngle -= f1;
             }
 
             if (this.lidAngle > 1.0F)
@@ -394,11 +386,11 @@ public class TileEntityChest extends TileEntityLockable implements IUpdatePlayer
                 this.lidAngle = 1.0F;
             }
 
-            float f2 = 0.5F;
+            float f3 = 0.5F;
 
-            if (this.lidAngle < f2 && f1 >= f2 && this.adjacentChestZNeg == null && this.adjacentChestXNeg == null)
+            if (this.lidAngle < f3 && f2 >= f3 && this.adjacentChestZNeg == null && this.adjacentChestXNeg == null)
             {
-                d2 = (double)i + 0.5D;
+                double d3 = (double)i + 0.5D;
                 double d0 = (double)k + 0.5D;
 
                 if (this.adjacentChestZPos != null)
@@ -408,10 +400,10 @@ public class TileEntityChest extends TileEntityLockable implements IUpdatePlayer
 
                 if (this.adjacentChestXPos != null)
                 {
-                    d2 += 0.5D;
+                    d3 += 0.5D;
                 }
 
-                this.worldObj.playSoundEffect(d2, (double)j + 0.5D, d0, "random.chestclosed", 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
+                this.worldObj.playSoundEffect(d3, (double)j + 0.5D, d0, "random.chestclosed", 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
             }
 
             if (this.lidAngle < 0.0F)
@@ -509,7 +501,9 @@ public class TileEntityChest extends TileEntityLockable implements IUpdatePlayer
         return 0;
     }
 
-    public void setField(int id, int value) {}
+    public void setField(int id, int value)
+    {
+    }
 
     public int getFieldCount()
     {
@@ -524,48 +518,23 @@ public class TileEntityChest extends TileEntityLockable implements IUpdatePlayer
         }
     }
 
-    static final class SwitchEnumFacing
+    public net.minecraftforge.items.VanillaDoubleChestItemHandler doubleChestHandler;
+
+    @Override
+    public <T> T getCapability(net.minecraftforge.common.capabilities.Capability<T> capability, net.minecraft.util.EnumFacing facing)
+    {
+        if (capability == net.minecraftforge.items.CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
         {
-            static final int[] field_177366_a = new int[EnumFacing.values().length];
-            private static final String __OBFID = "CL_00002041";
-
-            static
-            {
-                try
-                {
-                    field_177366_a[EnumFacing.NORTH.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var4)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_177366_a[EnumFacing.SOUTH.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var3)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_177366_a[EnumFacing.EAST.ordinal()] = 3;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_177366_a[EnumFacing.WEST.ordinal()] = 4;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
-            }
+            if(doubleChestHandler == null || doubleChestHandler.needsRefresh())
+                doubleChestHandler = net.minecraftforge.items.VanillaDoubleChestItemHandler.get(this);
+            if (doubleChestHandler != null && doubleChestHandler != net.minecraftforge.items.VanillaDoubleChestItemHandler.NO_ADJACENT_CHESTS_INSTANCE)
+                return (T) doubleChestHandler;
         }
+        return super.getCapability(capability, facing);
+    }
+
+    public net.minecraftforge.items.IItemHandler getSingleChestHandler()
+    {
+        return super.getCapability(net.minecraftforge.items.CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+    }
 }

@@ -4,12 +4,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.mojang.authlib.GameProfile;
 import io.netty.buffer.Unpooled;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
@@ -30,7 +28,6 @@ import net.minecraft.inventory.ContainerHorseInventory;
 import net.minecraft.inventory.ContainerMerchant;
 import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryMerchant;
 import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
@@ -113,10 +110,8 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
     public double managedPosX;
     /** player Z position as seen by PlayerManager */
     public double managedPosZ;
-    /** LinkedList that holds the loaded chunks. */
-    public final List loadedChunks = Lists.newLinkedList();
-    /** entities added to this list will  be packet29'd to the player */
-    private final List destroyedItemsNetCache = Lists.newLinkedList();
+    public final List<ChunkCoordIntPair> loadedChunks = Lists.<ChunkCoordIntPair>newLinkedList();
+    private final List<Integer> destroyedItemsNetCache = Lists.<Integer>newLinkedList();
     private final StatisticsFile statsFile;
     /** the total health of the player, includes actual health and absorption health. Updated every tick. */
     private float combinedHealth = Float.MIN_VALUE;
@@ -147,7 +142,6 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
      * and XP
      */
     public boolean playerConqueredTheEnd;
-    private static final String __OBFID = "CL_00001440";
 
     @SuppressWarnings("unused")
     public EntityPlayerMP(MinecraftServer server, WorldServer worldIn, GameProfile profile, ItemInWorldManager interactionManager)
@@ -232,18 +226,24 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
 
     public void addSelfToInternalCraftingInventory()
     {
-        this.openContainer.addCraftingToCrafters(this);
+        this.openContainer.onCraftGuiOpened(this);
     }
 
-    public void func_152111_bt()
+    /**
+     * Sends an ENTER_COMBAT packet to the client
+     */
+    public void sendEnterCombat()
     {
-        super.func_152111_bt();
+        super.sendEnterCombat();
         this.playerNetServerHandler.sendPacket(new S42PacketCombatEvent(this.getCombatTracker(), S42PacketCombatEvent.Event.ENTER_COMBAT));
     }
 
-    public void func_152112_bu()
+    /**
+     * Sends an END_COMBAT packet to the client
+     */
+    public void sendEndCombat()
     {
-        super.func_152112_bu();
+        super.sendEndCombat();
         this.playerNetServerHandler.sendPacket(new S42PacketCombatEvent(this.getCombatTracker(), S42PacketCombatEvent.Event.END_COMBAT));
     }
 
@@ -272,7 +272,7 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
         {
             int i = Math.min(this.destroyedItemsNetCache.size(), Integer.MAX_VALUE);
             int[] aint = new int[i];
-            Iterator iterator = this.destroyedItemsNetCache.iterator();
+            Iterator<Integer> iterator = this.destroyedItemsNetCache.iterator();
             int j = 0;
 
             while (iterator.hasNext() && j < i)
@@ -286,12 +286,11 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
 
         if (!this.loadedChunks.isEmpty())
         {
-            ArrayList arraylist = Lists.newArrayList();
-            Iterator iterator1 = this.loadedChunks.iterator();
-            ArrayList arraylist1 = Lists.newArrayList();
-            Chunk chunk;
+            List<Chunk> list = Lists.<Chunk>newArrayList();
+            Iterator<ChunkCoordIntPair> iterator1 = this.loadedChunks.iterator();
+            List<TileEntity> list1 = Lists.<TileEntity>newArrayList();
 
-            while (iterator1.hasNext() && arraylist.size() < 10)
+            while (iterator1.hasNext() && ((List)list).size() < 10)
             {
                 ChunkCoordIntPair chunkcoordintpair = (ChunkCoordIntPair)iterator1.next();
 
@@ -299,13 +298,12 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
                 {
                     if (this.worldObj.isBlockLoaded(new BlockPos(chunkcoordintpair.chunkXPos << 4, 0, chunkcoordintpair.chunkZPos << 4)))
                     {
-                        chunk = this.worldObj.getChunkFromChunkCoords(chunkcoordintpair.chunkXPos, chunkcoordintpair.chunkZPos);
+                        Chunk chunk = this.worldObj.getChunkFromChunkCoords(chunkcoordintpair.chunkXPos, chunkcoordintpair.chunkZPos);
 
                         if (chunk.isPopulated())
                         {
-                            arraylist.add(chunk);
-                            arraylist1.addAll(((WorldServer)this.worldObj).func_147486_a(chunkcoordintpair.chunkXPos * 16, 0, chunkcoordintpair.chunkZPos * 16, chunkcoordintpair.chunkXPos * 16 + 15, 256, chunkcoordintpair.chunkZPos * 16 + 15));
-                            //BugFix: 16 makes it load an extra chunk, which isn't associated with a player, which makes it not unload unless a player walks near it.
+                            list.add(chunk);
+                            list1.addAll(((WorldServer)this.worldObj).getTileEntitiesIn(chunkcoordintpair.chunkXPos * 16, 0, chunkcoordintpair.chunkZPos * 16, chunkcoordintpair.chunkXPos * 16 + 16, 256, chunkcoordintpair.chunkZPos * 16 + 16));
                             iterator1.remove();
                         }
                     }
@@ -316,32 +314,26 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
                 }
             }
 
-            if (!arraylist.isEmpty())
+            if (!list.isEmpty())
             {
-                if (arraylist.size() == 1)
+                if (list.size() == 1)
                 {
-                    this.playerNetServerHandler.sendPacket(new S21PacketChunkData((Chunk)arraylist.get(0), true, 65535));
+                    this.playerNetServerHandler.sendPacket(new S21PacketChunkData((Chunk)list.get(0), true, 65535));
                 }
                 else
                 {
-                    this.playerNetServerHandler.sendPacket(new S26PacketMapChunkBulk(arraylist));
+                    this.playerNetServerHandler.sendPacket(new S26PacketMapChunkBulk(list));
                 }
 
-                Iterator iterator2 = arraylist1.iterator();
-
-                while (iterator2.hasNext())
+                for (TileEntity tileentity : list1)
                 {
-                    TileEntity tileentity = (TileEntity)iterator2.next();
                     this.sendTileEntityUpdate(tileentity);
                 }
 
-                iterator2 = arraylist.iterator();
-
-                while (iterator2.hasNext())
+                for (Chunk chunk1 : list)
                 {
-                    chunk = (Chunk)iterator2.next();
-                    this.getServerForPlayer().getEntityTracker().func_85172_a(this, chunk);
-                    net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.world.ChunkWatchEvent.Watch(chunk.getChunkCoordIntPair(), this));
+                    this.getServerForPlayer().getEntityTracker().func_85172_a(this, chunk1);
+                    net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.world.ChunkWatchEvent.Watch(chunk1.getChunkCoordIntPair(), this));
                 }
             }
         }
@@ -399,13 +391,10 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
             if (this.getHealth() + this.getAbsorptionAmount() != this.combinedHealth)
             {
                 this.combinedHealth = this.getHealth() + this.getAbsorptionAmount();
-                Collection collection = this.getWorldScoreboard().getObjectivesFromCriteria(IScoreObjectiveCriteria.health);
-                Iterator iterator = collection.iterator();
 
-                while (iterator.hasNext())
+                for (ScoreObjective scoreobjective : this.getWorldScoreboard().getObjectivesFromCriteria(IScoreObjectiveCriteria.health))
                 {
-                    ScoreObjective scoreobjective = (ScoreObjective)iterator.next();
-                    this.getWorldScoreboard().getValueFromObjective(this.getName(), scoreobjective).func_96651_a(Arrays.asList(new EntityPlayer[] {this}));
+                    this.getWorldScoreboard().getValueFromObjective(this.getName(), scoreobjective).func_96651_a(Arrays.<EntityPlayer>asList(new EntityPlayer[] {this}));
                 }
             }
 
@@ -447,31 +436,29 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
 
         if (this.getStatFile().canUnlockAchievement(AchievementList.exploreAllBiomes) && jsonserializableset.size() >= BiomeGenBase.explorationBiomesList.size())
         {
-            HashSet hashset = Sets.newHashSet(BiomeGenBase.explorationBiomesList);
-            Iterator iterator = jsonserializableset.iterator();
+            Set<BiomeGenBase> set = Sets.newHashSet(BiomeGenBase.explorationBiomesList);
 
-            while (iterator.hasNext())
+            for (String s1 : jsonserializableset)
             {
-                String s1 = (String)iterator.next();
-                Iterator iterator1 = hashset.iterator();
+                Iterator<BiomeGenBase> iterator = set.iterator();
 
-                while (iterator1.hasNext())
+                while (iterator.hasNext())
                 {
-                    BiomeGenBase biomegenbase1 = (BiomeGenBase)iterator1.next();
+                    BiomeGenBase biomegenbase1 = (BiomeGenBase)iterator.next();
 
                     if (biomegenbase1.biomeName.equals(s1))
                     {
-                        iterator1.remove();
+                        iterator.remove();
                     }
                 }
 
-                if (hashset.isEmpty())
+                if (set.isEmpty())
                 {
                     break;
                 }
             }
 
-            if (hashset.isEmpty())
+            if (set.isEmpty())
             {
                 this.triggerAchievement(AchievementList.exploreAllBiomes);
             }
@@ -484,19 +471,19 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
     public void onDeath(DamageSource cause)
     {
         if (net.minecraftforge.common.ForgeHooks.onLivingDeath(this, cause)) return;
-        if (this.worldObj.getGameRules().getGameRuleBooleanValue("showDeathMessages"))
+        if (this.worldObj.getGameRules().getBoolean("showDeathMessages"))
         {
             Team team = this.getTeam();
 
-            if (team != null && team.func_178771_j() != Team.EnumVisible.ALWAYS)
+            if (team != null && team.getDeathMessageVisibility() != Team.EnumVisible.ALWAYS)
             {
-                if (team.func_178771_j() == Team.EnumVisible.HIDE_FOR_OTHER_TEAMS)
+                if (team.getDeathMessageVisibility() == Team.EnumVisible.HIDE_FOR_OTHER_TEAMS)
                 {
-                    this.mcServer.getConfigurationManager().func_177453_a(this, this.getCombatTracker().getDeathMessage());
+                    this.mcServer.getConfigurationManager().sendMessageToAllTeamMembers(this, this.getCombatTracker().getDeathMessage());
                 }
-                else if (team.func_178771_j() == Team.EnumVisible.HIDE_FOR_OWN_TEAM)
+                else if (team.getDeathMessageVisibility() == Team.EnumVisible.HIDE_FOR_OWN_TEAM)
                 {
-                    this.mcServer.getConfigurationManager().func_177452_b(this, this.getCombatTracker().getDeathMessage());
+                    this.mcServer.getConfigurationManager().sendMessageToTeamOrEvryPlayer(this, this.getCombatTracker().getDeathMessage());
                 }
             }
             else
@@ -505,7 +492,7 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
             }
         }
 
-        if (!this.worldObj.getGameRules().getGameRuleBooleanValue("keepInventory"))
+        if (!this.worldObj.getGameRules().getBoolean("keepInventory"))
         {
             captureDrops = true;
             capturedDrops.clear();
@@ -523,12 +510,8 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
             }
         }
 
-        Collection collection = this.worldObj.getScoreboard().getObjectivesFromCriteria(IScoreObjectiveCriteria.deathCount);
-        Iterator iterator = collection.iterator();
-
-        while (iterator.hasNext())
+        for (ScoreObjective scoreobjective : this.worldObj.getScoreboard().getObjectivesFromCriteria(IScoreObjectiveCriteria.deathCount))
         {
-            ScoreObjective scoreobjective = (ScoreObjective)iterator.next();
             Score score = this.getWorldScoreboard().getValueFromObjective(this.getName(), scoreobjective);
             score.func_96648_a();
         }
@@ -537,12 +520,12 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
 
         if (entitylivingbase != null)
         {
-            EntityList.EntityEggInfo entityegginfo = (EntityList.EntityEggInfo)EntityList.entityEggs.get(Integer.valueOf(EntityList.getEntityID(entitylivingbase)));
-            if (entityegginfo == null) entityegginfo = net.minecraftforge.fml.common.registry.EntityRegistry.getEggs().get(EntityList.getEntityString(entitylivingbase));
+            EntityList.EntityEggInfo entitylist$entityegginfo = (EntityList.EntityEggInfo)EntityList.entityEggs.get(Integer.valueOf(EntityList.getEntityID(entitylivingbase)));
+            if (entitylist$entityegginfo == null) entitylist$entityegginfo = net.minecraftforge.fml.common.registry.EntityRegistry.getEggs().get(EntityList.getEntityString(entitylivingbase));
 
-            if (entityegginfo != null)
+            if (entitylist$entityegginfo != null)
             {
-                this.triggerAchievement(entityegginfo.field_151513_e);
+                this.triggerAchievement(entitylist$entityegginfo.field_151513_e);
             }
 
             entitylivingbase.addToPlayerScore(this, this.scoreValue);
@@ -550,7 +533,7 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
 
         this.triggerAchievement(StatList.deathsStat);
         this.func_175145_a(StatList.timeSinceDeathStat);
-        this.getCombatTracker().func_94549_h();
+        this.getCombatTracker().reset();
     }
 
     /**
@@ -564,7 +547,7 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
         }
         else
         {
-            boolean flag = this.mcServer.isDedicatedServer() && this.func_175400_cq() && "fall".equals(source.damageType);
+            boolean flag = this.mcServer.isDedicatedServer() && this.canPlayersAttack() && "fall".equals(source.damageType);
 
             if (!flag && this.respawnInvulnerabilityTicks > 0 && source != DamageSource.outOfWorld)
             {
@@ -599,10 +582,13 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
 
     public boolean canAttackPlayer(EntityPlayer other)
     {
-        return !this.func_175400_cq() ? false : super.canAttackPlayer(other);
+        return !this.canPlayersAttack() ? false : super.canAttackPlayer(other);
     }
 
-    private boolean func_175400_cq()
+    /**
+     * Returns if other players can attack this player
+     */
+    private boolean canPlayersAttack()
     {
         return this.mcServer.isPVPEnabled();
     }
@@ -612,6 +598,7 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
      */
     public void travelToDimension(int dimensionId)
     {
+        if (!net.minecraftforge.common.ForgeHooks.onTravelToDimension(this, dimensionId)) return;
         if (this.dimension == 1 && dimensionId == 1)
         {
             this.triggerAchievement(AchievementList.theEnd2);
@@ -624,7 +611,7 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
             if (this.dimension == 0 && dimensionId == 1)
             {
                 this.triggerAchievement(AchievementList.theEnd);
-                BlockPos blockpos = this.mcServer.worldServerForDimension(dimensionId).func_180504_m();
+                BlockPos blockpos = this.mcServer.worldServerForDimension(dimensionId).getSpawnCoordinate();
 
                 if (blockpos != null)
                 {
@@ -645,9 +632,9 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
         }
     }
 
-    public boolean func_174827_a(EntityPlayerMP p_174827_1_)
+    public boolean isSpectatedByPlayer(EntityPlayerMP player)
     {
-        return p_174827_1_.isSpectator() ? this.getSpectatingEntity() == this : (this.isSpectator() ? false : super.func_174827_a(p_174827_1_));
+        return player.isSpectator() ? this.getSpectatingEntity() == this : (this.isSpectator() ? false : super.isSpectatedByPlayer(player));
     }
 
     private void sendTileEntityUpdate(TileEntity p_147097_1_)
@@ -674,17 +661,17 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
 
     public EntityPlayer.EnumStatus trySleep(BlockPos bedLocation)
     {
-        EntityPlayer.EnumStatus enumstatus = super.trySleep(bedLocation);
+        EntityPlayer.EnumStatus entityplayer$enumstatus = super.trySleep(bedLocation);
 
-        if (enumstatus == EntityPlayer.EnumStatus.OK)
+        if (entityplayer$enumstatus == EntityPlayer.EnumStatus.OK)
         {
-            S0APacketUseBed s0apacketusebed = new S0APacketUseBed(this, bedLocation);
-            this.getServerForPlayer().getEntityTracker().sendToAllTrackingEntity(this, s0apacketusebed);
+            Packet packet = new S0APacketUseBed(this, bedLocation);
+            this.getServerForPlayer().getEntityTracker().sendToAllTrackingEntity(this, packet);
             this.playerNetServerHandler.setPlayerLocation(this.posX, this.posY, this.posZ, this.rotationYaw, this.rotationPitch);
-            this.playerNetServerHandler.sendPacket(s0apacketusebed);
+            this.playerNetServerHandler.sendPacket(packet);
         }
 
-        return enumstatus;
+        return entityplayer$enumstatus;
     }
 
     /**
@@ -710,17 +697,19 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
      */
     public void mountEntity(Entity entityIn)
     {
-        Entity entity1 = this.ridingEntity;
+        Entity entity = this.ridingEntity;
         super.mountEntity(entityIn);
 
-        if (entityIn != entity1)
+        if (entityIn != entity)
         {
             this.playerNetServerHandler.sendPacket(new S1BPacketEntityAttach(0, this, this.ridingEntity));
             this.playerNetServerHandler.setPlayerLocation(this.posX, this.posY, this.posZ, this.rotationYaw, this.rotationPitch);
         }
     }
 
-    protected void func_180433_a(double p_180433_1_, boolean p_180433_3_, Block p_180433_4_, BlockPos p_180433_5_) {}
+    protected void updateFallState(double y, boolean onGroundIn, Block blockIn, BlockPos pos)
+    {
+    }
 
     /**
      * process player falling based on movement packet
@@ -744,7 +733,7 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
             }
         }
 
-        super.func_180433_a(p_71122_1_, p_71122_3_, block, blockpos);
+        super.updateFallState(p_71122_1_, p_71122_3_, block, blockpos);
     }
 
     public void openEditSign(TileEntitySign signTile)
@@ -767,7 +756,7 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
         this.playerNetServerHandler.sendPacket(new S2DPacketOpenWindow(this.currentWindowId, guiOwner.getGuiID(), guiOwner.getDisplayName()));
         this.openContainer = guiOwner.createContainer(this.inventory, this);
         this.openContainer.windowId = this.currentWindowId;
-        this.openContainer.addCraftingToCrafters(this);
+        this.openContainer.onCraftGuiOpened(this);
     }
 
     /**
@@ -806,7 +795,7 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
         }
 
         this.openContainer.windowId = this.currentWindowId;
-        this.openContainer.addCraftingToCrafters(this);
+        this.openContainer.onCraftGuiOpened(this);
     }
 
     public void displayVillagerTradeGui(IMerchant villager)
@@ -814,10 +803,10 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
         this.getNextWindowId();
         this.openContainer = new ContainerMerchant(this.inventory, villager, this.worldObj);
         this.openContainer.windowId = this.currentWindowId;
-        this.openContainer.addCraftingToCrafters(this);
-        InventoryMerchant inventorymerchant = ((ContainerMerchant)this.openContainer).getMerchantInventory();
+        this.openContainer.onCraftGuiOpened(this);
+        IInventory iinventory = ((ContainerMerchant)this.openContainer).getMerchantInventory();
         IChatComponent ichatcomponent = villager.getDisplayName();
-        this.playerNetServerHandler.sendPacket(new S2DPacketOpenWindow(this.currentWindowId, "minecraft:villager", ichatcomponent, inventorymerchant.getSizeInventory()));
+        this.playerNetServerHandler.sendPacket(new S2DPacketOpenWindow(this.currentWindowId, "minecraft:villager", ichatcomponent, iinventory.getSizeInventory()));
         MerchantRecipeList merchantrecipelist = villager.getRecipes(this);
 
         if (merchantrecipelist != null)
@@ -840,7 +829,7 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
         this.playerNetServerHandler.sendPacket(new S2DPacketOpenWindow(this.currentWindowId, "EntityHorse", horseInventory.getDisplayName(), horseInventory.getSizeInventory(), horse.getEntityId()));
         this.openContainer = new ContainerHorseInventory(this.inventory, horseInventory, horse, this);
         this.openContainer.windowId = this.currentWindowId;
-        this.openContainer.addCraftingToCrafters(this);
+        this.openContainer.onCraftGuiOpened(this);
     }
 
     /**
@@ -859,10 +848,6 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
     /**
      * Sends the contents of an inventory slot to the client-side Container. This doesn't have to match the actual
      * contents of that slot. Args: Container, slot number, slot contents
-     *  
-     * @param containerToSend The container that is to be updated on the client.
-     * @param slotInd The slot index that is to be updated.
-     * @param stack The itemstack to be updated in the selected slot.
      */
     public void sendSlotContents(Container containerToSend, int slotInd, ItemStack stack)
     {
@@ -877,16 +862,13 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
 
     public void sendContainerToPlayer(Container p_71120_1_)
     {
-        this.sendContainerAndContentsToPlayer(p_71120_1_, p_71120_1_.getInventory());
+        this.updateCraftingInventory(p_71120_1_, p_71120_1_.getInventory());
     }
 
     /**
      * update the crafting window inventory with the items in the list
-     *  
-     * @param containerToSend The container whose contents are to be sent to the player.
-     * @param itemsList The items to be sent to the player.
      */
-    public void sendContainerAndContentsToPlayer(Container containerToSend, List itemsList)
+    public void updateCraftingInventory(Container containerToSend, List<ItemStack> itemsList)
     {
         this.playerNetServerHandler.sendPacket(new S30PacketWindowItems(containerToSend.windowId, itemsList));
         this.playerNetServerHandler.sendPacket(new S2FPacketSetSlot(-1, -1, this.inventory.getItemStack()));
@@ -896,17 +878,13 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
      * Sends two ints to the client-side Container. Used for furnace burning time, smelting progress, brewing progress,
      * and enchanting level. Normally the first int identifies which variable to update, and the second contains the new
      * value. Both are truncated to shorts in non-local SMP.
-     *  
-     * @param containerIn The container sending a progress bar update.
-     * @param varToUpdate The integer corresponding the variable to be updated.
-     * @param newValue The value the variable is to be updated with.
      */
     public void sendProgressBarUpdate(Container containerIn, int varToUpdate, int newValue)
     {
         this.playerNetServerHandler.sendPacket(new S31PacketWindowProperty(containerIn.windowId, varToUpdate, newValue));
     }
 
-    public void func_175173_a(Container p_175173_1_, IInventory p_175173_2_)
+    public void sendAllWindowProperties(Container p_175173_1_, IInventory p_175173_2_)
     {
         for (int i = 0; i < p_175173_2_.getFieldCount(); ++i)
         {
@@ -943,7 +921,7 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
         this.openContainer = this.inventoryContainer;
     }
 
-    public void setEntityActionState(float p_110430_1_, float p_110430_2_, boolean p_110430_3_, boolean p_110430_4_)
+    public void setEntityActionState(float p_110430_1_, float p_110430_2_, boolean p_110430_3_, boolean sneaking)
     {
         if (this.ridingEntity != null)
         {
@@ -958,7 +936,7 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
             }
 
             this.isJumping = p_110430_3_;
-            this.setSneaking(p_110430_4_);
+            this.setSneaking(sneaking);
         }
     }
 
@@ -970,12 +948,10 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
         if (stat != null)
         {
             if (stat.isAchievement() && net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.player.AchievementEvent(this, (net.minecraft.stats.Achievement) stat))) return;
-            this.statsFile.func_150871_b(this, stat, amount);
-            Iterator iterator = this.getWorldScoreboard().getObjectivesFromCriteria(stat.func_150952_k()).iterator();
+            this.statsFile.increaseStat(this, stat, amount);
 
-            while (iterator.hasNext())
+            for (ScoreObjective scoreobjective : this.getWorldScoreboard().getObjectivesFromCriteria(stat.func_150952_k()))
             {
-                ScoreObjective scoreobjective = (ScoreObjective)iterator.next();
                 this.getWorldScoreboard().getValueFromObjective(this.getName(), scoreobjective).increseScore(amount);
             }
 
@@ -990,12 +966,10 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
     {
         if (p_175145_1_ != null)
         {
-            this.statsFile.func_150873_a(this, p_175145_1_, 0);
-            Iterator iterator = this.getWorldScoreboard().getObjectivesFromCriteria(p_175145_1_.func_150952_k()).iterator();
+            this.statsFile.unlockAchievement(this, p_175145_1_, 0);
 
-            while (iterator.hasNext())
+            for (ScoreObjective scoreobjective : this.getWorldScoreboard().getObjectivesFromCriteria(p_175145_1_.func_150952_k()))
             {
-                ScoreObjective scoreobjective = (ScoreObjective)iterator.next();
                 this.getWorldScoreboard().getValueFromObjective(this.getName(), scoreobjective).setScorePoints(0);
             }
 
@@ -1068,16 +1042,16 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
         this.destroyedItemsNetCache.addAll(((EntityPlayerMP)oldPlayer).destroyedItemsNetCache);
     }
 
-    protected void onNewPotionEffect(PotionEffect p_70670_1_)
+    protected void onNewPotionEffect(PotionEffect id)
     {
-        super.onNewPotionEffect(p_70670_1_);
-        this.playerNetServerHandler.sendPacket(new S1DPacketEntityEffect(this.getEntityId(), p_70670_1_));
+        super.onNewPotionEffect(id);
+        this.playerNetServerHandler.sendPacket(new S1DPacketEntityEffect(this.getEntityId(), id));
     }
 
-    protected void onChangedPotionEffect(PotionEffect p_70695_1_, boolean p_70695_2_)
+    protected void onChangedPotionEffect(PotionEffect id, boolean p_70695_2_)
     {
-        super.onChangedPotionEffect(p_70695_1_, p_70695_2_);
-        this.playerNetServerHandler.sendPacket(new S1DPacketEntityEffect(this.getEntityId(), p_70695_1_));
+        super.onChangedPotionEffect(id, p_70695_2_);
+        this.playerNetServerHandler.sendPacket(new S1DPacketEntityEffect(this.getEntityId(), id));
     }
 
     protected void onFinishedPotionEffect(PotionEffect p_70688_1_)
@@ -1115,7 +1089,7 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
         if (this.playerNetServerHandler != null)
         {
             this.playerNetServerHandler.sendPacket(new S39PacketPlayerAbilities(this.capabilities));
-            this.func_175135_B();
+            this.updatePotionMetadata();
         }
     }
 
@@ -1142,7 +1116,7 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
         }
 
         this.sendPlayerAbilities();
-        this.func_175136_bO();
+        this.markPotionsDirty();
     }
 
     /**
@@ -1154,23 +1128,17 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
     }
 
     /**
-     * Notifies this sender of some sort of information.  This is for messages intended to display to the user.  Used
-     * for typical output (like "you asked for whether or not this game rule is set, so here's your answer"), warnings
-     * (like "I fetched this block for you by ID, but I'd like you to know that every time you do this, I die a little
-     * inside"), and errors (like "it's not called iron_pixacke, silly").
+     * Send a chat message to the CommandSender
      */
-    public void addChatMessage(IChatComponent message)
+    public void addChatMessage(IChatComponent component)
     {
-        this.playerNetServerHandler.sendPacket(new S02PacketChat(message));
+        this.playerNetServerHandler.sendPacket(new S02PacketChat(component));
     }
 
     /**
-     * Returns true if the CommandSender may execute the given command
-     *  
-     * @param permLevel The permission level required to execute the command
-     * @param commandName The name of the command
+     * Returns {@code true} if the CommandSender is allowed to execute the command, {@code false} if not
      */
-    public boolean canUseCommand(int permLevel, String commandName)
+    public boolean canCommandSenderUseCommand(int permLevel, String commandName)
     {
         if ("seed".equals(commandName) && !this.mcServer.isDedicatedServer())
         {
@@ -1223,6 +1191,10 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
         this.playerNetServerHandler.sendPacket(new S48PacketResourcePackSend(url, hash));
     }
 
+    /**
+     * Get the position in the world. <b>{@code null} is not allowed!</b> If you are not an entity in the world, return
+     * the coordinates 0, 0, 0
+     */
     public BlockPos getPosition()
     {
         return new BlockPos(this.posX, this.posY + 0.5D, this.posZ);
@@ -1241,7 +1213,10 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
         return this.statsFile;
     }
 
-    public void func_152339_d(Entity p_152339_1_)
+    /**
+     * Sends a packet to the player to remove an entity.
+     */
+    public void removeEntity(Entity p_152339_1_)
     {
         if (p_152339_1_ instanceof EntityPlayer)
         {
@@ -1253,16 +1228,20 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
         }
     }
 
-    protected void func_175135_B()
+    /**
+     * Clears potion metadata values if the entity has no potion effects. Otherwise, updates potion effect color,
+     * ambience, and invisibility metadata values
+     */
+    protected void updatePotionMetadata()
     {
         if (this.isSpectator())
         {
-            this.func_175133_bi();
+            this.resetPotionEffectMetadata();
             this.setInvisible(true);
         }
         else
         {
-            super.func_175135_B();
+            super.updatePotionMetadata();
         }
 
         this.getServerForPlayer().getEntityTracker().func_180245_a(this);
@@ -1273,12 +1252,12 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting
         return (Entity)(this.spectatingEntity == null ? this : this.spectatingEntity);
     }
 
-    public void setSpectatingEntity(Entity p_175399_1_)
+    public void setSpectatingEntity(Entity entityToSpectate)
     {
-        Entity entity1 = this.getSpectatingEntity();
-        this.spectatingEntity = (Entity)(p_175399_1_ == null ? this : p_175399_1_);
+        Entity entity = this.getSpectatingEntity();
+        this.spectatingEntity = (Entity)(entityToSpectate == null ? this : entityToSpectate);
 
-        if (entity1 != this.spectatingEntity)
+        if (entity != this.spectatingEntity)
         {
             this.playerNetServerHandler.sendPacket(new S43PacketCamera(this.spectatingEntity));
             this.setPositionAndUpdate(this.spectatingEntity.posX, this.spectatingEntity.posY, this.spectatingEntity.posZ);

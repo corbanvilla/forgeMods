@@ -11,15 +11,14 @@ public class ScoreObjective
     private final IScoreObjectiveCriteria objectiveCriteria;
     private IScoreObjectiveCriteria.EnumRenderType renderType;
     private String displayName;
-    private static final String __OBFID = "CL_00000614";
 
-    public ScoreObjective(Scoreboard p_i2307_1_, String p_i2307_2_, IScoreObjectiveCriteria p_i2307_3_)
+    public ScoreObjective(Scoreboard theScoreboardIn, String nameIn, IScoreObjectiveCriteria objectiveCriteriaIn)
     {
-        this.theScoreboard = p_i2307_1_;
-        this.name = p_i2307_2_;
-        this.objectiveCriteria = p_i2307_3_;
-        this.displayName = p_i2307_2_;
-        this.renderType = p_i2307_3_.getRenderType();
+        this.theScoreboard = theScoreboardIn;
+        this.name = nameIn;
+        this.objectiveCriteria = objectiveCriteriaIn;
+        this.displayName = nameIn;
+        this.renderType = objectiveCriteriaIn.getRenderType();
     }
 
     @SideOnly(Side.CLIENT)
@@ -43,10 +42,10 @@ public class ScoreObjective
         return this.displayName;
     }
 
-    public void setDisplayName(String p_96681_1_)
+    public void setDisplayName(String nameIn)
     {
-        this.displayName = p_96681_1_;
-        this.theScoreboard.func_96532_b(this);
+        this.displayName = nameIn;
+        this.theScoreboard.onObjectiveDisplayNameChanged(this);
     }
 
     public IScoreObjectiveCriteria.EnumRenderType getRenderType()
@@ -57,6 +56,6 @@ public class ScoreObjective
     public void setRenderType(IScoreObjectiveCriteria.EnumRenderType type)
     {
         this.renderType = type;
-        this.theScoreboard.func_96532_b(this);
+        this.theScoreboard.onObjectiveDisplayNameChanged(this);
     }
 }

@@ -11,7 +11,6 @@ public class WorldChunkManagerHell extends WorldChunkManager
     private BiomeGenBase biomeGenerator;
     /** The rainfall in the world */
     private float rainfall;
-    private static final String __OBFID = "CL_00000169";
 
     public WorldChunkManagerHell(BiomeGenBase p_i45374_1_, float p_i45374_2_)
     {
@@ -22,7 +21,7 @@ public class WorldChunkManagerHell extends WorldChunkManager
     /**
      * Returns the biome generator
      */
-    public BiomeGenBase getBiomeGenerator(BlockPos p_180631_1_)
+    public BiomeGenBase getBiomeGenerator(BlockPos pos)
     {
         return this.biomeGenerator;
     }
@@ -30,15 +29,15 @@ public class WorldChunkManagerHell extends WorldChunkManager
     /**
      * Returns an array of biomes for the location input.
      */
-    public BiomeGenBase[] getBiomesForGeneration(BiomeGenBase[] p_76937_1_, int p_76937_2_, int p_76937_3_, int p_76937_4_, int p_76937_5_)
+    public BiomeGenBase[] getBiomesForGeneration(BiomeGenBase[] biomes, int x, int z, int width, int height)
     {
-        if (p_76937_1_ == null || p_76937_1_.length < p_76937_4_ * p_76937_5_)
+        if (biomes == null || biomes.length < width * height)
         {
-            p_76937_1_ = new BiomeGenBase[p_76937_4_ * p_76937_5_];
+            biomes = new BiomeGenBase[width * height];
         }
 
-        Arrays.fill(p_76937_1_, 0, p_76937_4_ * p_76937_5_, this.biomeGenerator);
-        return p_76937_1_;
+        Arrays.fill(biomes, 0, width * height, this.biomeGenerator);
+        return biomes;
     }
 
     /**
@@ -73,15 +72,13 @@ public class WorldChunkManagerHell extends WorldChunkManager
     /**
      * Return a list of biomes for the specified blocks. Args: listToReuse, x, y, width, length, cacheFlag (if false,
      * don't check biomeCache to avoid infinite loop in BiomeCacheBlock)
-     *  
-     * @param cacheFlag If false, don't check biomeCache to avoid infinite loop in BiomeCacheBlock
      */
     public BiomeGenBase[] getBiomeGenAt(BiomeGenBase[] listToReuse, int x, int z, int width, int length, boolean cacheFlag)
     {
         return this.loadBlockGeneratorData(listToReuse, x, z, width, length);
     }
 
-    public BlockPos findBiomePosition(int x, int z, int range, List biomes, Random random)
+    public BlockPos findBiomePosition(int x, int z, int range, List<BiomeGenBase> biomes, Random random)
     {
         return biomes.contains(this.biomeGenerator) ? new BlockPos(x - range + random.nextInt(range * 2 + 1), 0, z - range + random.nextInt(range * 2 + 1)) : null;
     }
@@ -89,7 +86,7 @@ public class WorldChunkManagerHell extends WorldChunkManager
     /**
      * checks given Chunk's Biomes against List of allowed ones
      */
-    public boolean areBiomesViable(int p_76940_1_, int p_76940_2_, int p_76940_3_, List p_76940_4_)
+    public boolean areBiomesViable(int p_76940_1_, int p_76940_2_, int p_76940_3_, List<BiomeGenBase> p_76940_4_)
     {
         return p_76940_4_.contains(this.biomeGenerator);
     }

@@ -53,9 +53,6 @@ import net.minecraft.world.IInteractionObject;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.PlaySoundAtEntityEvent;
 
 @SideOnly(Side.CLIENT)
 public class EntityPlayerSP extends AbstractClientPlayer
@@ -96,7 +93,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
      * player is not moving.
      */
     private int positionUpdateTicks;
-    private boolean field_175169_bQ;
+    private boolean hasValidHealth;
     private String clientBrand;
     public MovementInput movementInput;
     protected Minecraft mc;
@@ -118,13 +115,12 @@ public class EntityPlayerSP extends AbstractClientPlayer
     public float timeInPortal;
     /** The amount of time an entity has been in a Portal the previous tick */
     public float prevTimeInPortal;
-    private static final String __OBFID = "CL_00000938";
 
-    public EntityPlayerSP(Minecraft mcIn, World worldIn, NetHandlerPlayClient p_i46278_3_, StatFileWriter p_i46278_4_)
+    public EntityPlayerSP(Minecraft mcIn, World worldIn, NetHandlerPlayClient netHandler, StatFileWriter statFile)
     {
-        super(worldIn, p_i46278_3_.getGameProfile());
-        this.sendQueue = p_i46278_3_;
-        this.statWriter = p_i46278_4_;
+        super(worldIn, netHandler.getGameProfile());
+        this.sendQueue = netHandler;
+        this.statWriter = statFile;
         this.mc = mcIn;
         this.dimension = 0;
     }
@@ -140,7 +136,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
     /**
      * Heal living entity (param: amount of half-hearts)
      */
-    public void heal(float healAmount) {}
+    public void heal(float healAmount)
+    {
+    }
 
     /**
      * Called when a player mounts an entity. e.g. mounts a pig, mounts a boat.
@@ -269,24 +267,26 @@ public class EntityPlayerSP extends AbstractClientPlayer
     /**
      * Called when player presses the drop item key
      */
-    public EntityItem dropOneItem(boolean p_71040_1_)
+    public EntityItem dropOneItem(boolean dropAll)
     {
-        C07PacketPlayerDigging.Action action = p_71040_1_ ? C07PacketPlayerDigging.Action.DROP_ALL_ITEMS : C07PacketPlayerDigging.Action.DROP_ITEM;
-        this.sendQueue.addToSendQueue(new C07PacketPlayerDigging(action, BlockPos.ORIGIN, EnumFacing.DOWN));
+        C07PacketPlayerDigging.Action c07packetplayerdigging$action = dropAll ? C07PacketPlayerDigging.Action.DROP_ALL_ITEMS : C07PacketPlayerDigging.Action.DROP_ITEM;
+        this.sendQueue.addToSendQueue(new C07PacketPlayerDigging(c07packetplayerdigging$action, BlockPos.ORIGIN, EnumFacing.DOWN));
         return null;
     }
 
     /**
      * Joins the passed in entity item with the world. Args: entityItem
      */
-    public void joinEntityItemWithWorld(EntityItem p_71012_1_) {}
+    public void joinEntityItemWithWorld(EntityItem itemIn)
+    {
+    }
 
     /**
      * Sends a chat message from the player. Args: chatMessage
      */
-    public void sendChatMessage(String p_71165_1_)
+    public void sendChatMessage(String message)
     {
-        this.sendQueue.addToSendQueue(new C01PacketChatMessage(p_71165_1_));
+        this.sendQueue.addToSendQueue(new C01PacketChatMessage(message));
     }
 
     /**
@@ -321,10 +321,10 @@ public class EntityPlayerSP extends AbstractClientPlayer
     public void closeScreen()
     {
         this.sendQueue.addToSendQueue(new C0DPacketCloseWindow(this.openContainer.windowId));
-        this.func_175159_q();
+        this.closeScreenAndDropStack();
     }
 
-    public void func_175159_q()
+    public void closeScreenAndDropStack()
     {
         this.inventory.setItemStack((ItemStack)null);
         super.closeScreen();
@@ -334,34 +334,34 @@ public class EntityPlayerSP extends AbstractClientPlayer
     /**
      * Updates health locally.
      */
-    public void setPlayerSPHealth(float p_71150_1_)
+    public void setPlayerSPHealth(float health)
     {
-        if (this.field_175169_bQ)
+        if (this.hasValidHealth)
         {
-            float f1 = this.getHealth() - p_71150_1_;
+            float f = this.getHealth() - health;
 
-            if (f1 <= 0.0F)
+            if (f <= 0.0F)
             {
-                this.setHealth(p_71150_1_);
+                this.setHealth(health);
 
-                if (f1 < 0.0F)
+                if (f < 0.0F)
                 {
                     this.hurtResistantTime = this.maxHurtResistantTime / 2;
                 }
             }
             else
             {
-                this.lastDamage = f1;
+                this.lastDamage = f;
                 this.setHealth(this.getHealth());
                 this.hurtResistantTime = this.maxHurtResistantTime;
-                this.damageEntity(DamageSource.generic, f1);
+                this.damageEntity(DamageSource.generic, f);
                 this.hurtTime = this.maxHurtTime = 10;
             }
         }
         else
         {
-            this.setHealth(p_71150_1_);
-            this.field_175169_bQ = true;
+            this.setHealth(health);
+            this.hasValidHealth = true;
         }
     }
 
@@ -443,8 +443,8 @@ public class EntityPlayerSP extends AbstractClientPlayer
         else
         {
             BlockPos blockpos = new BlockPos(x, y, z);
-            double d3 = x - (double)blockpos.getX();
-            double d4 = z - (double)blockpos.getZ();
+            double d0 = x - (double)blockpos.getX();
+            double d1 = z - (double)blockpos.getZ();
 
             int entHeight = Math.max(Math.round(this.height), 1);
 
@@ -452,51 +452,51 @@ public class EntityPlayerSP extends AbstractClientPlayer
 
             if (inTranslucentBlock)
             {
-                byte b0 = -1;
-                double d5 = 9999.0D;
+                int i = -1;
+                double d2 = 9999.0D;
 
-                if (!this.isHeadspaceFree(blockpos.west(), entHeight) && d3 < d5)
+                if (!this.isHeadspaceFree(blockpos.west(), entHeight) && d0 < d2)
                 {
-                    d5 = d3;
-                    b0 = 0;
+                    d2 = d0;
+                    i = 0;
                 }
 
-                if (!this.isHeadspaceFree(blockpos.east(), entHeight) && 1.0D - d3 < d5)
+                if (!this.isHeadspaceFree(blockpos.east(), entHeight) && 1.0D - d0 < d2)
                 {
-                    d5 = 1.0D - d3;
-                    b0 = 1;
+                    d2 = 1.0D - d0;
+                    i = 1;
                 }
 
-                if (!this.isHeadspaceFree(blockpos.north(), entHeight) && d4 < d5)
+                if (!this.isHeadspaceFree(blockpos.north(), entHeight) && d1 < d2)
                 {
-                    d5 = d4;
-                    b0 = 4;
+                    d2 = d1;
+                    i = 4;
                 }
 
-                if (!this.isHeadspaceFree(blockpos.south(), entHeight) && 1.0D - d4 < d5)
+                if (!this.isHeadspaceFree(blockpos.south(), entHeight) && 1.0D - d1 < d2)
                 {
-                    d5 = 1.0D - d4;
-                    b0 = 5;
+                    d2 = 1.0D - d1;
+                    i = 5;
                 }
 
                 float f = 0.1F;
 
-                if (b0 == 0)
+                if (i == 0)
                 {
                     this.motionX = (double)(-f);
                 }
 
-                if (b0 == 1)
+                if (i == 1)
                 {
                     this.motionX = (double)f;
                 }
 
-                if (b0 == 4)
+                if (i == 4)
                 {
                     this.motionZ = (double)(-f);
                 }
 
-                if (b0 == 5)
+                if (i == 5)
                 {
                     this.motionZ = (double)f;
                 }
@@ -534,27 +534,25 @@ public class EntityPlayerSP extends AbstractClientPlayer
     }
 
     /**
-     * Notifies this sender of some sort of information.  This is for messages intended to display to the user.  Used
-     * for typical output (like "you asked for whether or not this game rule is set, so here's your answer"), warnings
-     * (like "I fetched this block for you by ID, but I'd like you to know that every time you do this, I die a little
-     * inside"), and errors (like "it's not called iron_pixacke, silly").
+     * Send a chat message to the CommandSender
      */
-    public void addChatMessage(IChatComponent message)
+    public void addChatMessage(IChatComponent component)
     {
-        this.mc.ingameGUI.getChatGUI().printChatMessage(message);
+        this.mc.ingameGUI.getChatGUI().printChatMessage(component);
     }
 
     /**
-     * Returns true if the CommandSender may execute the given command
-     *  
-     * @param permLevel The permission level required to execute the command
-     * @param commandName The name of the command
+     * Returns {@code true} if the CommandSender is allowed to execute the command, {@code false} if not
      */
-    public boolean canUseCommand(int permLevel, String commandName)
+    public boolean canCommandSenderUseCommand(int permLevel, String commandName)
     {
         return permLevel <= 0;
     }
 
+    /**
+     * Get the position in the world. <b>{@code null} is not allowed!</b> If you are not an entity in the world, return
+     * the coordinates 0, 0, 0
+     */
     public BlockPos getPosition()
     {
         return new BlockPos(this.posX + 0.5D, this.posY + 0.5D, this.posZ + 0.5D);
@@ -562,11 +560,12 @@ public class EntityPlayerSP extends AbstractClientPlayer
 
     public void playSound(String name, float volume, float pitch)
     {
-        PlaySoundAtEntityEvent event = net.minecraftforge.event.ForgeEventFactory.onPlaySoundAtEntity(this, name, volume, pitch);
+        net.minecraftforge.event.entity.PlaySoundAtEntityEvent event = net.minecraftforge.event.ForgeEventFactory.onPlaySoundAtEntity(this, name, volume, pitch);
         if (event.isCanceled() || event.name == null) return;
         name = event.name;
         volume = event.newVolume;
         pitch = event.newPitch;
+
         this.worldObj.playSound(this.posX, this.posY, this.posZ, name, volume, pitch, false);
     }
 
@@ -681,12 +680,12 @@ public class EntityPlayerSP extends AbstractClientPlayer
      */
     public void onCriticalHit(Entity entityHit)
     {
-        this.mc.effectRenderer.func_178926_a(entityHit, EnumParticleTypes.CRIT);
+        this.mc.effectRenderer.emitParticleAtEntity(entityHit, EnumParticleTypes.CRIT);
     }
 
     public void onEnchantmentCritical(Entity entityHit)
     {
-        this.mc.effectRenderer.func_178926_a(entityHit, EnumParticleTypes.CRIT_MAGIC);
+        this.mc.effectRenderer.emitParticleAtEntity(entityHit, EnumParticleTypes.CRIT_MAGIC);
     }
 
     /**

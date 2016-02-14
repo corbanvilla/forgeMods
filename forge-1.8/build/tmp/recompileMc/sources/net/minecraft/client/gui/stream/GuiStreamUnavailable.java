@@ -3,9 +3,7 @@ package net.minecraft.client.gui.stream;
 import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -31,28 +29,28 @@ public class GuiStreamUnavailable extends GuiScreen
 {
     private static final Logger field_152322_a = LogManager.getLogger();
     private final IChatComponent field_152324_f;
-    private final GuiScreen field_152325_g;
+    private final GuiScreen parentScreen;
     private final GuiStreamUnavailable.Reason field_152326_h;
-    private final List field_152327_i;
-    private final List field_152323_r;
-    private static final String __OBFID = "CL_00001840";
+    private final List<ChatComponentTranslation> field_152327_i;
+    private final List<String> field_152323_r;
 
     public GuiStreamUnavailable(GuiScreen p_i1070_1_, GuiStreamUnavailable.Reason p_i1070_2_)
     {
-        this(p_i1070_1_, p_i1070_2_, (List)null);
+        this(p_i1070_1_, p_i1070_2_, (List<ChatComponentTranslation>)null);
     }
 
-    public GuiStreamUnavailable(GuiScreen p_i46311_1_, GuiStreamUnavailable.Reason p_i46311_2_, List p_i46311_3_)
+    public GuiStreamUnavailable(GuiScreen parentScreenIn, GuiStreamUnavailable.Reason p_i46311_2_, List<ChatComponentTranslation> p_i46311_3_)
     {
         this.field_152324_f = new ChatComponentTranslation("stream.unavailable.title", new Object[0]);
-        this.field_152323_r = Lists.newArrayList();
-        this.field_152325_g = p_i46311_1_;
+        this.field_152323_r = Lists.<String>newArrayList();
+        this.parentScreen = parentScreenIn;
         this.field_152326_h = p_i46311_2_;
         this.field_152327_i = p_i46311_3_;
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
     public void initGui()
     {
@@ -63,11 +61,9 @@ public class GuiStreamUnavailable extends GuiScreen
             if (this.field_152327_i != null)
             {
                 this.field_152323_r.add("");
-                Iterator iterator = this.field_152327_i.iterator();
 
-                while (iterator.hasNext())
+                for (ChatComponentTranslation chatcomponenttranslation : this.field_152327_i)
                 {
-                    ChatComponentTranslation chatcomponenttranslation = (ChatComponentTranslation)iterator.next();
                     this.field_152323_r.add(chatcomponenttranslation.getUnformattedTextForChat());
                 }
             }
@@ -87,7 +83,9 @@ public class GuiStreamUnavailable extends GuiScreen
     /**
      * Called when the screen is unloaded. Used to disable keyboard repeat events
      */
-    public void onGuiClosed() {}
+    public void onGuiClosed()
+    {
+    }
 
     /**
      * Draws the screen and all the components in it. Args : mouseX, mouseY, renderPartialTicks
@@ -95,44 +93,48 @@ public class GuiStreamUnavailable extends GuiScreen
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
         this.drawDefaultBackground();
-        int k = Math.max((int)((double)this.height * 0.85D / 2.0D - (double)((float)(this.field_152323_r.size() * this.fontRendererObj.FONT_HEIGHT) / 2.0F)), 50);
-        this.drawCenteredString(this.fontRendererObj, this.field_152324_f.getFormattedText(), this.width / 2, k - this.fontRendererObj.FONT_HEIGHT * 2, 16777215);
+        int i = Math.max((int)((double)this.height * 0.85D / 2.0D - (double)((float)(this.field_152323_r.size() * this.fontRendererObj.FONT_HEIGHT) / 2.0F)), 50);
+        this.drawCenteredString(this.fontRendererObj, this.field_152324_f.getFormattedText(), this.width / 2, i - this.fontRendererObj.FONT_HEIGHT * 2, 16777215);
 
-        for (Iterator iterator = this.field_152323_r.iterator(); iterator.hasNext(); k += this.fontRendererObj.FONT_HEIGHT)
+        for (String s : this.field_152323_r)
         {
-            String s = (String)iterator.next();
-            this.drawCenteredString(this.fontRendererObj, s, this.width / 2, k, 10526880);
+            this.drawCenteredString(this.fontRendererObj, s, this.width / 2, i, 10526880);
+            i += this.fontRendererObj.FONT_HEIGHT;
         }
 
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
+    /**
+     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
+     */
+    @SuppressWarnings("incomplete-switch")
     protected void actionPerformed(GuiButton button) throws IOException
     {
         if (button.enabled)
         {
             if (button.id == 1)
             {
-                switch (GuiStreamUnavailable.SwitchReason.field_152577_a[this.field_152326_h.ordinal()])
+                switch (this.field_152326_h)
                 {
-                    case 1:
-                    case 2:
+                    case ACCOUNT_NOT_BOUND:
+                    case FAILED_TWITCH_AUTH:
                         this.func_152320_a("https://account.mojang.com/me/settings");
                         break;
-                    case 3:
+                    case ACCOUNT_NOT_MIGRATED:
                         this.func_152320_a("https://account.mojang.com/migrate");
                         break;
-                    case 4:
+                    case UNSUPPORTED_OS_MAC:
                         this.func_152320_a("http://www.apple.com/osx/");
                         break;
-                    case 5:
-                    case 6:
-                    case 7:
+                    case UNKNOWN:
+                    case LIBRARY_FAILURE:
+                    case INITIALIZATION_FAILURE:
                         this.func_152320_a("http://bugs.mojang.com/browse/MC");
                 }
             }
 
-            this.mc.displayGuiScreen(this.field_152325_g);
+            this.mc.displayGuiScreen(this.parentScreen);
         }
     }
 
@@ -140,7 +142,7 @@ public class GuiStreamUnavailable extends GuiScreen
     {
         try
         {
-            Class oclass = Class.forName("java.awt.Desktop");
+            Class<?> oclass = Class.forName("java.awt.Desktop");
             Object object = oclass.getMethod("getDesktop", new Class[0]).invoke((Object)null, new Object[0]);
             oclass.getMethod("browse", new Class[] {URI.class}).invoke(object, new Object[] {new URI(p_152320_1_)});
         }
@@ -157,12 +159,12 @@ public class GuiStreamUnavailable extends GuiScreen
 
         if (!OpenGlHelper.framebufferSupported)
         {
-            ArrayList arraylist = Lists.newArrayList();
-            arraylist.add(new ChatComponentTranslation("stream.unavailable.no_fbo.version", new Object[] {GL11.glGetString(GL11.GL_VERSION)}));
-            arraylist.add(new ChatComponentTranslation("stream.unavailable.no_fbo.blend", new Object[] {Boolean.valueOf(GLContext.getCapabilities().GL_EXT_blend_func_separate)}));
-            arraylist.add(new ChatComponentTranslation("stream.unavailable.no_fbo.arb", new Object[] {Boolean.valueOf(GLContext.getCapabilities().GL_ARB_framebuffer_object)}));
-            arraylist.add(new ChatComponentTranslation("stream.unavailable.no_fbo.ext", new Object[] {Boolean.valueOf(GLContext.getCapabilities().GL_EXT_framebuffer_object)}));
-            minecraft.displayGuiScreen(new GuiStreamUnavailable(p_152321_0_, GuiStreamUnavailable.Reason.NO_FBO, arraylist));
+            List<ChatComponentTranslation> list = Lists.<ChatComponentTranslation>newArrayList();
+            list.add(new ChatComponentTranslation("stream.unavailable.no_fbo.version", new Object[] {GL11.glGetString(GL11.GL_VERSION)}));
+            list.add(new ChatComponentTranslation("stream.unavailable.no_fbo.blend", new Object[] {Boolean.valueOf(GLContext.getCapabilities().GL_EXT_blend_func_separate)}));
+            list.add(new ChatComponentTranslation("stream.unavailable.no_fbo.arb", new Object[] {Boolean.valueOf(GLContext.getCapabilities().GL_ARB_framebuffer_object)}));
+            list.add(new ChatComponentTranslation("stream.unavailable.no_fbo.ext", new Object[] {Boolean.valueOf(GLContext.getCapabilities().GL_EXT_framebuffer_object)}));
+            minecraft.displayGuiScreen(new GuiStreamUnavailable(p_152321_0_, GuiStreamUnavailable.Reason.NO_FBO, list));
         }
         else if (istream instanceof NullStream)
         {
@@ -177,12 +179,12 @@ public class GuiStreamUnavailable extends GuiScreen
         }
         else if (!istream.func_152928_D() && istream.func_152912_E() == ErrorCode.TTV_EC_OS_TOO_OLD)
         {
-            switch (GuiStreamUnavailable.SwitchReason.field_152578_b[Util.getOSType().ordinal()])
+            switch (Util.getOSType())
             {
-                case 1:
+                case WINDOWS:
                     minecraft.displayGuiScreen(new GuiStreamUnavailable(p_152321_0_, GuiStreamUnavailable.Reason.UNSUPPORTED_OS_WINDOWS));
                     break;
-                case 2:
+                case OSX:
                     minecraft.displayGuiScreen(new GuiStreamUnavailable(p_152321_0_, GuiStreamUnavailable.Reason.UNSUPPORTED_OS_MAC));
                     break;
                 default:
@@ -202,20 +204,20 @@ public class GuiStreamUnavailable extends GuiScreen
         }
         else if (!istream.func_152913_F())
         {
-            switch (GuiStreamUnavailable.SwitchReason.field_152579_c[istream.func_152918_H().ordinal()])
+            switch (istream.func_152918_H())
             {
-                case 1:
+                case INVALID_TOKEN:
                     minecraft.displayGuiScreen(new GuiStreamUnavailable(p_152321_0_, GuiStreamUnavailable.Reason.FAILED_TWITCH_AUTH));
                     break;
-                case 2:
+                case ERROR:
                 default:
                     minecraft.displayGuiScreen(new GuiStreamUnavailable(p_152321_0_, GuiStreamUnavailable.Reason.FAILED_TWITCH_AUTH_ERROR));
             }
         }
         else if (istream.func_152912_E() != null)
         {
-            List list = Arrays.asList(new ChatComponentTranslation[] {new ChatComponentTranslation("stream.unavailable.initialization_failure.extra", new Object[]{ErrorCode.getString(istream.func_152912_E())})});
-            minecraft.displayGuiScreen(new GuiStreamUnavailable(p_152321_0_, GuiStreamUnavailable.Reason.INITIALIZATION_FAILURE, list));
+            List<ChatComponentTranslation> list1 = Arrays.<ChatComponentTranslation>asList(new ChatComponentTranslation[] {new ChatComponentTranslation("stream.unavailable.initialization_failure.extra", new Object[]{ErrorCode.getString(istream.func_152912_E())})});
+            minecraft.displayGuiScreen(new GuiStreamUnavailable(p_152321_0_, GuiStreamUnavailable.Reason.INITIALIZATION_FAILURE, list1));
         }
         else
         {
@@ -238,10 +240,9 @@ public class GuiStreamUnavailable extends GuiScreen
         FAILED_TWITCH_AUTH_ERROR(new ChatComponentTranslation("stream.unavailable.failed_auth_error", new Object[0])),
         INITIALIZATION_FAILURE(new ChatComponentTranslation("stream.unavailable.initialization_failure", new Object[0]), new ChatComponentTranslation("stream.unavailable.report_to_mojang", new Object[0])),
         UNKNOWN(new ChatComponentTranslation("stream.unavailable.unknown", new Object[0]), new ChatComponentTranslation("stream.unavailable.report_to_mojang", new Object[0]));
+
         private final IChatComponent field_152574_m;
         private final IChatComponent field_152575_n;
-
-        private static final String __OBFID = "CL_00001838";
 
         private Reason(IChatComponent p_i1066_3_)
         {
@@ -264,122 +265,4 @@ public class GuiStreamUnavailable extends GuiScreen
             return this.field_152575_n;
         }
     }
-
-    @SideOnly(Side.CLIENT)
-
-    static final class SwitchReason
-        {
-            static final int[] field_152577_a;
-
-            static final int[] field_152578_b;
-
-            static final int[] field_152579_c = new int[IStream.AuthFailureReason.values().length];
-            private static final String __OBFID = "CL_00001839";
-
-            static
-            {
-                try
-                {
-                    field_152579_c[IStream.AuthFailureReason.INVALID_TOKEN.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var11)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_152579_c[IStream.AuthFailureReason.ERROR.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var10)
-                {
-                    ;
-                }
-
-                field_152578_b = new int[Util.EnumOS.values().length];
-
-                try
-                {
-                    field_152578_b[Util.EnumOS.WINDOWS.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var9)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_152578_b[Util.EnumOS.OSX.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var8)
-                {
-                    ;
-                }
-
-                field_152577_a = new int[GuiStreamUnavailable.Reason.values().length];
-
-                try
-                {
-                    field_152577_a[GuiStreamUnavailable.Reason.ACCOUNT_NOT_BOUND.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var7)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_152577_a[GuiStreamUnavailable.Reason.FAILED_TWITCH_AUTH.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var6)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_152577_a[GuiStreamUnavailable.Reason.ACCOUNT_NOT_MIGRATED.ordinal()] = 3;
-                }
-                catch (NoSuchFieldError var5)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_152577_a[GuiStreamUnavailable.Reason.UNSUPPORTED_OS_MAC.ordinal()] = 4;
-                }
-                catch (NoSuchFieldError var4)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_152577_a[GuiStreamUnavailable.Reason.UNKNOWN.ordinal()] = 5;
-                }
-                catch (NoSuchFieldError var3)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_152577_a[GuiStreamUnavailable.Reason.LIBRARY_FAILURE.ordinal()] = 6;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_152577_a[GuiStreamUnavailable.Reason.INITIALIZATION_FAILURE.ordinal()] = 7;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
-            }
-        }
 }

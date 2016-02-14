@@ -24,11 +24,11 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ChatComponentText;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.config.GuiConfigEntries.IConfigEntry;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.PostConfigChangedEvent;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 
@@ -176,9 +176,9 @@ public class GuiConfig extends GuiScreen
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
-    @SuppressWarnings("unchecked")
     @Override
     public void initGui()
     {
@@ -230,6 +230,9 @@ public class GuiConfig extends GuiScreen
             Keyboard.enableRepeatEvents(false);
     }
 
+    /**
+     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
+     */
     @Override
     protected void actionPerformed(GuiButton button)
     {
@@ -246,9 +249,9 @@ public class GuiConfig extends GuiScreen
                     if (Loader.isModLoaded(modID))
                     {
                         ConfigChangedEvent event = new OnConfigChangedEvent(modID, configID, isWorldRunning, requiresMcRestart);
-                        FMLCommonHandler.instance().bus().post(event);
+                        MinecraftForge.EVENT_BUS.post(event);
                         if (!event.getResult().equals(Result.DENY))
-                            FMLCommonHandler.instance().bus().post(new PostConfigChangedEvent(modID, configID, isWorldRunning, requiresMcRestart));
+                            MinecraftForge.EVENT_BUS.post(new PostConfigChangedEvent(modID, configID, isWorldRunning, requiresMcRestart));
 
                         if (requiresMcRestart)
                         {
@@ -315,7 +318,7 @@ public class GuiConfig extends GuiScreen
     }
 
     /**
-     * Fired when a key is typed (except F11 who toggle full screen). This is the equivalent of
+     * Fired when a key is typed (except F11 which toggles full screen). This is the equivalent of
      * KeyListener.keyTyped(KeyEvent e). Args : character (character on the key), keyCode (lwjgl Keyboard key code)
      */
     @Override
@@ -369,8 +372,7 @@ public class GuiConfig extends GuiScreen
             this.drawToolTip(this.mc.fontRendererObj.listFormattedStringToWidth(I18n.format("fml.configgui.tooltip.applyGlobally"), 300), mouseX, mouseY);
     }
 
-    @SuppressWarnings("rawtypes")
-    public void drawToolTip(List stringList, int x, int y)
+    public void drawToolTip(List<String> stringList, int x, int y)
     {
         this.drawHoveringText(stringList, x, y);
     }

@@ -11,14 +11,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class LocalBlockIntercommunication implements IInteractionObject
 {
-    private String field_175126_a;
-    private IChatComponent field_175125_b;
-    private static final String __OBFID = "CL_00002571";
+    private String guiID;
+    private IChatComponent displayName;
 
-    public LocalBlockIntercommunication(String p_i46277_1_, IChatComponent p_i46277_2_)
+    public LocalBlockIntercommunication(String guiIdIn, IChatComponent displayNameIn)
     {
-        this.field_175126_a = p_i46277_1_;
-        this.field_175125_b = p_i46277_2_;
+        this.guiID = guiIdIn;
+        this.displayName = displayNameIn;
     }
 
     public Container createContainer(InventoryPlayer playerInventory, EntityPlayer playerIn)
@@ -27,11 +26,11 @@ public class LocalBlockIntercommunication implements IInteractionObject
     }
 
     /**
-     * Gets the name of this command sender (usually username, but possibly "Rcon")
+     * Get the name of this object. For players this returns their username
      */
     public String getName()
     {
-        return this.field_175125_b.getUnformattedText();
+        return this.displayName.getUnformattedText();
     }
 
     /**
@@ -44,11 +43,14 @@ public class LocalBlockIntercommunication implements IInteractionObject
 
     public String getGuiID()
     {
-        return this.field_175126_a;
+        return this.guiID;
     }
 
+    /**
+     * Get the formatted ChatComponent that will be used for the sender's username in chat
+     */
     public IChatComponent getDisplayName()
     {
-        return this.field_175125_b;
+        return this.displayName;
     }
 }

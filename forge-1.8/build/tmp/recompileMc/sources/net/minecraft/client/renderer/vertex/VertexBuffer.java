@@ -12,11 +12,10 @@ public class VertexBuffer
     private int glBufferId;
     private final VertexFormat vertexFormat;
     private int count;
-    private static final String __OBFID = "CL_00002402";
 
-    public VertexBuffer(VertexFormat p_i46098_1_)
+    public VertexBuffer(VertexFormat vertexFormatIn)
     {
-        this.vertexFormat = p_i46098_1_;
+        this.vertexFormat = vertexFormatIn;
         this.glBufferId = OpenGlHelper.glGenBuffers();
     }
 
@@ -25,17 +24,17 @@ public class VertexBuffer
         OpenGlHelper.glBindBuffer(OpenGlHelper.GL_ARRAY_BUFFER, this.glBufferId);
     }
 
-    public void bufferData(ByteBuffer p_177360_1_, int p_177360_2_)
+    public void bufferData(ByteBuffer p_181722_1_)
     {
         this.bindBuffer();
-        OpenGlHelper.glBufferData(OpenGlHelper.GL_ARRAY_BUFFER, p_177360_1_, 35044);
+        OpenGlHelper.glBufferData(OpenGlHelper.GL_ARRAY_BUFFER, p_181722_1_, 35044);
         this.unbindBuffer();
-        this.count = p_177360_2_ / this.vertexFormat.getNextOffset();
+        this.count = p_181722_1_.limit() / this.vertexFormat.getNextOffset();
     }
 
-    public void drawArrays(int p_177358_1_)
+    public void drawArrays(int mode)
     {
-        GL11.glDrawArrays(p_177358_1_, 0, this.count);
+        GL11.glDrawArrays(mode, 0, this.count);
     }
 
     public void unbindBuffer()

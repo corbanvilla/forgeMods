@@ -4,8 +4,6 @@ import net.minecraft.util.ResourceLocation;
 
 public class EnchantmentKnockback extends Enchantment
 {
-    private static final String __OBFID = "CL_00000118";
-
     protected EnchantmentKnockback(int p_i45768_1_, ResourceLocation p_i45768_2_, int p_i45768_3_)
     {
         super(p_i45768_1_, p_i45768_2_, p_i45768_3_, EnumEnchantmentType.WEAPON);

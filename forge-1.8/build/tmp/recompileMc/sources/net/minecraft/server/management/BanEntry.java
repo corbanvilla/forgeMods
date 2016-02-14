@@ -5,53 +5,52 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public abstract class BanEntry extends UserListEntry
+public abstract class BanEntry<T> extends UserListEntry<T>
 {
     public static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
     protected final Date banStartDate;
     protected final String bannedBy;
     protected final Date banEndDate;
     protected final String reason;
-    private static final String __OBFID = "CL_00001395";
 
-    public BanEntry(Object p_i46334_1_, Date startDate, String banner, Date endDate, String banReason)
+    public BanEntry(T valueIn, Date startDate, String banner, Date endDate, String banReason)
     {
-        super(p_i46334_1_);
+        super(valueIn);
         this.banStartDate = startDate == null ? new Date() : startDate;
         this.bannedBy = banner == null ? "(Unknown)" : banner;
         this.banEndDate = endDate;
         this.reason = banReason == null ? "Banned by an operator." : banReason;
     }
 
-    protected BanEntry(Object p_i1174_1_, JsonObject p_i1174_2_)
+    protected BanEntry(T valueIn, JsonObject json)
     {
-        super(p_i1174_1_, p_i1174_2_);
+        super(valueIn, json);
         Date date;
 
         try
         {
-            date = p_i1174_2_.has("created") ? dateFormat.parse(p_i1174_2_.get("created").getAsString()) : new Date();
+            date = json.has("created") ? dateFormat.parse(json.get("created").getAsString()) : new Date();
         }
-        catch (ParseException parseexception1)
+        catch (ParseException var7)
         {
             date = new Date();
         }
 
         this.banStartDate = date;
-        this.bannedBy = p_i1174_2_.has("source") ? p_i1174_2_.get("source").getAsString() : "(Unknown)";
+        this.bannedBy = json.has("source") ? json.get("source").getAsString() : "(Unknown)";
         Date date1;
 
         try
         {
-            date1 = p_i1174_2_.has("expires") ? dateFormat.parse(p_i1174_2_.get("expires").getAsString()) : null;
+            date1 = json.has("expires") ? dateFormat.parse(json.get("expires").getAsString()) : null;
         }
-        catch (ParseException parseexception)
+        catch (ParseException var6)
         {
             date1 = null;
         }
 
         this.banEndDate = date1;
-        this.reason = p_i1174_2_.has("reason") ? p_i1174_2_.get("reason").getAsString() : "Banned by an operator.";
+        this.reason = json.has("reason") ? json.get("reason").getAsString() : "Banned by an operator.";
     }
 
     public Date getBanEndDate()

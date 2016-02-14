@@ -9,7 +9,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class GuiLockIconButton extends GuiButton
 {
     private boolean field_175231_o = false;
-    private static final String __OBFID = "CL_00001952";
 
     public GuiLockIconButton(int p_i45538_1_, int p_i45538_2_, int p_i45538_3_)
     {
@@ -36,37 +35,37 @@ public class GuiLockIconButton extends GuiButton
             mc.getTextureManager().bindTexture(GuiButton.buttonTextures);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             boolean flag = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
-            GuiLockIconButton.Icon icon;
+            GuiLockIconButton.Icon guilockiconbutton$icon;
 
             if (this.field_175231_o)
             {
                 if (!this.enabled)
                 {
-                    icon = GuiLockIconButton.Icon.LOCKED_DISABLED;
+                    guilockiconbutton$icon = GuiLockIconButton.Icon.LOCKED_DISABLED;
                 }
                 else if (flag)
                 {
-                    icon = GuiLockIconButton.Icon.LOCKED_HOVER;
+                    guilockiconbutton$icon = GuiLockIconButton.Icon.LOCKED_HOVER;
                 }
                 else
                 {
-                    icon = GuiLockIconButton.Icon.LOCKED;
+                    guilockiconbutton$icon = GuiLockIconButton.Icon.LOCKED;
                 }
             }
             else if (!this.enabled)
             {
-                icon = GuiLockIconButton.Icon.UNLOCKED_DISABLED;
+                guilockiconbutton$icon = GuiLockIconButton.Icon.UNLOCKED_DISABLED;
             }
             else if (flag)
             {
-                icon = GuiLockIconButton.Icon.UNLOCKED_HOVER;
+                guilockiconbutton$icon = GuiLockIconButton.Icon.UNLOCKED_HOVER;
             }
             else
             {
-                icon = GuiLockIconButton.Icon.UNLOCKED;
+                guilockiconbutton$icon = GuiLockIconButton.Icon.UNLOCKED;
             }
 
-            this.drawTexturedModalRect(this.xPosition, this.yPosition, icon.func_178910_a(), icon.func_178912_b(), this.width, this.height);
+            this.drawTexturedModalRect(this.xPosition, this.yPosition, guilockiconbutton$icon.func_178910_a(), guilockiconbutton$icon.func_178912_b(), this.width, this.height);
         }
     }
 
@@ -79,10 +78,9 @@ public class GuiLockIconButton extends GuiButton
         UNLOCKED(20, 146),
         UNLOCKED_HOVER(20, 166),
         UNLOCKED_DISABLED(20, 186);
+
         private final int field_178914_g;
         private final int field_178920_h;
-
-        private static final String __OBFID = "CL_00001951";
 
         private Icon(int p_i45537_3_, int p_i45537_4_)
         {

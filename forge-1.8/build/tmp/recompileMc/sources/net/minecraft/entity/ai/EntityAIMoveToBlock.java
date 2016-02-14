@@ -6,23 +6,22 @@ import net.minecraft.world.World;
 
 public abstract class EntityAIMoveToBlock extends EntityAIBase
 {
-    private final EntityCreature field_179495_c;
-    private final double field_179492_d;
-    protected int field_179496_a;
-    private int field_179493_e;
+    private final EntityCreature theEntity;
+    private final double movementSpeed;
+    /** Controls task execution delay */
+    protected int runDelay;
+    private int timeoutCounter;
     private int field_179490_f;
     /** Block to move to */
-    protected BlockPos destinationBlock;
-    private boolean field_179491_g;
-    private int field_179497_h;
-    private static final String __OBFID = "CL_00002252";
+    protected BlockPos destinationBlock = BlockPos.ORIGIN;
+    private boolean isAboveDestination;
+    private int searchLength;
 
-    public EntityAIMoveToBlock(EntityCreature p_i45888_1_, double p_i45888_2_, int p_i45888_4_)
+    public EntityAIMoveToBlock(EntityCreature creature, double speedIn, int length)
     {
-        this.destinationBlock = BlockPos.ORIGIN;
-        this.field_179495_c = p_i45888_1_;
-        this.field_179492_d = p_i45888_2_;
-        this.field_179497_h = p_i45888_4_;
+        this.theEntity = creature;
+        this.movementSpeed = speedIn;
+        this.searchLength = length;
         this.setMutexBits(5);
     }
 
@@ -31,15 +30,15 @@ public abstract class EntityAIMoveToBlock extends EntityAIBase
      */
     public boolean shouldExecute()
     {
-        if (this.field_179496_a > 0)
+        if (this.runDelay > 0)
         {
-            --this.field_179496_a;
+            --this.runDelay;
             return false;
         }
         else
         {
-            this.field_179496_a = 200 + this.field_179495_c.getRNG().nextInt(200);
-            return this.func_179489_g();
+            this.runDelay = 200 + this.theEntity.getRNG().nextInt(200);
+            return this.searchForDestination();
         }
     }
 
@@ -48,7 +47,7 @@ public abstract class EntityAIMoveToBlock extends EntityAIBase
      */
     public boolean continueExecuting()
     {
-        return this.field_179493_e >= -this.field_179490_f && this.field_179493_e <= 1200 && this.func_179488_a(this.field_179495_c.worldObj, this.destinationBlock);
+        return this.timeoutCounter >= -this.field_179490_f && this.timeoutCounter <= 1200 && this.shouldMoveTo(this.theEntity.worldObj, this.destinationBlock);
     }
 
     /**
@@ -56,60 +55,67 @@ public abstract class EntityAIMoveToBlock extends EntityAIBase
      */
     public void startExecuting()
     {
-        this.field_179495_c.getNavigator().tryMoveToXYZ((double)((float)this.destinationBlock.getX()) + 0.5D, (double)(this.destinationBlock.getY() + 1), (double)((float)this.destinationBlock.getZ()) + 0.5D, this.field_179492_d);
-        this.field_179493_e = 0;
-        this.field_179490_f = this.field_179495_c.getRNG().nextInt(this.field_179495_c.getRNG().nextInt(1200) + 1200) + 1200;
+        this.theEntity.getNavigator().tryMoveToXYZ((double)((float)this.destinationBlock.getX()) + 0.5D, (double)(this.destinationBlock.getY() + 1), (double)((float)this.destinationBlock.getZ()) + 0.5D, this.movementSpeed);
+        this.timeoutCounter = 0;
+        this.field_179490_f = this.theEntity.getRNG().nextInt(this.theEntity.getRNG().nextInt(1200) + 1200) + 1200;
     }
 
     /**
      * Resets the task
      */
-    public void resetTask() {}
+    public void resetTask()
+    {
+    }
 
     /**
      * Updates the task
      */
     public void updateTask()
     {
-        if (this.field_179495_c.getDistanceSqToCenter(this.destinationBlock.up()) > 1.0D)
+        if (this.theEntity.getDistanceSqToCenter(this.destinationBlock.up()) > 1.0D)
         {
-            this.field_179491_g = false;
-            ++this.field_179493_e;
+            this.isAboveDestination = false;
+            ++this.timeoutCounter;
 
-            if (this.field_179493_e % 40 == 0)
+            if (this.timeoutCounter % 40 == 0)
             {
-                this.field_179495_c.getNavigator().tryMoveToXYZ((double)((float)this.destinationBlock.getX()) + 0.5D, (double)(this.destinationBlock.getY() + 1), (double)((float)this.destinationBlock.getZ()) + 0.5D, this.field_179492_d);
+                this.theEntity.getNavigator().tryMoveToXYZ((double)((float)this.destinationBlock.getX()) + 0.5D, (double)(this.destinationBlock.getY() + 1), (double)((float)this.destinationBlock.getZ()) + 0.5D, this.movementSpeed);
             }
         }
         else
         {
-            this.field_179491_g = true;
-            --this.field_179493_e;
+            this.isAboveDestination = true;
+            --this.timeoutCounter;
         }
     }
 
-    protected boolean func_179487_f()
+    protected boolean getIsAboveDestination()
     {
-        return this.field_179491_g;
+        return this.isAboveDestination;
     }
 
-    private boolean func_179489_g()
+    /**
+     * Searches and sets new destination block and returns true if a suitable block (specified in {@link
+     * net.minecraft.entity.ai.EntityAIMoveToBlock#shouldMoveTo(World, BlockPos) EntityAIMoveToBlock#shouldMoveTo(World,
+     * BlockPos)}) can be found.
+     */
+    private boolean searchForDestination()
     {
-        int i = this.field_179497_h;
-        boolean flag = true;
-        BlockPos blockpos = new BlockPos(this.field_179495_c);
+        int i = this.searchLength;
+        int j = 1;
+        BlockPos blockpos = new BlockPos(this.theEntity);
 
-        for (int j = 0; j <= 1; j = j > 0 ? -j : 1 - j)
+        for (int k = 0; k <= 1; k = k > 0 ? -k : 1 - k)
         {
-            for (int k = 0; k < i; ++k)
+            for (int l = 0; l < i; ++l)
             {
-                for (int l = 0; l <= k; l = l > 0 ? -l : 1 - l)
+                for (int i1 = 0; i1 <= l; i1 = i1 > 0 ? -i1 : 1 - i1)
                 {
-                    for (int i1 = l < k && l > -k ? k : 0; i1 <= k; i1 = i1 > 0 ? -i1 : 1 - i1)
+                    for (int j1 = i1 < l && i1 > -l ? l : 0; j1 <= l; j1 = j1 > 0 ? -j1 : 1 - j1)
                     {
-                        BlockPos blockpos1 = blockpos.add(l, j - 1, i1);
+                        BlockPos blockpos1 = blockpos.add(i1, k - 1, j1);
 
-                        if (this.field_179495_c.func_180485_d(blockpos1) && this.func_179488_a(this.field_179495_c.worldObj, blockpos1))
+                        if (this.theEntity.isWithinHomeDistanceFromPosition(blockpos1) && this.shouldMoveTo(this.theEntity.worldObj, blockpos1))
                         {
                             this.destinationBlock = blockpos1;
                             return true;
@@ -122,5 +128,8 @@ public abstract class EntityAIMoveToBlock extends EntityAIBase
         return false;
     }
 
-    protected abstract boolean func_179488_a(World worldIn, BlockPos p_179488_2_);
+    /**
+     * Return true to set given position as destination
+     */
+    protected abstract boolean shouldMoveTo(World worldIn, BlockPos pos);
 }

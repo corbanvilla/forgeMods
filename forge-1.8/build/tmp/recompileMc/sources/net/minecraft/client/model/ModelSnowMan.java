@@ -13,7 +13,6 @@ public class ModelSnowMan extends ModelBase
     public ModelRenderer head;
     public ModelRenderer rightHand;
     public ModelRenderer leftHand;
-    private static final String __OBFID = "CL_00000859";
 
     public ModelSnowMan()
     {
@@ -41,34 +40,34 @@ public class ModelSnowMan extends ModelBase
      * and legs, where par1 represents the time(so that arms and legs swing back and forth) and par2 represents how
      * "far" arms and legs can swing at most.
      */
-    public void setRotationAngles(float p_78087_1_, float p_78087_2_, float p_78087_3_, float p_78087_4_, float p_78087_5_, float p_78087_6_, Entity p_78087_7_)
+    public void setRotationAngles(float p_78087_1_, float p_78087_2_, float p_78087_3_, float p_78087_4_, float p_78087_5_, float p_78087_6_, Entity entityIn)
     {
-        super.setRotationAngles(p_78087_1_, p_78087_2_, p_78087_3_, p_78087_4_, p_78087_5_, p_78087_6_, p_78087_7_);
+        super.setRotationAngles(p_78087_1_, p_78087_2_, p_78087_3_, p_78087_4_, p_78087_5_, p_78087_6_, entityIn);
         this.head.rotateAngleY = p_78087_4_ / (180F / (float)Math.PI);
         this.head.rotateAngleX = p_78087_5_ / (180F / (float)Math.PI);
         this.body.rotateAngleY = p_78087_4_ / (180F / (float)Math.PI) * 0.25F;
-        float f6 = MathHelper.sin(this.body.rotateAngleY);
-        float f7 = MathHelper.cos(this.body.rotateAngleY);
+        float f = MathHelper.sin(this.body.rotateAngleY);
+        float f1 = MathHelper.cos(this.body.rotateAngleY);
         this.rightHand.rotateAngleZ = 1.0F;
         this.leftHand.rotateAngleZ = -1.0F;
         this.rightHand.rotateAngleY = 0.0F + this.body.rotateAngleY;
         this.leftHand.rotateAngleY = (float)Math.PI + this.body.rotateAngleY;
-        this.rightHand.rotationPointX = f7 * 5.0F;
-        this.rightHand.rotationPointZ = -f6 * 5.0F;
-        this.leftHand.rotationPointX = -f7 * 5.0F;
-        this.leftHand.rotationPointZ = f6 * 5.0F;
+        this.rightHand.rotationPointX = f1 * 5.0F;
+        this.rightHand.rotationPointZ = -f * 5.0F;
+        this.leftHand.rotationPointX = -f1 * 5.0F;
+        this.leftHand.rotationPointZ = f * 5.0F;
     }
 
     /**
      * Sets the models various rotation angles then renders the model.
      */
-    public void render(Entity p_78088_1_, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float p_78088_7_)
+    public void render(Entity entityIn, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float scale)
     {
-        this.setRotationAngles(p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, p_78088_7_, p_78088_1_);
-        this.body.render(p_78088_7_);
-        this.bottomBody.render(p_78088_7_);
-        this.head.render(p_78088_7_);
-        this.rightHand.render(p_78088_7_);
-        this.leftHand.render(p_78088_7_);
+        this.setRotationAngles(p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, scale, entityIn);
+        this.body.render(scale);
+        this.bottomBody.render(scale);
+        this.head.render(scale);
+        this.rightHand.render(scale);
+        this.leftHand.render(scale);
     }
 }

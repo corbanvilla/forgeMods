@@ -10,7 +10,6 @@ public class ModelSign extends ModelBase
     public ModelRenderer signBoard = new ModelRenderer(this, 0, 0);
     /** The stick a sign stands on. */
     public ModelRenderer signStick;
-    private static final String __OBFID = "CL_00000854";
 
     public ModelSign()
     {

@@ -2,6 +2,7 @@ package net.minecraft.block;
 
 import com.google.common.base.Predicate;
 import java.util.List;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -15,6 +16,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
+import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityHopper;
 import net.minecraft.util.AxisAlignedBB;
@@ -28,24 +30,18 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockHopper extends BlockContainer
 {
-    public static final PropertyDirection FACING = PropertyDirection.create("facing", new Predicate()
+    public static final PropertyDirection FACING = PropertyDirection.create("facing", new Predicate<EnumFacing>()
     {
-        private static final String __OBFID = "CL_00002106";
-        public boolean apply(EnumFacing facing)
+        public boolean apply(EnumFacing p_apply_1_)
         {
-            return facing != EnumFacing.UP;
-        }
-        public boolean apply(Object p_apply_1_)
-        {
-            return this.apply((EnumFacing)p_apply_1_);
+            return p_apply_1_ != EnumFacing.UP;
         }
     });
     public static final PropertyBool ENABLED = PropertyBool.create("enabled");
-    private static final String __OBFID = "CL_00000257";
 
     public BlockHopper()
     {
-        super(Material.iron);
+        super(Material.iron, MapColor.stoneColor);
         this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.DOWN).withProperty(ENABLED, Boolean.valueOf(true)));
         this.setCreativeTab(CreativeTabs.tabRedstone);
         this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
@@ -58,10 +54,8 @@ public class BlockHopper extends BlockContainer
 
     /**
      * Add all collision boxes of this Block to the list that intersect with the given mask.
-     *  
-     * @param collidingEntity the Entity colliding with this Block
      */
-    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List list, Entity collidingEntity)
+    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity)
     {
         this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.625F, 1.0F);
         super.addCollisionBoxesToList(worldIn, pos, state, mask, list, collidingEntity);
@@ -77,16 +71,20 @@ public class BlockHopper extends BlockContainer
         this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
     }
 
+    /**
+     * Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the
+     * IBlockstate
+     */
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
-        EnumFacing enumfacing1 = facing.getOpposite();
+        EnumFacing enumfacing = facing.getOpposite();
 
-        if (enumfacing1 == EnumFacing.UP)
+        if (enumfacing == EnumFacing.UP)
         {
-            enumfacing1 = EnumFacing.DOWN;
+            enumfacing = EnumFacing.DOWN;
         }
 
-        return this.getDefaultState().withProperty(FACING, enumfacing1).withProperty(ENABLED, Boolean.valueOf(true));
+        return this.getDefaultState().withProperty(FACING, enumfacing).withProperty(ENABLED, Boolean.valueOf(true));
     }
 
     /**
@@ -97,6 +95,9 @@ public class BlockHopper extends BlockContainer
         return new TileEntityHopper();
     }
 
+    /**
+     * Called by ItemBlocks after a block is set in the world, to allow post-place logic
+     */
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
     {
         super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
@@ -130,6 +131,7 @@ public class BlockHopper extends BlockContainer
             if (tileentity instanceof TileEntityHopper)
             {
                 playerIn.displayGUIChest((TileEntityHopper)tileentity);
+                playerIn.triggerAchievement(StatList.field_181732_P);
             }
 
             return true;
@@ -168,7 +170,7 @@ public class BlockHopper extends BlockContainer
     }
 
     /**
-     * The type of render function that is called for this block
+     * The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render
      */
     public int getRenderType()
     {
@@ -180,6 +182,9 @@ public class BlockHopper extends BlockContainer
         return false;
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -234,8 +239,8 @@ public class BlockHopper extends BlockContainer
      */
     public int getMetaFromState(IBlockState state)
     {
-        byte b0 = 0;
-        int i = b0 | ((EnumFacing)state.getValue(FACING)).getIndex();
+        int i = 0;
+        i = i | ((EnumFacing)state.getValue(FACING)).getIndex();
 
         if (!((Boolean)state.getValue(ENABLED)).booleanValue())
         {

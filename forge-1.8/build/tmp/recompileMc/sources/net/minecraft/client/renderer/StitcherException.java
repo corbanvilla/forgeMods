@@ -8,7 +8,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class StitcherException extends RuntimeException
 {
     private final Stitcher.Holder holder;
-    private static final String __OBFID = "CL_00001057";
 
     public StitcherException(Stitcher.Holder p_i2344_1_, String p_i2344_2_)
     {

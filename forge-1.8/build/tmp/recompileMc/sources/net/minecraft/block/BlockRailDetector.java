@@ -8,7 +8,6 @@ import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityMinecartCommandBlock;
 import net.minecraft.entity.item.EntityMinecart;
@@ -16,26 +15,21 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class BlockRailDetector extends BlockRailBase
 {
-    public static final PropertyEnum SHAPE = PropertyEnum.create("shape", BlockRailBase.EnumRailDirection.class, new Predicate()
+    public static final PropertyEnum<BlockRailBase.EnumRailDirection> SHAPE = PropertyEnum.<BlockRailBase.EnumRailDirection>create("shape", BlockRailBase.EnumRailDirection.class, new Predicate<BlockRailBase.EnumRailDirection>()
     {
-        private static final String __OBFID = "CL_00002126";
-        public boolean apply(BlockRailBase.EnumRailDirection direction)
+        public boolean apply(BlockRailBase.EnumRailDirection p_apply_1_)
         {
-            return direction != BlockRailBase.EnumRailDirection.NORTH_EAST && direction != BlockRailBase.EnumRailDirection.NORTH_WEST && direction != BlockRailBase.EnumRailDirection.SOUTH_EAST && direction != BlockRailBase.EnumRailDirection.SOUTH_WEST;
-        }
-        public boolean apply(Object p_apply_1_)
-        {
-            return this.apply((BlockRailBase.EnumRailDirection)p_apply_1_);
+            return p_apply_1_ != BlockRailBase.EnumRailDirection.NORTH_EAST && p_apply_1_ != BlockRailBase.EnumRailDirection.NORTH_WEST && p_apply_1_ != BlockRailBase.EnumRailDirection.SOUTH_EAST && p_apply_1_ != BlockRailBase.EnumRailDirection.SOUTH_WEST;
         }
     });
     public static final PropertyBool POWERED = PropertyBool.create("powered");
-    private static final String __OBFID = "CL_00000225";
 
     public BlockRailDetector()
     {
@@ -77,7 +71,9 @@ public class BlockRailDetector extends BlockRailBase
     /**
      * Called randomly when setTickRandomly is set to true (used by e.g. crops to grow, etc.)
      */
-    public void randomTick(World worldIn, BlockPos pos, IBlockState state, Random random) {}
+    public void randomTick(World worldIn, BlockPos pos, IBlockState state, Random random)
+    {
+    }
 
     public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
@@ -87,12 +83,12 @@ public class BlockRailDetector extends BlockRailBase
         }
     }
 
-    public int isProvidingWeakPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
+    public int getWeakPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
     {
         return ((Boolean)state.getValue(POWERED)).booleanValue() ? 15 : 0;
     }
 
-    public int isProvidingStrongPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
+    public int getStrongPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
     {
         return !((Boolean)state.getValue(POWERED)).booleanValue() ? 0 : (side == EnumFacing.UP ? 15 : 0);
     }
@@ -101,7 +97,7 @@ public class BlockRailDetector extends BlockRailBase
     {
         boolean flag = ((Boolean)state.getValue(POWERED)).booleanValue();
         boolean flag1 = false;
-        List list = this.findMinecarts(worldIn, pos, EntityMinecart.class, new Predicate[0]);
+        List<EntityMinecart> list = this.<EntityMinecart>findMinecarts(worldIn, pos, EntityMinecart.class, new Predicate[0]);
 
         if (!list.isEmpty())
         {
@@ -138,7 +134,7 @@ public class BlockRailDetector extends BlockRailBase
         this.updatePoweredState(worldIn, pos, state);
     }
 
-    public IProperty getShapeProperty()
+    public IProperty<BlockRailBase.EnumRailDirection> getShapeProperty()
     {
         return SHAPE;
     }
@@ -152,14 +148,14 @@ public class BlockRailDetector extends BlockRailBase
     {
         if (((Boolean)worldIn.getBlockState(pos).getValue(POWERED)).booleanValue())
         {
-            List list = this.findMinecarts(worldIn, pos, EntityMinecartCommandBlock.class, new Predicate[0]);
+            List<EntityMinecartCommandBlock> list = this.<EntityMinecartCommandBlock>findMinecarts(worldIn, pos, EntityMinecartCommandBlock.class, new Predicate[0]);
 
             if (!list.isEmpty())
             {
                 return ((EntityMinecartCommandBlock)list.get(0)).getCommandBlockLogic().getSuccessCount();
             }
 
-            List list1 = this.findMinecarts(worldIn, pos, EntityMinecart.class, new Predicate[] {IEntitySelector.selectInventories});
+            List<EntityMinecart> list1 = this.<EntityMinecart>findMinecarts(worldIn, pos, EntityMinecart.class, new Predicate[] {EntitySelectors.selectInventories});
 
             if (!list1.isEmpty())
             {
@@ -170,7 +166,7 @@ public class BlockRailDetector extends BlockRailBase
         return 0;
     }
 
-    protected List findMinecarts(World worldIn, BlockPos pos, Class clazz, Predicate ... filter)
+    protected <T extends EntityMinecart> List<T> findMinecarts(World worldIn, BlockPos pos, Class<T> clazz, Predicate<Entity>... filter)
     {
         AxisAlignedBB axisalignedbb = this.getDectectionBox(pos);
         return filter.length != 1 ? worldIn.getEntitiesWithinAABB(clazz, axisalignedbb) : worldIn.getEntitiesWithinAABB(clazz, axisalignedbb, filter[0]);
@@ -195,8 +191,8 @@ public class BlockRailDetector extends BlockRailBase
      */
     public int getMetaFromState(IBlockState state)
     {
-        byte b0 = 0;
-        int i = b0 | ((BlockRailBase.EnumRailDirection)state.getValue(SHAPE)).getMetadata();
+        int i = 0;
+        i = i | ((BlockRailBase.EnumRailDirection)state.getValue(SHAPE)).getMetadata();
 
         if (((Boolean)state.getValue(POWERED)).booleanValue())
         {

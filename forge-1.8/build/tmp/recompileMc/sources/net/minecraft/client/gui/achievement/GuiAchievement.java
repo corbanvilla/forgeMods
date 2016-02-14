@@ -25,7 +25,6 @@ public class GuiAchievement extends Gui
     private long notificationTime;
     private RenderItem renderItem;
     private boolean permanentNotification;
-    private static final String __OBFID = "CL_00000721";
 
     public GuiAchievement(Minecraft mc)
     {
@@ -42,12 +41,12 @@ public class GuiAchievement extends Gui
         this.permanentNotification = false;
     }
 
-    public void displayUnformattedAchievement(Achievement p_146255_1_)
+    public void displayUnformattedAchievement(Achievement achievementIn)
     {
-        this.achievementTitle = p_146255_1_.getStatName().getUnformattedText();
-        this.achievementDescription = p_146255_1_.getDescription();
+        this.achievementTitle = achievementIn.getStatName().getUnformattedText();
+        this.achievementDescription = achievementIn.getDescription();
         this.notificationTime = Minecraft.getSystemTime() + 2500L;
-        this.theAchievement = p_146255_1_;
+        this.theAchievement = achievementIn;
         this.permanentNotification = true;
     }
 
@@ -60,7 +59,7 @@ public class GuiAchievement extends Gui
         GlStateManager.loadIdentity();
         this.width = this.mc.displayWidth;
         this.height = this.mc.displayHeight;
-        ScaledResolution scaledresolution = new ScaledResolution(this.mc, this.mc.displayWidth, this.mc.displayHeight);
+        ScaledResolution scaledresolution = new ScaledResolution(this.mc);
         this.width = scaledresolution.getScaledWidth();
         this.height = scaledresolution.getScaledHeight();
         GlStateManager.clear(256);
@@ -101,7 +100,7 @@ public class GuiAchievement extends Gui
                 d1 = 2.0D - d1;
             }
 
-            d1 *= 4.0D;
+            d1 = d1 * 4.0D;
             d1 = 1.0D - d1;
 
             if (d1 < 0.0D)
@@ -109,8 +108,8 @@ public class GuiAchievement extends Gui
                 d1 = 0.0D;
             }
 
-            d1 *= d1;
-            d1 *= d1;
+            d1 = d1 * d1;
+            d1 = d1 * d1;
             int i = this.width - 160;
             int j = 0 - (int)(d1 * 36.0D);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);

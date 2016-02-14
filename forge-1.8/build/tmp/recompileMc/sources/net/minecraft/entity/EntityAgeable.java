@@ -10,12 +10,11 @@ import net.minecraft.world.World;
 
 public abstract class EntityAgeable extends EntityCreature
 {
-    protected int field_175504_a;
+    protected int growingAge;
     protected int field_175502_b;
     protected int field_175503_c;
-    private float field_98056_d = -1.0F;
-    private float field_98057_e;
-    private static final String __OBFID = "CL_00001530";
+    private float ageWidth = -1.0F;
+    private float ageHeight;
 
     public EntityAgeable(World worldIn)
     {
@@ -35,7 +34,7 @@ public abstract class EntityAgeable extends EntityCreature
         {
             if (!this.worldObj.isRemote)
             {
-                Class oclass = EntityList.getClassFromID(itemstack.getMetadata());
+                Class <? extends Entity > oclass = EntityList.stringToClassMapping.get(net.minecraft.item.ItemMonsterPlacer.getEntityName(itemstack));
 
                 if (oclass != null && this.getClass() == oclass)
                 {
@@ -86,31 +85,31 @@ public abstract class EntityAgeable extends EntityCreature
      */
     public int getGrowingAge()
     {
-        return this.worldObj.isRemote ? this.dataWatcher.getWatchableObjectByte(12) : this.field_175504_a;
+        return this.worldObj.isRemote ? this.dataWatcher.getWatchableObjectByte(12) : this.growingAge;
     }
 
     public void func_175501_a(int p_175501_1_, boolean p_175501_2_)
     {
-        int j = this.getGrowingAge();
-        int k = j;
-        j += p_175501_1_ * 20;
+        int i = this.getGrowingAge();
+        int j = i;
+        i = i + p_175501_1_ * 20;
 
-        if (j > 0)
+        if (i > 0)
         {
-            j = 0;
+            i = 0;
 
-            if (k < 0)
+            if (j < 0)
             {
-                this.func_175500_n();
+                this.onGrowingAdult();
             }
         }
 
-        int l = j - k;
-        this.setGrowingAge(j);
+        int k = i - j;
+        this.setGrowingAge(i);
 
         if (p_175501_2_)
         {
-            this.field_175502_b += l;
+            this.field_175502_b += k;
 
             if (this.field_175503_c == 0)
             {
@@ -128,19 +127,19 @@ public abstract class EntityAgeable extends EntityCreature
      * "Adds the value of the parameter times 20 to the age of this entity. If the entity is an adult (if the entity's
      * age is greater than 0), it will have no effect."
      */
-    public void addGrowth(int p_110195_1_)
+    public void addGrowth(int growth)
     {
-        this.func_175501_a(p_110195_1_, false);
+        this.func_175501_a(growth, false);
     }
 
     /**
      * The age value may be negative or positive or zero. If it's negative, it get's incremented on each tick, if it's
      * positive, it get's decremented each tick. With a negative value the Entity is considered a child.
      */
-    public void setGrowingAge(int p_70873_1_)
+    public void setGrowingAge(int age)
     {
-        this.dataWatcher.updateObject(12, Byte.valueOf((byte)MathHelper.clamp_int(p_70873_1_, -1, 1)));
-        this.field_175504_a = p_70873_1_;
+        this.dataWatcher.updateObject(12, Byte.valueOf((byte)MathHelper.clamp_int(age, -1, 1)));
+        this.growingAge = age;
         this.setScaleForAge(this.isChild());
     }
 
@@ -197,7 +196,7 @@ public abstract class EntityAgeable extends EntityCreature
 
                 if (i == 0)
                 {
-                    this.func_175500_n();
+                    this.onGrowingAdult();
                 }
             }
             else if (i > 0)
@@ -208,7 +207,13 @@ public abstract class EntityAgeable extends EntityCreature
         }
     }
 
-    protected void func_175500_n() {}
+    /**
+     * This is called when Entity's growing age timer reaches 0 (negative values are considered as a child, positive as
+     * an adult)
+     */
+    protected void onGrowingAdult()
+    {
+    }
 
     /**
      * If Animal, checks if the age timer is negative
@@ -231,9 +236,9 @@ public abstract class EntityAgeable extends EntityCreature
      */
     protected final void setSize(float width, float height)
     {
-        boolean flag = this.field_98056_d > 0.0F;
-        this.field_98056_d = width;
-        this.field_98057_e = height;
+        boolean flag = this.ageWidth > 0.0F;
+        this.ageWidth = width;
+        this.ageHeight = height;
 
         if (!flag)
         {
@@ -241,8 +246,8 @@ public abstract class EntityAgeable extends EntityCreature
         }
     }
 
-    protected final void setScale(float p_98055_1_)
+    protected final void setScale(float scale)
     {
-        super.setSize(this.field_98056_d * p_98055_1_, this.field_98057_e * p_98055_1_);
+        super.setSize(this.ageWidth * scale, this.ageHeight * scale);
     }
 }

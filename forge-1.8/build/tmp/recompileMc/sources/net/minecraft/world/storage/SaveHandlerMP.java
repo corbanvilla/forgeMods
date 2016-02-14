@@ -11,8 +11,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class SaveHandlerMP implements ISaveHandler
 {
-    private static final String __OBFID = "CL_00000602";
-
     /**
      * Loads and returns the world info
      */
@@ -24,7 +22,9 @@ public class SaveHandlerMP implements ISaveHandler
     /**
      * Checks the session lock to prevent save collisions
      */
-    public void checkSessionLock() throws MinecraftException {}
+    public void checkSessionLock() throws MinecraftException
+    {
+    }
 
     /**
      * initializes and returns the chunk loader for the specified world provider
@@ -37,12 +37,16 @@ public class SaveHandlerMP implements ISaveHandler
     /**
      * Saves the given World Info with the given NBTTagCompound as the Player.
      */
-    public void saveWorldInfoWithPlayer(WorldInfo worldInformation, NBTTagCompound tagCompound) {}
+    public void saveWorldInfoWithPlayer(WorldInfo worldInformation, NBTTagCompound tagCompound)
+    {
+    }
 
     /**
      * used to update level.dat from old format to MCRegion format
      */
-    public void saveWorldInfo(WorldInfo worldInformation) {}
+    public void saveWorldInfo(WorldInfo worldInformation)
+    {
+    }
 
     public IPlayerFileData getPlayerNBTManager()
     {
@@ -52,7 +56,9 @@ public class SaveHandlerMP implements ISaveHandler
     /**
      * Called to flush all changes to disk, waiting for them to complete.
      */
-    public void flush() {}
+    public void flush()
+    {
+    }
 
     /**
      * Gets the file location of the given map

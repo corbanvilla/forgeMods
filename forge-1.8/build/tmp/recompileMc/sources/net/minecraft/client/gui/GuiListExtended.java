@@ -7,17 +7,17 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public abstract class GuiListExtended extends GuiSlot
 {
-    private static final String __OBFID = "CL_00000674";
-
-    public GuiListExtended(Minecraft mcIn, int p_i45010_2_, int p_i45010_3_, int p_i45010_4_, int p_i45010_5_, int p_i45010_6_)
+    public GuiListExtended(Minecraft mcIn, int widthIn, int heightIn, int topIn, int bottomIn, int slotHeightIn)
     {
-        super(mcIn, p_i45010_2_, p_i45010_3_, p_i45010_4_, p_i45010_5_, p_i45010_6_);
+        super(mcIn, widthIn, heightIn, topIn, bottomIn, slotHeightIn);
     }
 
     /**
      * The element in the slot that was clicked, boolean for whether it was double clicked or not
      */
-    protected void elementClicked(int slotIndex, boolean isDoubleClick, int mouseX, int mouseY) {}
+    protected void elementClicked(int slotIndex, boolean isDoubleClick, int mouseX, int mouseY)
+    {
+    }
 
     /**
      * Returns true if the element passed in is currently selected
@@ -27,11 +27,13 @@ public abstract class GuiListExtended extends GuiSlot
         return false;
     }
 
-    protected void drawBackground() {}
-
-    protected void drawSlot(int entryID, int p_180791_2_, int p_180791_3_, int p_180791_4_, int p_180791_5_, int p_180791_6_)
+    protected void drawBackground()
     {
-        this.getListEntry(entryID).drawEntry(entryID, p_180791_2_, p_180791_3_, this.getListWidth(), p_180791_4_, p_180791_5_, p_180791_6_, this.getSlotIndexFromScreenCoords(p_180791_5_, p_180791_6_) == entryID);
+    }
+
+    protected void drawSlot(int entryID, int p_180791_2_, int p_180791_3_, int p_180791_4_, int mouseXIn, int mouseYIn)
+    {
+        this.getListEntry(entryID).drawEntry(entryID, p_180791_2_, p_180791_3_, this.getListWidth(), p_180791_4_, mouseXIn, mouseYIn, this.getSlotIndexFromScreenCoords(mouseXIn, mouseYIn) == entryID);
     }
 
     protected void func_178040_a(int p_178040_1_, int p_178040_2_, int p_178040_3_)
@@ -43,16 +45,16 @@ public abstract class GuiListExtended extends GuiSlot
     {
         if (this.isMouseYWithinSlotBounds(mouseY))
         {
-            int l = this.getSlotIndexFromScreenCoords(mouseX, mouseY);
+            int i = this.getSlotIndexFromScreenCoords(mouseX, mouseY);
 
-            if (l >= 0)
+            if (i >= 0)
             {
-                int i1 = this.left + this.width / 2 - this.getListWidth() / 2 + 2;
-                int j1 = this.top + 4 - this.getAmountScrolled() + l * this.slotHeight + this.headerPadding;
-                int k1 = mouseX - i1;
-                int l1 = mouseY - j1;
+                int j = this.left + this.width / 2 - this.getListWidth() / 2 + 2;
+                int k = this.top + 4 - this.getAmountScrolled() + i * this.slotHeight + this.headerPadding;
+                int l = mouseX - j;
+                int i1 = mouseY - k;
 
-                if (this.getListEntry(l).mousePressed(l, mouseX, mouseY, mouseEvent, k1, l1))
+                if (this.getListEntry(i).mousePressed(i, mouseX, mouseY, mouseEvent, l, i1))
                 {
                     this.setEnabled(false);
                     return true;
@@ -65,13 +67,13 @@ public abstract class GuiListExtended extends GuiSlot
 
     public boolean mouseReleased(int p_148181_1_, int p_148181_2_, int p_148181_3_)
     {
-        for (int l = 0; l < this.getSize(); ++l)
+        for (int i = 0; i < this.getSize(); ++i)
         {
-            int i1 = this.left + this.width / 2 - this.getListWidth() / 2 + 2;
-            int j1 = this.top + 4 - this.getAmountScrolled() + l * this.slotHeight + this.headerPadding;
-            int k1 = p_148181_1_ - i1;
-            int l1 = p_148181_2_ - j1;
-            this.getListEntry(l).mouseReleased(l, p_148181_1_, p_148181_2_, p_148181_3_, k1, l1);
+            int j = this.left + this.width / 2 - this.getListWidth() / 2 + 2;
+            int k = this.top + 4 - this.getAmountScrolled() + i * this.slotHeight + this.headerPadding;
+            int l = p_148181_1_ - j;
+            int i1 = p_148181_2_ - k;
+            this.getListEntry(i).mouseReleased(i, p_148181_1_, p_148181_2_, p_148181_3_, l, i1);
         }
 
         this.setEnabled(true);
@@ -81,7 +83,7 @@ public abstract class GuiListExtended extends GuiSlot
     /**
      * Gets the IGuiListEntry object for the given index
      */
-    public abstract GuiListExtended.IGuiListEntry getListEntry(int p_148180_1_);
+    public abstract GuiListExtended.IGuiListEntry getListEntry(int index);
 
     @SideOnly(Side.CLIENT)
     public interface IGuiListEntry
@@ -93,7 +95,7 @@ public abstract class GuiListExtended extends GuiSlot
         /**
          * Returns true if the mouse has been pressed on this control.
          */
-        boolean mousePressed(int p_148278_1_, int p_148278_2_, int p_148278_3_, int p_148278_4_, int p_148278_5_, int p_148278_6_);
+        boolean mousePressed(int slotIndex, int p_148278_2_, int p_148278_3_, int p_148278_4_, int p_148278_5_, int p_148278_6_);
 
         /**
          * Fired when the mouse button is released. Arguments: index, x, y, mouseEvent, relativeX, relativeY

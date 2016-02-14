@@ -1,7 +1,6 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -9,24 +8,25 @@ import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S28PacketEffect implements Packet
+public class S28PacketEffect implements Packet<INetHandlerPlayClient>
 {
     private int soundType;
-    private BlockPos field_179747_b;
+    private BlockPos soundPos;
     /** can be a block/item id or other depending on the soundtype */
     private int soundData;
     /** If true the sound is played across the server */
     private boolean serverWide;
-    private static final String __OBFID = "CL_00001307";
 
-    public S28PacketEffect() {}
-
-    public S28PacketEffect(int p_i45978_1_, BlockPos p_i45978_2_, int p_i45978_3_, boolean p_i45978_4_)
+    public S28PacketEffect()
     {
-        this.soundType = p_i45978_1_;
-        this.field_179747_b = p_i45978_2_;
-        this.soundData = p_i45978_3_;
-        this.serverWide = p_i45978_4_;
+    }
+
+    public S28PacketEffect(int soundTypeIn, BlockPos soundPosIn, int soundDataIn, boolean serverWideIn)
+    {
+        this.soundType = soundTypeIn;
+        this.soundPos = soundPosIn;
+        this.soundData = soundDataIn;
+        this.serverWide = serverWideIn;
     }
 
     /**
@@ -35,7 +35,7 @@ public class S28PacketEffect implements Packet
     public void readPacketData(PacketBuffer buf) throws IOException
     {
         this.soundType = buf.readInt();
-        this.field_179747_b = buf.readBlockPos();
+        this.soundPos = buf.readBlockPos();
         this.soundData = buf.readInt();
         this.serverWide = buf.readBoolean();
     }
@@ -46,28 +46,23 @@ public class S28PacketEffect implements Packet
     public void writePacketData(PacketBuffer buf) throws IOException
     {
         buf.writeInt(this.soundType);
-        buf.writeBlockPos(this.field_179747_b);
+        buf.writeBlockPos(this.soundPos);
         buf.writeInt(this.soundData);
         buf.writeBoolean(this.serverWide);
     }
 
-    public void func_180739_a(INetHandlerPlayClient p_180739_1_)
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
+    public void processPacket(INetHandlerPlayClient handler)
     {
-        p_180739_1_.handleEffect(this);
+        handler.handleEffect(this);
     }
 
     @SideOnly(Side.CLIENT)
     public boolean isSoundServerwide()
     {
         return this.serverWide;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.func_180739_a((INetHandlerPlayClient)handler);
     }
 
     @SideOnly(Side.CLIENT)
@@ -83,8 +78,8 @@ public class S28PacketEffect implements Packet
     }
 
     @SideOnly(Side.CLIENT)
-    public BlockPos func_179746_d()
+    public BlockPos getSoundPos()
     {
-        return this.field_179747_b;
+        return this.soundPos;
     }
 }

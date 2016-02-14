@@ -19,7 +19,6 @@ public class GuiHopper extends GuiContainer
     private IInventory playerInventory;
     /** The hopper inventory bound to this GUI instance */
     private IInventory hopperInventory;
-    private static final String __OBFID = "CL_00000759";
 
     public GuiHopper(InventoryPlayer playerInv, IInventory hopperInv)
     {
@@ -46,8 +45,8 @@ public class GuiHopper extends GuiContainer
     {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(HOPPER_GUI_TEXTURE);
-        int k = (this.width - this.xSize) / 2;
-        int l = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(k, l, 0, 0, this.xSize, this.ySize);
+        int i = (this.width - this.xSize) / 2;
+        int j = (this.height - this.ySize) / 2;
+        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
     }
 }

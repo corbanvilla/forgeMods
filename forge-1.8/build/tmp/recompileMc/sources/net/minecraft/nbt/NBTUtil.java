@@ -2,14 +2,11 @@ package net.minecraft.nbt;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import java.util.Iterator;
 import java.util.UUID;
 import net.minecraft.util.StringUtils;
 
 public final class NBTUtil
 {
-    private static final String __OBFID = "CL_00001901";
-
     /**
      * Reads and returns a GameProfile that has been saved to the passed in NBTTagCompound
      */
@@ -40,7 +37,7 @@ public final class NBTUtil
             {
                 uuid = UUID.fromString(s1);
             }
-            catch (Throwable throwable)
+            catch (Throwable var12)
             {
                 uuid = null;
             }
@@ -49,22 +46,20 @@ public final class NBTUtil
 
             if (compound.hasKey("Properties", 10))
             {
-                NBTTagCompound nbttagcompound1 = compound.getCompoundTag("Properties");
-                Iterator iterator = nbttagcompound1.getKeySet().iterator();
+                NBTTagCompound nbttagcompound = compound.getCompoundTag("Properties");
 
-                while (iterator.hasNext())
+                for (String s2 : nbttagcompound.getKeySet())
                 {
-                    String s2 = (String)iterator.next();
-                    NBTTagList nbttaglist = nbttagcompound1.getTagList(s2, 10);
+                    NBTTagList nbttaglist = nbttagcompound.getTagList(s2, 10);
 
                     for (int i = 0; i < nbttaglist.tagCount(); ++i)
                     {
-                        NBTTagCompound nbttagcompound2 = nbttaglist.getCompoundTagAt(i);
-                        String s3 = nbttagcompound2.getString("Value");
+                        NBTTagCompound nbttagcompound1 = nbttaglist.getCompoundTagAt(i);
+                        String s3 = nbttagcompound1.getString("Value");
 
-                        if (nbttagcompound2.hasKey("Signature", 8))
+                        if (nbttagcompound1.hasKey("Signature", 8))
                         {
-                            gameprofile.getProperties().put(s2, new Property(s2, s3, nbttagcompound2.getString("Signature")));
+                            gameprofile.getProperties().put(s2, new Property(s2, s3, nbttagcompound1.getString("Signature")));
                         }
                         else
                         {
@@ -80,9 +75,6 @@ public final class NBTUtil
 
     /**
      * Writes a GameProfile to an NBTTagCompound.
-     *  
-     * @param tagCompound The NBTTagCompound to write the GameProfile to.
-     * @param profile The game profile you are saving.
      */
     public static NBTTagCompound writeGameProfile(NBTTagCompound tagCompound, GameProfile profile)
     {
@@ -98,33 +90,106 @@ public final class NBTUtil
 
         if (!profile.getProperties().isEmpty())
         {
-            NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-            Iterator iterator = profile.getProperties().keySet().iterator();
+            NBTTagCompound nbttagcompound = new NBTTagCompound();
 
-            while (iterator.hasNext())
+            for (String s : profile.getProperties().keySet())
             {
-                String s = (String)iterator.next();
                 NBTTagList nbttaglist = new NBTTagList();
-                NBTTagCompound nbttagcompound2;
 
-                for (Iterator iterator1 = profile.getProperties().get(s).iterator(); iterator1.hasNext(); nbttaglist.appendTag(nbttagcompound2))
+                for (Property property : profile.getProperties().get(s))
                 {
-                    Property property = (Property)iterator1.next();
-                    nbttagcompound2 = new NBTTagCompound();
-                    nbttagcompound2.setString("Value", property.getValue());
+                    NBTTagCompound nbttagcompound1 = new NBTTagCompound();
+                    nbttagcompound1.setString("Value", property.getValue());
 
                     if (property.hasSignature())
                     {
-                        nbttagcompound2.setString("Signature", property.getSignature());
+                        nbttagcompound1.setString("Signature", property.getSignature());
                     }
+
+                    nbttaglist.appendTag(nbttagcompound1);
                 }
 
-                nbttagcompound1.setTag(s, nbttaglist);
+                nbttagcompound.setTag(s, nbttaglist);
             }
 
-            tagCompound.setTag("Properties", nbttagcompound1);
+            tagCompound.setTag("Properties", nbttagcompound);
         }
 
         return tagCompound;
+    }
+
+    public static boolean func_181123_a(NBTBase p_181123_0_, NBTBase p_181123_1_, boolean p_181123_2_)
+    {
+        if (p_181123_0_ == p_181123_1_)
+        {
+            return true;
+        }
+        else if (p_181123_0_ == null)
+        {
+            return true;
+        }
+        else if (p_181123_1_ == null)
+        {
+            return false;
+        }
+        else if (!p_181123_0_.getClass().equals(p_181123_1_.getClass()))
+        {
+            return false;
+        }
+        else if (p_181123_0_ instanceof NBTTagCompound)
+        {
+            NBTTagCompound nbttagcompound = (NBTTagCompound)p_181123_0_;
+            NBTTagCompound nbttagcompound1 = (NBTTagCompound)p_181123_1_;
+
+            for (String s : nbttagcompound.getKeySet())
+            {
+                NBTBase nbtbase1 = nbttagcompound.getTag(s);
+
+                if (!func_181123_a(nbtbase1, nbttagcompound1.getTag(s), p_181123_2_))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        else if (p_181123_0_ instanceof NBTTagList && p_181123_2_)
+        {
+            NBTTagList nbttaglist = (NBTTagList)p_181123_0_;
+            NBTTagList nbttaglist1 = (NBTTagList)p_181123_1_;
+
+            if (nbttaglist.tagCount() == 0)
+            {
+                return nbttaglist1.tagCount() == 0;
+            }
+            else
+            {
+                for (int i = 0; i < nbttaglist.tagCount(); ++i)
+                {
+                    NBTBase nbtbase = nbttaglist.get(i);
+                    boolean flag = false;
+
+                    for (int j = 0; j < nbttaglist1.tagCount(); ++j)
+                    {
+                        if (func_181123_a(nbtbase, nbttaglist1.get(j), p_181123_2_))
+                        {
+                            flag = true;
+                            break;
+                        }
+                    }
+
+                    if (!flag)
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }
+        else
+        {
+            return p_181123_0_.equals(p_181123_1_);
+        }
     }
 }

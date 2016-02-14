@@ -10,17 +10,19 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import net.minecraftforge.fml.relauncher.Side;
@@ -29,16 +31,15 @@ import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class UserList
+public class UserList<K, V extends UserListEntry<K>>
 {
     protected static final Logger logger = LogManager.getLogger();
     protected final Gson gson;
     private final File saveFile;
-    private final Map values = Maps.newHashMap();
+    private final Map<String, V> values = Maps.<String, V>newHashMap();
     private boolean lanServer = true;
     private static final ParameterizedType saveFileFormat = new ParameterizedType()
     {
-        private static final String __OBFID = "CL_00001875";
         public Type[] getActualTypeArguments()
         {
             return new Type[] {UserListEntry.class};
@@ -52,13 +53,12 @@ public class UserList
             return null;
         }
     };
-    private static final String __OBFID = "CL_00001876";
 
     public UserList(File saveFile)
     {
         this.saveFile = saveFile;
         GsonBuilder gsonbuilder = (new GsonBuilder()).setPrettyPrinting();
-        gsonbuilder.registerTypeHierarchyAdapter(UserListEntry.class, new UserList.Serializer(null));
+        gsonbuilder.registerTypeHierarchyAdapter(UserListEntry.class, new UserList.Serializer());
         this.gson = gsonbuilder.create();
     }
 
@@ -75,7 +75,7 @@ public class UserList
     /**
      * Adds an entry to the list
      */
-    public void addEntry(UserListEntry entry)
+    public void addEntry(V entry)
     {
         this.values.put(this.getObjectKey(entry.getValue()), entry);
 
@@ -85,19 +85,19 @@ public class UserList
         }
         catch (IOException ioexception)
         {
-            logger.warn("Could not save the list after adding a user.", ioexception);
+            logger.warn((String)"Could not save the list after adding a user.", (Throwable)ioexception);
         }
     }
 
-    public UserListEntry getEntry(Object obj)
+    public V getEntry(K obj)
     {
         this.removeExpired();
-        return (UserListEntry)this.values.get(this.getObjectKey(obj));
+        return (V)((UserListEntry)this.values.get(this.getObjectKey(obj)));
     }
 
-    public void removeEntry(Object p_152684_1_)
+    public void removeEntry(K entry)
     {
-        this.values.remove(this.getObjectKey(p_152684_1_));
+        this.values.remove(this.getObjectKey(entry));
 
         try
         {
@@ -105,7 +105,7 @@ public class UserList
         }
         catch (IOException ioexception)
         {
-            logger.warn("Could not save the list after removing a user.", ioexception);
+            logger.warn((String)"Could not save the list after removing a user.", (Throwable)ioexception);
         }
     }
 
@@ -123,58 +123,51 @@ public class UserList
     /**
      * Gets the key value for the given object
      */
-    protected String getObjectKey(Object obj)
+    protected String getObjectKey(K obj)
     {
         return obj.toString();
     }
 
-    protected boolean hasEntry(Object entry)
+    protected boolean hasEntry(K entry)
     {
         return this.values.containsKey(this.getObjectKey(entry));
     }
 
     /**
-     * Removes expired bans from the list. Never actually does anything since UserListEntry#hasBanExpired always returns
-     * false. Appears to be an effort by Mojang to add temp ban functionality. (1.7.10)
+     * Removes expired bans from the list. See {@link BanEntry#hasBanExpired}
      */
     private void removeExpired()
     {
-        ArrayList arraylist = Lists.newArrayList();
-        Iterator iterator = this.values.values().iterator();
+        List<K> list = Lists.<K>newArrayList();
 
-        while (iterator.hasNext())
+        for (V v : this.values.values())
         {
-            UserListEntry userlistentry = (UserListEntry)iterator.next();
-
-            if (userlistentry.hasBanExpired())
+            if (v.hasBanExpired())
             {
-                arraylist.add(userlistentry.getValue());
+                list.add(v.getValue());
             }
         }
 
-        iterator = arraylist.iterator();
-
-        while (iterator.hasNext())
+        for (K k : list)
         {
-            Object object = iterator.next();
-            this.values.remove(object);
+            this.values.remove(k);
         }
     }
 
-    protected UserListEntry createEntry(JsonObject entryData)
+    protected UserListEntry<K> createEntry(JsonObject entryData)
     {
         return new UserListEntry((Object)null, entryData);
     }
 
-    protected Map getValues()
+    protected Map<String, V> getValues()
     {
         return this.values;
     }
 
     public void writeChanges() throws IOException
     {
-        Collection collection = this.values.values();
-        String s = this.gson.toJson(collection);
+        Collection<V> collection = this.values.values();
+        String s = this.gson.toJson((Object)collection);
         BufferedWriter bufferedwriter = null;
 
         try
@@ -184,89 +177,71 @@ public class UserList
         }
         finally
         {
-            IOUtils.closeQuietly(bufferedwriter);
+            IOUtils.closeQuietly((Writer)bufferedwriter);
         }
     }
 
     @SideOnly(Side.SERVER)
-    public boolean hasEntries()
+    public boolean isEmpty()
     {
         return this.values.size() < 1;
     }
 
     @SideOnly(Side.SERVER)
-    public void readSavedFile() throws IOException
+    public void readSavedFile() throws IOException, FileNotFoundException
     {
-        Collection collection = null;
+        Collection<UserListEntry<K>> collection = null;
         BufferedReader bufferedreader = null;
 
         try
         {
             bufferedreader = Files.newReader(this.saveFile, Charsets.UTF_8);
-            collection = (Collection)this.gson.fromJson(bufferedreader, saveFileFormat);
+            collection = (Collection)this.gson.fromJson((Reader)bufferedreader, saveFileFormat);
         }
         finally
         {
-            IOUtils.closeQuietly(bufferedreader);
+            IOUtils.closeQuietly((Reader)bufferedreader);
         }
 
         if (collection != null)
         {
             this.values.clear();
-            Iterator iterator = collection.iterator();
 
-            while (iterator.hasNext())
+            for (UserListEntry<K> userlistentry : collection)
             {
-                UserListEntry userlistentry = (UserListEntry)iterator.next();
-
                 if (userlistentry.getValue() != null)
                 {
-                    this.values.put(this.getObjectKey(userlistentry.getValue()), userlistentry);
+                    this.values.put(this.getObjectKey(userlistentry.getValue()), (V)userlistentry);
                 }
             }
         }
     }
 
-    class Serializer implements JsonDeserializer, JsonSerializer
+    class Serializer implements JsonDeserializer<UserListEntry<K>>, JsonSerializer<UserListEntry<K>>
     {
-        private static final String __OBFID = "CL_00001874";
+        private Serializer()
+        {
+        }
 
-        private Serializer() {}
-
-        public JsonElement serializeEntry(UserListEntry p_152751_1_, Type p_152751_2_, JsonSerializationContext p_152751_3_)
+        public JsonElement serialize(UserListEntry<K> p_serialize_1_, Type p_serialize_2_, JsonSerializationContext p_serialize_3_)
         {
             JsonObject jsonobject = new JsonObject();
-            p_152751_1_.onSerialization(jsonobject);
+            p_serialize_1_.onSerialization(jsonobject);
             return jsonobject;
         }
 
-        public UserListEntry deserializeEntry(JsonElement p_152750_1_, Type p_152750_2_, JsonDeserializationContext p_152750_3_)
+        public UserListEntry<K> deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_) throws JsonParseException
         {
-            if (p_152750_1_.isJsonObject())
+            if (p_deserialize_1_.isJsonObject())
             {
-                JsonObject jsonobject = p_152750_1_.getAsJsonObject();
-                UserListEntry userlistentry = UserList.this.createEntry(jsonobject);
+                JsonObject jsonobject = p_deserialize_1_.getAsJsonObject();
+                UserListEntry<K> userlistentry = UserList.this.createEntry(jsonobject);
                 return userlistentry;
             }
             else
             {
                 return null;
             }
-        }
-
-        public JsonElement serialize(Object p_serialize_1_, Type p_serialize_2_, JsonSerializationContext p_serialize_3_)
-        {
-            return this.serializeEntry((UserListEntry)p_serialize_1_, p_serialize_2_, p_serialize_3_);
-        }
-
-        public Object deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_)
-        {
-            return this.deserializeEntry(p_deserialize_1_, p_deserialize_2_, p_deserialize_3_);
-        }
-
-        Serializer(Object p_i1141_2_)
-        {
-            this();
         }
     }
 }

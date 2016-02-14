@@ -21,13 +21,11 @@ import net.minecraft.world.World;
 
 public class EntityCow extends EntityAnimal
 {
-    private static final String __OBFID = "CL_00001640";
-
     public EntityCow(World worldIn)
     {
         super(worldIn);
         this.setSize(0.9F, 1.3F);
-        ((PathNavigateGround)this.getNavigator()).func_179690_a(true);
+        ((PathNavigateGround)this.getNavigator()).setAvoidsWater(true);
         this.tasks.addTask(0, new EntityAISwimming(this));
         this.tasks.addTask(1, new EntityAIPanic(this, 2.0D));
         this.tasks.addTask(2, new EntityAIMate(this, 1.0D));
@@ -69,7 +67,7 @@ public class EntityCow extends EntityAnimal
         return "mob.cow.hurt";
     }
 
-    protected void playStepSound(BlockPos p_180429_1_, Block p_180429_2_)
+    protected void playStepSound(BlockPos pos, Block blockIn)
     {
         this.playSound("mob.cow.step", 0.15F, 1.0F);
     }
@@ -92,17 +90,16 @@ public class EntityCow extends EntityAnimal
      */
     protected void dropFewItems(boolean p_70628_1_, int p_70628_2_)
     {
-        int j = this.rand.nextInt(3) + this.rand.nextInt(1 + p_70628_2_);
-        int k;
+        int i = this.rand.nextInt(3) + this.rand.nextInt(1 + p_70628_2_);
 
-        for (k = 0; k < j; ++k)
+        for (int j = 0; j < i; ++j)
         {
             this.dropItem(Items.leather, 1);
         }
 
-        j = this.rand.nextInt(3) + 1 + this.rand.nextInt(1 + p_70628_2_);
+        i = this.rand.nextInt(3) + 1 + this.rand.nextInt(1 + p_70628_2_);
 
-        for (k = 0; k < j; ++k)
+        for (int k = 0; k < i; ++k)
         {
             if (this.isBurning())
             {
@@ -122,7 +119,7 @@ public class EntityCow extends EntityAnimal
     {
         ItemStack itemstack = player.inventory.getCurrentItem();
 
-        if (itemstack != null && itemstack.getItem() == Items.bucket && !player.capabilities.isCreativeMode)
+        if (itemstack != null && itemstack.getItem() == Items.bucket && !player.capabilities.isCreativeMode && !this.isChild())
         {
             if (itemstack.stackSize-- == 1)
             {

@@ -1,7 +1,6 @@
 package net.minecraft.client.gui;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.IChatComponent;
@@ -13,10 +12,9 @@ public class GuiDisconnected extends GuiScreen
 {
     private String reason;
     private IChatComponent message;
-    private List multilineMessage;
+    private List<String> multilineMessage;
     private final GuiScreen parentScreen;
     private int field_175353_i;
-    private static final String __OBFID = "CL_00000693";
 
     public GuiDisconnected(GuiScreen screen, String reasonLocalizationKey, IChatComponent chatComp)
     {
@@ -26,13 +24,16 @@ public class GuiDisconnected extends GuiScreen
     }
 
     /**
-     * Fired when a key is typed (except F11 who toggle full screen). This is the equivalent of
+     * Fired when a key is typed (except F11 which toggles full screen). This is the equivalent of
      * KeyListener.keyTyped(KeyEvent e). Args : character (character on the key), keyCode (lwjgl Keyboard key code)
      */
-    protected void keyTyped(char typedChar, int keyCode) throws IOException {}
+    protected void keyTyped(char typedChar, int keyCode) throws IOException
+    {
+    }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
     public void initGui()
     {
@@ -42,6 +43,9 @@ public class GuiDisconnected extends GuiScreen
         this.buttonList.add(new GuiButton(0, this.width / 2 - 100, this.height / 2 + this.field_175353_i / 2 + this.fontRendererObj.FONT_HEIGHT, I18n.format("gui.toMenu", new Object[0])));
     }
 
+    /**
+     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
+     */
     protected void actionPerformed(GuiButton button) throws IOException
     {
         if (button.id == 0)
@@ -57,14 +61,14 @@ public class GuiDisconnected extends GuiScreen
     {
         this.drawDefaultBackground();
         this.drawCenteredString(this.fontRendererObj, this.reason, this.width / 2, this.height / 2 - this.field_175353_i / 2 - this.fontRendererObj.FONT_HEIGHT * 2, 11184810);
-        int k = this.height / 2 - this.field_175353_i / 2;
+        int i = this.height / 2 - this.field_175353_i / 2;
 
         if (this.multilineMessage != null)
         {
-            for (Iterator iterator = this.multilineMessage.iterator(); iterator.hasNext(); k += this.fontRendererObj.FONT_HEIGHT)
+            for (String s : this.multilineMessage)
             {
-                String s = (String)iterator.next();
-                this.drawCenteredString(this.fontRendererObj, s, this.width / 2, k, 16777215);
+                this.drawCenteredString(this.fontRendererObj, s, this.width / 2, i, 16777215);
+                i += this.fontRendererObj.FONT_HEIGHT;
             }
         }
 

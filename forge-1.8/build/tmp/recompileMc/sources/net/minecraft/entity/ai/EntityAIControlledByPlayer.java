@@ -24,12 +24,11 @@ public class EntityAIControlledByPlayer extends EntityAIBase
     private int speedBoostTime;
     /** Maximum time the entity's speed should be boosted for. */
     private int maxSpeedBoostTime;
-    private static final String __OBFID = "CL_00001580";
 
-    public EntityAIControlledByPlayer(EntityLiving p_i1620_1_, float p_i1620_2_)
+    public EntityAIControlledByPlayer(EntityLiving entitylivingIn, float maxspeed)
     {
-        this.thisEntity = p_i1620_1_;
-        this.maxSpeed = p_i1620_2_;
+        this.thisEntity = entitylivingIn;
+        this.maxSpeed = maxspeed;
         this.setMutexBits(7);
     }
 
@@ -190,9 +189,9 @@ public class EntityAIControlledByPlayer extends EntityAIBase
     /**
      * True if the block is a stair block or a slab block
      */
-    private boolean isStairOrSlab(Block p_151498_1_)
+    private boolean isStairOrSlab(Block blockIn)
     {
-        return p_151498_1_ instanceof BlockStairs || p_151498_1_ instanceof BlockSlab;
+        return blockIn instanceof BlockStairs || blockIn instanceof BlockSlab;
     }
 
     /**

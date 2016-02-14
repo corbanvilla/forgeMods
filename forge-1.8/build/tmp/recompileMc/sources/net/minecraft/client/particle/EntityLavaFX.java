@@ -12,11 +12,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class EntityLavaFX extends EntityFX
 {
     private float lavaParticleScale;
-    private static final String __OBFID = "CL_00000912";
 
-    protected EntityLavaFX(World worldIn, double p_i1215_2_, double p_i1215_4_, double p_i1215_6_)
+    protected EntityLavaFX(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn)
     {
-        super(worldIn, p_i1215_2_, p_i1215_4_, p_i1215_6_, 0.0D, 0.0D, 0.0D);
+        super(worldIn, xCoordIn, yCoordIn, zCoordIn, 0.0D, 0.0D, 0.0D);
         this.motionX *= 0.800000011920929D;
         this.motionY *= 0.800000011920929D;
         this.motionZ *= 0.800000011920929D;
@@ -29,29 +28,32 @@ public class EntityLavaFX extends EntityFX
         this.setParticleTextureIndex(49);
     }
 
-    public int getBrightnessForRender(float p_70070_1_)
+    public int getBrightnessForRender(float partialTicks)
     {
-        float f1 = ((float)this.particleAge + p_70070_1_) / (float)this.particleMaxAge;
-        f1 = MathHelper.clamp_float(f1, 0.0F, 1.0F);
-        int i = super.getBrightnessForRender(p_70070_1_);
-        short short1 = 240;
-        int j = i >> 16 & 255;
-        return short1 | j << 16;
+        float f = ((float)this.particleAge + partialTicks) / (float)this.particleMaxAge;
+        f = MathHelper.clamp_float(f, 0.0F, 1.0F);
+        int i = super.getBrightnessForRender(partialTicks);
+        int j = 240;
+        int k = i >> 16 & 255;
+        return j | k << 16;
     }
 
     /**
      * Gets how bright this entity is.
      */
-    public float getBrightness(float p_70013_1_)
+    public float getBrightness(float partialTicks)
     {
         return 1.0F;
     }
 
-    public void func_180434_a(WorldRenderer p_180434_1_, Entity p_180434_2_, float p_180434_3_, float p_180434_4_, float p_180434_5_, float p_180434_6_, float p_180434_7_, float p_180434_8_)
+    /**
+     * Renders the particle
+     */
+    public void renderParticle(WorldRenderer worldRendererIn, Entity entityIn, float partialTicks, float p_180434_4_, float p_180434_5_, float p_180434_6_, float p_180434_7_, float p_180434_8_)
     {
-        float f6 = ((float)this.particleAge + p_180434_3_) / (float)this.particleMaxAge;
-        this.particleScale = this.lavaParticleScale * (1.0F - f6 * f6);
-        super.func_180434_a(p_180434_1_, p_180434_2_, p_180434_3_, p_180434_4_, p_180434_5_, p_180434_6_, p_180434_7_, p_180434_8_);
+        float f = ((float)this.particleAge + partialTicks) / (float)this.particleMaxAge;
+        this.particleScale = this.lavaParticleScale * (1.0F - f * f);
+        super.renderParticle(worldRendererIn, entityIn, partialTicks, p_180434_4_, p_180434_5_, p_180434_6_, p_180434_7_, p_180434_8_);
     }
 
     /**
@@ -91,11 +93,9 @@ public class EntityLavaFX extends EntityFX
     @SideOnly(Side.CLIENT)
     public static class Factory implements IParticleFactory
         {
-            private static final String __OBFID = "CL_00002595";
-
-            public EntityFX getEntityFX(int p_178902_1_, World worldIn, double p_178902_3_, double p_178902_5_, double p_178902_7_, double p_178902_9_, double p_178902_11_, double p_178902_13_, int ... p_178902_15_)
+            public EntityFX getEntityFX(int particleID, World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn, int... p_178902_15_)
             {
-                return new EntityLavaFX(worldIn, p_178902_3_, p_178902_5_, p_178902_7_);
+                return new EntityLavaFX(worldIn, xCoordIn, yCoordIn, zCoordIn);
             }
         }
 }

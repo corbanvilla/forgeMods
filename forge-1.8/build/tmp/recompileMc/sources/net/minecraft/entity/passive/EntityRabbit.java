@@ -1,6 +1,5 @@
 package net.minecraft.entity.passive;
 
-import com.google.common.base.Predicate;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCarrot;
 import net.minecraft.block.state.IBlockState;
@@ -33,6 +32,7 @@ import net.minecraft.pathfinding.PathNavigateGround;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.StatCollector;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.DifficultyInstance;
@@ -42,59 +42,46 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class EntityRabbit extends EntityAnimal
 {
-    private EntityRabbit.AIAvoidEntity field_175539_bk;
+    private EntityRabbit.AIAvoidEntity<EntityWolf> aiAvoidWolves;
     private int field_175540_bm = 0;
     private int field_175535_bn = 0;
     private boolean field_175536_bo = false;
     private boolean field_175537_bp = false;
-    private int field_175538_bq = 0;
-    private EntityRabbit.EnumMoveType moveType;
-    private int carrotTicks;
-    private EntityPlayer field_175543_bt;
-    private static final String __OBFID = "CL_00002242";
+    private int currentMoveTypeDuration = 0;
+    private EntityRabbit.EnumMoveType moveType = EntityRabbit.EnumMoveType.HOP;
+    private int carrotTicks = 0;
+    private EntityPlayer field_175543_bt = null;
 
     public EntityRabbit(World worldIn)
     {
         super(worldIn);
-        this.moveType = EntityRabbit.EnumMoveType.HOP;
-        this.carrotTicks = 0;
-        this.field_175543_bt = null;
         this.setSize(0.6F, 0.7F);
         this.jumpHelper = new EntityRabbit.RabbitJumpHelper(this);
-        this.moveHelper = new EntityRabbit.RabbitMoveHelper();
-        ((PathNavigateGround)this.getNavigator()).func_179690_a(true);
-        this.navigator.func_179678_a(2.5F);
+        this.moveHelper = new EntityRabbit.RabbitMoveHelper(this);
+        ((PathNavigateGround)this.getNavigator()).setAvoidsWater(true);
+        this.navigator.setHeightRequirement(2.5F);
         this.tasks.addTask(1, new EntityAISwimming(this));
-        this.tasks.addTask(1, new EntityRabbit.AIPanic(1.33D));
+        this.tasks.addTask(1, new EntityRabbit.AIPanic(this, 1.33D));
         this.tasks.addTask(2, new EntityAITempt(this, 1.0D, Items.carrot, false));
+        this.tasks.addTask(2, new EntityAITempt(this, 1.0D, Items.golden_carrot, false));
+        this.tasks.addTask(2, new EntityAITempt(this, 1.0D, Item.getItemFromBlock(Blocks.yellow_flower), false));
         this.tasks.addTask(3, new EntityAIMate(this, 0.8D));
-        this.tasks.addTask(5, new EntityRabbit.AIRaidFarm());
+        this.tasks.addTask(5, new EntityRabbit.AIRaidFarm(this));
         this.tasks.addTask(5, new EntityAIWander(this, 0.6D));
         this.tasks.addTask(11, new EntityAIWatchClosest(this, EntityPlayer.class, 10.0F));
-        this.field_175539_bk = new EntityRabbit.AIAvoidEntity(new Predicate()
-        {
-            private static final String __OBFID = "CL_00002241";
-            public boolean func_180086_a(Entity p_180086_1_)
-            {
-                return p_180086_1_ instanceof EntityWolf;
-            }
-            public boolean apply(Object p_apply_1_)
-            {
-                return this.func_180086_a((Entity)p_apply_1_);
-            }
-        }, 16.0F, 1.33D, 1.33D);
-        this.tasks.addTask(4, this.field_175539_bk);
-        this.func_175515_b(0.0D);
+        this.aiAvoidWolves = new EntityRabbit.AIAvoidEntity(this, EntityWolf.class, 16.0F, 1.33D, 1.33D);
+        this.tasks.addTask(4, this.aiAvoidWolves);
+        this.setMovementSpeed(0.0D);
     }
 
-    protected float func_175134_bD()
+    protected float getJumpUpwardsMotion()
     {
-        return this.moveHelper.isUpdating() && this.moveHelper.func_179919_e() > this.posY + 0.5D ? 0.5F : this.moveType.func_180074_b();
+        return this.moveHelper.isUpdating() && this.moveHelper.getY() > this.posY + 0.5D ? 0.5F : this.moveType.func_180074_b();
     }
 
-    public void func_175522_a(EntityRabbit.EnumMoveType p_175522_1_)
+    public void setMoveType(EntityRabbit.EnumMoveType type)
     {
-        this.moveType = p_175522_1_;
+        this.moveType = type;
     }
 
     @SideOnly(Side.CLIENT)
@@ -103,17 +90,17 @@ public class EntityRabbit extends EntityAnimal
         return this.field_175535_bn == 0 ? 0.0F : ((float)this.field_175540_bm + p_175521_1_) / (float)this.field_175535_bn;
     }
 
-    public void func_175515_b(double p_175515_1_)
+    public void setMovementSpeed(double newSpeed)
     {
-        this.getNavigator().setSpeed(p_175515_1_);
-        this.moveHelper.setMoveTo(this.moveHelper.func_179917_d(), this.moveHelper.func_179919_e(), this.moveHelper.func_179918_f(), p_175515_1_);
+        this.getNavigator().setSpeed(newSpeed);
+        this.moveHelper.setMoveTo(this.moveHelper.getX(), this.moveHelper.getY(), this.moveHelper.getZ(), newSpeed);
     }
 
-    public void func_175519_a(boolean p_175519_1_, EntityRabbit.EnumMoveType p_175519_2_)
+    public void setJumping(boolean jump, EntityRabbit.EnumMoveType moveTypeIn)
     {
-        super.setJumping(p_175519_1_);
+        super.setJumping(jump);
 
-        if (!p_175519_1_)
+        if (!jump)
         {
             if (this.moveType == EntityRabbit.EnumMoveType.ATTACK)
             {
@@ -122,17 +109,17 @@ public class EntityRabbit extends EntityAnimal
         }
         else
         {
-            this.func_175515_b(1.5D * (double)p_175519_2_.func_180072_a());
-            this.playSound(this.func_175516_ck(), this.getSoundVolume(), ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F) * 0.8F);
+            this.setMovementSpeed(1.5D * (double)moveTypeIn.getSpeed());
+            this.playSound(this.getJumpingSound(), this.getSoundVolume(), ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F) * 0.8F);
         }
 
-        this.field_175536_bo = p_175519_1_;
+        this.field_175536_bo = jump;
     }
 
-    public void func_175524_b(EntityRabbit.EnumMoveType p_175524_1_)
+    public void doMovementAction(EntityRabbit.EnumMoveType movetype)
     {
-        this.func_175519_a(true, p_175524_1_);
-        this.field_175535_bn = p_175524_1_.func_180073_d();
+        this.setJumping(true, movetype);
+        this.field_175535_bn = movetype.func_180073_d();
         this.field_175540_bm = 0;
     }
 
@@ -151,16 +138,16 @@ public class EntityRabbit extends EntityAnimal
     {
         if (this.moveHelper.getSpeed() > 0.8D)
         {
-            this.func_175522_a(EntityRabbit.EnumMoveType.SPRINT);
+            this.setMoveType(EntityRabbit.EnumMoveType.SPRINT);
         }
         else if (this.moveType != EntityRabbit.EnumMoveType.ATTACK)
         {
-            this.func_175522_a(EntityRabbit.EnumMoveType.HOP);
+            this.setMoveType(EntityRabbit.EnumMoveType.HOP);
         }
 
-        if (this.field_175538_bq > 0)
+        if (this.currentMoveTypeDuration > 0)
         {
-            --this.field_175538_bq;
+            --this.currentMoveTypeDuration;
         }
 
         if (this.carrotTicks > 0)
@@ -177,42 +164,42 @@ public class EntityRabbit extends EntityAnimal
         {
             if (!this.field_175537_bp)
             {
-                this.func_175519_a(false, EntityRabbit.EnumMoveType.NONE);
+                this.setJumping(false, EntityRabbit.EnumMoveType.NONE);
                 this.func_175517_cu();
             }
 
-            if (this.getRabbitType() == 99 && this.field_175538_bq == 0)
+            if (this.getRabbitType() == 99 && this.currentMoveTypeDuration == 0)
             {
                 EntityLivingBase entitylivingbase = this.getAttackTarget();
 
                 if (entitylivingbase != null && this.getDistanceSqToEntity(entitylivingbase) < 16.0D)
                 {
-                    this.func_175533_a(entitylivingbase.posX, entitylivingbase.posZ);
+                    this.calculateRotationYaw(entitylivingbase.posX, entitylivingbase.posZ);
                     this.moveHelper.setMoveTo(entitylivingbase.posX, entitylivingbase.posY, entitylivingbase.posZ, this.moveHelper.getSpeed());
-                    this.func_175524_b(EntityRabbit.EnumMoveType.ATTACK);
+                    this.doMovementAction(EntityRabbit.EnumMoveType.ATTACK);
                     this.field_175537_bp = true;
                 }
             }
 
-            EntityRabbit.RabbitJumpHelper rabbitjumphelper = (EntityRabbit.RabbitJumpHelper)this.jumpHelper;
+            EntityRabbit.RabbitJumpHelper entityrabbit$rabbitjumphelper = (EntityRabbit.RabbitJumpHelper)this.jumpHelper;
 
-            if (!rabbitjumphelper.func_180067_c())
+            if (!entityrabbit$rabbitjumphelper.getIsJumping())
             {
-                if (this.moveHelper.isUpdating() && this.field_175538_bq == 0)
+                if (this.moveHelper.isUpdating() && this.currentMoveTypeDuration == 0)
                 {
                     PathEntity pathentity = this.navigator.getPath();
-                    Vec3 vec3 = new Vec3(this.moveHelper.func_179917_d(), this.moveHelper.func_179919_e(), this.moveHelper.func_179918_f());
+                    Vec3 vec3 = new Vec3(this.moveHelper.getX(), this.moveHelper.getY(), this.moveHelper.getZ());
 
                     if (pathentity != null && pathentity.getCurrentPathIndex() < pathentity.getCurrentPathLength())
                     {
                         vec3 = pathentity.getPosition(this);
                     }
 
-                    this.func_175533_a(vec3.xCoord, vec3.zCoord);
-                    this.func_175524_b(this.moveType);
+                    this.calculateRotationYaw(vec3.xCoord, vec3.zCoord);
+                    this.doMovementAction(this.moveType);
                 }
             }
-            else if (!rabbitjumphelper.func_180065_d())
+            else if (!entityrabbit$rabbitjumphelper.func_180065_d())
             {
                 this.func_175518_cr();
             }
@@ -224,11 +211,13 @@ public class EntityRabbit extends EntityAnimal
     /**
      * Attempts to create sprinting particles if the entity is sprinting and not in water.
      */
-    public void spawnRunningParticles() {}
-
-    private void func_175533_a(double p_175533_1_, double p_175533_3_)
+    public void spawnRunningParticles()
     {
-        this.rotationYaw = (float)(Math.atan2(p_175533_3_ - this.posZ, p_175533_1_ - this.posX) * 180.0D / Math.PI) - 90.0F;
+    }
+
+    private void calculateRotationYaw(double x, double z)
+    {
+        this.rotationYaw = (float)(MathHelper.atan2(z - this.posZ, x - this.posX) * 180.0D / Math.PI) - 90.0F;
     }
 
     private void func_175518_cr()
@@ -241,14 +230,14 @@ public class EntityRabbit extends EntityAnimal
         ((EntityRabbit.RabbitJumpHelper)this.jumpHelper).func_180066_a(false);
     }
 
-    private void func_175530_ct()
+    private void updateMoveTypeDuration()
     {
-        this.field_175538_bq = this.func_175532_cm();
+        this.currentMoveTypeDuration = this.getMoveTypeDuration();
     }
 
     private void func_175517_cu()
     {
-        this.func_175530_ct();
+        this.updateMoveTypeDuration();
         this.func_175520_cs();
     }
 
@@ -303,7 +292,7 @@ public class EntityRabbit extends EntityAnimal
         this.carrotTicks = tagCompund.getInteger("MoreCarrotTicks");
     }
 
-    protected String func_175516_ck()
+    protected String getJumpingSound()
     {
         return "mob.rabbit.hop";
     }
@@ -332,16 +321,16 @@ public class EntityRabbit extends EntityAnimal
         return "mob.rabbit.death";
     }
 
-    public boolean attackEntityAsMob(Entity p_70652_1_)
+    public boolean attackEntityAsMob(Entity entityIn)
     {
         if (this.getRabbitType() == 99)
         {
             this.playSound("mob.attack", 1.0F, (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
-            return p_70652_1_.attackEntityFrom(DamageSource.causeMobDamage(this), 8.0F);
+            return entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), 8.0F);
         }
         else
         {
-            return p_70652_1_.attackEntityFrom(DamageSource.causeMobDamage(this), 3.0F);
+            return entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), 3.0F);
         }
     }
 
@@ -362,9 +351,9 @@ public class EntityRabbit extends EntityAnimal
     }
 
     /**
-     * Makes entity wear random armor based on difficulty
+     * Causes this Entity to drop a random item.
      */
-    protected void addRandomArmor()
+    protected void addRandomDrop()
     {
         this.entityDropItem(new ItemStack(Items.rabbit_foot, 1), 0.0F);
     }
@@ -374,17 +363,16 @@ public class EntityRabbit extends EntityAnimal
      */
     protected void dropFewItems(boolean p_70628_1_, int p_70628_2_)
     {
-        int j = this.rand.nextInt(2) + this.rand.nextInt(1 + p_70628_2_);
-        int k;
+        int i = this.rand.nextInt(2) + this.rand.nextInt(1 + p_70628_2_);
 
-        for (k = 0; k < j; ++k)
+        for (int j = 0; j < i; ++j)
         {
             this.dropItem(Items.rabbit_hide, 1);
         }
 
-        j = this.rand.nextInt(2);
+        i = this.rand.nextInt(2);
 
-        for (k = 0; k < j; ++k)
+        for (int k = 0; k < i; ++k)
         {
             if (this.isBurning())
             {
@@ -397,18 +385,18 @@ public class EntityRabbit extends EntityAnimal
         }
     }
 
-    private boolean func_175525_a(Item p_175525_1_)
+    private boolean isRabbitBreedingItem(Item itemIn)
     {
-        return p_175525_1_ == Items.carrot || p_175525_1_ == Items.golden_carrot || p_175525_1_ == Item.getItemFromBlock(Blocks.yellow_flower);
+        return itemIn == Items.carrot || itemIn == Items.golden_carrot || itemIn == Item.getItemFromBlock(Blocks.yellow_flower);
     }
 
-    public EntityRabbit func_175526_b(EntityAgeable p_175526_1_)
+    public EntityRabbit createChild(EntityAgeable ageable)
     {
         EntityRabbit entityrabbit = new EntityRabbit(this.worldObj);
 
-        if (p_175526_1_ instanceof EntityRabbit)
+        if (ageable instanceof EntityRabbit)
         {
-            entityrabbit.setRabbitType(this.rand.nextBoolean() ? this.getRabbitType() : ((EntityRabbit)p_175526_1_).getRabbitType());
+            entityrabbit.setRabbitType(this.rand.nextBoolean() ? this.getRabbitType() : ((EntityRabbit)ageable).getRabbitType());
         }
 
         return entityrabbit;
@@ -420,7 +408,7 @@ public class EntityRabbit extends EntityAnimal
      */
     public boolean isBreedingItem(ItemStack stack)
     {
-        return stack != null && this.func_175525_a(stack.getItem());
+        return stack != null && this.isRabbitBreedingItem(stack.getItem());
     }
 
     public int getRabbitType()
@@ -432,8 +420,8 @@ public class EntityRabbit extends EntityAnimal
     {
         if (rabbitTypeId == 99)
         {
-            this.tasks.removeTask(this.field_175539_bk);
-            this.tasks.addTask(4, new EntityRabbit.AIEvilAttack());
+            this.tasks.removeTask(this.aiAvoidWolves);
+            this.tasks.addTask(4, new EntityRabbit.AIEvilAttack(this));
             this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, false, new Class[0]));
             this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, true));
             this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityWolf.class, true));
@@ -447,20 +435,24 @@ public class EntityRabbit extends EntityAnimal
         this.dataWatcher.updateObject(18, Byte.valueOf((byte)rabbitTypeId));
     }
 
-    public IEntityLivingData func_180482_a(DifficultyInstance p_180482_1_, IEntityLivingData p_180482_2_)
+    /**
+     * Called only once on an entity when first time spawned, via egg, mob spawner, natural spawning etc, but not called
+     * when entity is reloaded from nbt. Mainly used for initializing attributes and inventory
+     */
+    public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, IEntityLivingData livingdata)
     {
-        Object p_180482_2_1 = super.func_180482_a(p_180482_1_, p_180482_2_);
+        livingdata = super.onInitialSpawn(difficulty, livingdata);
         int i = this.rand.nextInt(6);
         boolean flag = false;
 
-        if (p_180482_2_1 instanceof EntityRabbit.RabbitTypeData)
+        if (livingdata instanceof EntityRabbit.RabbitTypeData)
         {
-            i = ((EntityRabbit.RabbitTypeData)p_180482_2_1).field_179427_a;
+            i = ((EntityRabbit.RabbitTypeData)livingdata).typeData;
             flag = true;
         }
         else
         {
-            p_180482_2_1 = new EntityRabbit.RabbitTypeData(i);
+            livingdata = new EntityRabbit.RabbitTypeData(i);
         }
 
         this.setRabbitType(i);
@@ -470,29 +462,35 @@ public class EntityRabbit extends EntityAnimal
             this.setGrowingAge(-24000);
         }
 
-        return (IEntityLivingData)p_180482_2_1;
+        return livingdata;
     }
 
-    private boolean func_175534_cv()
+    /**
+     * Returns true if {@link net.minecraft.entity.passive.EntityRabbit#carrotTicks carrotTicks} has reached zero
+     */
+    private boolean isCarrotEaten()
     {
         return this.carrotTicks == 0;
     }
 
-    protected int func_175532_cm()
+    /**
+     * Returns duration of the current {@link net.minecraft.entity.passive.EntityRabbit.EnumMoveType move type}
+     */
+    protected int getMoveTypeDuration()
     {
-        return this.moveType.func_180075_c();
+        return this.moveType.getDuration();
     }
 
-    protected void func_175528_cn()
+    protected void createEatingParticles()
     {
         this.worldObj.spawnParticle(EnumParticleTypes.BLOCK_DUST, this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.height), this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, 0.0D, 0.0D, 0.0D, new int[] {Block.getStateId(Blocks.carrots.getStateFromMeta(7))});
         this.carrotTicks = 100;
     }
 
     @SideOnly(Side.CLIENT)
-    public void handleHealthUpdate(byte p_70103_1_)
+    public void handleStatusUpdate(byte id)
     {
-        if (p_70103_1_ == 1)
+        if (id == 1)
         {
             this.createRunningParticles();
             this.field_175535_bn = 10;
@@ -500,170 +498,167 @@ public class EntityRabbit extends EntityAnimal
         }
         else
         {
-            super.handleHealthUpdate(p_70103_1_);
+            super.handleStatusUpdate(id);
         }
     }
 
-    public EntityAgeable createChild(EntityAgeable ageable)
-    {
-        return this.func_175526_b(ageable);
-    }
-
-    class AIAvoidEntity extends EntityAIAvoidEntity
-    {
-        private EntityRabbit entityInstance = EntityRabbit.this;
-        private static final String __OBFID = "CL_00002238";
-
-        public AIAvoidEntity(Predicate avoidPredicate, float p_i45865_3_, double p_i45865_4_, double p_i45865_6_)
+    static class AIAvoidEntity<T extends Entity> extends EntityAIAvoidEntity<T>
         {
-            super(EntityRabbit.this, avoidPredicate, p_i45865_3_, p_i45865_4_, p_i45865_6_);
-        }
+            private EntityRabbit entityInstance;
 
-        /**
-         * Updates the task
-         */
-        public void updateTask()
-        {
-            super.updateTask();
-        }
-    }
-
-    class AIEvilAttack extends EntityAIAttackOnCollide
-    {
-        private static final String __OBFID = "CL_00002240";
-
-        public AIEvilAttack()
-        {
-            super(EntityRabbit.this, EntityLivingBase.class, 1.4D, true);
-        }
-
-        protected double func_179512_a(EntityLivingBase p_179512_1_)
-        {
-            return (double)(4.0F + p_179512_1_.width);
-        }
-    }
-
-    class AIPanic extends EntityAIPanic
-    {
-        private EntityRabbit field_179486_b = EntityRabbit.this;
-        private static final String __OBFID = "CL_00002234";
-
-        public AIPanic(double p_i45861_2_)
-        {
-            super(EntityRabbit.this, p_i45861_2_);
-        }
-
-        /**
-         * Updates the task
-         */
-        public void updateTask()
-        {
-            super.updateTask();
-            this.field_179486_b.func_175515_b(this.speed);
-        }
-    }
-
-    class AIRaidFarm extends EntityAIMoveToBlock
-    {
-        private boolean field_179498_d;
-        private boolean field_179499_e = false;
-        private static final String __OBFID = "CL_00002233";
-
-        public AIRaidFarm()
-        {
-            super(EntityRabbit.this, 0.699999988079071D, 16);
-        }
-
-        /**
-         * Returns whether the EntityAIBase should begin execution.
-         */
-        public boolean shouldExecute()
-        {
-            if (this.field_179496_a <= 0)
+            public AIAvoidEntity(EntityRabbit p_i46403_1_, Class<T> p_i46403_2_, float p_i46403_3_, double p_i46403_4_, double p_i46403_6_)
             {
-                if (!EntityRabbit.this.worldObj.getGameRules().getGameRuleBooleanValue("mobGriefing"))
-                {
-                    return false;
-                }
-
-                this.field_179499_e = false;
-                this.field_179498_d = EntityRabbit.this.func_175534_cv();
+                super(p_i46403_1_, p_i46403_2_, p_i46403_3_, p_i46403_4_, p_i46403_6_);
+                this.entityInstance = p_i46403_1_;
             }
 
-            return super.shouldExecute();
-        }
-
-        /**
-         * Returns whether an in-progress EntityAIBase should continue executing
-         */
-        public boolean continueExecuting()
-        {
-            return this.field_179499_e && super.continueExecuting();
-        }
-
-        /**
-         * Execute a one shot task or start executing a continuous task
-         */
-        public void startExecuting()
-        {
-            super.startExecuting();
-        }
-
-        /**
-         * Resets the task
-         */
-        public void resetTask()
-        {
-            super.resetTask();
-        }
-
-        /**
-         * Updates the task
-         */
-        public void updateTask()
-        {
-            super.updateTask();
-            EntityRabbit.this.getLookHelper().setLookPosition((double)this.destinationBlock.getX() + 0.5D, (double)(this.destinationBlock.getY() + 1), (double)this.destinationBlock.getZ() + 0.5D, 10.0F, (float)EntityRabbit.this.getVerticalFaceSpeed());
-
-            if (this.func_179487_f())
+            /**
+             * Updates the task
+             */
+            public void updateTask()
             {
-                World world = EntityRabbit.this.worldObj;
-                BlockPos blockpos = this.destinationBlock.up();
-                IBlockState iblockstate = world.getBlockState(blockpos);
-                Block block = iblockstate.getBlock();
-
-                if (this.field_179499_e && block instanceof BlockCarrot && ((Integer)iblockstate.getValue(BlockCarrot.AGE)).intValue() == 7)
-                {
-                    world.setBlockState(blockpos, Blocks.air.getDefaultState(), 2);
-                    world.destroyBlock(blockpos, true);
-                    EntityRabbit.this.func_175528_cn();
-                }
-
-                this.field_179499_e = false;
-                this.field_179496_a = 10;
+                super.updateTask();
             }
         }
 
-        protected boolean func_179488_a(World worldIn, BlockPos p_179488_2_)
+    static class AIEvilAttack extends EntityAIAttackOnCollide
         {
-            Block block = worldIn.getBlockState(p_179488_2_).getBlock();
-
-            if (block == Blocks.farmland)
+            public AIEvilAttack(EntityRabbit p_i45867_1_)
             {
-                p_179488_2_ = p_179488_2_.up();
-                IBlockState iblockstate = worldIn.getBlockState(p_179488_2_);
-                block = iblockstate.getBlock();
+                super(p_i45867_1_, EntityLivingBase.class, 1.4D, true);
+            }
 
-                if (block instanceof BlockCarrot && ((Integer)iblockstate.getValue(BlockCarrot.AGE)).intValue() == 7 && this.field_179498_d && !this.field_179499_e)
+            protected double func_179512_a(EntityLivingBase attackTarget)
+            {
+                return (double)(4.0F + attackTarget.width);
+            }
+        }
+
+    static class AIPanic extends EntityAIPanic
+        {
+            private EntityRabbit theEntity;
+
+            public AIPanic(EntityRabbit p_i45861_1_, double speedIn)
+            {
+                super(p_i45861_1_, speedIn);
+                this.theEntity = p_i45861_1_;
+            }
+
+            /**
+             * Updates the task
+             */
+            public void updateTask()
+            {
+                super.updateTask();
+                this.theEntity.setMovementSpeed(this.speed);
+            }
+        }
+
+    static class AIRaidFarm extends EntityAIMoveToBlock
+        {
+            private final EntityRabbit field_179500_c;
+            private boolean field_179498_d;
+            private boolean field_179499_e = false;
+
+            public AIRaidFarm(EntityRabbit p_i45860_1_)
+            {
+                super(p_i45860_1_, 0.699999988079071D, 16);
+                this.field_179500_c = p_i45860_1_;
+            }
+
+            /**
+             * Returns whether the EntityAIBase should begin execution.
+             */
+            public boolean shouldExecute()
+            {
+                if (this.runDelay <= 0)
                 {
-                    this.field_179499_e = true;
-                    return true;
+                    if (!this.field_179500_c.worldObj.getGameRules().getBoolean("mobGriefing"))
+                    {
+                        return false;
+                    }
+
+                    this.field_179499_e = false;
+                    this.field_179498_d = this.field_179500_c.isCarrotEaten();
+                }
+
+                return super.shouldExecute();
+            }
+
+            /**
+             * Returns whether an in-progress EntityAIBase should continue executing
+             */
+            public boolean continueExecuting()
+            {
+                return this.field_179499_e && super.continueExecuting();
+            }
+
+            /**
+             * Execute a one shot task or start executing a continuous task
+             */
+            public void startExecuting()
+            {
+                super.startExecuting();
+            }
+
+            /**
+             * Resets the task
+             */
+            public void resetTask()
+            {
+                super.resetTask();
+            }
+
+            /**
+             * Updates the task
+             */
+            public void updateTask()
+            {
+                super.updateTask();
+                this.field_179500_c.getLookHelper().setLookPosition((double)this.destinationBlock.getX() + 0.5D, (double)(this.destinationBlock.getY() + 1), (double)this.destinationBlock.getZ() + 0.5D, 10.0F, (float)this.field_179500_c.getVerticalFaceSpeed());
+
+                if (this.getIsAboveDestination())
+                {
+                    World world = this.field_179500_c.worldObj;
+                    BlockPos blockpos = this.destinationBlock.up();
+                    IBlockState iblockstate = world.getBlockState(blockpos);
+                    Block block = iblockstate.getBlock();
+
+                    if (this.field_179499_e && block instanceof BlockCarrot && ((Integer)iblockstate.getValue(BlockCarrot.AGE)).intValue() == 7)
+                    {
+                        world.setBlockState(blockpos, Blocks.air.getDefaultState(), 2);
+                        world.destroyBlock(blockpos, true);
+                        this.field_179500_c.createEatingParticles();
+                    }
+
+                    this.field_179499_e = false;
+                    this.runDelay = 10;
                 }
             }
 
-            return false;
+            /**
+             * Return true to set given position as destination
+             */
+            protected boolean shouldMoveTo(World worldIn, BlockPos pos)
+            {
+                Block block = worldIn.getBlockState(pos).getBlock();
+
+                if (block == Blocks.farmland)
+                {
+                    pos = pos.up();
+                    IBlockState iblockstate = worldIn.getBlockState(pos);
+                    block = iblockstate.getBlock();
+
+                    if (block instanceof BlockCarrot && ((Integer)iblockstate.getValue(BlockCarrot.AGE)).intValue() == 7 && this.field_179498_d && !this.field_179499_e)
+                    {
+                        this.field_179499_e = true;
+                        return true;
+                    }
+                }
+
+                return false;
+            }
         }
-    }
 
     static enum EnumMoveType
     {
@@ -672,24 +667,23 @@ public class EntityRabbit extends EntityAnimal
         STEP(1.0F, 0.45F, 14, 14),
         SPRINT(1.75F, 0.4F, 1, 8),
         ATTACK(2.0F, 0.7F, 7, 8);
-        private final float field_180076_f;
+
+        private final float speed;
         private final float field_180077_g;
-        private final int field_180084_h;
+        private final int duration;
         private final int field_180085_i;
 
-        private static final String __OBFID = "CL_00002239";
-
-        private EnumMoveType(float p_i45866_3_, float p_i45866_4_, int p_i45866_5_, int p_i45866_6_)
+        private EnumMoveType(float typeSpeed, float p_i45866_4_, int typeDuration, int p_i45866_6_)
         {
-            this.field_180076_f = p_i45866_3_;
+            this.speed = typeSpeed;
             this.field_180077_g = p_i45866_4_;
-            this.field_180084_h = p_i45866_5_;
+            this.duration = typeDuration;
             this.field_180085_i = p_i45866_6_;
         }
 
-        public float func_180072_a()
+        public float getSpeed()
         {
-            return this.field_180076_f;
+            return this.speed;
         }
 
         public float func_180074_b()
@@ -697,9 +691,9 @@ public class EntityRabbit extends EntityAnimal
             return this.field_180077_g;
         }
 
-        public int func_180075_c()
+        public int getDuration()
         {
-            return this.field_180084_h;
+            return this.duration;
         }
 
         public int func_180073_d()
@@ -710,17 +704,16 @@ public class EntityRabbit extends EntityAnimal
 
     public class RabbitJumpHelper extends EntityJumpHelper
     {
-        private EntityRabbit field_180070_c;
+        private EntityRabbit theEntity;
         private boolean field_180068_d = false;
-        private static final String __OBFID = "CL_00002236";
 
-        public RabbitJumpHelper(EntityRabbit p_i45863_2_)
+        public RabbitJumpHelper(EntityRabbit rabbit)
         {
-            super(p_i45863_2_);
-            this.field_180070_c = p_i45863_2_;
+            super(rabbit);
+            this.theEntity = rabbit;
         }
 
-        public boolean func_180067_c()
+        public boolean getIsJumping()
         {
             return this.isJumping;
         }
@@ -742,41 +735,40 @@ public class EntityRabbit extends EntityAnimal
         {
             if (this.isJumping)
             {
-                this.field_180070_c.func_175524_b(EntityRabbit.EnumMoveType.STEP);
+                this.theEntity.doMovementAction(EntityRabbit.EnumMoveType.STEP);
                 this.isJumping = false;
             }
         }
     }
 
-    class RabbitMoveHelper extends EntityMoveHelper
-    {
-        private EntityRabbit field_179929_g = EntityRabbit.this;
-        private static final String __OBFID = "CL_00002235";
-
-        public RabbitMoveHelper()
+    static class RabbitMoveHelper extends EntityMoveHelper
         {
-            super(EntityRabbit.this);
-        }
+            private EntityRabbit theEntity;
 
-        public void onUpdateMoveHelper()
-        {
-            if (this.field_179929_g.onGround && !this.field_179929_g.func_175523_cj())
+            public RabbitMoveHelper(EntityRabbit p_i45862_1_)
             {
-                this.field_179929_g.func_175515_b(0.0D);
+                super(p_i45862_1_);
+                this.theEntity = p_i45862_1_;
             }
 
-            super.onUpdateMoveHelper();
+            public void onUpdateMoveHelper()
+            {
+                if (this.theEntity.onGround && !this.theEntity.func_175523_cj())
+                {
+                    this.theEntity.setMovementSpeed(0.0D);
+                }
+
+                super.onUpdateMoveHelper();
+            }
         }
-    }
 
     public static class RabbitTypeData implements IEntityLivingData
         {
-            public int field_179427_a;
-            private static final String __OBFID = "CL_00002237";
+            public int typeData;
 
-            public RabbitTypeData(int p_i45864_1_)
+            public RabbitTypeData(int type)
             {
-                this.field_179427_a = p_i45864_1_;
+                this.typeData = type;
             }
         }
 }

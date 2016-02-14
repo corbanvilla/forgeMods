@@ -13,18 +13,17 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class GuiPageButtonList extends GuiListExtended
 {
-    private final List field_178074_u = Lists.newArrayList();
-    private final IntHashMap field_178073_v = new IntHashMap();
-    private final List field_178072_w = Lists.newArrayList();
+    private final List<GuiPageButtonList.GuiEntry> field_178074_u = Lists.<GuiPageButtonList.GuiEntry>newArrayList();
+    private final IntHashMap<Gui> field_178073_v = new IntHashMap();
+    private final List<GuiTextField> field_178072_w = Lists.<GuiTextField>newArrayList();
     private final GuiPageButtonList.GuiListEntry[][] field_178078_x;
     private int field_178077_y;
     private GuiPageButtonList.GuiResponder field_178076_z;
     private Gui field_178075_A;
-    private static final String __OBFID = "CL_00001950";
 
-    public GuiPageButtonList(Minecraft mcIn, int p_i45536_2_, int p_i45536_3_, int p_i45536_4_, int p_i45536_5_, int p_i45536_6_, GuiPageButtonList.GuiResponder p_i45536_7_, GuiPageButtonList.GuiListEntry[] ... p_i45536_8_)
+    public GuiPageButtonList(Minecraft mcIn, int widthIn, int heightIn, int topIn, int bottomIn, int slotHeightIn, GuiPageButtonList.GuiResponder p_i45536_7_, GuiPageButtonList.GuiListEntry[]... p_i45536_8_)
     {
-        super(mcIn, p_i45536_2_, p_i45536_3_, p_i45536_4_, p_i45536_5_, p_i45536_6_);
+        super(mcIn, widthIn, heightIn, topIn, bottomIn, slotHeightIn);
         this.field_178076_z = p_i45536_7_;
         this.field_178078_x = p_i45536_8_;
         this.field_148163_i = false;
@@ -34,25 +33,20 @@ public class GuiPageButtonList extends GuiListExtended
 
     private void func_178069_s()
     {
-        GuiPageButtonList.GuiListEntry[][] aguilistentry = this.field_178078_x;
-        int i = aguilistentry.length;
-
-        for (int j = 0; j < i; ++j)
+        for (GuiPageButtonList.GuiListEntry[] aguipagebuttonlist$guilistentry : this.field_178078_x)
         {
-            GuiPageButtonList.GuiListEntry[] aguilistentry1 = aguilistentry[j];
-
-            for (int k = 0; k < aguilistentry1.length; k += 2)
+            for (int i = 0; i < aguipagebuttonlist$guilistentry.length; i += 2)
             {
-                GuiPageButtonList.GuiListEntry guilistentry = aguilistentry1[k];
-                GuiPageButtonList.GuiListEntry guilistentry1 = k < aguilistentry1.length - 1 ? aguilistentry1[k + 1] : null;
-                Gui gui = this.func_178058_a(guilistentry, 0, guilistentry1 == null);
-                Gui gui1 = this.func_178058_a(guilistentry1, 160, guilistentry == null);
-                GuiPageButtonList.GuiEntry guientry = new GuiPageButtonList.GuiEntry(gui, gui1);
-                this.field_178074_u.add(guientry);
+                GuiPageButtonList.GuiListEntry guipagebuttonlist$guilistentry = aguipagebuttonlist$guilistentry[i];
+                GuiPageButtonList.GuiListEntry guipagebuttonlist$guilistentry1 = i < aguipagebuttonlist$guilistentry.length - 1 ? aguipagebuttonlist$guilistentry[i + 1] : null;
+                Gui gui = this.func_178058_a(guipagebuttonlist$guilistentry, 0, guipagebuttonlist$guilistentry1 == null);
+                Gui gui1 = this.func_178058_a(guipagebuttonlist$guilistentry1, 160, guipagebuttonlist$guilistentry == null);
+                GuiPageButtonList.GuiEntry guipagebuttonlist$guientry = new GuiPageButtonList.GuiEntry(gui, gui1);
+                this.field_178074_u.add(guipagebuttonlist$guientry);
 
-                if (guilistentry != null && gui != null)
+                if (guipagebuttonlist$guilistentry != null && gui != null)
                 {
-                    this.field_178073_v.addKey(guilistentry.func_178935_b(), gui);
+                    this.field_178073_v.addKey(guipagebuttonlist$guilistentry.func_178935_b(), gui);
 
                     if (gui instanceof GuiTextField)
                     {
@@ -60,9 +54,9 @@ public class GuiPageButtonList extends GuiListExtended
                     }
                 }
 
-                if (guilistentry1 != null && gui1 != null)
+                if (guipagebuttonlist$guilistentry1 != null && gui1 != null)
                 {
-                    this.field_178073_v.addKey(guilistentry1.func_178935_b(), gui1);
+                    this.field_178073_v.addKey(guipagebuttonlist$guilistentry1.func_178935_b(), gui1);
 
                     if (gui1 instanceof GuiTextField)
                     {
@@ -79,12 +73,24 @@ public class GuiPageButtonList extends GuiListExtended
 
         for (int i = 0; i < this.field_178078_x[this.field_178077_y].length; i += 2)
         {
-            GuiPageButtonList.GuiListEntry guilistentry = this.field_178078_x[this.field_178077_y][i];
-            GuiPageButtonList.GuiListEntry guilistentry1 = i < this.field_178078_x[this.field_178077_y].length - 1 ? this.field_178078_x[this.field_178077_y][i + 1] : null;
-            Gui gui = (Gui)this.field_178073_v.lookup(guilistentry.func_178935_b());
-            Gui gui1 = guilistentry1 != null ? (Gui)this.field_178073_v.lookup(guilistentry1.func_178935_b()) : null;
-            GuiPageButtonList.GuiEntry guientry = new GuiPageButtonList.GuiEntry(gui, gui1);
-            this.field_178074_u.add(guientry);
+            GuiPageButtonList.GuiListEntry guipagebuttonlist$guilistentry = this.field_178078_x[this.field_178077_y][i];
+            GuiPageButtonList.GuiListEntry guipagebuttonlist$guilistentry1 = i < this.field_178078_x[this.field_178077_y].length - 1 ? this.field_178078_x[this.field_178077_y][i + 1] : null;
+            Gui gui = (Gui)this.field_178073_v.lookup(guipagebuttonlist$guilistentry.func_178935_b());
+            Gui gui1 = guipagebuttonlist$guilistentry1 != null ? (Gui)this.field_178073_v.lookup(guipagebuttonlist$guilistentry1.func_178935_b()) : null;
+            GuiPageButtonList.GuiEntry guipagebuttonlist$guientry = new GuiPageButtonList.GuiEntry(gui, gui1);
+            this.field_178074_u.add(guipagebuttonlist$guientry);
+        }
+    }
+
+    public void func_181156_c(int p_181156_1_)
+    {
+        if (p_181156_1_ != this.field_178077_y)
+        {
+            int i = this.field_178077_y;
+            this.field_178077_y = p_181156_1_;
+            this.func_178055_t();
+            this.func_178060_e(i, p_181156_1_);
+            this.amountScrolled = 0.0F;
         }
     }
 
@@ -107,10 +113,7 @@ public class GuiPageButtonList extends GuiListExtended
     {
         if (this.field_178077_y > 0)
         {
-            int i = this.field_178077_y--;
-            this.func_178055_t();
-            this.func_178060_e(i, this.field_178077_y);
-            this.amountScrolled = 0.0F;
+            this.func_181156_c(this.field_178077_y - 1);
         }
     }
 
@@ -118,10 +121,7 @@ public class GuiPageButtonList extends GuiListExtended
     {
         if (this.field_178077_y < this.field_178078_x.length - 1)
         {
-            int i = this.field_178077_y++;
-            this.func_178055_t();
-            this.func_178060_e(i, this.field_178077_y);
-            this.amountScrolled = 0.0F;
+            this.func_181156_c(this.field_178077_y + 1);
         }
     }
 
@@ -132,31 +132,19 @@ public class GuiPageButtonList extends GuiListExtended
 
     private void func_178060_e(int p_178060_1_, int p_178060_2_)
     {
-        GuiPageButtonList.GuiListEntry[] aguilistentry = this.field_178078_x[p_178060_1_];
-        int k = aguilistentry.length;
-        int l;
-        GuiPageButtonList.GuiListEntry guilistentry;
-
-        for (l = 0; l < k; ++l)
+        for (GuiPageButtonList.GuiListEntry guipagebuttonlist$guilistentry : this.field_178078_x[p_178060_1_])
         {
-            guilistentry = aguilistentry[l];
-
-            if (guilistentry != null)
+            if (guipagebuttonlist$guilistentry != null)
             {
-                this.func_178066_a((Gui)this.field_178073_v.lookup(guilistentry.func_178935_b()), false);
+                this.func_178066_a((Gui)this.field_178073_v.lookup(guipagebuttonlist$guilistentry.func_178935_b()), false);
             }
         }
 
-        aguilistentry = this.field_178078_x[p_178060_2_];
-        k = aguilistentry.length;
-
-        for (l = 0; l < k; ++l)
+        for (GuiPageButtonList.GuiListEntry guipagebuttonlist$guilistentry1 : this.field_178078_x[p_178060_2_])
         {
-            guilistentry = aguilistentry[l];
-
-            if (guilistentry != null)
+            if (guipagebuttonlist$guilistentry1 != null)
             {
-                this.func_178066_a((Gui)this.field_178073_v.lookup(guilistentry.func_178935_b()), true);
+                this.func_178066_a((Gui)this.field_178073_v.lookup(guipagebuttonlist$guilistentry1.func_178935_b()), true);
             }
         }
     }
@@ -182,21 +170,37 @@ public class GuiPageButtonList extends GuiListExtended
         return (Gui)(p_178058_1_ instanceof GuiPageButtonList.GuiSlideEntry ? this.func_178067_a(this.width / 2 - 155 + p_178058_2_, 0, (GuiPageButtonList.GuiSlideEntry)p_178058_1_) : (p_178058_1_ instanceof GuiPageButtonList.GuiButtonEntry ? this.func_178065_a(this.width / 2 - 155 + p_178058_2_, 0, (GuiPageButtonList.GuiButtonEntry)p_178058_1_) : (p_178058_1_ instanceof GuiPageButtonList.EditBoxEntry ? this.func_178068_a(this.width / 2 - 155 + p_178058_2_, 0, (GuiPageButtonList.EditBoxEntry)p_178058_1_) : (p_178058_1_ instanceof GuiPageButtonList.GuiLabelEntry ? this.func_178063_a(this.width / 2 - 155 + p_178058_2_, 0, (GuiPageButtonList.GuiLabelEntry)p_178058_1_, p_178058_3_) : null))));
     }
 
+    public void func_181155_a(boolean p_181155_1_)
+    {
+        for (GuiPageButtonList.GuiEntry guipagebuttonlist$guientry : this.field_178074_u)
+        {
+            if (guipagebuttonlist$guientry.field_178029_b instanceof GuiButton)
+            {
+                ((GuiButton)guipagebuttonlist$guientry.field_178029_b).enabled = p_181155_1_;
+            }
+
+            if (guipagebuttonlist$guientry.field_178030_c instanceof GuiButton)
+            {
+                ((GuiButton)guipagebuttonlist$guientry.field_178030_c).enabled = p_181155_1_;
+            }
+        }
+    }
+
     public boolean mouseClicked(int mouseX, int mouseY, int mouseEvent)
     {
         boolean flag = super.mouseClicked(mouseX, mouseY, mouseEvent);
-        int l = this.getSlotIndexFromScreenCoords(mouseX, mouseY);
+        int i = this.getSlotIndexFromScreenCoords(mouseX, mouseY);
 
-        if (l >= 0)
+        if (i >= 0)
         {
-            GuiPageButtonList.GuiEntry guientry = this.func_178070_d(l);
+            GuiPageButtonList.GuiEntry guipagebuttonlist$guientry = this.getListEntry(i);
 
-            if (this.field_178075_A != guientry.field_178028_d && this.field_178075_A != null && this.field_178075_A instanceof GuiTextField)
+            if (this.field_178075_A != guipagebuttonlist$guientry.field_178028_d && this.field_178075_A != null && this.field_178075_A instanceof GuiTextField)
             {
                 ((GuiTextField)this.field_178075_A).setFocused(false);
             }
 
-            this.field_178075_A = guientry.field_178028_d;
+            this.field_178075_A = guipagebuttonlist$guientry.field_178028_d;
         }
 
         return flag;
@@ -250,48 +254,47 @@ public class GuiPageButtonList extends GuiListExtended
         if (this.field_178075_A instanceof GuiTextField)
         {
             GuiTextField guitextfield = (GuiTextField)this.field_178075_A;
-            int j;
 
-            if (!GuiScreen.func_175279_e(p_178062_2_))
+            if (!GuiScreen.isKeyComboCtrlV(p_178062_2_))
             {
                 if (p_178062_2_ == 15)
                 {
                     guitextfield.setFocused(false);
-                    int j1 = this.field_178072_w.indexOf(this.field_178075_A);
+                    int k = this.field_178072_w.indexOf(this.field_178075_A);
 
                     if (GuiScreen.isShiftKeyDown())
                     {
-                        if (j1 == 0)
+                        if (k == 0)
                         {
-                            j1 = this.field_178072_w.size() - 1;
+                            k = this.field_178072_w.size() - 1;
                         }
                         else
                         {
-                            --j1;
+                            --k;
                         }
                     }
-                    else if (j1 == this.field_178072_w.size() - 1)
+                    else if (k == this.field_178072_w.size() - 1)
                     {
-                        j1 = 0;
+                        k = 0;
                     }
                     else
                     {
-                        ++j1;
+                        ++k;
                     }
 
-                    this.field_178075_A = (Gui)this.field_178072_w.get(j1);
+                    this.field_178075_A = (Gui)this.field_178072_w.get(k);
                     guitextfield = (GuiTextField)this.field_178075_A;
                     guitextfield.setFocused(true);
-                    int k1 = guitextfield.yPosition + this.slotHeight;
-                    j = guitextfield.yPosition;
+                    int l = guitextfield.yPosition + this.slotHeight;
+                    int i1 = guitextfield.yPosition;
 
-                    if (k1 > this.bottom)
+                    if (l > this.bottom)
                     {
-                        this.amountScrolled += (float)(k1 - this.bottom);
+                        this.amountScrolled += (float)(l - this.bottom);
                     }
-                    else if (j < this.top)
+                    else if (i1 < this.top)
                     {
-                        this.amountScrolled = (float)j;
+                        this.amountScrolled = (float)i1;
                     }
                 }
                 else
@@ -303,26 +306,23 @@ public class GuiPageButtonList extends GuiListExtended
             {
                 String s = GuiScreen.getClipboardString();
                 String[] astring = s.split(";");
-                j = this.field_178072_w.indexOf(this.field_178075_A);
-                int k = j;
-                String[] astring1 = astring;
-                int l = astring.length;
+                int i = this.field_178072_w.indexOf(this.field_178075_A);
+                int j = i;
 
-                for (int i1 = 0; i1 < l; ++i1)
+                for (String s1 : astring)
                 {
-                    String s1 = astring1[i1];
-                    ((GuiTextField)this.field_178072_w.get(k)).setText(s1);
+                    ((GuiTextField)this.field_178072_w.get(j)).setText(s1);
 
-                    if (k == this.field_178072_w.size() - 1)
+                    if (j == this.field_178072_w.size() - 1)
                     {
-                        k = 0;
+                        j = 0;
                     }
                     else
                     {
-                        ++k;
+                        ++j;
                     }
 
-                    if (k == j)
+                    if (j == i)
                     {
                         break;
                     }
@@ -331,9 +331,12 @@ public class GuiPageButtonList extends GuiListExtended
         }
     }
 
-    public GuiPageButtonList.GuiEntry func_178070_d(int p_178070_1_)
+    /**
+     * Gets the IGuiListEntry object for the given index
+     */
+    public GuiPageButtonList.GuiEntry getListEntry(int index)
     {
-        return (GuiPageButtonList.GuiEntry)this.field_178074_u.get(p_178070_1_);
+        return (GuiPageButtonList.GuiEntry)this.field_178074_u.get(index);
     }
 
     public int getSize()
@@ -354,27 +357,18 @@ public class GuiPageButtonList extends GuiListExtended
         return super.getScrollBarX() + 32;
     }
 
-    /**
-     * Gets the IGuiListEntry object for the given index
-     */
-    public GuiListExtended.IGuiListEntry getListEntry(int p_148180_1_)
-    {
-        return this.func_178070_d(p_148180_1_);
-    }
-
     @SideOnly(Side.CLIENT)
     public static class EditBoxEntry extends GuiPageButtonList.GuiListEntry
         {
-            private final Predicate field_178951_a;
-            private static final String __OBFID = "CL_00001948";
+            private final Predicate<String> field_178951_a;
 
-            public EditBoxEntry(int p_i45534_1_, String p_i45534_2_, boolean p_i45534_3_, Predicate p_i45534_4_)
+            public EditBoxEntry(int p_i45534_1_, String p_i45534_2_, boolean p_i45534_3_, Predicate<String> p_i45534_4_)
             {
                 super(p_i45534_1_, p_i45534_2_, p_i45534_3_);
                 this.field_178951_a = (Predicate)Objects.firstNonNull(p_i45534_4_, Predicates.alwaysTrue());
             }
 
-            public Predicate func_178950_a()
+            public Predicate<String> func_178950_a()
             {
                 return this.field_178951_a;
             }
@@ -384,7 +378,6 @@ public class GuiPageButtonList extends GuiListExtended
     public static class GuiButtonEntry extends GuiPageButtonList.GuiListEntry
         {
             private final boolean field_178941_a;
-            private static final String __OBFID = "CL_00001949";
 
             public GuiButtonEntry(int p_i45535_1_, String p_i45535_2_, boolean p_i45535_3_, boolean p_i45535_4_)
             {
@@ -405,7 +398,6 @@ public class GuiPageButtonList extends GuiListExtended
             private final Gui field_178029_b;
             private final Gui field_178030_c;
             private Gui field_178028_d;
-            private static final String __OBFID = "CL_00001947";
 
             public GuiEntry(Gui p_i45533_1_, Gui p_i45533_2_)
             {
@@ -487,7 +479,7 @@ public class GuiPageButtonList extends GuiListExtended
             /**
              * Returns true if the mouse has been pressed on this control.
              */
-            public boolean mousePressed(int p_148278_1_, int p_148278_2_, int p_148278_3_, int p_148278_4_, int p_148278_5_, int p_148278_6_)
+            public boolean mousePressed(int slotIndex, int p_148278_2_, int p_148278_3_, int p_148278_4_, int p_148278_5_, int p_148278_6_)
             {
                 boolean flag = this.func_178026_a(this.field_178029_b, p_148278_2_, p_148278_3_, p_148278_4_);
                 boolean flag1 = this.func_178026_a(this.field_178030_c, p_148278_2_, p_148278_3_, p_148278_4_);
@@ -566,8 +558,6 @@ public class GuiPageButtonList extends GuiListExtended
     @SideOnly(Side.CLIENT)
     public static class GuiLabelEntry extends GuiPageButtonList.GuiListEntry
         {
-            private static final String __OBFID = "CL_00001946";
-
             public GuiLabelEntry(int p_i45532_1_, String p_i45532_2_, boolean p_i45532_3_)
             {
                 super(p_i45532_1_, p_i45532_2_, p_i45532_3_);
@@ -580,7 +570,6 @@ public class GuiPageButtonList extends GuiListExtended
             private final int field_178939_a;
             private final String field_178937_b;
             private final boolean field_178938_c;
-            private static final String __OBFID = "CL_00001945";
 
             public GuiListEntry(int p_i45531_1_, String p_i45531_2_, boolean p_i45531_3_)
             {
@@ -610,7 +599,7 @@ public class GuiPageButtonList extends GuiListExtended
     {
         void func_175321_a(int p_175321_1_, boolean p_175321_2_);
 
-        void func_175320_a(int p_175320_1_, float p_175320_2_);
+        void onTick(int id, float value);
 
         void func_175319_a(int p_175319_1_, String p_175319_2_);
     }
@@ -622,7 +611,6 @@ public class GuiPageButtonList extends GuiListExtended
             private final float field_178947_b;
             private final float field_178948_c;
             private final float field_178946_d;
-            private static final String __OBFID = "CL_00001944";
 
             public GuiSlideEntry(int p_i45530_1_, String p_i45530_2_, boolean p_i45530_3_, GuiSlider.FormatHelper p_i45530_4_, float p_i45530_5_, float p_i45530_6_, float p_i45530_7_)
             {

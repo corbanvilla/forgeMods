@@ -13,27 +13,31 @@ public class MapGenBase
     protected Random rand = new Random();
     /** This world object. */
     protected World worldObj;
-    private static final String __OBFID = "CL_00000394";
 
-    public void func_175792_a(IChunkProvider p_175792_1_, World worldIn, int p_175792_3_, int p_175792_4_, ChunkPrimer p_175792_5_)
+    public void generate(IChunkProvider chunkProviderIn, World worldIn, int x, int z, ChunkPrimer chunkPrimerIn)
     {
-        int k = this.range;
+        int i = this.range;
         this.worldObj = worldIn;
         this.rand.setSeed(worldIn.getSeed());
-        long l = this.rand.nextLong();
-        long i1 = this.rand.nextLong();
+        long j = this.rand.nextLong();
+        long k = this.rand.nextLong();
 
-        for (int j1 = p_175792_3_ - k; j1 <= p_175792_3_ + k; ++j1)
+        for (int l = x - i; l <= x + i; ++l)
         {
-            for (int k1 = p_175792_4_ - k; k1 <= p_175792_4_ + k; ++k1)
+            for (int i1 = z - i; i1 <= z + i; ++i1)
             {
-                long l1 = (long)j1 * l;
-                long i2 = (long)k1 * i1;
-                this.rand.setSeed(l1 ^ i2 ^ worldIn.getSeed());
-                this.func_180701_a(worldIn, j1, k1, p_175792_3_, p_175792_4_, p_175792_5_);
+                long j1 = (long)l * j;
+                long k1 = (long)i1 * k;
+                this.rand.setSeed(j1 ^ k1 ^ worldIn.getSeed());
+                this.recursiveGenerate(worldIn, l, i1, x, z, chunkPrimerIn);
             }
         }
     }
 
-    protected void func_180701_a(World worldIn, int p_180701_2_, int p_180701_3_, int p_180701_4_, int p_180701_5_, ChunkPrimer p_180701_6_) {}
+    /**
+     * Recursively called by generate()
+     */
+    protected void recursiveGenerate(World worldIn, int chunkX, int chunkZ, int p_180701_4_, int p_180701_5_, ChunkPrimer chunkPrimerIn)
+    {
+    }
 }

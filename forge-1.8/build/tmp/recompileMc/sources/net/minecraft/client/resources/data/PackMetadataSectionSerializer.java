@@ -13,11 +13,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class PackMetadataSectionSerializer extends BaseMetadataSectionSerializer implements JsonSerializer
+public class PackMetadataSectionSerializer extends BaseMetadataSectionSerializer<PackMetadataSection> implements JsonSerializer<PackMetadataSection>
 {
-    private static final String __OBFID = "CL_00001113";
-
-    public PackMetadataSection deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_)
+    public PackMetadataSection deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_) throws JsonParseException
     {
         JsonObject jsonobject = p_deserialize_1_.getAsJsonObject();
         IChatComponent ichatcomponent = (IChatComponent)p_deserialize_3_.deserialize(jsonobject.get("description"), IChatComponent.class);
@@ -28,7 +26,7 @@ public class PackMetadataSectionSerializer extends BaseMetadataSectionSerializer
         }
         else
         {
-            int i = JsonUtils.getJsonObjectIntegerFieldValue(jsonobject, "pack_format");
+            int i = JsonUtils.getInt(jsonobject, "pack_format");
             return new PackMetadataSection(ichatcomponent, i);
         }
     }
@@ -36,7 +34,7 @@ public class PackMetadataSectionSerializer extends BaseMetadataSectionSerializer
     public JsonElement serialize(PackMetadataSection p_serialize_1_, Type p_serialize_2_, JsonSerializationContext p_serialize_3_)
     {
         JsonObject jsonobject = new JsonObject();
-        jsonobject.addProperty("pack_format", Integer.valueOf(p_serialize_1_.getPackFormat()));
+        jsonobject.addProperty("pack_format", (Number)Integer.valueOf(p_serialize_1_.getPackFormat()));
         jsonobject.add("description", p_serialize_3_.serialize(p_serialize_1_.getPackDescription()));
         return jsonobject;
     }
@@ -47,10 +45,5 @@ public class PackMetadataSectionSerializer extends BaseMetadataSectionSerializer
     public String getSectionName()
     {
         return "pack";
-    }
-
-    public JsonElement serialize(Object p_serialize_1_, Type p_serialize_2_, JsonSerializationContext p_serialize_3_)
-    {
-        return this.serialize((PackMetadataSection)p_serialize_1_, p_serialize_2_, p_serialize_3_);
     }
 }

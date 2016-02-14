@@ -55,6 +55,9 @@ public class GuiOldSaveLoadConfirm extends GuiYesNo implements GuiYesNoCallback 
             ((GuiLabel)this.labelList.get(k)).drawLabel(this.mc, mouseX, mouseY);
         }
     }
+    /**
+     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
+     */
     @Override
     protected void actionPerformed(GuiButton button)
     {

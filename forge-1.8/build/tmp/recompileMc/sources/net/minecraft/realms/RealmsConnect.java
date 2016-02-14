@@ -21,7 +21,6 @@ public class RealmsConnect
     private final RealmsScreen onlineScreen;
     private volatile boolean aborted = false;
     private NetworkManager connection;
-    private static final String __OBFID = "CL_00001844";
 
     public RealmsConnect(RealmsScreen p_i1079_1_)
     {
@@ -30,9 +29,9 @@ public class RealmsConnect
 
     public void connect(final String p_connect_1_, final int p_connect_2_)
     {
+        Realms.setConnectedToRealms(true);
         (new Thread("Realms-connect-task")
         {
-            private static final String __OBFID = "CL_00001808";
             public void run()
             {
                 InetAddress inetaddress = null;
@@ -47,7 +46,7 @@ public class RealmsConnect
                         return;
                     }
 
-                    RealmsConnect.this.connection = NetworkManager.provideLanClient(inetaddress, p_connect_2_);
+                    RealmsConnect.this.connection = NetworkManager.func_181124_a(inetaddress, p_connect_2_, Minecraft.getMinecraft().gameSettings.func_181148_f());
 
                     if (RealmsConnect.this.aborted)
                     {
@@ -72,22 +71,27 @@ public class RealmsConnect
                 }
                 catch (UnknownHostException unknownhostexception)
                 {
+                    Realms.clearResourcePack();
+
                     if (RealmsConnect.this.aborted)
                     {
                         return;
                     }
 
-                    RealmsConnect.LOGGER.error("Couldn\'t connect to world", unknownhostexception);
+                    RealmsConnect.LOGGER.error((String)"Couldn\'t connect to world", (Throwable)unknownhostexception);
+                    Minecraft.getMinecraft().getResourcePackRepository().clearResourcePack();
                     Realms.setScreen(new DisconnectedRealmsScreen(RealmsConnect.this.onlineScreen, "connect.failed", new ChatComponentTranslation("disconnect.genericReason", new Object[] {"Unknown host \'" + p_connect_1_ + "\'"})));
                 }
                 catch (Exception exception)
                 {
+                    Realms.clearResourcePack();
+
                     if (RealmsConnect.this.aborted)
                     {
                         return;
                     }
 
-                    RealmsConnect.LOGGER.error("Couldn\'t connect to world", exception);
+                    RealmsConnect.LOGGER.error((String)"Couldn\'t connect to world", (Throwable)exception);
                     String s = exception.toString();
 
                     if (inetaddress != null)

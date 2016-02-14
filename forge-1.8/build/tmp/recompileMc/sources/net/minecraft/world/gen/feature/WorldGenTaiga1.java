@@ -2,55 +2,58 @@ package net.minecraft.world.gen.feature;
 
 import java.util.Random;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockLeaves;
+import net.minecraft.block.BlockOldLeaf;
+import net.minecraft.block.BlockOldLog;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
 public class WorldGenTaiga1 extends WorldGenAbstractTree
 {
-    private static final String __OBFID = "CL_00000427";
+    private static final IBlockState field_181636_a = Blocks.log.getDefaultState().withProperty(BlockOldLog.VARIANT, BlockPlanks.EnumType.SPRUCE);
+    private static final IBlockState field_181637_b = Blocks.leaves.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.SPRUCE).withProperty(BlockLeaves.CHECK_DECAY, Boolean.valueOf(false));
 
     public WorldGenTaiga1()
     {
         super(false);
     }
 
-    public boolean generate(World worldIn, Random p_180709_2_, BlockPos p_180709_3_)
+    public boolean generate(World worldIn, Random rand, BlockPos position)
     {
-        int i = p_180709_2_.nextInt(5) + 7;
-        int j = i - p_180709_2_.nextInt(2) - 3;
+        int i = rand.nextInt(5) + 7;
+        int j = i - rand.nextInt(2) - 3;
         int k = i - j;
-        int l = 1 + p_180709_2_.nextInt(k + 1);
+        int l = 1 + rand.nextInt(k + 1);
         boolean flag = true;
 
-        if (p_180709_3_.getY() >= 1 && p_180709_3_.getY() + i + 1 <= 256)
+        if (position.getY() >= 1 && position.getY() + i + 1 <= 256)
         {
-            int j1;
-            int k1;
-            int k2;
-
-            for (int i1 = p_180709_3_.getY(); i1 <= p_180709_3_.getY() + 1 + i && flag; ++i1)
+            for (int i1 = position.getY(); i1 <= position.getY() + 1 + i && flag; ++i1)
             {
-                boolean flag1 = true;
+                int j1 = 1;
 
-                if (i1 - p_180709_3_.getY() < j)
+                if (i1 - position.getY() < j)
                 {
-                    k2 = 0;
+                    j1 = 0;
                 }
                 else
                 {
-                    k2 = l;
+                    j1 = l;
                 }
 
-                for (j1 = p_180709_3_.getX() - k2; j1 <= p_180709_3_.getX() + k2 && flag; ++j1)
+                BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+
+                for (int k1 = position.getX() - j1; k1 <= position.getX() + j1 && flag; ++k1)
                 {
-                    for (k1 = p_180709_3_.getZ() - k2; k1 <= p_180709_3_.getZ() + k2 && flag; ++k1)
+                    for (int l1 = position.getZ() - j1; l1 <= position.getZ() + j1 && flag; ++l1)
                     {
                         if (i1 >= 0 && i1 < 256)
                         {
-                            if (!this.isReplaceable(worldIn, new BlockPos(j1, i1, k1)))
+                            if (!this.isReplaceable(worldIn,blockpos$mutableblockpos.set(k1, i1, l1)))
                             {
                                 flag = false;
                             }
@@ -69,38 +72,38 @@ public class WorldGenTaiga1 extends WorldGenAbstractTree
             }
             else
             {
-                BlockPos down = p_180709_3_.down();
+                BlockPos down = position.down();
                 Block block = worldIn.getBlockState(down).getBlock();
                 boolean isSoil = block.canSustainPlant(worldIn, down, net.minecraft.util.EnumFacing.UP, (net.minecraft.block.BlockSapling)Blocks.sapling);
 
-                if (isSoil && p_180709_3_.getY() < 256 - i - 1)
+                if (isSoil && position.getY() < 256 - i - 1)
                 {
-                    block.onPlantGrow(worldIn, down, p_180709_3_);
-                    k2 = 0;
+                    block.onPlantGrow(worldIn, down, position);
+                    int k2 = 0;
 
-                    for (j1 = p_180709_3_.getY() + i; j1 >= p_180709_3_.getY() + j; --j1)
+                    for (int l2 = position.getY() + i; l2 >= position.getY() + j; --l2)
                     {
-                        for (k1 = p_180709_3_.getX() - k2; k1 <= p_180709_3_.getX() + k2; ++k1)
+                        for (int j3 = position.getX() - k2; j3 <= position.getX() + k2; ++j3)
                         {
-                            int l1 = k1 - p_180709_3_.getX();
+                            int k3 = j3 - position.getX();
 
-                            for (int i2 = p_180709_3_.getZ() - k2; i2 <= p_180709_3_.getZ() + k2; ++i2)
+                            for (int i2 = position.getZ() - k2; i2 <= position.getZ() + k2; ++i2)
                             {
-                                int j2 = i2 - p_180709_3_.getZ();
+                                int j2 = i2 - position.getZ();
 
-                                if (Math.abs(l1) != k2 || Math.abs(j2) != k2 || k2 <= 0)
+                                if (Math.abs(k3) != k2 || Math.abs(j2) != k2 || k2 <= 0)
                                 {
-                                    BlockPos blockpos1 = new BlockPos(k1, j1, i2);
+                                    BlockPos blockpos = new BlockPos(j3, l2, i2);
 
-                                    if (worldIn.getBlockState(blockpos1).getBlock().canBeReplacedByLeaves(worldIn, blockpos1))
+                                    if (worldIn.getBlockState(blockpos).getBlock().canBeReplacedByLeaves(worldIn, blockpos))
                                     {
-                                        this.func_175905_a(worldIn, blockpos1, Blocks.leaves, BlockPlanks.EnumType.SPRUCE.getMetadata());
+                                        this.setBlockAndNotifyAdequately(worldIn, blockpos, field_181637_b);
                                     }
                                 }
                             }
                         }
 
-                        if (k2 >= 1 && j1 == p_180709_3_.getY() + j + 1)
+                        if (k2 >= 1 && l2 == position.getY() + j + 1)
                         {
                             --k2;
                         }
@@ -110,14 +113,14 @@ public class WorldGenTaiga1 extends WorldGenAbstractTree
                         }
                     }
 
-                    for (j1 = 0; j1 < i - 1; ++j1)
+                    for (int i3 = 0; i3 < i - 1; ++i3)
                     {
-                        BlockPos upN = p_180709_3_.up(j1);
+                        BlockPos upN = position.up(i3);
                         Block block1 = worldIn.getBlockState(upN).getBlock();
 
                         if (block1.isAir(worldIn, upN) || block1.isLeaves(worldIn, upN))
                         {
-                            this.func_175905_a(worldIn, p_180709_3_.up(j1), Blocks.log, BlockPlanks.EnumType.SPRUCE.getMetadata());
+                            this.setBlockAndNotifyAdequately(worldIn, position.up(i3), field_181636_a);
                         }
                     }
 

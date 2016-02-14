@@ -21,7 +21,6 @@ import net.minecraft.world.World;
 public class BlockTNT extends Block
 {
     public static final PropertyBool EXPLODE = PropertyBool.create("explode");
-    private static final String __OBFID = "CL_00000324";
 
     public BlockTNT()
     {
@@ -60,7 +59,7 @@ public class BlockTNT extends Block
     {
         if (!worldIn.isRemote)
         {
-            EntityTNTPrimed entitytntprimed = new EntityTNTPrimed(worldIn, (double)((float)pos.getX() + 0.5F), (double)((float)pos.getY() + 0.5F), (double)((float)pos.getZ() + 0.5F), explosionIn.getExplosivePlacedBy());
+            EntityTNTPrimed entitytntprimed = new EntityTNTPrimed(worldIn, (double)((float)pos.getX() + 0.5F), (double)pos.getY(), (double)((float)pos.getZ() + 0.5F), explosionIn.getExplosivePlacedBy());
             entitytntprimed.fuse = worldIn.rand.nextInt(entitytntprimed.fuse / 4) + entitytntprimed.fuse / 8;
             worldIn.spawnEntityInWorld(entitytntprimed);
         }
@@ -80,7 +79,7 @@ public class BlockTNT extends Block
         {
             if (((Boolean)state.getValue(EXPLODE)).booleanValue())
             {
-                EntityTNTPrimed entitytntprimed = new EntityTNTPrimed(worldIn, (double)((float)pos.getX() + 0.5F), (double)((float)pos.getY() + 0.5F), (double)((float)pos.getZ() + 0.5F), igniter);
+                EntityTNTPrimed entitytntprimed = new EntityTNTPrimed(worldIn, (double)((float)pos.getX() + 0.5F), (double)pos.getY(), (double)((float)pos.getZ() + 0.5F), igniter);
                 worldIn.spawnEntityInWorld(entitytntprimed);
                 worldIn.playSoundAtEntity(entitytntprimed, "game.tnt.primed", 1.0F, 1.0F);
             }

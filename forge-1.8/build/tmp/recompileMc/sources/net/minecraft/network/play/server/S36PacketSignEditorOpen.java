@@ -1,7 +1,6 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -9,16 +8,17 @@ import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S36PacketSignEditorOpen implements Packet
+public class S36PacketSignEditorOpen implements Packet<INetHandlerPlayClient>
 {
-    private BlockPos field_179778_a;
-    private static final String __OBFID = "CL_00001316";
+    private BlockPos signPosition;
 
-    public S36PacketSignEditorOpen() {}
-
-    public S36PacketSignEditorOpen(BlockPos p_i45971_1_)
+    public S36PacketSignEditorOpen()
     {
-        this.field_179778_a = p_i45971_1_;
+    }
+
+    public S36PacketSignEditorOpen(BlockPos signPositionIn)
+    {
+        this.signPosition = signPositionIn;
     }
 
     /**
@@ -34,7 +34,7 @@ public class S36PacketSignEditorOpen implements Packet
      */
     public void readPacketData(PacketBuffer buf) throws IOException
     {
-        this.field_179778_a = buf.readBlockPos();
+        this.signPosition = buf.readBlockPos();
     }
 
     /**
@@ -42,20 +42,12 @@ public class S36PacketSignEditorOpen implements Packet
      */
     public void writePacketData(PacketBuffer buf) throws IOException
     {
-        buf.writeBlockPos(this.field_179778_a);
+        buf.writeBlockPos(this.signPosition);
     }
 
     @SideOnly(Side.CLIENT)
-    public BlockPos func_179777_a()
+    public BlockPos getSignPosition()
     {
-        return this.field_179778_a;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayClient)handler);
+        return this.signPosition;
     }
 }

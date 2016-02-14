@@ -8,7 +8,6 @@ public class StatCollector
      * StringTranslate singleton instance fails to translate a key.
      */
     private static StringTranslate fallbackTranslator = new StringTranslate();
-    private static final String __OBFID = "CL_00001211";
 
     /**
      * Translates a Stat name
@@ -21,7 +20,7 @@ public class StatCollector
     /**
      * Translates a Stat name with format args
      */
-    public static String translateToLocalFormatted(String key, Object ... format)
+    public static String translateToLocalFormatted(String key, Object... format)
     {
         return localizedName.translateKeyFormat(key, format);
     }

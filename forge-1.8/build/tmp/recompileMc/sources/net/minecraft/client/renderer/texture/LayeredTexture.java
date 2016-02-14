@@ -5,7 +5,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
@@ -18,10 +17,9 @@ import org.apache.logging.log4j.Logger;
 public class LayeredTexture extends AbstractTexture
 {
     private static final Logger logger = LogManager.getLogger();
-    public final List layeredTextureNames;
-    private static final String __OBFID = "CL_00001051";
+    public final List<String> layeredTextureNames;
 
-    public LayeredTexture(String ... textureNames)
+    public LayeredTexture(String... textureNames)
     {
         this.layeredTextureNames = Lists.newArrayList(textureNames);
     }
@@ -33,12 +31,8 @@ public class LayeredTexture extends AbstractTexture
 
         try
         {
-            Iterator iterator = this.layeredTextureNames.iterator();
-
-            while (iterator.hasNext())
+            for (String s : this.layeredTextureNames)
             {
-                String s = (String)iterator.next();
-
                 if (s != null)
                 {
                     InputStream inputstream = resourceManager.getResource(new ResourceLocation(s)).getInputStream();
@@ -55,7 +49,7 @@ public class LayeredTexture extends AbstractTexture
         }
         catch (IOException ioexception)
         {
-            logger.error("Couldn\'t load layered image", ioexception);
+            logger.error((String)"Couldn\'t load layered image", (Throwable)ioexception);
             return;
         }
 

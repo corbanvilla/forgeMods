@@ -1,6 +1,5 @@
 package net.minecraft.block;
 
-import java.util.Iterator;
 import java.util.Random;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -22,7 +21,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BlockReed extends Block implements net.minecraftforge.common.IPlantable
 {
     public static final PropertyInteger AGE = PropertyInteger.create("age", 0, 15);
-    private static final String __OBFID = "CL_00000300";
 
     protected BlockReed()
     {
@@ -79,21 +77,15 @@ public class BlockReed extends Block implements net.minecraftforge.common.IPlant
         }
         else
         {
-            Iterator iterator = EnumFacing.Plane.HORIZONTAL.iterator();
-            EnumFacing enumfacing;
-
-            do
+            for (EnumFacing enumfacing : EnumFacing.Plane.HORIZONTAL)
             {
-                if (!iterator.hasNext())
+                if (worldIn.getBlockState(pos.offset(enumfacing).down()).getBlock().getMaterial() == Material.water)
                 {
-                    return false;
+                    return true;
                 }
-
-                enumfacing = (EnumFacing)iterator.next();
             }
-            while (worldIn.getBlockState(pos.offset(enumfacing).down()).getBlock().getMaterial() != Material.water);
 
-            return true;
+            return false;
         }
     }
 
@@ -105,16 +97,16 @@ public class BlockReed extends Block implements net.minecraftforge.common.IPlant
         this.checkForDrop(worldIn, pos, state);
     }
 
-    protected final boolean checkForDrop(World worldIn, BlockPos p_176353_2_, IBlockState state)
+    protected final boolean checkForDrop(World worldIn, BlockPos pos, IBlockState state)
     {
-        if (this.canBlockStay(worldIn, p_176353_2_))
+        if (this.canBlockStay(worldIn, pos))
         {
             return true;
         }
         else
         {
-            this.dropBlockAsItem(worldIn, p_176353_2_, state, 0);
-            worldIn.setBlockToAir(p_176353_2_);
+            this.dropBlockAsItem(worldIn, pos, state, 0);
+            worldIn.setBlockToAir(pos);
             return false;
         }
     }
@@ -131,14 +123,15 @@ public class BlockReed extends Block implements net.minecraftforge.common.IPlant
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
         return Items.reeds;
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;

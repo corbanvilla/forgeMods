@@ -1,7 +1,5 @@
 package net.minecraft.entity;
 
-import java.util.Iterator;
-import java.util.List;
 import net.minecraft.block.BlockFence;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -16,17 +14,15 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class EntityLeashKnot extends EntityHanging
 {
-    private static final String __OBFID = "CL_00001548";
-
     public EntityLeashKnot(World worldIn)
     {
         super(worldIn);
     }
 
-    public EntityLeashKnot(World worldIn, BlockPos p_i45851_2_)
+    public EntityLeashKnot(World worldIn, BlockPos hangingPositionIn)
     {
-        super(worldIn, p_i45851_2_);
-        this.setPosition((double)p_i45851_2_.getX() + 0.5D, (double)p_i45851_2_.getY() + 0.5D, (double)p_i45851_2_.getZ() + 0.5D);
+        super(worldIn, hangingPositionIn);
+        this.setPosition((double)hangingPositionIn.getX() + 0.5D, (double)hangingPositionIn.getY() + 0.5D, (double)hangingPositionIn.getZ() + 0.5D);
         float f = 0.125F;
         float f1 = 0.1875F;
         float f2 = 0.25F;
@@ -38,7 +34,12 @@ public class EntityLeashKnot extends EntityHanging
         super.entityInit();
     }
 
-    public void func_174859_a(EnumFacing p_174859_1_) {}
+    /**
+     * Updates facing and bounding box based on it
+     */
+    public void updateFacingWithBoundingBox(EnumFacing facingDirectionIn)
+    {
+    }
 
     public int getWidthPixels()
     {
@@ -68,7 +69,9 @@ public class EntityLeashKnot extends EntityHanging
     /**
      * Called when this entity is broken. Entity parameter may be null.
      */
-    public void onBroken(Entity p_110128_1_) {}
+    public void onBroken(Entity brokenEntity)
+    {
+    }
 
     /**
      * Either write this entity to the NBT tag given and return true, or return false without doing anything. If this
@@ -83,12 +86,16 @@ public class EntityLeashKnot extends EntityHanging
     /**
      * (abstract) Protected helper method to write subclass entity data to NBT.
      */
-    public void writeEntityToNBT(NBTTagCompound tagCompound) {}
+    public void writeEntityToNBT(NBTTagCompound tagCompound)
+    {
+    }
 
     /**
      * (abstract) Protected helper method to read subclass entity data from NBT.
      */
-    public void readEntityFromNBT(NBTTagCompound tagCompund) {}
+    public void readEntityFromNBT(NBTTagCompound tagCompund)
+    {
+    }
 
     /**
      * First layer of player interaction
@@ -97,21 +104,13 @@ public class EntityLeashKnot extends EntityHanging
     {
         ItemStack itemstack = playerIn.getHeldItem();
         boolean flag = false;
-        double d0;
-        List list;
-        Iterator iterator;
-        EntityLiving entityliving;
 
         if (itemstack != null && itemstack.getItem() == Items.lead && !this.worldObj.isRemote)
         {
-            d0 = 7.0D;
-            list = this.worldObj.getEntitiesWithinAABB(EntityLiving.class, new AxisAlignedBB(this.posX - d0, this.posY - d0, this.posZ - d0, this.posX + d0, this.posY + d0, this.posZ + d0));
-            iterator = list.iterator();
+            double d0 = 7.0D;
 
-            while (iterator.hasNext())
+            for (EntityLiving entityliving : this.worldObj.getEntitiesWithinAABB(EntityLiving.class, new AxisAlignedBB(this.posX - d0, this.posY - d0, this.posZ - d0, this.posX + d0, this.posY + d0, this.posZ + d0)))
             {
-                entityliving = (EntityLiving)iterator.next();
-
                 if (entityliving.getLeashed() && entityliving.getLeashedToEntity() == playerIn)
                 {
                     entityliving.setLeashedToEntity(this, true);
@@ -126,17 +125,13 @@ public class EntityLeashKnot extends EntityHanging
 
             if (playerIn.capabilities.isCreativeMode)
             {
-                d0 = 7.0D;
-                list = this.worldObj.getEntitiesWithinAABB(EntityLiving.class, new AxisAlignedBB(this.posX - d0, this.posY - d0, this.posZ - d0, this.posX + d0, this.posY + d0, this.posZ + d0));
-                iterator = list.iterator();
+                double d1 = 7.0D;
 
-                while (iterator.hasNext())
+                for (EntityLiving entityliving1 : this.worldObj.getEntitiesWithinAABB(EntityLiving.class, new AxisAlignedBB(this.posX - d1, this.posY - d1, this.posZ - d1, this.posX + d1, this.posY + d1, this.posZ + d1)))
                 {
-                    entityliving = (EntityLiving)iterator.next();
-
-                    if (entityliving.getLeashed() && entityliving.getLeashedToEntity() == this)
+                    if (entityliving1.getLeashed() && entityliving1.getLeashedToEntity() == this)
                     {
-                        entityliving.clearLeashed(true, false);
+                        entityliving1.clearLeashed(true, false);
                     }
                 }
             }
@@ -166,21 +161,15 @@ public class EntityLeashKnot extends EntityHanging
         int i = pos.getX();
         int j = pos.getY();
         int k = pos.getZ();
-        List list = worldIn.getEntitiesWithinAABB(EntityLeashKnot.class, new AxisAlignedBB((double)i - 1.0D, (double)j - 1.0D, (double)k - 1.0D, (double)i + 1.0D, (double)j + 1.0D, (double)k + 1.0D));
-        Iterator iterator = list.iterator();
-        EntityLeashKnot entityleashknot;
 
-        do
+        for (EntityLeashKnot entityleashknot : worldIn.getEntitiesWithinAABB(EntityLeashKnot.class, new AxisAlignedBB((double)i - 1.0D, (double)j - 1.0D, (double)k - 1.0D, (double)i + 1.0D, (double)j + 1.0D, (double)k + 1.0D)))
         {
-            if (!iterator.hasNext())
+            if (entityleashknot.getHangingPosition().equals(pos))
             {
-                return null;
+                return entityleashknot;
             }
-
-            entityleashknot = (EntityLeashKnot)iterator.next();
         }
-        while (!entityleashknot.func_174857_n().equals(pos));
 
-        return entityleashknot;
+        return null;
     }
 }

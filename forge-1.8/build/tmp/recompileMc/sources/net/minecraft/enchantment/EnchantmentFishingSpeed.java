@@ -4,8 +4,6 @@ import net.minecraft.util.ResourceLocation;
 
 public class EnchantmentFishingSpeed extends Enchantment
 {
-    private static final String __OBFID = "CL_00000117";
-
     protected EnchantmentFishingSpeed(int enchID, ResourceLocation enchName, int enchWeight, EnumEnchantmentType enchType)
     {
         super(enchID, enchName, enchWeight, enchType);

@@ -15,9 +15,8 @@ public class InventoryBasic implements IInventory
     private String inventoryTitle;
     private int slotsCount;
     private ItemStack[] inventoryContents;
-    private List field_70480_d;
+    private List<IInvBasic> field_70480_d;
     private boolean hasCustomName;
-    private static final String __OBFID = "CL_00001514";
 
     public InventoryBasic(String title, boolean customName, int slotCount)
     {
@@ -37,7 +36,7 @@ public class InventoryBasic implements IInventory
     {
         if (this.field_70480_d == null)
         {
-            this.field_70480_d = Lists.newArrayList();
+            this.field_70480_d = Lists.<IInvBasic>newArrayList();
         }
 
         this.field_70480_d.add(p_110134_1_);
@@ -49,7 +48,7 @@ public class InventoryBasic implements IInventory
     }
 
     /**
-     * Returns the stack in slot i
+     * Returns the stack in the given slot.
      */
     public ItemStack getStackInSlot(int index)
     {
@@ -57,25 +56,22 @@ public class InventoryBasic implements IInventory
     }
 
     /**
-     * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a
-     * new stack.
+     * Removes up to a specified number of items from an inventory slot and returns them in a new stack.
      */
     public ItemStack decrStackSize(int index, int count)
     {
         if (this.inventoryContents[index] != null)
         {
-            ItemStack itemstack;
-
             if (this.inventoryContents[index].stackSize <= count)
             {
-                itemstack = this.inventoryContents[index];
+                ItemStack itemstack1 = this.inventoryContents[index];
                 this.inventoryContents[index] = null;
                 this.markDirty();
-                return itemstack;
+                return itemstack1;
             }
             else
             {
-                itemstack = this.inventoryContents[index].splitStack(count);
+                ItemStack itemstack = this.inventoryContents[index].splitStack(count);
 
                 if (this.inventoryContents[index].stackSize == 0)
                 {
@@ -92,32 +88,32 @@ public class InventoryBasic implements IInventory
         }
     }
 
-    public ItemStack func_174894_a(ItemStack p_174894_1_)
+    public ItemStack func_174894_a(ItemStack stack)
     {
-        ItemStack itemstack1 = p_174894_1_.copy();
+        ItemStack itemstack = stack.copy();
 
         for (int i = 0; i < this.slotsCount; ++i)
         {
-            ItemStack itemstack2 = this.getStackInSlot(i);
+            ItemStack itemstack1 = this.getStackInSlot(i);
 
-            if (itemstack2 == null)
+            if (itemstack1 == null)
             {
-                this.setInventorySlotContents(i, itemstack1);
+                this.setInventorySlotContents(i, itemstack);
                 this.markDirty();
                 return null;
             }
 
-            if (ItemStack.areItemsEqual(itemstack2, itemstack1))
+            if (ItemStack.areItemsEqual(itemstack1, itemstack))
             {
-                int j = Math.min(this.getInventoryStackLimit(), itemstack2.getMaxStackSize());
-                int k = Math.min(itemstack1.stackSize, j - itemstack2.stackSize);
+                int j = Math.min(this.getInventoryStackLimit(), itemstack1.getMaxStackSize());
+                int k = Math.min(itemstack.stackSize, j - itemstack1.stackSize);
 
                 if (k > 0)
                 {
-                    itemstack2.stackSize += k;
-                    itemstack1.stackSize -= k;
+                    itemstack1.stackSize += k;
+                    itemstack.stackSize -= k;
 
-                    if (itemstack1.stackSize <= 0)
+                    if (itemstack.stackSize <= 0)
                     {
                         this.markDirty();
                         return null;
@@ -126,19 +122,18 @@ public class InventoryBasic implements IInventory
             }
         }
 
-        if (itemstack1.stackSize != p_174894_1_.stackSize)
+        if (itemstack.stackSize != stack.stackSize)
         {
             this.markDirty();
         }
 
-        return itemstack1;
+        return itemstack;
     }
 
     /**
-     * When some containers are closed they call this on each slot, then drop whatever it returns as an EntityItem -
-     * like when you close a workbench GUI.
+     * Removes a stack from the given slot and returns it.
      */
-    public ItemStack getStackInSlotOnClosing(int index)
+    public ItemStack removeStackFromSlot(int index)
     {
         if (this.inventoryContents[index] != null)
         {
@@ -176,7 +171,7 @@ public class InventoryBasic implements IInventory
     }
 
     /**
-     * Gets the name of this command sender (usually username, but possibly "Rcon")
+     * Get the name of this object. For players this returns their username
      */
     public String getName()
     {
@@ -194,20 +189,22 @@ public class InventoryBasic implements IInventory
     /**
      * Sets the name of this inventory. This is displayed to the client on opening.
      */
-    public void setCustomName(String p_110133_1_)
+    public void setCustomName(String inventoryTitleIn)
     {
         this.hasCustomName = true;
-        this.inventoryTitle = p_110133_1_;
+        this.inventoryTitle = inventoryTitleIn;
     }
 
+    /**
+     * Get the formatted ChatComponent that will be used for the sender's username in chat
+     */
     public IChatComponent getDisplayName()
     {
         return (IChatComponent)(this.hasCustomName() ? new ChatComponentText(this.getName()) : new ChatComponentTranslation(this.getName(), new Object[0]));
     }
 
     /**
-     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended. *Isn't
-     * this more of a set than a get?*
+     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended.
      */
     public int getInventoryStackLimit()
     {
@@ -237,9 +234,13 @@ public class InventoryBasic implements IInventory
         return true;
     }
 
-    public void openInventory(EntityPlayer player) {}
+    public void openInventory(EntityPlayer player)
+    {
+    }
 
-    public void closeInventory(EntityPlayer player) {}
+    public void closeInventory(EntityPlayer player)
+    {
+    }
 
     /**
      * Returns true if automation is allowed to insert the given stack (ignoring stack size) into the given slot.
@@ -254,7 +255,9 @@ public class InventoryBasic implements IInventory
         return 0;
     }
 
-    public void setField(int id, int value) {}
+    public void setField(int id, int value)
+    {
+    }
 
     public int getFieldCount()
     {

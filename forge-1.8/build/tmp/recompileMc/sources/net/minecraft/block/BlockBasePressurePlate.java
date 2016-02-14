@@ -1,6 +1,7 @@
 package net.minecraft.block;
 
 import java.util.Random;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -13,23 +14,26 @@ import net.minecraft.world.World;
 
 public abstract class BlockBasePressurePlate extends Block
 {
-    private static final String __OBFID = "CL_00000194";
-
     protected BlockBasePressurePlate(Material materialIn)
     {
-        super(materialIn);
+        this(materialIn, materialIn.getMaterialMapColor());
+    }
+
+    protected BlockBasePressurePlate(Material p_i46401_1_, MapColor p_i46401_2_)
+    {
+        super(p_i46401_1_, p_i46401_2_);
         this.setCreativeTab(CreativeTabs.tabRedstone);
         this.setTickRandomly(true);
     }
 
     public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
     {
-        this.func_180668_d(worldIn.getBlockState(pos));
+        this.setBlockBoundsBasedOnState0(worldIn.getBlockState(pos));
     }
 
-    protected void func_180668_d(IBlockState p_180668_1_)
+    protected void setBlockBoundsBasedOnState0(IBlockState state)
     {
-        boolean flag = this.getRedstoneStrength(p_180668_1_) > 0;
+        boolean flag = this.getRedstoneStrength(state) > 0;
         float f = 0.0625F;
 
         if (flag)
@@ -55,6 +59,9 @@ public abstract class BlockBasePressurePlate extends Block
         return null;
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -66,6 +73,11 @@ public abstract class BlockBasePressurePlate extends Block
     }
 
     public boolean isPassable(IBlockAccess worldIn, BlockPos pos)
+    {
+        return true;
+    }
+
+    public boolean func_181623_g()
     {
         return true;
     }
@@ -95,7 +107,9 @@ public abstract class BlockBasePressurePlate extends Block
     /**
      * Called randomly when setTickRandomly is set to true (used by e.g. crops to grow, etc.)
      */
-    public void randomTick(World worldIn, BlockPos pos, IBlockState state, Random random) {}
+    public void randomTick(World worldIn, BlockPos pos, IBlockState state, Random random)
+    {
+    }
 
     public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
@@ -131,13 +145,13 @@ public abstract class BlockBasePressurePlate extends Block
      */
     protected void updateState(World worldIn, BlockPos pos, IBlockState state, int oldRedstoneStrength)
     {
-        int j = this.computeRedstoneStrength(worldIn, pos);
+        int i = this.computeRedstoneStrength(worldIn, pos);
         boolean flag = oldRedstoneStrength > 0;
-        boolean flag1 = j > 0;
+        boolean flag1 = i > 0;
 
-        if (oldRedstoneStrength != j)
+        if (oldRedstoneStrength != i)
         {
-            state = this.setRedstoneStrength(state, j);
+            state = this.setRedstoneStrength(state, i);
             worldIn.setBlockState(pos, state, 2);
             this.updateNeighbors(worldIn, pos);
             worldIn.markBlockRangeForRenderUpdate(pos, pos);
@@ -186,12 +200,12 @@ public abstract class BlockBasePressurePlate extends Block
         worldIn.notifyNeighborsOfStateChange(pos.down(), this);
     }
 
-    public int isProvidingWeakPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
+    public int getWeakPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
     {
         return this.getRedstoneStrength(state);
     }
 
-    public int isProvidingStrongPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
+    public int getStrongPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
     {
         return side == EnumFacing.UP ? this.getRedstoneStrength(state) : 0;
     }
@@ -222,7 +236,7 @@ public abstract class BlockBasePressurePlate extends Block
 
     protected abstract int computeRedstoneStrength(World worldIn, BlockPos pos);
 
-    protected abstract int getRedstoneStrength(IBlockState p_176576_1_);
+    protected abstract int getRedstoneStrength(IBlockState state);
 
-    protected abstract IBlockState setRedstoneStrength(IBlockState p_176575_1_, int p_176575_2_);
+    protected abstract IBlockState setRedstoneStrength(IBlockState state, int strength);
 }

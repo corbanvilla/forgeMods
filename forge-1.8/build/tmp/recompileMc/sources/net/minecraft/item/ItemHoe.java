@@ -16,7 +16,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemHoe extends Item
 {
     protected Item.ToolMaterial theToolMaterial;
-    private static final String __OBFID = "CL_00000039";
 
     public ItemHoe(Item.ToolMaterial material)
     {
@@ -28,10 +27,8 @@ public class ItemHoe extends Item
 
     /**
      * Called when a Block is right-clicked with this Item
-     *  
-     * @param pos The block being right-clicked
-     * @param side The side being right-clicked
      */
+    @SuppressWarnings("incomplete-switch")
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
         if (!playerIn.canPlayerEdit(pos.offset(side), side, stack))
@@ -55,11 +52,11 @@ public class ItemHoe extends Item
 
                 if (block == Blocks.dirt)
                 {
-                    switch (ItemHoe.SwitchDirtType.TYPE_LOOKUP[((BlockDirt.DirtType)iblockstate.getValue(BlockDirt.VARIANT)).ordinal()])
+                    switch ((BlockDirt.DirtType)iblockstate.getValue(BlockDirt.VARIANT))
                     {
-                        case 1:
+                        case DIRT:
                             return this.useHoe(stack, playerIn, worldIn, pos, Blocks.farmland.getDefaultState());
-                        case 2:
+                        case COARSE_DIRT:
                             return this.useHoe(stack, playerIn, worldIn, pos, Blocks.dirt.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.DIRT));
                     }
                 }
@@ -102,31 +99,4 @@ public class ItemHoe extends Item
     {
         return this.theToolMaterial.toString();
     }
-
-    static final class SwitchDirtType
-        {
-            static final int[] TYPE_LOOKUP = new int[BlockDirt.DirtType.values().length];
-            private static final String __OBFID = "CL_00002179";
-
-            static
-            {
-                try
-                {
-                    TYPE_LOOKUP[BlockDirt.DirtType.DIRT.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
-
-                try
-                {
-                    TYPE_LOOKUP[BlockDirt.DirtType.COARSE_DIRT.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
-            }
-        }
 }

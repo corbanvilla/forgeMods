@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -15,7 +16,6 @@ public class GuiStreamIndicator
     private final Minecraft mc;
     private float field_152443_c = 1.0F;
     private int field_152444_d = 1;
-    private static final String __OBFID = "CL_00001849";
 
     public GuiStreamIndicator(Minecraft mcIn)
     {
@@ -24,31 +24,31 @@ public class GuiStreamIndicator
 
     public void render(int p_152437_1_, int p_152437_2_)
     {
-        if (this.mc.getTwitchStream().func_152934_n())
+        if (this.mc.getTwitchStream().isBroadcasting())
         {
             GlStateManager.enableBlend();
-            int k = this.mc.getTwitchStream().func_152920_A();
+            int i = this.mc.getTwitchStream().func_152920_A();
 
-            if (k > 0)
+            if (i > 0)
             {
-                String s = "" + k;
-                int l = this.mc.fontRendererObj.getStringWidth(s);
-                boolean flag = true;
-                int i1 = p_152437_1_ - l - 1;
-                int j1 = p_152437_2_ + 20 - 1;
-                int k1 = p_152437_2_ + 20 + this.mc.fontRendererObj.FONT_HEIGHT - 1;
+                String s = "" + i;
+                int j = this.mc.fontRendererObj.getStringWidth(s);
+                int k = 20;
+                int l = p_152437_1_ - j - 1;
+                int i1 = p_152437_2_ + 20 - 1;
+                int j1 = p_152437_2_ + 20 + this.mc.fontRendererObj.FONT_HEIGHT - 1;
                 GlStateManager.disableTexture2D();
                 Tessellator tessellator = Tessellator.getInstance();
                 WorldRenderer worldrenderer = tessellator.getWorldRenderer();
                 GlStateManager.color(0.0F, 0.0F, 0.0F, (0.65F + 0.35000002F * this.field_152443_c) / 2.0F);
-                worldrenderer.startDrawingQuads();
-                worldrenderer.addVertex((double)i1, (double)k1, 0.0D);
-                worldrenderer.addVertex((double)p_152437_1_, (double)k1, 0.0D);
-                worldrenderer.addVertex((double)p_152437_1_, (double)j1, 0.0D);
-                worldrenderer.addVertex((double)i1, (double)j1, 0.0D);
+                worldrenderer.begin(7, DefaultVertexFormats.POSITION);
+                worldrenderer.pos((double)l, (double)j1, 0.0D).endVertex();
+                worldrenderer.pos((double)p_152437_1_, (double)j1, 0.0D).endVertex();
+                worldrenderer.pos((double)p_152437_1_, (double)i1, 0.0D).endVertex();
+                worldrenderer.pos((double)l, (double)i1, 0.0D).endVertex();
                 tessellator.draw();
                 GlStateManager.enableTexture2D();
-                this.mc.fontRendererObj.drawString(s, p_152437_1_ - l, p_152437_2_ + 20, 16777215);
+                this.mc.fontRendererObj.drawString(s, p_152437_1_ - j, p_152437_2_ + 20, 16777215);
             }
 
             this.render(p_152437_1_, p_152437_2_, this.func_152440_b(), 0);
@@ -67,11 +67,11 @@ public class GuiStreamIndicator
         float f4 = (float)(p_152436_3_ + 16) * 0.015625F;
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        worldrenderer.startDrawingQuads();
-        worldrenderer.addVertexWithUV((double)(p_152436_1_ - 16 - p_152436_4_), (double)(p_152436_2_ + 16), (double)f, (double)f1, (double)f4);
-        worldrenderer.addVertexWithUV((double)(p_152436_1_ - p_152436_4_), (double)(p_152436_2_ + 16), (double)f, (double)f3, (double)f4);
-        worldrenderer.addVertexWithUV((double)(p_152436_1_ - p_152436_4_), (double)(p_152436_2_ + 0), (double)f, (double)f3, (double)f2);
-        worldrenderer.addVertexWithUV((double)(p_152436_1_ - 16 - p_152436_4_), (double)(p_152436_2_ + 0), (double)f, (double)f1, (double)f2);
+        worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
+        worldrenderer.pos((double)(p_152436_1_ - 16 - p_152436_4_), (double)(p_152436_2_ + 16), (double)f).tex((double)f1, (double)f4).endVertex();
+        worldrenderer.pos((double)(p_152436_1_ - p_152436_4_), (double)(p_152436_2_ + 16), (double)f).tex((double)f3, (double)f4).endVertex();
+        worldrenderer.pos((double)(p_152436_1_ - p_152436_4_), (double)(p_152436_2_ + 0), (double)f).tex((double)f3, (double)f2).endVertex();
+        worldrenderer.pos((double)(p_152436_1_ - 16 - p_152436_4_), (double)(p_152436_2_ + 0), (double)f).tex((double)f1, (double)f2).endVertex();
         tessellator.draw();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     }
@@ -88,7 +88,7 @@ public class GuiStreamIndicator
 
     public void func_152439_a()
     {
-        if (this.mc.getTwitchStream().func_152934_n())
+        if (this.mc.getTwitchStream().isBroadcasting())
         {
             this.field_152443_c += 0.025F * (float)this.field_152444_d;
 

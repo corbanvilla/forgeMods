@@ -1,7 +1,6 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -9,33 +8,34 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S1DPacketEntityEffect implements Packet
+public class S1DPacketEntityEffect implements Packet<INetHandlerPlayClient>
 {
-    private int field_149434_a;
-    private byte field_149432_b;
-    private byte field_149433_c;
-    private int field_149431_d;
-    private byte field_179708_e;
-    private static final String __OBFID = "CL_00001343";
+    private int entityId;
+    private byte effectId;
+    private byte amplifier;
+    private int duration;
+    private byte hideParticles;
 
-    public S1DPacketEntityEffect() {}
-
-    public S1DPacketEntityEffect(int p_i45237_1_, PotionEffect p_i45237_2_)
+    public S1DPacketEntityEffect()
     {
-        this.field_149434_a = p_i45237_1_;
-        this.field_149432_b = (byte)(p_i45237_2_.getPotionID() & 255);
-        this.field_149433_c = (byte)(p_i45237_2_.getAmplifier() & 255);
+    }
 
-        if (p_i45237_2_.getDuration() > 32767)
+    public S1DPacketEntityEffect(int entityIdIn, PotionEffect effect)
+    {
+        this.entityId = entityIdIn;
+        this.effectId = (byte)(effect.getPotionID() & 255);
+        this.amplifier = (byte)(effect.getAmplifier() & 255);
+
+        if (effect.getDuration() > 32767)
         {
-            this.field_149431_d = 32767;
+            this.duration = 32767;
         }
         else
         {
-            this.field_149431_d = p_i45237_2_.getDuration();
+            this.duration = effect.getDuration();
         }
 
-        this.field_179708_e = (byte)(p_i45237_2_.getIsShowParticles() ? 1 : 0);
+        this.hideParticles = (byte)(effect.getIsShowParticles() ? 1 : 0);
     }
 
     /**
@@ -43,11 +43,11 @@ public class S1DPacketEntityEffect implements Packet
      */
     public void readPacketData(PacketBuffer buf) throws IOException
     {
-        this.field_149434_a = buf.readVarIntFromBuffer();
-        this.field_149432_b = buf.readByte();
-        this.field_149433_c = buf.readByte();
-        this.field_149431_d = buf.readVarIntFromBuffer();
-        this.field_179708_e = buf.readByte();
+        this.entityId = buf.readVarIntFromBuffer();
+        this.effectId = buf.readByte();
+        this.amplifier = buf.readByte();
+        this.duration = buf.readVarIntFromBuffer();
+        this.hideParticles = buf.readByte();
     }
 
     /**
@@ -55,17 +55,17 @@ public class S1DPacketEntityEffect implements Packet
      */
     public void writePacketData(PacketBuffer buf) throws IOException
     {
-        buf.writeVarIntToBuffer(this.field_149434_a);
-        buf.writeByte(this.field_149432_b);
-        buf.writeByte(this.field_149433_c);
-        buf.writeVarIntToBuffer(this.field_149431_d);
-        buf.writeByte(this.field_179708_e);
+        buf.writeVarIntToBuffer(this.entityId);
+        buf.writeByte(this.effectId);
+        buf.writeByte(this.amplifier);
+        buf.writeVarIntToBuffer(this.duration);
+        buf.writeByte(this.hideParticles);
     }
 
     @SideOnly(Side.CLIENT)
     public boolean func_149429_c()
     {
-        return this.field_149431_d == 32767;
+        return this.duration == 32767;
     }
 
     /**
@@ -76,41 +76,33 @@ public class S1DPacketEntityEffect implements Packet
         handler.handleEntityEffect(this);
     }
 
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
+    @SideOnly(Side.CLIENT)
+    public int getEntityId()
     {
-        this.processPacket((INetHandlerPlayClient)handler);
+        return this.entityId;
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_149426_d()
+    public byte getEffectId()
     {
-        return this.field_149434_a;
+        return this.effectId;
     }
 
     @SideOnly(Side.CLIENT)
-    public byte func_149427_e()
+    public byte getAmplifier()
     {
-        return this.field_149432_b;
+        return this.amplifier;
     }
 
     @SideOnly(Side.CLIENT)
-    public byte func_149428_f()
+    public int getDuration()
     {
-        return this.field_149433_c;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public int func_180755_e()
-    {
-        return this.field_149431_d;
+        return this.duration;
     }
 
     @SideOnly(Side.CLIENT)
     public boolean func_179707_f()
     {
-        return this.field_179708_e != 0;
+        return this.hideParticles != 0;
     }
 }

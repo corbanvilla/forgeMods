@@ -9,9 +9,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemDoublePlant extends ItemMultiTexture
 {
-    private static final String __OBFID = "CL_00000021";
-
-    public ItemDoublePlant(Block block, Block block2, Function nameFunction)
+    public ItemDoublePlant(Block block, Block block2, Function<ItemStack, String> nameFunction)
     {
         super(block, block2, nameFunction);
     }
@@ -19,7 +17,7 @@ public class ItemDoublePlant extends ItemMultiTexture
     @SideOnly(Side.CLIENT)
     public int getColorFromItemStack(ItemStack stack, int renderPass)
     {
-        BlockDoublePlant.EnumPlantType enumplanttype = BlockDoublePlant.EnumPlantType.byMetadata(stack.getMetadata());
-        return enumplanttype != BlockDoublePlant.EnumPlantType.GRASS && enumplanttype != BlockDoublePlant.EnumPlantType.FERN ? super.getColorFromItemStack(stack, renderPass) : ColorizerGrass.getGrassColor(0.5D, 1.0D);
+        BlockDoublePlant.EnumPlantType blockdoubleplant$enumplanttype = BlockDoublePlant.EnumPlantType.byMetadata(stack.getMetadata());
+        return blockdoubleplant$enumplanttype != BlockDoublePlant.EnumPlantType.GRASS && blockdoubleplant$enumplanttype != BlockDoublePlant.EnumPlantType.FERN ? super.getColorFromItemStack(stack, renderPass) : ColorizerGrass.getGrassColor(0.5D, 1.0D);
     }
 }

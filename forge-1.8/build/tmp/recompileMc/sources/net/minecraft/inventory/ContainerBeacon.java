@@ -11,37 +11,32 @@ public class ContainerBeacon extends Container
     private IInventory tileBeacon;
     /** This beacon's slot where you put in Emerald, Diamond, Gold or Iron Ingot. */
     private final ContainerBeacon.BeaconSlot beaconSlot;
-    private static final String __OBFID = "CL_00001735";
 
-    public ContainerBeacon(IInventory p_i45804_1_, IInventory p_i45804_2_)
+    public ContainerBeacon(IInventory playerInventory, IInventory tileBeaconIn)
     {
-        this.tileBeacon = p_i45804_2_;
-        this.addSlotToContainer(this.beaconSlot = new ContainerBeacon.BeaconSlot(p_i45804_2_, 0, 136, 110));
-        byte b0 = 36;
-        short short1 = 137;
-        int i;
+        this.tileBeacon = tileBeaconIn;
+        this.addSlotToContainer(this.beaconSlot = new ContainerBeacon.BeaconSlot(tileBeaconIn, 0, 136, 110));
+        int i = 36;
+        int j = 137;
 
-        for (i = 0; i < 3; ++i)
+        for (int k = 0; k < 3; ++k)
         {
-            for (int j = 0; j < 9; ++j)
+            for (int l = 0; l < 9; ++l)
             {
-                this.addSlotToContainer(new Slot(p_i45804_1_, j + i * 9 + 9, b0 + j * 18, short1 + i * 18));
+                this.addSlotToContainer(new Slot(playerInventory, l + k * 9 + 9, i + l * 18, j + k * 18));
             }
         }
 
-        for (i = 0; i < 9; ++i)
+        for (int i1 = 0; i1 < 9; ++i1)
         {
-            this.addSlotToContainer(new Slot(p_i45804_1_, i, b0 + i * 18, 58 + short1));
+            this.addSlotToContainer(new Slot(playerInventory, i1, i + i1 * 18, 58 + j));
         }
     }
 
-    /**
-     * Add the given Listener to the list of Listeners. Method name is for legacy.
-     */
-    public void addCraftingToCrafters(ICrafting listener)
+    public void onCraftGuiOpened(ICrafting listener)
     {
-        super.addCraftingToCrafters(listener);
-        listener.func_175173_a(this, this.tileBeacon);
+        super.onCraftGuiOpened(listener);
+        listener.sendAllWindowProperties(this, this.tileBeacon);
     }
 
     @SideOnly(Side.CLIENT)
@@ -53,6 +48,24 @@ public class ContainerBeacon extends Container
     public IInventory func_180611_e()
     {
         return this.tileBeacon;
+    }
+
+    /**
+     * Called when the container is closed.
+     */
+    public void onContainerClosed(EntityPlayer playerIn)
+    {
+        super.onContainerClosed(playerIn);
+
+        if (playerIn != null && !playerIn.worldObj.isRemote)
+        {
+            ItemStack itemstack = this.beaconSlot.decrStackSize(this.beaconSlot.getSlotStackLimit());
+
+            if (itemstack != null)
+            {
+                playerIn.dropPlayerItemWithRandomChoice(itemstack, false);
+            }
+        }
     }
 
     public boolean canInteractWith(EntityPlayer playerIn)
@@ -130,8 +143,6 @@ public class ContainerBeacon extends Container
 
     class BeaconSlot extends Slot
     {
-        private static final String __OBFID = "CL_00001736";
-
         public BeaconSlot(IInventory p_i1801_2_, int p_i1801_3_, int p_i1801_4_, int p_i1801_5_)
         {
             super(p_i1801_2_, p_i1801_3_, p_i1801_4_, p_i1801_5_);

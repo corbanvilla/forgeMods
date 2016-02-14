@@ -32,9 +32,8 @@ public class BlockFire extends Block
     public static final PropertyBool SOUTH = PropertyBool.create("south");
     public static final PropertyBool WEST = PropertyBool.create("west");
     public static final PropertyInteger UPPER = PropertyInteger.create("upper", 0, 2);
-    private final Map encouragements = Maps.newIdentityHashMap();
-    private final Map flammabilities = Maps.newIdentityHashMap();
-    private static final String __OBFID = "CL_00000245";
+    private final Map<Block, Integer> encouragements = Maps.<Block, Integer>newIdentityHashMap();
+    private final Map<Block, Integer> flammabilities = Maps.<Block, Integer>newIdentityHashMap();
 
     /**
      * Get the actual Block state of this Block at the given position. This applies properties not visible in the
@@ -129,6 +128,9 @@ public class BlockFire extends Block
         return null;
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -157,7 +159,7 @@ public class BlockFire extends Block
 
     public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
-        if (worldIn.getGameRules().getGameRuleBooleanValue("doFireTick"))
+        if (worldIn.getGameRules().getBoolean("doFireTick"))
         {
             if (!this.canPlaceBlockAt(worldIn, pos))
             {
@@ -203,57 +205,57 @@ public class BlockFire extends Block
                 }
 
                 boolean flag1 = worldIn.isBlockinHighHumidity(pos);
-                byte b0 = 0;
+                int j = 0;
 
                 if (flag1)
                 {
-                    b0 = -50;
+                    j = -50;
                 }
 
-                this.tryCatchFire(worldIn, pos.east(), 300 + b0, rand, i, EnumFacing.WEST);
-                this.tryCatchFire(worldIn, pos.west(), 300 + b0, rand, i, EnumFacing.EAST);
-                this.tryCatchFire(worldIn, pos.down(), 250 + b0, rand, i, EnumFacing.UP);
-                this.tryCatchFire(worldIn, pos.up(), 250 + b0, rand, i, EnumFacing.DOWN);
-                this.tryCatchFire(worldIn, pos.north(), 300 + b0, rand, i, EnumFacing.SOUTH);
-                this.tryCatchFire(worldIn, pos.south(), 300 + b0, rand, i, EnumFacing.NORTH);
+                this.tryCatchFire(worldIn, pos.east(), 300 + j, rand, i, EnumFacing.WEST);
+                this.tryCatchFire(worldIn, pos.west(), 300 + j, rand, i, EnumFacing.EAST);
+                this.tryCatchFire(worldIn, pos.down(), 250 + j, rand, i, EnumFacing.UP);
+                this.tryCatchFire(worldIn, pos.up(), 250 + j, rand, i, EnumFacing.DOWN);
+                this.tryCatchFire(worldIn, pos.north(), 300 + j, rand, i, EnumFacing.SOUTH);
+                this.tryCatchFire(worldIn, pos.south(), 300 + j, rand, i, EnumFacing.NORTH);
 
-                for (int j = -1; j <= 1; ++j)
+                for (int k = -1; k <= 1; ++k)
                 {
-                    for (int k = -1; k <= 1; ++k)
+                    for (int l = -1; l <= 1; ++l)
                     {
-                        for (int l = -1; l <= 4; ++l)
+                        for (int i1 = -1; i1 <= 4; ++i1)
                         {
-                            if (j != 0 || l != 0 || k != 0)
+                            if (k != 0 || i1 != 0 || l != 0)
                             {
-                                int i1 = 100;
+                                int j1 = 100;
 
-                                if (l > 1)
+                                if (i1 > 1)
                                 {
-                                    i1 += (l - 1) * 100;
+                                    j1 += (i1 - 1) * 100;
                                 }
 
-                                BlockPos blockpos1 = pos.add(j, l, k);
-                                int j1 = this.getNeighborEncouragement(worldIn, blockpos1);
+                                BlockPos blockpos = pos.add(k, i1, l);
+                                int k1 = this.getNeighborEncouragement(worldIn, blockpos);
 
-                                if (j1 > 0)
+                                if (k1 > 0)
                                 {
-                                    int k1 = (j1 + 40 + worldIn.getDifficulty().getDifficultyId() * 7) / (i + 30);
+                                    int l1 = (k1 + 40 + worldIn.getDifficulty().getDifficultyId() * 7) / (i + 30);
 
                                     if (flag1)
                                     {
-                                        k1 /= 2;
+                                        l1 /= 2;
                                     }
 
-                                    if (k1 > 0 && rand.nextInt(i1) <= k1 && (!worldIn.isRaining() || !this.canDie(worldIn, blockpos1)))
+                                    if (l1 > 0 && rand.nextInt(j1) <= l1 && (!worldIn.isRaining() || !this.canDie(worldIn, blockpos)))
                                     {
-                                        int l1 = i + rand.nextInt(5) / 4;
+                                        int i2 = i + rand.nextInt(5) / 4;
 
-                                        if (l1 > 15)
+                                        if (i2 > 15)
                                         {
-                                            l1 = 15;
+                                            i2 = 15;
                                         }
 
-                                        worldIn.setBlockState(blockpos1, state.withProperty(AGE, Integer.valueOf(l1)), 3);
+                                        worldIn.setBlockState(blockpos, state.withProperty(AGE, Integer.valueOf(i2)), 3);
                                     }
                                 }
                             }
@@ -296,22 +298,22 @@ public class BlockFire extends Block
 
     private void tryCatchFire(World worldIn, BlockPos pos, int chance, Random random, int age, EnumFacing face)
     {
-        int k = worldIn.getBlockState(pos).getBlock().getFlammability(worldIn, pos, face);
+        int i = worldIn.getBlockState(pos).getBlock().getFlammability(worldIn, pos, face);
 
-        if (random.nextInt(chance) < k)
+        if (random.nextInt(chance) < i)
         {
             IBlockState iblockstate = worldIn.getBlockState(pos);
 
             if (random.nextInt(age + 10) < 5 && !worldIn.canLightningStrike(pos))
             {
-                int l = age + random.nextInt(5) / 4;
+                int j = age + random.nextInt(5) / 4;
 
-                if (l > 15)
+                if (j > 15)
                 {
-                    l = 15;
+                    j = 15;
                 }
 
-                worldIn.setBlockState(pos, this.getDefaultState().withProperty(AGE, Integer.valueOf(l)), 3);
+                worldIn.setBlockState(pos, this.getDefaultState().withProperty(AGE, Integer.valueOf(j)), 3);
             }
             else
             {
@@ -327,13 +329,8 @@ public class BlockFire extends Block
 
     private boolean canNeighborCatchFire(World worldIn, BlockPos pos)
     {
-        EnumFacing[] aenumfacing = EnumFacing.values();
-        int i = aenumfacing.length;
-
-        for (int j = 0; j < i; ++j)
+        for (EnumFacing enumfacing : EnumFacing.values())
         {
-            EnumFacing enumfacing = aenumfacing[j];
-
             if (this.canCatchFire(worldIn, pos.offset(enumfacing), enumfacing.getOpposite()))
             {
                 return true;
@@ -352,12 +349,9 @@ public class BlockFire extends Block
         else
         {
             int i = 0;
-            EnumFacing[] aenumfacing = EnumFacing.values();
-            int j = aenumfacing.length;
 
-            for (int k = 0; k < j; ++k)
+            for (EnumFacing enumfacing : EnumFacing.values())
             {
-                EnumFacing enumfacing = aenumfacing[k];
                 i = Math.max(worldIn.getBlockState(pos.offset(enumfacing)).getBlock().getFlammability(worldIn, pos.offset(enumfacing), enumfacing.getOpposite()), i);
             }
 
@@ -421,75 +415,70 @@ public class BlockFire extends Block
             worldIn.playSound((double)((float)pos.getX() + 0.5F), (double)((float)pos.getY() + 0.5F), (double)((float)pos.getZ() + 0.5F), "fire.fire", 1.0F + rand.nextFloat(), rand.nextFloat() * 0.7F + 0.3F, false);
         }
 
-        int i;
-        double d0;
-        double d1;
-        double d2;
-
         if (!World.doesBlockHaveSolidTopSurface(worldIn, pos.down()) && !Blocks.fire.canCatchFire(worldIn, pos.down(), EnumFacing.UP))
         {
             if (Blocks.fire.canCatchFire(worldIn, pos.west(), EnumFacing.EAST))
             {
-                for (i = 0; i < 2; ++i)
+                for (int j = 0; j < 2; ++j)
                 {
-                    d0 = (double)pos.getX() + rand.nextDouble() * 0.10000000149011612D;
-                    d1 = (double)pos.getY() + rand.nextDouble();
-                    d2 = (double)pos.getZ() + rand.nextDouble();
-                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d0, d1, d2, 0.0D, 0.0D, 0.0D, new int[0]);
+                    double d3 = (double)pos.getX() + rand.nextDouble() * 0.10000000149011612D;
+                    double d8 = (double)pos.getY() + rand.nextDouble();
+                    double d13 = (double)pos.getZ() + rand.nextDouble();
+                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d3, d8, d13, 0.0D, 0.0D, 0.0D, new int[0]);
                 }
             }
 
             if (Blocks.fire.canCatchFire(worldIn, pos.east(), EnumFacing.WEST))
             {
-                for (i = 0; i < 2; ++i)
+                for (int k = 0; k < 2; ++k)
                 {
-                    d0 = (double)(pos.getX() + 1) - rand.nextDouble() * 0.10000000149011612D;
-                    d1 = (double)pos.getY() + rand.nextDouble();
-                    d2 = (double)pos.getZ() + rand.nextDouble();
-                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d0, d1, d2, 0.0D, 0.0D, 0.0D, new int[0]);
+                    double d4 = (double)(pos.getX() + 1) - rand.nextDouble() * 0.10000000149011612D;
+                    double d9 = (double)pos.getY() + rand.nextDouble();
+                    double d14 = (double)pos.getZ() + rand.nextDouble();
+                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d4, d9, d14, 0.0D, 0.0D, 0.0D, new int[0]);
                 }
             }
 
             if (Blocks.fire.canCatchFire(worldIn, pos.north(), EnumFacing.SOUTH))
             {
-                for (i = 0; i < 2; ++i)
+                for (int l = 0; l < 2; ++l)
                 {
-                    d0 = (double)pos.getX() + rand.nextDouble();
-                    d1 = (double)pos.getY() + rand.nextDouble();
-                    d2 = (double)pos.getZ() + rand.nextDouble() * 0.10000000149011612D;
-                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d0, d1, d2, 0.0D, 0.0D, 0.0D, new int[0]);
+                    double d5 = (double)pos.getX() + rand.nextDouble();
+                    double d10 = (double)pos.getY() + rand.nextDouble();
+                    double d15 = (double)pos.getZ() + rand.nextDouble() * 0.10000000149011612D;
+                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d5, d10, d15, 0.0D, 0.0D, 0.0D, new int[0]);
                 }
             }
 
             if (Blocks.fire.canCatchFire(worldIn, pos.south(), EnumFacing.NORTH))
             {
-                for (i = 0; i < 2; ++i)
+                for (int i1 = 0; i1 < 2; ++i1)
                 {
-                    d0 = (double)pos.getX() + rand.nextDouble();
-                    d1 = (double)pos.getY() + rand.nextDouble();
-                    d2 = (double)(pos.getZ() + 1) - rand.nextDouble() * 0.10000000149011612D;
-                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d0, d1, d2, 0.0D, 0.0D, 0.0D, new int[0]);
+                    double d6 = (double)pos.getX() + rand.nextDouble();
+                    double d11 = (double)pos.getY() + rand.nextDouble();
+                    double d16 = (double)(pos.getZ() + 1) - rand.nextDouble() * 0.10000000149011612D;
+                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d6, d11, d16, 0.0D, 0.0D, 0.0D, new int[0]);
                 }
             }
 
             if (Blocks.fire.canCatchFire(worldIn, pos.up(), EnumFacing.DOWN))
             {
-                for (i = 0; i < 2; ++i)
+                for (int j1 = 0; j1 < 2; ++j1)
                 {
-                    d0 = (double)pos.getX() + rand.nextDouble();
-                    d1 = (double)(pos.getY() + 1) - rand.nextDouble() * 0.10000000149011612D;
-                    d2 = (double)pos.getZ() + rand.nextDouble();
-                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d0, d1, d2, 0.0D, 0.0D, 0.0D, new int[0]);
+                    double d7 = (double)pos.getX() + rand.nextDouble();
+                    double d12 = (double)(pos.getY() + 1) - rand.nextDouble() * 0.10000000149011612D;
+                    double d17 = (double)pos.getZ() + rand.nextDouble();
+                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d7, d12, d17, 0.0D, 0.0D, 0.0D, new int[0]);
                 }
             }
         }
         else
         {
-            for (i = 0; i < 3; ++i)
+            for (int i = 0; i < 3; ++i)
             {
-                d0 = (double)pos.getX() + rand.nextDouble();
-                d1 = (double)pos.getY() + rand.nextDouble() * 0.5D + 0.5D;
-                d2 = (double)pos.getZ() + rand.nextDouble();
+                double d0 = (double)pos.getX() + rand.nextDouble();
+                double d1 = (double)pos.getY() + rand.nextDouble() * 0.5D + 0.5D;
+                double d2 = (double)pos.getZ() + rand.nextDouble();
                 worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d0, d1, d2, 0.0D, 0.0D, 0.0D, new int[0]);
             }
         }

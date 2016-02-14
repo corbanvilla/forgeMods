@@ -10,7 +10,6 @@ public class EntityDamageSource extends DamageSource
     protected Entity damageSourceEntity;
     /** Whether this EntityDamageSource is from an entity wearing Thorns-enchanted armor. */
     private boolean isThornsDamage = false;
-    private static final String __OBFID = "CL_00001522";
 
     public EntityDamageSource(String p_i1567_1_, Entity damageSourceEntityIn)
     {

@@ -1,23 +1,23 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S13PacketDestroyEntities implements Packet
+public class S13PacketDestroyEntities implements Packet<INetHandlerPlayClient>
 {
-    private int[] field_149100_a;
-    private static final String __OBFID = "CL_00001320";
+    private int[] entityIDs;
 
-    public S13PacketDestroyEntities() {}
-
-    public S13PacketDestroyEntities(int ... p_i45211_1_)
+    public S13PacketDestroyEntities()
     {
-        this.field_149100_a = p_i45211_1_;
+    }
+
+    public S13PacketDestroyEntities(int... entityIDsIn)
+    {
+        this.entityIDs = entityIDsIn;
     }
 
     /**
@@ -25,11 +25,11 @@ public class S13PacketDestroyEntities implements Packet
      */
     public void readPacketData(PacketBuffer buf) throws IOException
     {
-        this.field_149100_a = new int[buf.readVarIntFromBuffer()];
+        this.entityIDs = new int[buf.readVarIntFromBuffer()];
 
-        for (int i = 0; i < this.field_149100_a.length; ++i)
+        for (int i = 0; i < this.entityIDs.length; ++i)
         {
-            this.field_149100_a[i] = buf.readVarIntFromBuffer();
+            this.entityIDs[i] = buf.readVarIntFromBuffer();
         }
     }
 
@@ -38,11 +38,11 @@ public class S13PacketDestroyEntities implements Packet
      */
     public void writePacketData(PacketBuffer buf) throws IOException
     {
-        buf.writeVarIntToBuffer(this.field_149100_a.length);
+        buf.writeVarIntToBuffer(this.entityIDs.length);
 
-        for (int i = 0; i < this.field_149100_a.length; ++i)
+        for (int i = 0; i < this.entityIDs.length; ++i)
         {
-            buf.writeVarIntToBuffer(this.field_149100_a[i]);
+            buf.writeVarIntToBuffer(this.entityIDs[i]);
         }
     }
 
@@ -55,16 +55,8 @@ public class S13PacketDestroyEntities implements Packet
     }
 
     @SideOnly(Side.CLIENT)
-    public int[] func_149098_c()
+    public int[] getEntityIDs()
     {
-        return this.field_149100_a;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayClient)handler);
+        return this.entityIDs;
     }
 }

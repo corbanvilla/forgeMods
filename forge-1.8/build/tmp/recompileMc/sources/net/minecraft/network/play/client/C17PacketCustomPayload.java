@@ -2,28 +2,28 @@ package net.minecraft.network.play.client;
 
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class C17PacketCustomPayload implements Packet
+public class C17PacketCustomPayload implements Packet<INetHandlerPlayServer>
 {
     private String channel;
     private PacketBuffer data;
-    private static final String __OBFID = "CL_00001356";
 
-    public C17PacketCustomPayload() {}
+    public C17PacketCustomPayload()
+    {
+    }
 
     @SideOnly(Side.CLIENT)
-    public C17PacketCustomPayload(String p_i45945_1_, PacketBuffer p_i45945_2_)
+    public C17PacketCustomPayload(String channelIn, PacketBuffer dataIn)
     {
-        this.channel = p_i45945_1_;
-        this.data = p_i45945_2_;
+        this.channel = channelIn;
+        this.data = dataIn;
 
-        if (p_i45945_2_.writerIndex() > 32767)
+        if (dataIn.writerIndex() > 32767)
         {
             throw new IllegalArgumentException("Payload may not be larger than 32767 bytes");
         }
@@ -76,13 +76,5 @@ public class C17PacketCustomPayload implements Packet
     public PacketBuffer getBufferData()
     {
         return this.data;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayServer)handler);
     }
 }

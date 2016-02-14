@@ -1,7 +1,6 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -9,23 +8,24 @@ import net.minecraft.util.IChatComponent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S02PacketChat implements Packet
+public class S02PacketChat implements Packet<INetHandlerPlayClient>
 {
     private IChatComponent chatComponent;
-    private byte field_179842_b;
-    private static final String __OBFID = "CL_00001289";
+    private byte type;
 
-    public S02PacketChat() {}
+    public S02PacketChat()
+    {
+    }
 
     public S02PacketChat(IChatComponent component)
     {
         this(component, (byte)1);
     }
 
-    public S02PacketChat(IChatComponent p_i45986_1_, byte p_i45986_2_)
+    public S02PacketChat(IChatComponent message, byte typeIn)
     {
-        this.chatComponent = p_i45986_1_;
-        this.field_179842_b = p_i45986_2_;
+        this.chatComponent = message;
+        this.type = typeIn;
     }
 
     /**
@@ -34,7 +34,7 @@ public class S02PacketChat implements Packet
     public void readPacketData(PacketBuffer buf) throws IOException
     {
         this.chatComponent = buf.readChatComponent();
-        this.field_179842_b = buf.readByte();
+        this.type = buf.readByte();
     }
 
     /**
@@ -43,7 +43,7 @@ public class S02PacketChat implements Packet
     public void writePacketData(PacketBuffer buf) throws IOException
     {
         buf.writeChatComponent(this.chatComponent);
-        buf.writeByte(this.field_179842_b);
+        buf.writeByte(this.type);
     }
 
     /**
@@ -55,27 +55,23 @@ public class S02PacketChat implements Packet
     }
 
     @SideOnly(Side.CLIENT)
-    public IChatComponent func_148915_c()
+    public IChatComponent getChatComponent()
     {
         return this.chatComponent;
     }
 
     public boolean isChat()
     {
-        return this.field_179842_b == 1 || this.field_179842_b == 2;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public byte func_179841_c()
-    {
-        return this.field_179842_b;
+        return this.type == 1 || this.type == 2;
     }
 
     /**
-     * Passes this Packet on to the NetHandler for processing.
+     * Returns the id of the area to display the text, 2 for above the action bar, anything else currently for the chat
+     * window
      */
-    public void processPacket(INetHandler handler)
+    @SideOnly(Side.CLIENT)
+    public byte getType()
     {
-        this.processPacket((INetHandlerPlayClient)handler);
+        return this.type;
     }
 }

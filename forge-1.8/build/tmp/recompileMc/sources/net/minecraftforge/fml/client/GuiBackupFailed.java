@@ -28,15 +28,18 @@ public class GuiBackupFailed extends GuiScreen
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
-    @SuppressWarnings("unchecked")
     @Override
     public void initGui()
     {
         this.buttonList.add(new GuiButton(1, this.width / 2 - 75, this.height - 38, I18n.format("gui.done")));
     }
 
+    /**
+     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
+     */
     @Override
     protected void actionPerformed(GuiButton p_73875_1_)
     {

@@ -9,7 +9,6 @@ public class BlockEventData
     /** Different for each blockID */
     private int eventID;
     private int eventParameter;
-    private static final String __OBFID = "CL_00000131";
 
     public BlockEventData(BlockPos pos, Block blockType, int eventId, int p_i45756_4_)
     {

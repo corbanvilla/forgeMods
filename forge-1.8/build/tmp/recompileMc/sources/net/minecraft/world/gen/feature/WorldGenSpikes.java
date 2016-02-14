@@ -2,6 +2,7 @@ package net.minecraft.world.gen.feature;
 
 import java.util.Random;
 import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityEnderCrystal;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
@@ -9,60 +10,56 @@ import net.minecraft.world.World;
 
 public class WorldGenSpikes extends WorldGenerator
 {
-    private Block field_150520_a;
-    private static final String __OBFID = "CL_00000433";
+    private Block baseBlockRequired;
 
     public WorldGenSpikes(Block p_i45464_1_)
     {
-        this.field_150520_a = p_i45464_1_;
+        this.baseBlockRequired = p_i45464_1_;
     }
 
-    public boolean generate(World worldIn, Random p_180709_2_, BlockPos p_180709_3_)
+    public boolean generate(World worldIn, Random rand, BlockPos position)
     {
-        if (worldIn.isAirBlock(p_180709_3_) && worldIn.getBlockState(p_180709_3_.down()).getBlock() == this.field_150520_a)
+        if (worldIn.isAirBlock(position) && worldIn.getBlockState(position.down()).getBlock() == this.baseBlockRequired)
         {
-            int i = p_180709_2_.nextInt(32) + 6;
-            int j = p_180709_2_.nextInt(4) + 1;
-            int k;
-            int l;
-            int i1;
-            int j1;
+            int i = rand.nextInt(32) + 6;
+            int j = rand.nextInt(4) + 1;
+            BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
 
-            for (k = p_180709_3_.getX() - j; k <= p_180709_3_.getX() + j; ++k)
+            for (int k = position.getX() - j; k <= position.getX() + j; ++k)
             {
-                for (l = p_180709_3_.getZ() - j; l <= p_180709_3_.getZ() + j; ++l)
+                for (int l = position.getZ() - j; l <= position.getZ() + j; ++l)
                 {
-                    i1 = k - p_180709_3_.getX();
-                    j1 = l - p_180709_3_.getZ();
+                    int i1 = k - position.getX();
+                    int j1 = l - position.getZ();
 
-                    if (i1 * i1 + j1 * j1 <= j * j + 1 && worldIn.getBlockState(new BlockPos(k, p_180709_3_.getY() - 1, l)).getBlock() != this.field_150520_a)
+                    if (i1 * i1 + j1 * j1 <= j * j + 1 && worldIn.getBlockState(blockpos$mutableblockpos.set(k, position.getY() - 1, l)).getBlock() != this.baseBlockRequired)
                     {
                         return false;
                     }
                 }
             }
 
-            for (k = p_180709_3_.getY(); k < p_180709_3_.getY() + i && k < 256; ++k)
+            for (int l1 = position.getY(); l1 < position.getY() + i && l1 < 256; ++l1)
             {
-                for (l = p_180709_3_.getX() - j; l <= p_180709_3_.getX() + j; ++l)
+                for (int i2 = position.getX() - j; i2 <= position.getX() + j; ++i2)
                 {
-                    for (i1 = p_180709_3_.getZ() - j; i1 <= p_180709_3_.getZ() + j; ++i1)
+                    for (int j2 = position.getZ() - j; j2 <= position.getZ() + j; ++j2)
                     {
-                        j1 = l - p_180709_3_.getX();
-                        int k1 = i1 - p_180709_3_.getZ();
+                        int k2 = i2 - position.getX();
+                        int k1 = j2 - position.getZ();
 
-                        if (j1 * j1 + k1 * k1 <= j * j + 1)
+                        if (k2 * k2 + k1 * k1 <= j * j + 1)
                         {
-                            worldIn.setBlockState(new BlockPos(l, k, i1), Blocks.obsidian.getDefaultState(), 2);
+                            worldIn.setBlockState(new BlockPos(i2, l1, j2), Blocks.obsidian.getDefaultState(), 2);
                         }
                     }
                 }
             }
 
-            EntityEnderCrystal entityendercrystal = new EntityEnderCrystal(worldIn);
-            entityendercrystal.setLocationAndAngles((double)((float)p_180709_3_.getX() + 0.5F), (double)(p_180709_3_.getY() + i), (double)((float)p_180709_3_.getZ() + 0.5F), p_180709_2_.nextFloat() * 360.0F, 0.0F);
-            worldIn.spawnEntityInWorld(entityendercrystal);
-            worldIn.setBlockState(p_180709_3_.up(i), Blocks.bedrock.getDefaultState(), 2);
+            Entity entity = new EntityEnderCrystal(worldIn);
+            entity.setLocationAndAngles((double)((float)position.getX() + 0.5F), (double)(position.getY() + i), (double)((float)position.getZ() + 0.5F), rand.nextFloat() * 360.0F, 0.0F);
+            worldIn.spawnEntityInWorld(entity);
+            worldIn.setBlockState(position.up(i), Blocks.bedrock.getDefaultState(), 2);
             return true;
         }
         else

@@ -1,6 +1,5 @@
 package net.minecraft.block;
 
-import java.util.Iterator;
 import java.util.Random;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -15,6 +14,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.EnumWorldBlockLayer;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -25,7 +25,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public abstract class BlockLiquid extends Block
 {
     public static final PropertyInteger LEVEL = PropertyInteger.create("level", 0, 15);
-    private static final String __OBFID = "CL_00000265";
 
     protected BlockLiquid(Material materialIn)
     {
@@ -75,6 +74,9 @@ public abstract class BlockLiquid extends Block
         return false;
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -106,13 +108,13 @@ public abstract class BlockLiquid extends Block
     }
 
     @SideOnly(Side.CLIENT)
-    public boolean func_176364_g(IBlockAccess p_176364_1_, BlockPos p_176364_2_)
+    public boolean func_176364_g(IBlockAccess blockAccess, BlockPos pos)
     {
         for (int i = -1; i <= 1; ++i)
         {
             for (int j = -1; j <= 1; ++j)
             {
-                IBlockState iblockstate = p_176364_1_.getBlockState(p_176364_2_.add(i, 0, j));
+                IBlockState iblockstate = blockAccess.getBlockState(pos.add(i, 0, j));
                 Block block = iblockstate.getBlock();
                 Material material = block.getMaterial();
 
@@ -127,7 +129,7 @@ public abstract class BlockLiquid extends Block
     }
 
     /**
-     * The type of render function that is called for this block
+     * The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render
      */
     public int getRenderType()
     {
@@ -136,8 +138,6 @@ public abstract class BlockLiquid extends Block
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -156,47 +156,39 @@ public abstract class BlockLiquid extends Block
     {
         Vec3 vec3 = new Vec3(0.0D, 0.0D, 0.0D);
         int i = this.getEffectiveFlowDecay(worldIn, pos);
-        Iterator iterator = EnumFacing.Plane.HORIZONTAL.iterator();
-        EnumFacing enumfacing;
-        BlockPos blockpos1;
 
-        while (iterator.hasNext())
+        for (EnumFacing enumfacing : EnumFacing.Plane.HORIZONTAL)
         {
-            enumfacing = (EnumFacing)iterator.next();
-            blockpos1 = pos.offset(enumfacing);
-            int j = this.getEffectiveFlowDecay(worldIn, blockpos1);
-            int k;
+            BlockPos blockpos = pos.offset(enumfacing);
+            int j = this.getEffectiveFlowDecay(worldIn, blockpos);
 
             if (j < 0)
             {
-                if (!worldIn.getBlockState(blockpos1).getBlock().getMaterial().blocksMovement())
+                if (!worldIn.getBlockState(blockpos).getBlock().getMaterial().blocksMovement())
                 {
-                    j = this.getEffectiveFlowDecay(worldIn, blockpos1.down());
+                    j = this.getEffectiveFlowDecay(worldIn, blockpos.down());
 
                     if (j >= 0)
                     {
-                        k = j - (i - 8);
-                        vec3 = vec3.addVector((double)((blockpos1.getX() - pos.getX()) * k), (double)((blockpos1.getY() - pos.getY()) * k), (double)((blockpos1.getZ() - pos.getZ()) * k));
+                        int k = j - (i - 8);
+                        vec3 = vec3.addVector((double)((blockpos.getX() - pos.getX()) * k), (double)((blockpos.getY() - pos.getY()) * k), (double)((blockpos.getZ() - pos.getZ()) * k));
                     }
                 }
             }
             else if (j >= 0)
             {
-                k = j - i;
-                vec3 = vec3.addVector((double)((blockpos1.getX() - pos.getX()) * k), (double)((blockpos1.getY() - pos.getY()) * k), (double)((blockpos1.getZ() - pos.getZ()) * k));
+                int l = j - i;
+                vec3 = vec3.addVector((double)((blockpos.getX() - pos.getX()) * l), (double)((blockpos.getY() - pos.getY()) * l), (double)((blockpos.getZ() - pos.getZ()) * l));
             }
         }
 
         if (((Integer)worldIn.getBlockState(pos).getValue(LEVEL)).intValue() >= 8)
         {
-            iterator = EnumFacing.Plane.HORIZONTAL.iterator();
-
-            while (iterator.hasNext())
+            for (EnumFacing enumfacing1 : EnumFacing.Plane.HORIZONTAL)
             {
-                enumfacing = (EnumFacing)iterator.next();
-                blockpos1 = pos.offset(enumfacing);
+                BlockPos blockpos1 = pos.offset(enumfacing1);
 
-                if (this.isBlockSolid(worldIn, blockpos1, enumfacing) || this.isBlockSolid(worldIn, blockpos1.up(), enumfacing))
+                if (this.isBlockSolid(worldIn, blockpos1, enumfacing1) || this.isBlockSolid(worldIn, blockpos1.up(), enumfacing1))
                 {
                     vec3 = vec3.normalize().addVector(0.0D, -6.0D, 0.0D);
                     break;
@@ -310,7 +302,7 @@ public abstract class BlockLiquid extends Block
     public static double getFlowDirection(IBlockAccess worldIn, BlockPos pos, Material materialIn)
     {
         Vec3 vec3 = getFlowingBlock(materialIn).getFlowVector(worldIn, pos);
-        return vec3.xCoord == 0.0D && vec3.zCoord == 0.0D ? -1000.0D : Math.atan2(vec3.zCoord, vec3.xCoord) - (Math.PI / 2D);
+        return vec3.xCoord == 0.0D && vec3.zCoord == 0.0D ? -1000.0D : MathHelper.atan2(vec3.zCoord, vec3.xCoord) - (Math.PI / 2D);
     }
 
     /**
@@ -326,13 +318,9 @@ public abstract class BlockLiquid extends Block
         if (this.blockMaterial == Material.lava)
         {
             boolean flag = false;
-            EnumFacing[] aenumfacing = EnumFacing.values();
-            int i = aenumfacing.length;
 
-            for (int j = 0; j < i; ++j)
+            for (EnumFacing enumfacing : EnumFacing.values())
             {
-                EnumFacing enumfacing = aenumfacing[j];
-
                 if (enumfacing != EnumFacing.DOWN && worldIn.getBlockState(pos.offset(enumfacing)).getBlock().getMaterial() == Material.water)
                 {
                     flag = true;

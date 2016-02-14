@@ -18,9 +18,10 @@ import com.google.common.cache.LoadingCache;
 import net.minecraft.client.renderer.vertex.VertexFormatElement.EnumUsage;
 public class LightUtil
 {
+    private static final float s2 = (float)Math.pow(2, .5);
+
     public static float diffuseLight(float x, float y, float z)
     {
-        float s2 = (float)Math.pow(2, .5);
         float y1 = y + 3 - 2 * s2;
         return (x * x * 0.6f + (y1 * y1 * (3 + 2 * s2)) / 8 + z * z * 0.8f);
     }
@@ -81,6 +82,8 @@ public class LightUtil
             }
         });
 
+    private static final int itemCount = DefaultVertexFormats.ITEM.getElementCount();
+
     public static void putBakedQuad(IVertexConsumer consumer, BakedQuad quad)
     {
         consumer.setQuadOrientation(quad.getFace());
@@ -94,12 +97,14 @@ public class LightUtil
         }
         //int[] eMap = mapFormats(consumer.getVertexFormat(), DefaultVertexFormats.ITEM);
         float[] data = new float[4];
-        int[] eMap = formatMaps.getUnchecked(consumer.getVertexFormat());
+        VertexFormat format = consumer.getVertexFormat();
+        int count = format.getElementCount();
+        int[] eMap = formatMaps.getUnchecked(format);
         for(int v = 0; v < 4; v++)
         {
-            for(int e = 0; e < consumer.getVertexFormat().getElementCount(); e++)
+            for(int e = 0; e < count; e++)
             {
-                if(eMap[e] != DefaultVertexFormats.ITEM.getElementCount())
+                if(eMap[e] != itemCount)
                 {
                     unpack(quad.getVertexData(), data, DefaultVertexFormats.ITEM, v, eMap[e]);
                     consumer.put(e, data);
@@ -114,13 +119,15 @@ public class LightUtil
 
     public static int[] mapFormats(VertexFormat from, VertexFormat to)
     {
-        int[] eMap = new int[from.getElementCount()];
+        int fromCount = from.getElementCount();
+        int toCount = to.getElementCount();
+        int[] eMap = new int[fromCount];
 
-        for(int e = 0; e < from.getElementCount(); e++)
+        for(int e = 0; e < fromCount; e++)
         {
             VertexFormatElement expected = from.getElement(e);
             int e2;
-            for(e2 = 0; e2 < to.getElementCount(); e2++)
+            for(e2 = 0; e2 < toCount; e2++)
             {
                 VertexFormatElement current = to.getElement(e2);
                 if(expected.getUsage() == current.getUsage() && expected.getIndex() == current.getIndex())
@@ -135,43 +142,50 @@ public class LightUtil
 
     public static void unpack(int[] from, float[] to, VertexFormat formatFrom, int v, int e)
     {
+        int length = 4 < to.length ? 4 : to.length;
         VertexFormatElement element = formatFrom.getElement(e);
-        for(int i = 0; i < 4; i++)
+        int vertexStart = v * formatFrom.getNextOffset() + formatFrom.func_181720_d(e);
+        int count = element.getElementCount();
+        VertexFormatElement.EnumType type = element.getType();
+        int size = type.getSize();
+        int mask = (256 << (8 * (size - 1))) - 1;
+        for(int i = 0; i < length; i++)
         {
-            if(i < element.getElementCount())
+            if(i < count)
             {
-                int pos = v * formatFrom.getNextOffset() + element.getOffset() + element.getType().getSize() * i;
+                int pos = vertexStart + size * i;
                 int index = pos >> 2;
                 int offset = pos & 3;
                 int bits = from[index];
                 bits = bits >>> (offset * 8);
-                if((pos + element.getType().getSize() - 1) / 4 != index)
+                if((pos + size - 1) / 4 != index)
                 {
                     bits |= from[index + 1] << ((4 - offset) * 8);
                 }
-                int mask = (256 << (8 * (element.getType().getSize() - 1))) - 1;
                 bits &= mask;
-                switch(element.getType())
+                if(type == VertexFormatElement.EnumType.FLOAT)
                 {
-                    case FLOAT:
-                        to[i] = Float.intBitsToFloat(bits);
-                        break;
-                    case UBYTE:
-                    case USHORT:
-                        to[i] = (float)bits / mask;
-                        break;
-                    case UINT:
-                        to[i] = (float)((double)(bits & 0xFFFFFFFFL) / 0xFFFFFFFFL);
-                        break;
-                    case BYTE:
-                        to[i] = ((float)(byte)bits) / mask * 2;
-                        break;
-                    case SHORT:
-                        to[i] = ((float)(short)bits) / mask * 2;
-                        break;
-                    case INT:
-                        to[i] = ((float)(bits & 0xFFFFFFFFL)) / 0xFFFFFFFFL * 2;
-                        break;
+                    to[i] = Float.intBitsToFloat(bits);
+                }
+                else if(type == VertexFormatElement.EnumType.UBYTE || type == VertexFormatElement.EnumType.USHORT)
+                {
+                    to[i] = (float)bits / mask;
+                }
+                else if(type == VertexFormatElement.EnumType.UINT)
+                {
+                    to[i] = (float)((double)(bits & 0xFFFFFFFFL) / 0xFFFFFFFFL);
+                }
+                else if(type == VertexFormatElement.EnumType.BYTE)
+                {
+                    to[i] = ((float)(byte)bits) / mask * 2;
+                }
+                else if(type == VertexFormatElement.EnumType.SHORT)
+                {
+                    to[i] = ((float)(short)bits) / mask * 2;
+                }
+                else if(type == VertexFormatElement.EnumType.INT)
+                {
+                    to[i] = ((float)(bits & 0xFFFFFFFFL)) / 0xFFFFFFFFL * 2;
                 }
             }
             else
@@ -184,30 +198,35 @@ public class LightUtil
     public static void pack(float[] from, int[] to, VertexFormat formatTo, int v, int e)
     {
         VertexFormatElement element = formatTo.getElement(e);
+        int vertexStart = v * formatTo.getNextOffset() + formatTo.func_181720_d(e);
+        int count = element.getElementCount();
+        VertexFormatElement.EnumType type = element.getType();
+        int size = type.getSize();
+        int mask = (256 << (8 * (size - 1))) - 1;
         for(int i = 0; i < 4; i++)
         {
-            if(i < element.getElementCount())
+            if(i < count)
             {
-                int pos = v * formatTo.getNextOffset() + element.getOffset() + element.getType().getSize() * i;
+                int pos = vertexStart + size * i;
                 int index = pos >> 2;
                 int offset = pos & 3;
                 int bits = 0;
-                int mask = (256 << (8 * (element.getType().getSize() - 1))) - 1;
-                switch(element.getType())
+                float f = i < from.length ? from[i] : 0;
+                if(type == VertexFormatElement.EnumType.FLOAT)
                 {
-                    case FLOAT:
-                        bits = Float.floatToRawIntBits(from[i]);
-                        break;
-                    case UBYTE:
-                    case USHORT:
-                    case UINT:
-                        bits = (int)(from[i] * mask);
-                        break;
-                    case BYTE:
-                    case SHORT:
-                    case INT:
-                        bits = (int)(from[i] * mask / 2);
-                        break;
+                    bits = Float.floatToRawIntBits(f);
+                }
+                else if(
+                    type == VertexFormatElement.EnumType.UBYTE ||
+                    type == VertexFormatElement.EnumType.USHORT ||
+                    type == VertexFormatElement.EnumType.UINT
+                )
+                {
+                    bits = (int)(f * mask);
+                }
+                else
+                {
+                    bits = (int)(f * mask / 2);
                 }
                 to[index] &= ~(mask << (offset * 8));
                 to[index] |= (((bits & mask) << (offset * 8)));

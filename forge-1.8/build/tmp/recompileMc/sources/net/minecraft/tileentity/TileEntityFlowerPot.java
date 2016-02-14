@@ -10,9 +10,10 @@ public class TileEntityFlowerPot extends TileEntity
 {
     private Item flowerPotItem;
     private int flowerPotData;
-    private static final String __OBFID = "CL_00000356";
 
-    public TileEntityFlowerPot() {}
+    public TileEntityFlowerPot()
+    {
+    }
 
     public TileEntityFlowerPot(Item potItem, int potData)
     {

@@ -1,6 +1,7 @@
 package net.minecraft.block;
 
 import java.util.List;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
@@ -10,16 +11,16 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.StatCollector;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockPrismarine extends Block
 {
-    public static final PropertyEnum VARIANT = PropertyEnum.create("variant", BlockPrismarine.EnumType.class);
+    public static final PropertyEnum<BlockPrismarine.EnumType> VARIANT = PropertyEnum.<BlockPrismarine.EnumType>create("variant", BlockPrismarine.EnumType.class);
     public static final int ROUGH_META = BlockPrismarine.EnumType.ROUGH.getMetadata();
     public static final int BRICKS_META = BlockPrismarine.EnumType.BRICKS.getMetadata();
     public static final int DARK_META = BlockPrismarine.EnumType.DARK.getMetadata();
-    private static final String __OBFID = "CL_00002077";
 
     public BlockPrismarine()
     {
@@ -29,7 +30,24 @@ public class BlockPrismarine extends Block
     }
 
     /**
-     * Get the damage value that this Block should drop
+     * Gets the localized name of this block. Used for the statistics page.
+     */
+    public String getLocalizedName()
+    {
+        return StatCollector.translateToLocal(this.getUnlocalizedName() + "." + BlockPrismarine.EnumType.ROUGH.getUnlocalizedName() + ".name");
+    }
+
+    /**
+     * Get the MapColor for this Block and the given BlockState
+     */
+    public MapColor getMapColor(IBlockState state)
+    {
+        return state.getValue(VARIANT) == BlockPrismarine.EnumType.ROUGH ? MapColor.cyanColor : MapColor.diamondColor;
+    }
+
+    /**
+     * Gets the metadata of the item this Block can drop. This method is called when the block gets destroyed. It
+     * returns the metadata of the dropped item based on the old metadata of the block.
      */
     public int damageDropped(IBlockState state)
     {
@@ -61,7 +79,7 @@ public class BlockPrismarine extends Block
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
     {
         list.add(new ItemStack(itemIn, 1, ROUGH_META));
         list.add(new ItemStack(itemIn, 1, BRICKS_META));
@@ -73,12 +91,11 @@ public class BlockPrismarine extends Block
         ROUGH(0, "prismarine", "rough"),
         BRICKS(1, "prismarine_bricks", "bricks"),
         DARK(2, "dark_prismarine", "dark");
+
         private static final BlockPrismarine.EnumType[] META_LOOKUP = new BlockPrismarine.EnumType[values().length];
         private final int meta;
         private final String name;
         private final String unlocalizedName;
-
-        private static final String __OBFID = "CL_00002076";
 
         private EnumType(int meta, String name, String unlocalizedName)
         {
@@ -119,13 +136,9 @@ public class BlockPrismarine extends Block
 
         static
         {
-            BlockPrismarine.EnumType[] var0 = values();
-            int var1 = var0.length;
-
-            for (int var2 = 0; var2 < var1; ++var2)
+            for (BlockPrismarine.EnumType blockprismarine$enumtype : values())
             {
-                BlockPrismarine.EnumType var3 = var0[var2];
-                META_LOOKUP[var3.getMetadata()] = var3;
+                META_LOOKUP[blockprismarine$enumtype.getMetadata()] = blockprismarine$enumtype;
             }
         }
     }

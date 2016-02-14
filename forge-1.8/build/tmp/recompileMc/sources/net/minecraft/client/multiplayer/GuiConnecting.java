@@ -29,13 +29,12 @@ public class GuiConnecting extends GuiScreen
     private NetworkManager networkManager;
     private boolean cancel;
     private final GuiScreen previousGuiScreen;
-    private static final String __OBFID = "CL_00000685";
 
     public GuiConnecting(GuiScreen p_i1181_1_, Minecraft mcIn, ServerData p_i1181_3_)
     {
         this.mc = mcIn;
         this.previousGuiScreen = p_i1181_1_;
-        ServerAddress serveraddress = ServerAddress.func_78860_a(p_i1181_3_.serverIP);
+        ServerAddress serveraddress = ServerAddress.fromString(p_i1181_3_.serverIP);
         mcIn.loadWorld((WorldClient)null);
         mcIn.setServerData(p_i1181_3_);
         this.connect(serveraddress.getIP(), serveraddress.getPort());
@@ -54,7 +53,6 @@ public class GuiConnecting extends GuiScreen
         logger.info("Connecting to " + ip + ", " + port);
         (new Thread("Server Connector #" + CONNECTION_ID.incrementAndGet())
         {
-            private static final String __OBFID = "CL_00000686";
             public void run()
             {
                 InetAddress inetaddress = null;
@@ -67,7 +65,7 @@ public class GuiConnecting extends GuiScreen
                     }
 
                     inetaddress = InetAddress.getByName(ip);
-                    GuiConnecting.this.networkManager = NetworkManager.provideLanClient(inetaddress, port);
+                    GuiConnecting.this.networkManager = NetworkManager.func_181124_a(inetaddress, port, GuiConnecting.this.mc.gameSettings.func_181148_f());
                     GuiConnecting.this.networkManager.setNetHandler(new NetHandlerLoginClient(GuiConnecting.this.networkManager, GuiConnecting.this.mc, GuiConnecting.this.previousGuiScreen));
                     GuiConnecting.this.networkManager.sendPacket(new C00Handshake(47, ip, port, EnumConnectionState.LOGIN, true));
                     GuiConnecting.this.networkManager.sendPacket(new C00PacketLoginStart(GuiConnecting.this.mc.getSession().getProfile()));
@@ -79,7 +77,7 @@ public class GuiConnecting extends GuiScreen
                         return;
                     }
 
-                    GuiConnecting.logger.error("Couldn\'t connect to server", unknownhostexception);
+                    GuiConnecting.logger.error((String)"Couldn\'t connect to server", (Throwable)unknownhostexception);
                     GuiConnecting.this.mc.displayGuiScreen(new GuiDisconnected(GuiConnecting.this.previousGuiScreen, "connect.failed", new ChatComponentTranslation("disconnect.genericReason", new Object[] {"Unknown host"})));
                 }
                 catch (Exception exception)
@@ -89,7 +87,7 @@ public class GuiConnecting extends GuiScreen
                         return;
                     }
 
-                    GuiConnecting.logger.error("Couldn\'t connect to server", exception);
+                    GuiConnecting.logger.error((String)"Couldn\'t connect to server", (Throwable)exception);
                     String s = exception.toString();
 
                     if (inetaddress != null)
@@ -123,13 +121,16 @@ public class GuiConnecting extends GuiScreen
     }
 
     /**
-     * Fired when a key is typed (except F11 who toggle full screen). This is the equivalent of
+     * Fired when a key is typed (except F11 which toggles full screen). This is the equivalent of
      * KeyListener.keyTyped(KeyEvent e). Args : character (character on the key), keyCode (lwjgl Keyboard key code)
      */
-    protected void keyTyped(char typedChar, int keyCode) throws IOException {}
+    protected void keyTyped(char typedChar, int keyCode) throws IOException
+    {
+    }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
     public void initGui()
     {
@@ -137,6 +138,9 @@ public class GuiConnecting extends GuiScreen
         this.buttonList.add(new GuiButton(0, this.width / 2 - 100, this.height / 4 + 120 + 12, I18n.format("gui.cancel", new Object[0])));
     }
 
+    /**
+     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
+     */
     protected void actionPerformed(GuiButton button) throws IOException
     {
         if (button.id == 0)

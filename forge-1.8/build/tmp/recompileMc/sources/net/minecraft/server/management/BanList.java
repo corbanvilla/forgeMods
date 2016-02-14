@@ -4,16 +4,14 @@ import com.google.gson.JsonObject;
 import java.io.File;
 import java.net.SocketAddress;
 
-public class BanList extends UserList
+public class BanList extends UserList<String, IPBanEntry>
 {
-    private static final String __OBFID = "CL_00001396";
-
     public BanList(File bansFile)
     {
         super(bansFile);
     }
 
-    protected UserListEntry createEntry(JsonObject entryData)
+    protected UserListEntry<String> createEntry(JsonObject entryData)
     {
         return new IPBanEntry(entryData);
     }

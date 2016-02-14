@@ -7,15 +7,9 @@ import net.minecraft.world.gen.feature.WorldGenerator;
 
 public class BiomeEndDecorator extends BiomeDecorator
 {
-    protected WorldGenerator spikeGen;
-    private static final String __OBFID = "CL_00000188";
+    protected WorldGenerator spikeGen = new WorldGenSpikes(Blocks.end_stone);
 
-    public BiomeEndDecorator()
-    {
-        this.spikeGen = new WorldGenSpikes(Blocks.end_stone);
-    }
-
-    protected void genDecorations(BiomeGenBase p_150513_1_)
+    protected void genDecorations(BiomeGenBase biomeGenBaseIn)
     {
         this.generateOres();
 

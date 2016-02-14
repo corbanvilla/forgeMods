@@ -12,7 +12,6 @@ import net.minecraft.world.World;
 public class BlockFalling extends Block
 {
     public static boolean fallInstantly;
-    private static final String __OBFID = "CL_00000240";
 
     public BlockFalling()
     {
@@ -50,9 +49,9 @@ public class BlockFalling extends Block
     {
         if (canFallInto(worldIn, pos.down()) && pos.getY() >= 0)
         {
-            byte b0 = 32;
+            int i = 32;
 
-            if (!fallInstantly && worldIn.isAreaLoaded(pos.add(-b0, -b0, -b0), pos.add(b0, b0, b0)))
+            if (!fallInstantly && worldIn.isAreaLoaded(pos.add(-i, -i, -i), pos.add(i, i, i)))
             {
                 if (!worldIn.isRemote)
                 {
@@ -64,22 +63,24 @@ public class BlockFalling extends Block
             else
             {
                 worldIn.setBlockToAir(pos);
-                BlockPos blockpos1;
+                BlockPos blockpos;
 
-                for (blockpos1 = pos.down(); canFallInto(worldIn, blockpos1) && blockpos1.getY() > 0; blockpos1 = blockpos1.down())
+                for (blockpos = pos.down(); canFallInto(worldIn, blockpos) && blockpos.getY() > 0; blockpos = blockpos.down())
                 {
                     ;
                 }
 
-                if (blockpos1.getY() > 0)
+                if (blockpos.getY() > 0)
                 {
-                    worldIn.setBlockState(blockpos1.up(), this.getDefaultState());
+                    worldIn.setBlockState(blockpos.up(), this.getDefaultState());
                 }
             }
         }
     }
 
-    protected void onStartFalling(EntityFallingBlock fallingEntity) {}
+    protected void onStartFalling(EntityFallingBlock fallingEntity)
+    {
+    }
 
     /**
      * How many world ticks before ticking
@@ -97,5 +98,7 @@ public class BlockFalling extends Block
         return block == Blocks.fire || material == Material.air || material == Material.water || material == Material.lava;
     }
 
-    public void onEndFalling(World worldIn, BlockPos pos) {}
+    public void onEndFalling(World worldIn, BlockPos pos)
+    {
+    }
 }

@@ -1,7 +1,6 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -10,15 +9,16 @@ import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S3CPacketUpdateScore implements Packet
+public class S3CPacketUpdateScore implements Packet<INetHandlerPlayClient>
 {
     private String name = "";
     private String objective = "";
     private int value;
     private S3CPacketUpdateScore.Action action;
-    private static final String __OBFID = "CL_00001335";
 
-    public S3CPacketUpdateScore() {}
+    public S3CPacketUpdateScore()
+    {
+    }
 
     public S3CPacketUpdateScore(Score scoreIn)
     {
@@ -83,33 +83,25 @@ public class S3CPacketUpdateScore implements Packet
     }
 
     @SideOnly(Side.CLIENT)
-    public String func_149324_c()
+    public String getPlayerName()
     {
         return this.name;
     }
 
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayClient)handler);
-    }
-
     @SideOnly(Side.CLIENT)
-    public String func_149321_d()
+    public String getObjectiveName()
     {
         return this.objective;
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_149323_e()
+    public int getScoreValue()
     {
         return this.value;
     }
 
     @SideOnly(Side.CLIENT)
-    public S3CPacketUpdateScore.Action func_180751_d()
+    public S3CPacketUpdateScore.Action getScoreAction()
     {
         return this.action;
     }
@@ -118,7 +110,5 @@ public class S3CPacketUpdateScore implements Packet
     {
         CHANGE,
         REMOVE;
-
-        private static final String __OBFID = "CL_00002288";
     }
 }

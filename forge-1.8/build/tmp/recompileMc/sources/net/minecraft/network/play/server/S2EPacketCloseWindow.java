@@ -1,26 +1,29 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 
-public class S2EPacketCloseWindow implements Packet
+public class S2EPacketCloseWindow implements Packet<INetHandlerPlayClient>
 {
-    private int field_148896_a;
-    private static final String __OBFID = "CL_00001292";
+    private int windowId;
 
-    public S2EPacketCloseWindow() {}
-
-    public S2EPacketCloseWindow(int p_i45183_1_)
+    public S2EPacketCloseWindow()
     {
-        this.field_148896_a = p_i45183_1_;
     }
 
-    public void func_180731_a(INetHandlerPlayClient p_180731_1_)
+    public S2EPacketCloseWindow(int windowIdIn)
     {
-        p_180731_1_.handleCloseWindow(this);
+        this.windowId = windowIdIn;
+    }
+
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
+    public void processPacket(INetHandlerPlayClient handler)
+    {
+        handler.handleCloseWindow(this);
     }
 
     /**
@@ -28,7 +31,7 @@ public class S2EPacketCloseWindow implements Packet
      */
     public void readPacketData(PacketBuffer buf) throws IOException
     {
-        this.field_148896_a = buf.readUnsignedByte();
+        this.windowId = buf.readUnsignedByte();
     }
 
     /**
@@ -36,14 +39,6 @@ public class S2EPacketCloseWindow implements Packet
      */
     public void writePacketData(PacketBuffer buf) throws IOException
     {
-        buf.writeByte(this.field_148896_a);
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.func_180731_a((INetHandlerPlayClient)handler);
+        buf.writeByte(this.windowId);
     }
 }

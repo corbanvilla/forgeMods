@@ -8,12 +8,11 @@ public class EntityAIOwnerHurtByTarget extends EntityAITarget
     EntityTameable theDefendingTameable;
     EntityLivingBase theOwnerAttacker;
     private int field_142051_e;
-    private static final String __OBFID = "CL_00001624";
 
-    public EntityAIOwnerHurtByTarget(EntityTameable p_i1667_1_)
+    public EntityAIOwnerHurtByTarget(EntityTameable theDefendingTameableIn)
     {
-        super(p_i1667_1_, false);
-        this.theDefendingTameable = p_i1667_1_;
+        super(theDefendingTameableIn, false);
+        this.theDefendingTameable = theDefendingTameableIn;
         this.setMutexBits(1);
     }
 
@@ -28,7 +27,7 @@ public class EntityAIOwnerHurtByTarget extends EntityAITarget
         }
         else
         {
-            EntityLivingBase entitylivingbase = this.theDefendingTameable.getOwnerEntity();
+            EntityLivingBase entitylivingbase = this.theDefendingTameable.getOwner();
 
             if (entitylivingbase == null)
             {
@@ -38,7 +37,7 @@ public class EntityAIOwnerHurtByTarget extends EntityAITarget
             {
                 this.theOwnerAttacker = entitylivingbase.getAITarget();
                 int i = entitylivingbase.getRevengeTimer();
-                return i != this.field_142051_e && this.isSuitableTarget(this.theOwnerAttacker, false) && this.theDefendingTameable.func_142018_a(this.theOwnerAttacker, entitylivingbase);
+                return i != this.field_142051_e && this.isSuitableTarget(this.theOwnerAttacker, false) && this.theDefendingTameable.shouldAttackEntity(this.theOwnerAttacker, entitylivingbase);
             }
         }
     }
@@ -49,7 +48,7 @@ public class EntityAIOwnerHurtByTarget extends EntityAITarget
     public void startExecuting()
     {
         this.taskOwner.setAttackTarget(this.theOwnerAttacker);
-        EntityLivingBase entitylivingbase = this.theDefendingTameable.getOwnerEntity();
+        EntityLivingBase entitylivingbase = this.theDefendingTameable.getOwner();
 
         if (entitylivingbase != null)
         {

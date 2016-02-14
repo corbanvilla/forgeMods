@@ -10,7 +10,6 @@ import net.minecraft.world.World;
 public class BlockStandingSign extends BlockSign
 {
     public static final PropertyInteger ROTATION = PropertyInteger.create("rotation", 0, 15);
-    private static final String __OBFID = "CL_00002060";
 
     public BlockStandingSign()
     {

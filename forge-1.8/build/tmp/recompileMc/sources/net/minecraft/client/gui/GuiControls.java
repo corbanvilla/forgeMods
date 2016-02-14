@@ -22,7 +22,6 @@ public class GuiControls extends GuiScreen
     public long time;
     private GuiKeyBindingList keyBindingList;
     private GuiButton buttonReset;
-    private static final String __OBFID = "CL_00000736";
 
     public GuiControls(GuiScreen screen, GameSettings settings)
     {
@@ -31,7 +30,8 @@ public class GuiControls extends GuiScreen
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
     public void initGui()
     {
@@ -40,20 +40,16 @@ public class GuiControls extends GuiScreen
         this.buttonList.add(this.buttonReset = new GuiButton(201, this.width / 2 - 155 + 160, this.height - 29, 150, 20, I18n.format("controls.resetAll", new Object[0])));
         this.screenTitle = I18n.format("controls.title", new Object[0]);
         int i = 0;
-        GameSettings.Options[] aoptions = optionsArr;
-        int j = aoptions.length;
 
-        for (int k = 0; k < j; ++k)
+        for (GameSettings.Options gamesettings$options : optionsArr)
         {
-            GameSettings.Options options = aoptions[k];
-
-            if (options.getEnumFloat())
+            if (gamesettings$options.getEnumFloat())
             {
-                this.buttonList.add(new GuiOptionSlider(options.returnEnumOrdinal(), this.width / 2 - 155 + i % 2 * 160, 18 + 24 * (i >> 1), options));
+                this.buttonList.add(new GuiOptionSlider(gamesettings$options.returnEnumOrdinal(), this.width / 2 - 155 + i % 2 * 160, 18 + 24 * (i >> 1), gamesettings$options));
             }
             else
             {
-                this.buttonList.add(new GuiOptionButton(options.returnEnumOrdinal(), this.width / 2 - 155 + i % 2 * 160, 18 + 24 * (i >> 1), options, this.options.getKeyBinding(options)));
+                this.buttonList.add(new GuiOptionButton(gamesettings$options.returnEnumOrdinal(), this.width / 2 - 155 + i % 2 * 160, 18 + 24 * (i >> 1), gamesettings$options, this.options.getKeyBinding(gamesettings$options)));
             }
 
             ++i;
@@ -69,6 +65,9 @@ public class GuiControls extends GuiScreen
         this.keyBindingList.handleMouseInput();
     }
 
+    /**
+     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
+     */
     protected void actionPerformed(GuiButton button) throws IOException
     {
         if (button.id == 200)
@@ -77,12 +76,8 @@ public class GuiControls extends GuiScreen
         }
         else if (button.id == 201)
         {
-            KeyBinding[] akeybinding = this.mc.gameSettings.keyBindings;
-            int i = akeybinding.length;
-
-            for (int j = 0; j < i; ++j)
+            for (KeyBinding keybinding : this.mc.gameSettings.keyBindings)
             {
-                KeyBinding keybinding = akeybinding[j];
                 keybinding.setKeyCode(keybinding.getKeyCodeDefault());
             }
 
@@ -124,7 +119,7 @@ public class GuiControls extends GuiScreen
     }
 
     /**
-     * Fired when a key is typed (except F11 who toggle full screen). This is the equivalent of
+     * Fired when a key is typed (except F11 which toggles full screen). This is the equivalent of
      * KeyListener.keyTyped(KeyEvent e). Args : character (character on the key), keyCode (lwjgl Keyboard key code)
      */
     protected void keyTyped(char typedChar, int keyCode) throws IOException
@@ -163,13 +158,9 @@ public class GuiControls extends GuiScreen
         this.keyBindingList.drawScreen(mouseX, mouseY, partialTicks);
         this.drawCenteredString(this.fontRendererObj, this.screenTitle, this.width / 2, 8, 16777215);
         boolean flag = true;
-        KeyBinding[] akeybinding = this.options.keyBindings;
-        int k = akeybinding.length;
 
-        for (int l = 0; l < k; ++l)
+        for (KeyBinding keybinding : this.options.keyBindings)
         {
-            KeyBinding keybinding = akeybinding[l];
-
             if (keybinding.getKeyCode() != keybinding.getKeyCodeDefault())
             {
                 flag = false;

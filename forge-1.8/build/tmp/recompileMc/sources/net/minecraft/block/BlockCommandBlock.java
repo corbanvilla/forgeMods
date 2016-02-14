@@ -1,6 +1,7 @@
 package net.minecraft.block;
 
 import java.util.Random;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -19,11 +20,10 @@ import net.minecraft.world.World;
 public class BlockCommandBlock extends BlockContainer
 {
     public static final PropertyBool TRIGGERED = PropertyBool.create("triggered");
-    private static final String __OBFID = "CL_00000219";
 
     public BlockCommandBlock()
     {
-        super(Material.iron);
+        super(Material.iron, MapColor.adobeColor);
         this.setDefaultState(this.blockState.getBaseState().withProperty(TRIGGERED, Boolean.valueOf(false)));
     }
 
@@ -79,7 +79,7 @@ public class BlockCommandBlock extends BlockContainer
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ)
     {
         TileEntity tileentity = worldIn.getTileEntity(pos);
-        return tileentity instanceof TileEntityCommandBlock ? ((TileEntityCommandBlock)tileentity).getCommandBlockLogic().func_175574_a(playerIn) : false;
+        return tileentity instanceof TileEntityCommandBlock ? ((TileEntityCommandBlock)tileentity).getCommandBlockLogic().tryOpenEditCommandBlock(playerIn) : false;
     }
 
     public boolean hasComparatorInputOverride()
@@ -93,6 +93,9 @@ public class BlockCommandBlock extends BlockContainer
         return tileentity instanceof TileEntityCommandBlock ? ((TileEntityCommandBlock)tileentity).getCommandBlockLogic().getSuccessCount() : 0;
     }
 
+    /**
+     * Called by ItemBlocks after a block is set in the world, to allow post-place logic
+     */
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
     {
         TileEntity tileentity = worldIn.getTileEntity(pos);
@@ -108,7 +111,7 @@ public class BlockCommandBlock extends BlockContainer
 
             if (!worldIn.isRemote)
             {
-                commandblocklogic.setTrackOutput(worldIn.getGameRules().getGameRuleBooleanValue("sendCommandFeedback"));
+                commandblocklogic.setTrackOutput(worldIn.getGameRules().getBoolean("sendCommandFeedback"));
             }
         }
     }
@@ -122,7 +125,7 @@ public class BlockCommandBlock extends BlockContainer
     }
 
     /**
-     * The type of render function that is called for this block
+     * The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render
      */
     public int getRenderType()
     {
@@ -157,6 +160,10 @@ public class BlockCommandBlock extends BlockContainer
         return new BlockState(this, new IProperty[] {TRIGGERED});
     }
 
+    /**
+     * Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the
+     * IBlockstate
+     */
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
         return this.getDefaultState().withProperty(TRIGGERED, Boolean.valueOf(false));

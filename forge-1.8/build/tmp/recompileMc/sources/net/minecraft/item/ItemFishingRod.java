@@ -10,8 +10,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemFishingRod extends Item
 {
-    private static final String __OBFID = "CL_00000034";
-
     public ItemFishingRod()
     {
         this.setMaxDamage(64);

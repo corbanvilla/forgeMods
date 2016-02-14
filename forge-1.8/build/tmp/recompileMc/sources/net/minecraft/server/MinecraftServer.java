@@ -18,14 +18,13 @@ import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.Proxy;
 import java.security.KeyPair;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 import java.util.Random;
@@ -47,12 +46,10 @@ import net.minecraft.init.Bootstrap;
 import net.minecraft.network.NetworkSystem;
 import net.minecraft.network.ServerStatusResponse;
 import net.minecraft.network.play.server.S03PacketTimeUpdate;
-import net.minecraft.network.rcon.RConConsoleSource;
 import net.minecraft.profiler.IPlayerUsage;
 import net.minecraft.profiler.PlayerUsageSnooper;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.server.dedicated.DedicatedServer;
-import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.server.management.PlayerProfileCache;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.util.BlockPos;
@@ -60,8 +57,10 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.IProgressUpdate;
 import net.minecraft.util.IThreadListener;
+import net.minecraft.util.ITickable;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ReportedException;
+import net.minecraft.util.Util;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.MinecraftException;
@@ -82,7 +81,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public abstract class MinecraftServer implements ICommandSender, Runnable, IThreadListener, IPlayerUsage
+public abstract class MinecraftServer implements Runnable, ICommandSender, IThreadListener, IPlayerUsage
 {
     private static final Logger logger = LogManager.getLogger();
     public static final File USER_CACHE_FILE = new File("usercache.json");
@@ -92,9 +91,8 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
     /** The PlayerUsageSnooper instance. */
     private final PlayerUsageSnooper usageSnooper = new PlayerUsageSnooper("server", this, getCurrentTimeMillis());
     private final File anvilFile;
-    /** List of names of players who are online. */
-    private final List playersOnline = Lists.newArrayList();
-    private final ICommandManager commandManager;
+    private final List<ITickable> playersOnline = Lists.<ITickable>newArrayList();
+    protected final ICommandManager commandManager;
     public final Profiler theProfiler = new Profiler();
     private final NetworkSystem networkSystem;
     private final ServerStatusResponse statusResponse = new ServerStatusResponse();
@@ -160,10 +158,9 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
     private long nanoTimeSinceStatusRefresh = 0L;
     private final GameProfileRepository profileRepo;
     private final PlayerProfileCache profileCache;
-    protected final Queue futureTaskQueue = Queues.newArrayDeque();
+    protected final Queue < FutureTask<? >> futureTaskQueue = Queues. < FutureTask<? >> newArrayDeque();
     private Thread serverThread;
     private long currentTime = getCurrentTimeMillis();
-    private static final String __OBFID = "CL_00001462";
 
     @SideOnly(Side.CLIENT)
     public MinecraftServer(Proxy proxy, File workDir)
@@ -213,11 +210,12 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
             this.getActiveAnvilConverter().convertMapFormat(worldNameIn, new IProgressUpdate()
             {
                 private long startTime = System.currentTimeMillis();
-                private static final String __OBFID = "CL_00001417";
                 /**
                  * Shows the 'Saving level' string.
                  */
-                public void displaySavingString(String message) {}
+                public void displaySavingString(String message)
+                {
+                }
                 /**
                  * Updates the progress bar on the loading screen to the specified amount. Args: loadProgress
                  */
@@ -234,13 +232,19 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
                  * progress to 0, and the WorkingString to "working...".
                  */
                 @SideOnly(Side.CLIENT)
-                public void resetProgressAndMessage(String p_73721_1_) {}
+                public void resetProgressAndMessage(String message)
+                {
+                }
                 @SideOnly(Side.CLIENT)
-                public void setDoneWorking() {}
+                public void setDoneWorking()
+                {
+                }
                 /**
                  * Displays a string on the loading screen supposed to indicate what is being done currently.
                  */
-                public void displayLoadingString(String message) {}
+                public void displayLoadingString(String message)
+                {
+                }
             });
         }
     }
@@ -315,32 +319,32 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
 
     protected void initialWorldChunkLoad()
     {
-        boolean flag = true;
-        boolean flag1 = true;
-        boolean flag2 = true;
-        boolean flag3 = true;
-        int i = 0;
+        int i = 16;
+        int j = 4;
+        int k = 192;
+        int l = 625;
+        int i1 = 0;
         this.setUserMessage("menu.generatingTerrain");
-        byte b0 = 0;
-        logger.info("Preparing start region for level " + b0);
-        WorldServer worldserver = net.minecraftforge.common.DimensionManager.getWorld(b0);
+        int j1 = 0;
+        logger.info("Preparing start region for level " + j1);
+        WorldServer worldserver = net.minecraftforge.common.DimensionManager.getWorld(j1);
         BlockPos blockpos = worldserver.getSpawnPoint();
-        long j = getCurrentTimeMillis();
+        long k1 = getCurrentTimeMillis();
 
-        for (int k = -192; k <= 192 && this.isServerRunning(); k += 16)
+        for (int l1 = -192; l1 <= 192 && this.isServerRunning(); l1 += 16)
         {
-            for (int l = -192; l <= 192 && this.isServerRunning(); l += 16)
+            for (int i2 = -192; i2 <= 192 && this.isServerRunning(); i2 += 16)
             {
-                long i1 = getCurrentTimeMillis();
+                long j2 = getCurrentTimeMillis();
 
-                if (i1 - j > 1000L)
+                if (j2 - k1 > 1000L)
                 {
-                    this.outputPercentRemaining("Preparing spawn area", i * 100 / 625);
-                    j = i1;
+                    this.outputPercentRemaining("Preparing spawn area", i1 * 100 / 625);
+                    k1 = j2;
                 }
 
-                ++i;
-                worldserver.theChunkProviderServer.loadChunk(blockpos.getX() + k >> 4, blockpos.getZ() + l >> 4);
+                ++i1;
+                worldserver.theChunkProviderServer.loadChunk(blockpos.getX() + l1 >> 4, blockpos.getZ() + i2 >> 4);
             }
         }
 
@@ -374,6 +378,16 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
     public abstract int getOpPermissionLevel();
 
     /**
+     * Get if RCON command events should be broadcast to ops
+     */
+    public abstract boolean shouldBroadcastRconToOps();
+
+    /**
+     * Get if console command events should be broadcast to ops
+     */
+    public abstract boolean shouldBroadcastConsoleToOps();
+
+    /**
      * Used to display a percent remaining given text and the percentage.
      */
     protected void outputPercentRemaining(String message, int percent)
@@ -399,14 +413,8 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
     {
         if (!this.worldIsBeingDeleted)
         {
-            WorldServer[] aworldserver = this.worldServers;
-            if (aworldserver == null) return; //Forge: Just in case, NPE protection as it has been encountered.
-            int i = aworldserver.length;
-
-            for (int j = 0; j < i; ++j)
+            for (WorldServer worldserver : this.worldServers)
             {
-                WorldServer worldserver = aworldserver[j];
-
                 if (worldserver != null)
                 {
                     if (!dontLog)
@@ -503,7 +511,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
                 this.currentTime = getCurrentTimeMillis();
                 long i = 0L;
                 this.statusResponse.setServerDescription(new ChatComponentText(this.motd));
-                this.statusResponse.setProtocolVersionInfo(new ServerStatusResponse.MinecraftProtocolVersionIdentifier("1.8", 47));
+                this.statusResponse.setProtocolVersionInfo(new ServerStatusResponse.MinecraftProtocolVersionIdentifier("1.8.9", 47));
                 this.addFaviconToStatusResponse(this.statusResponse);
 
                 while (this.serverRunning)
@@ -619,13 +627,13 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
                 BufferedImage bufferedimage = ImageIO.read(file1);
                 Validate.validState(bufferedimage.getWidth() == 64, "Must be 64 pixels wide", new Object[0]);
                 Validate.validState(bufferedimage.getHeight() == 64, "Must be 64 pixels high", new Object[0]);
-                ImageIO.write(bufferedimage, "PNG", new ByteBufOutputStream(bytebuf));
+                ImageIO.write(bufferedimage, "PNG", (OutputStream)(new ByteBufOutputStream(bytebuf)));
                 ByteBuf bytebuf1 = Base64.encode(bytebuf);
                 response.setFavicon("data:image/png;base64," + bytebuf1.toString(Charsets.UTF_8));
             }
             catch (Exception exception)
             {
-                logger.error("Couldn\'t load server icon", exception);
+                logger.error((String)"Couldn\'t load server icon", (Throwable)exception);
             }
             finally
             {
@@ -642,12 +650,16 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
     /**
      * Called on exit from the main run() loop.
      */
-    protected void finalTick(CrashReport report) {}
+    protected void finalTick(CrashReport report)
+    {
+    }
 
     /**
      * Directly calls System.exit(0), instantly killing the program.
      */
-    protected void systemExitNow() {}
+    protected void systemExitNow()
+    {
+    }
 
     /**
      * Main function called by run() every loop.
@@ -677,7 +689,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
 
             for (int k = 0; k < agameprofile.length; ++k)
             {
-                agameprofile[k] = ((EntityPlayerMP)this.serverConfigManager.playerEntityList.get(j + k)).getGameProfile();
+                agameprofile[k] = ((EntityPlayerMP)this.serverConfigManager.getPlayerList().get(j + k)).getGameProfile();
             }
 
             Collections.shuffle(Arrays.asList(agameprofile));
@@ -716,26 +728,17 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
     public void updateTimeLightAndEntities()
     {
         this.theProfiler.startSection("jobs");
-        Queue queue = this.futureTaskQueue;
 
         synchronized (this.futureTaskQueue)
         {
             while (!this.futureTaskQueue.isEmpty())
             {
-                try
-                {
-                    net.minecraftforge.fml.common.FMLCommonHandler.callFuture(((FutureTask)this.futureTaskQueue.poll()));
-                }
-                catch (Throwable throwable2)
-                {
-                    logger.fatal(throwable2);
-                }
+                Util.runTask((FutureTask)this.futureTaskQueue.poll(), logger);
             }
         }
 
         this.theProfiler.endStartSection("levels");
         net.minecraftforge.common.chunkio.ChunkIOExecutor.tick();
-        int j;
 
         Integer[] ids = net.minecraftforge.common.DimensionManager.getIDs(this.tickCounter % 200 == 0);
         for (int x = 0; x < ids.length; x++)
@@ -751,13 +754,12 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
                 if (this.tickCounter % 20 == 0)
                 {
                     this.theProfiler.startSection("timeSync");
-                    this.serverConfigManager.sendPacketToAllPlayersInDimension(new S03PacketTimeUpdate(worldserver.getTotalWorldTime(), worldserver.getWorldTime(), worldserver.getGameRules().getGameRuleBooleanValue("doDaylightCycle")), worldserver.provider.getDimensionId());
+                    this.serverConfigManager.sendPacketToAllPlayersInDimension(new S03PacketTimeUpdate(worldserver.getTotalWorldTime(), worldserver.getWorldTime(), worldserver.getGameRules().getBoolean("doDaylightCycle")), worldserver.provider.getDimensionId());
                     this.theProfiler.endSection();
                 }
 
                 this.theProfiler.startSection("tick");
                 net.minecraftforge.fml.common.FMLCommonHandler.instance().onPreWorldTick(worldserver);
-                CrashReport crashreport;
 
                 try
                 {
@@ -765,7 +767,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
                 }
                 catch (Throwable throwable1)
                 {
-                    crashreport = CrashReport.makeCrashReport(throwable1, "Exception ticking world");
+                    CrashReport crashreport = CrashReport.makeCrashReport(throwable1, "Exception ticking world");
                     worldserver.addWorldInfoToCrashReport(crashreport);
                     throw new ReportedException(crashreport);
                 }
@@ -776,9 +778,9 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
                 }
                 catch (Throwable throwable)
                 {
-                    crashreport = CrashReport.makeCrashReport(throwable, "Exception ticking world entities");
-                    worldserver.addWorldInfoToCrashReport(crashreport);
-                    throw new ReportedException(crashreport);
+                    CrashReport crashreport1 = CrashReport.makeCrashReport(throwable, "Exception ticking world entities");
+                    worldserver.addWorldInfoToCrashReport(crashreport1);
+                    throw new ReportedException(crashreport1);
                 }
 
                 net.minecraftforge.fml.common.FMLCommonHandler.instance().onPostWorldTick(worldserver);
@@ -800,9 +802,9 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
         this.serverConfigManager.onTick();
         this.theProfiler.endStartSection("tickables");
 
-        for (j = 0; j < this.playersOnline.size(); ++j)
+        for (int k = 0; k < this.playersOnline.size(); ++k)
         {
-            ((IUpdatePlayerListBox)this.playersOnline.get(j)).update();
+            ((ITickable)this.playersOnline.get(k)).update();
         }
 
         this.theProfiler.endSection();
@@ -855,7 +857,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
      */
     public String getMinecraftVersion()
     {
-        return "1.8";
+        return "1.8.9";
     }
 
     /**
@@ -900,10 +902,9 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
      */
     public CrashReport addServerInfoToCrashReport(CrashReport report)
     {
-        report.getCategory().addCrashSectionCallable("Profiler Position", new Callable()
+        report.getCategory().addCrashSectionCallable("Profiler Position", new Callable<String>()
         {
-            private static final String __OBFID = "CL_00001418";
-            public String call()
+            public String call() throws Exception
             {
                 return MinecraftServer.this.theProfiler.profilingEnabled ? MinecraftServer.this.theProfiler.getNameOfLastSection() : "N/A (disabled)";
             }
@@ -911,12 +912,11 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
 
         if (this.serverConfigManager != null)
         {
-            report.getCategory().addCrashSectionCallable("Player Count", new Callable()
+            report.getCategory().addCrashSectionCallable("Player Count", new Callable<String>()
             {
-                private static final String __OBFID = "CL_00001419";
                 public String call()
                 {
-                    return MinecraftServer.this.serverConfigManager.getCurrentPlayerCount() + " / " + MinecraftServer.this.serverConfigManager.getMaxPlayers() + "; " + MinecraftServer.this.serverConfigManager.playerEntityList;
+                    return MinecraftServer.this.serverConfigManager.getCurrentPlayerCount() + " / " + MinecraftServer.this.serverConfigManager.getMaxPlayers() + "; " + MinecraftServer.this.serverConfigManager.getPlayerList();
                 }
             });
         }
@@ -924,55 +924,47 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
         return report;
     }
 
-    public List getTabCompletions(ICommandSender sender, String input, BlockPos pos)
+    public List<String> getTabCompletions(ICommandSender sender, String input, BlockPos pos)
     {
-        ArrayList arraylist = Lists.newArrayList();
+        List<String> list = Lists.<String>newArrayList();
 
         if (input.startsWith("/"))
         {
             input = input.substring(1);
             boolean flag = !input.contains(" ");
-            List list = this.commandManager.getTabCompletionOptions(sender, input, pos);
+            List<String> list1 = this.commandManager.getTabCompletionOptions(sender, input, pos);
 
-            if (list != null)
+            if (list1 != null)
             {
-                Iterator iterator = list.iterator();
-
-                while (iterator.hasNext())
+                for (String s2 : list1)
                 {
-                    String s3 = (String)iterator.next();
-
                     if (flag)
                     {
-                        arraylist.add("/" + s3);
+                        list.add("/" + s2);
                     }
                     else
                     {
-                        arraylist.add(s3);
+                        list.add(s2);
                     }
                 }
             }
 
-            return arraylist;
+            return list;
         }
         else
         {
             String[] astring = input.split(" ", -1);
-            String s1 = astring[astring.length - 1];
-            String[] astring1 = this.serverConfigManager.getAllUsernames();
-            int i = astring1.length;
+            String s = astring[astring.length - 1];
 
-            for (int j = 0; j < i; ++j)
+            for (String s1 : this.serverConfigManager.getAllUsernames())
             {
-                String s2 = astring1[j];
-
-                if (CommandBase.doesStringStartWith(s1, s2))
+                if (CommandBase.doesStringStartWith(s, s1))
                 {
-                    arraylist.add(s2);
+                    list.add(s1);
                 }
             }
 
-            return arraylist;
+            return list;
         }
     }
 
@@ -985,13 +977,13 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
         return mcServer;
     }
 
-    public boolean func_175578_N()
+    public boolean isAnvilFileSet()
     {
         return this.anvilFile != null;
     }
 
     /**
-     * Gets the name of this command sender (usually username, but possibly "Rcon")
+     * Get the name of this object. For players this returns their username
      */
     public String getName()
     {
@@ -999,23 +991,17 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
     }
 
     /**
-     * Notifies this sender of some sort of information.  This is for messages intended to display to the user.  Used
-     * for typical output (like "you asked for whether or not this game rule is set, so here's your answer"), warnings
-     * (like "I fetched this block for you by ID, but I'd like you to know that every time you do this, I die a little
-     * inside"), and errors (like "it's not called iron_pixacke, silly").
+     * Send a chat message to the CommandSender
      */
-    public void addChatMessage(IChatComponent message)
+    public void addChatMessage(IChatComponent component)
     {
-        logger.info(message.getUnformattedText());
+        logger.info(component.getUnformattedText());
     }
 
     /**
-     * Returns true if the CommandSender may execute the given command
-     *  
-     * @param permLevel The permission level required to execute the command
-     * @param commandName The name of the command
+     * Returns {@code true} if the CommandSender is allowed to execute the command, {@code false} if not
      */
-    public boolean canUseCommand(int permLevel, String commandName)
+    public boolean canCommandSenderUseCommand(int permLevel, String commandName)
     {
         return true;
     }
@@ -1085,24 +1071,24 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
     {
         for (int i = 0; i < this.worldServers.length; ++i)
         {
-            WorldServer worldserver = this.worldServers[i];
+            World world = this.worldServers[i];
 
-            if (worldserver != null)
+            if (world != null)
             {
-                if (worldserver.getWorldInfo().isHardcoreModeEnabled())
+                if (world.getWorldInfo().isHardcoreModeEnabled())
                 {
-                    worldserver.getWorldInfo().setDifficulty(EnumDifficulty.HARD);
-                    worldserver.setAllowedSpawnTypes(true, true);
+                    world.getWorldInfo().setDifficulty(EnumDifficulty.HARD);
+                    world.setAllowedSpawnTypes(true, true);
                 }
                 else if (this.isSinglePlayer())
                 {
-                    worldserver.getWorldInfo().setDifficulty(difficulty);
-                    worldserver.setAllowedSpawnTypes(worldserver.getDifficulty() != EnumDifficulty.PEACEFUL, true);
+                    world.getWorldInfo().setDifficulty(difficulty);
+                    world.setAllowedSpawnTypes(world.getDifficulty() != EnumDifficulty.PEACEFUL, true);
                 }
                 else
                 {
-                    worldserver.getWorldInfo().setDifficulty(difficulty);
-                    worldserver.setAllowedSpawnTypes(this.allowSpawnMonsters(), this.canSpawnAnimals);
+                    world.getWorldInfo().setDifficulty(difficulty);
+                    world.setAllowedSpawnTypes(this.allowSpawnMonsters(), this.canSpawnAnimals);
                 }
             }
         }
@@ -1264,6 +1250,12 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
         return this.canSpawnNPCs;
     }
 
+    /**
+     * Get if native transport should be used. Native transport means linux server performance improvements and
+     * optimized packet sending/receiving on linux
+     */
+    public abstract boolean shouldUseNativeTransport();
+
     public void setCanSpawnNPCs(boolean spawnNpcs)
     {
         this.canSpawnNPCs = spawnNpcs;
@@ -1312,6 +1304,11 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
     public void setBuildLimit(int maxBuildHeight)
     {
         this.buildLimit = maxBuildHeight;
+    }
+
+    public boolean isServerStopped()
+    {
+        return this.serverStopped;
     }
 
     public ServerConfigurationManager getConfigurationManager()
@@ -1372,16 +1369,28 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
         return this.usageSnooper;
     }
 
+    /**
+     * Get the position in the world. <b>{@code null} is not allowed!</b> If you are not an entity in the world, return
+     * the coordinates 0, 0, 0
+     */
     public BlockPos getPosition()
     {
         return BlockPos.ORIGIN;
     }
 
+    /**
+     * Get the position vector. <b>{@code null} is not allowed!</b> If you are not an entity in the world, return 0.0D,
+     * 0.0D, 0.0D
+     */
     public Vec3 getPositionVector()
     {
         return new Vec3(0.0D, 0.0D, 0.0D);
     }
 
+    /**
+     * Get the world, if available. <b>{@code null} is not allowed!</b> If you are not an entity in the world, return
+     * the overworld
+     */
     public World getEntityWorld()
     {
         return this.worldServers[0];
@@ -1433,6 +1442,9 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
         this.maxPlayerIdleMinutes = idleTimeout;
     }
 
+    /**
+     * Get the formatted ChatComponent that will be used for the sender's username in chat
+     */
     public IChatComponent getDisplayName()
     {
         return new ChatComponentText(this.getName());
@@ -1470,13 +1482,8 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
 
     public Entity getEntityFromUuid(UUID uuid)
     {
-        WorldServer[] aworldserver = this.worldServers;
-        int i = aworldserver.length;
-
-        for (int j = 0; j < i; ++j)
+        for (WorldServer worldserver : this.worldServers)
         {
-            WorldServer worldserver = aworldserver[j];
-
             if (worldserver != null)
             {
                 Entity entity = worldserver.getEntityFromUuid(uuid);
@@ -1499,24 +1506,25 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
         /**
          * Gets mcServer.
          */
-        return getServer().worldServers[0].getGameRules().getGameRuleBooleanValue("sendCommandFeedback");
+        return getServer().worldServers[0].getGameRules().getBoolean("sendCommandFeedback");
     }
 
-    public void setCommandStat(CommandResultStats.Type type, int amount) {}
+    public void setCommandStat(CommandResultStats.Type type, int amount)
+    {
+    }
 
     public int getMaxWorldSize()
     {
         return 29999984;
     }
 
-    public ListenableFuture callFromMainThread(Callable callable)
+    public <V> ListenableFuture<V> callFromMainThread(Callable<V> callable)
     {
         Validate.notNull(callable);
 
-        if (!this.isCallingFromMinecraftThread())
+        if (!this.isCallingFromMinecraftThread() && !this.isServerStopped())
         {
-            ListenableFutureTask listenablefuturetask = ListenableFutureTask.create(callable);
-            Queue queue = this.futureTaskQueue;
+            ListenableFutureTask<V> listenablefuturetask = ListenableFutureTask.<V>create(callable);
 
             synchronized (this.futureTaskQueue)
             {
@@ -1528,7 +1536,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
         {
             try
             {
-                return Futures.immediateFuture(callable.call());
+                return Futures.<V>immediateFuture(callable.call());
             }
             catch (Exception exception)
             {
@@ -1537,10 +1545,10 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
         }
     }
 
-    public ListenableFuture addScheduledTask(Runnable runnableToSchedule)
+    public ListenableFuture<Object> addScheduledTask(Runnable runnableToSchedule)
     {
         Validate.notNull(runnableToSchedule);
-        return this.callFromMainThread(Executors.callable(runnableToSchedule));
+        return this.<Object>callFromMainThread(Executors.callable(runnableToSchedule));
     }
 
     public boolean isCallingFromMinecraftThread()
@@ -1572,7 +1580,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
     }
 
     @SideOnly(Side.SERVER)
-    public void registerTickable(IUpdatePlayerListBox tickable)
+    public void registerTickable(ITickable tickable)
     {
         this.playersOnline.add(tickable);
     }
@@ -1608,7 +1616,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
                         {
                             i = Integer.parseInt(s4);
                         }
-                        catch (NumberFormatException numberformatexception)
+                        catch (NumberFormatException var13)
                         {
                             ;
                         }
@@ -1683,7 +1691,6 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
             dedicatedserver.startServerThread();
             Runtime.getRuntime().addShutdownHook(new Thread("Server Shutdown Thread")
             {
-                private static final String __OBFID = "CL_00001806";
                 public void run()
                 {
                     dedicatedserver.stopServer();
@@ -1692,7 +1699,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
         }
         catch (Exception exception)
         {
-            logger.fatal("Failed to start the minecraft server", exception);
+            logger.fatal((String)"Failed to start the minecraft server", (Throwable)exception);
         }
     }
 
@@ -1730,26 +1737,6 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
     public String getMotd()
     {
         return this.motd;
-    }
-
-    /**
-     * Used by RCon's Query in the form of "MajorServerMod 1.2.3: MyPlugin 1.3; AnotherPlugin 2.1; AndSoForth 1.0".
-     */
-    @SideOnly(Side.SERVER)
-    public String getPlugins()
-    {
-        return "";
-    }
-
-    /**
-     * Handle a command received by an RCon instance
-     */
-    @SideOnly(Side.SERVER)
-    public String handleRConCommand(String command)
-    {
-        RConConsoleSource.getInstance().resetLog();
-        this.commandManager.executeCommand(RConConsoleSource.getInstance(), command);
-        return RConConsoleSource.getInstance().getLogContents();
     }
 
     /**
@@ -1795,11 +1782,6 @@ public abstract class MinecraftServer implements ICommandSender, Runnable, IThre
     public void setServerPort(int port)
     {
         this.serverPort = port;
-    }
-
-    public boolean isServerStopped()
-    {
-        return this.serverStopped;
     }
 
     @SideOnly(Side.SERVER)

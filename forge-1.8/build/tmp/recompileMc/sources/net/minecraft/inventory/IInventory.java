@@ -12,21 +12,19 @@ public interface IInventory extends IWorldNameable
     int getSizeInventory();
 
     /**
-     * Returns the stack in slot i
+     * Returns the stack in the given slot.
      */
     ItemStack getStackInSlot(int index);
 
     /**
-     * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a
-     * new stack.
+     * Removes up to a specified number of items from an inventory slot and returns them in a new stack.
      */
     ItemStack decrStackSize(int index, int count);
 
     /**
-     * When some containers are closed they call this on each slot, then drop whatever it returns as an EntityItem -
-     * like when you close a workbench GUI.
+     * Removes a stack from the given slot and returns it.
      */
-    ItemStack getStackInSlotOnClosing(int index);
+    ItemStack removeStackFromSlot(int index);
 
     /**
      * Sets the given item stack to the specified slot in the inventory (can be crafting or armor sections).
@@ -34,8 +32,7 @@ public interface IInventory extends IWorldNameable
     void setInventorySlotContents(int index, ItemStack stack);
 
     /**
-     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended. *Isn't
-     * this more of a set than a get?*
+     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended.
      */
     int getInventoryStackLimit();
 

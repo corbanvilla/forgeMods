@@ -14,36 +14,34 @@ public class ContainerWorkbench extends Container
     public InventoryCrafting craftMatrix = new InventoryCrafting(this, 3, 3);
     public IInventory craftResult = new InventoryCraftResult();
     private World worldObj;
-    private BlockPos field_178145_h;
-    private static final String __OBFID = "CL_00001744";
+    /** Position of the workbench */
+    private BlockPos pos;
 
-    public ContainerWorkbench(InventoryPlayer playerInventory, World worldIn, BlockPos p_i45800_3_)
+    public ContainerWorkbench(InventoryPlayer playerInventory, World worldIn, BlockPos posIn)
     {
         this.worldObj = worldIn;
-        this.field_178145_h = p_i45800_3_;
+        this.pos = posIn;
         this.addSlotToContainer(new SlotCrafting(playerInventory.player, this.craftMatrix, this.craftResult, 0, 124, 35));
-        int i;
-        int j;
 
-        for (i = 0; i < 3; ++i)
+        for (int i = 0; i < 3; ++i)
         {
-            for (j = 0; j < 3; ++j)
+            for (int j = 0; j < 3; ++j)
             {
                 this.addSlotToContainer(new Slot(this.craftMatrix, j + i * 3, 30 + j * 18, 17 + i * 18));
             }
         }
 
-        for (i = 0; i < 3; ++i)
+        for (int k = 0; k < 3; ++k)
         {
-            for (j = 0; j < 9; ++j)
+            for (int i1 = 0; i1 < 9; ++i1)
             {
-                this.addSlotToContainer(new Slot(playerInventory, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
+                this.addSlotToContainer(new Slot(playerInventory, i1 + k * 9 + 9, 8 + i1 * 18, 84 + k * 18));
             }
         }
 
-        for (i = 0; i < 9; ++i)
+        for (int l = 0; l < 9; ++l)
         {
-            this.addSlotToContainer(new Slot(playerInventory, i, 8 + i * 18, 142));
+            this.addSlotToContainer(new Slot(playerInventory, l, 8 + l * 18, 142));
         }
 
         this.onCraftMatrixChanged(this.craftMatrix);
@@ -68,7 +66,7 @@ public class ContainerWorkbench extends Container
         {
             for (int i = 0; i < 9; ++i)
             {
-                ItemStack itemstack = this.craftMatrix.getStackInSlotOnClosing(i);
+                ItemStack itemstack = this.craftMatrix.removeStackFromSlot(i);
 
                 if (itemstack != null)
                 {
@@ -80,7 +78,7 @@ public class ContainerWorkbench extends Container
 
     public boolean canInteractWith(EntityPlayer playerIn)
     {
-        return this.worldObj.getBlockState(this.field_178145_h).getBlock() != Blocks.crafting_table ? false : playerIn.getDistanceSq((double)this.field_178145_h.getX() + 0.5D, (double)this.field_178145_h.getY() + 0.5D, (double)this.field_178145_h.getZ() + 0.5D) <= 64.0D;
+        return this.worldObj.getBlockState(this.pos).getBlock() != Blocks.crafting_table ? false : playerIn.getDistanceSq((double)this.pos.getX() + 0.5D, (double)this.pos.getY() + 0.5D, (double)this.pos.getZ() + 0.5D) <= 64.0D;
     }
 
     /**
@@ -148,8 +146,8 @@ public class ContainerWorkbench extends Container
      * Called to determine if the current slot is valid for the stack merging (double-click) code. The stack passed in
      * is null for the initial slot that was double-clicked.
      */
-    public boolean canMergeSlot(ItemStack p_94530_1_, Slot p_94530_2_)
+    public boolean canMergeSlot(ItemStack stack, Slot p_94530_2_)
     {
-        return p_94530_2_.inventory != this.craftResult && super.canMergeSlot(p_94530_1_, p_94530_2_);
+        return p_94530_2_.inventory != this.craftResult && super.canMergeSlot(stack, p_94530_2_);
     }
 }

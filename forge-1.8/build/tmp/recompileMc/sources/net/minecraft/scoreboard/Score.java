@@ -2,20 +2,15 @@ package net.minecraft.scoreboard;
 
 import java.util.Comparator;
 import java.util.List;
+import net.minecraft.entity.player.EntityPlayer;
 
 public class Score
 {
-    /** Used for sorting score by points */
-    public static final Comparator scoreComparator = new Comparator()
+    public static final Comparator<Score> scoreComparator = new Comparator<Score>()
     {
-        private static final String __OBFID = "CL_00000618";
         public int compare(Score p_compare_1_, Score p_compare_2_)
         {
             return p_compare_1_.getScorePoints() > p_compare_2_.getScorePoints() ? 1 : (p_compare_1_.getScorePoints() < p_compare_2_.getScorePoints() ? -1 : p_compare_2_.getPlayerName().compareToIgnoreCase(p_compare_1_.getPlayerName()));
-        }
-        public int compare(Object p_compare_1_, Object p_compare_2_)
-        {
-            return this.compare((Score)p_compare_1_, (Score)p_compare_2_);
         }
     };
     private final Scoreboard theScoreboard;
@@ -23,18 +18,17 @@ public class Score
     private final String scorePlayerName;
     private int scorePoints;
     private boolean locked;
-    private boolean field_178818_g;
-    private static final String __OBFID = "CL_00000617";
+    private boolean forceUpdate;
 
-    public Score(Scoreboard p_i2309_1_, ScoreObjective p_i2309_2_, String p_i2309_3_)
+    public Score(Scoreboard theScoreboardIn, ScoreObjective theScoreObjectiveIn, String scorePlayerNameIn)
     {
-        this.theScoreboard = p_i2309_1_;
-        this.theScoreObjective = p_i2309_2_;
-        this.scorePlayerName = p_i2309_3_;
-        this.field_178818_g = true;
+        this.theScoreboard = theScoreboardIn;
+        this.theScoreObjective = theScoreObjectiveIn;
+        this.scorePlayerName = scorePlayerNameIn;
+        this.forceUpdate = true;
     }
 
-    public void increseScore(int p_96649_1_)
+    public void increseScore(int amount)
     {
         if (this.theScoreObjective.getCriteria().isReadOnly())
         {
@@ -42,11 +36,11 @@ public class Score
         }
         else
         {
-            this.setScorePoints(this.getScorePoints() + p_96649_1_);
+            this.setScorePoints(this.getScorePoints() + amount);
         }
     }
 
-    public void decreaseScore(int p_96646_1_)
+    public void decreaseScore(int amount)
     {
         if (this.theScoreObjective.getCriteria().isReadOnly())
         {
@@ -54,7 +48,7 @@ public class Score
         }
         else
         {
-            this.setScorePoints(this.getScorePoints() - p_96646_1_);
+            this.setScorePoints(this.getScorePoints() - amount);
         }
     }
 
@@ -75,14 +69,14 @@ public class Score
         return this.scorePoints;
     }
 
-    public void setScorePoints(int p_96647_1_)
+    public void setScorePoints(int points)
     {
-        int j = this.scorePoints;
-        this.scorePoints = p_96647_1_;
+        int i = this.scorePoints;
+        this.scorePoints = points;
 
-        if (j != p_96647_1_ || this.field_178818_g)
+        if (i != points || this.forceUpdate)
         {
-            this.field_178818_g = false;
+            this.forceUpdate = false;
             this.getScoreScoreboard().func_96536_a(this);
         }
     }
@@ -115,7 +109,7 @@ public class Score
         this.locked = locked;
     }
 
-    public void func_96651_a(List p_96651_1_)
+    public void func_96651_a(List<EntityPlayer> p_96651_1_)
     {
         this.setScorePoints(this.theScoreObjective.getCriteria().func_96635_a(p_96651_1_));
     }

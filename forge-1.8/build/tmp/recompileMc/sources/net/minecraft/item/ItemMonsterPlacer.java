@@ -1,6 +1,5 @@
 package net.minecraft.item;
 
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockLiquid;
@@ -28,8 +27,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemMonsterPlacer extends Item
 {
-    private static final String __OBFID = "CL_00000070";
-
     public ItemMonsterPlacer()
     {
         this.setHasSubtypes(true);
@@ -52,15 +49,12 @@ public class ItemMonsterPlacer extends Item
     @SideOnly(Side.CLIENT)
     public int getColorFromItemStack(ItemStack stack, int renderPass)
     {
-        EntityList.EntityEggInfo entityegginfo = ItemMonsterPlacer.getEggInfo(stack);
-        return entityegginfo != null ? (renderPass == 0 ? entityegginfo.primaryColor : entityegginfo.secondaryColor) : 16777215;
+        EntityList.EntityEggInfo entitylist$entityegginfo = ItemMonsterPlacer.getEggInfo(stack);
+        return entitylist$entityegginfo != null ? (renderPass == 0 ? entitylist$entityegginfo.primaryColor : entitylist$entityegginfo.secondaryColor) : 16777215;
     }
 
     /**
      * Called when a Block is right-clicked with this Item
-     *  
-     * @param pos The block being right-clicked
-     * @param side The side being right-clicked
      */
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
@@ -99,7 +93,7 @@ public class ItemMonsterPlacer extends Item
             pos = pos.offset(side);
             double d0 = 0.0D;
 
-            if (side == EnumFacing.UP && iblockstate instanceof BlockFence)
+            if (side == EnumFacing.UP && iblockstate.getBlock() instanceof BlockFence) //Forge: Fix Vanilla bug comparing state instead of block
             {
                 d0 = 0.5D;
             }
@@ -206,7 +200,7 @@ public class ItemMonsterPlacer extends Item
         {
             Entity entity = null;
 
-            for (int j = 0; j < 1; ++j)
+            for (int i = 0; i < 1; ++i)
             {
                 entity = EntityList.createEntityByName(name, worldIn);
 
@@ -216,7 +210,7 @@ public class ItemMonsterPlacer extends Item
                     entity.setLocationAndAngles(x, y, z, MathHelper.wrapAngleTo180_float(worldIn.rand.nextFloat() * 360.0F), 0.0F);
                     entityliving.rotationYawHead = entityliving.rotationYaw;
                     entityliving.renderYawOffset = entityliving.rotationYaw;
-                    entityliving.func_180482_a(worldIn.getDifficultyForLocation(new BlockPos(entityliving)), (IEntityLivingData)null);
+                    entityliving.onInitialSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityliving)), (IEntityLivingData)null);
                     worldIn.spawnEntityInWorld(entity);
                     entityliving.playLivingSound();
                 }
@@ -228,18 +222,13 @@ public class ItemMonsterPlacer extends Item
 
     /**
      * returns a list of items with the same ID, but different meta (eg: dye returns 16 items)
-     *  
-     * @param subItems The List of sub-items. This is a List of ItemStacks.
      */
     @SideOnly(Side.CLIENT)
-    public void getSubItems(Item itemIn, CreativeTabs tab, List subItems)
+    public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems)
     {
-        Iterator iterator = EntityList.entityEggs.values().iterator();
-
-        while (iterator.hasNext())
+        for (EntityList.EntityEggInfo entitylist$entityegginfo : EntityList.entityEggs.values())
         {
-            EntityList.EntityEggInfo entityegginfo = (EntityList.EntityEggInfo)iterator.next();
-            subItems.add(new ItemStack(itemIn, 1, entityegginfo.spawnedID));
+            subItems.add(new ItemStack(itemIn, 1, entitylist$entityegginfo.spawnedID));
         }
 
         for (String name : net.minecraftforge.fml.common.registry.EntityRegistry.getEggs().keySet())

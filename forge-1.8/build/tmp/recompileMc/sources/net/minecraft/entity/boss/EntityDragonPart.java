@@ -10,7 +10,6 @@ public class EntityDragonPart extends Entity
     /** The dragon entity this dragon part belongs to */
     public final IEntityMultiPart entityDragonObj;
     public final String partName;
-    private static final String __OBFID = "CL_00001657";
 
     public EntityDragonPart(IEntityMultiPart parent, String partName, float base, float sizeHeight)
     {
@@ -20,17 +19,23 @@ public class EntityDragonPart extends Entity
         this.partName = partName;
     }
 
-    protected void entityInit() {}
+    protected void entityInit()
+    {
+    }
 
     /**
      * (abstract) Protected helper method to read subclass entity data from NBT.
      */
-    protected void readEntityFromNBT(NBTTagCompound tagCompund) {}
+    protected void readEntityFromNBT(NBTTagCompound tagCompund)
+    {
+    }
 
     /**
      * (abstract) Protected helper method to write subclass entity data to NBT.
      */
-    protected void writeEntityToNBT(NBTTagCompound tagCompound) {}
+    protected void writeEntityToNBT(NBTTagCompound tagCompound)
+    {
+    }
 
     /**
      * Returns true if other Entities should be prevented from moving through this Entity.

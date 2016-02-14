@@ -17,9 +17,12 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryHelper;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityDispenser;
+import net.minecraft.tileentity.TileEntityDropper;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.RegistryDefaulted;
@@ -31,10 +34,8 @@ public class BlockDispenser extends BlockContainer
 {
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
     public static final PropertyBool TRIGGERED = PropertyBool.create("triggered");
-    /** Registry for all dispense behaviors. */
-    public static final RegistryDefaulted dispenseBehaviorRegistry = new RegistryDefaulted(new BehaviorDefaultDispenseItem());
+    public static final RegistryDefaulted<Item, IBehaviorDispenseItem> dispenseBehaviorRegistry = new RegistryDefaulted(new BehaviorDefaultDispenseItem());
     protected Random rand = new Random();
-    private static final String __OBFID = "CL_00000229";
 
     protected BlockDispenser()
     {
@@ -105,6 +106,15 @@ public class BlockDispenser extends BlockContainer
             if (tileentity instanceof TileEntityDispenser)
             {
                 playerIn.displayGUIChest((TileEntityDispenser)tileentity);
+
+                if (tileentity instanceof TileEntityDropper)
+                {
+                    playerIn.triggerAchievement(StatList.field_181731_O);
+                }
+                else
+                {
+                    playerIn.triggerAchievement(StatList.field_181733_Q);
+                }
             }
 
             return true;
@@ -132,7 +142,7 @@ public class BlockDispenser extends BlockContainer
                 if (ibehaviordispenseitem != IBehaviorDispenseItem.itemDispenseBehaviorProvider)
                 {
                     ItemStack itemstack1 = ibehaviordispenseitem.dispense(blocksourceimpl, itemstack);
-                    tileentitydispenser.setInventorySlotContents(i, itemstack1.stackSize == 0 ? null : itemstack1);
+                    tileentitydispenser.setInventorySlotContents(i, itemstack1.stackSize <= 0 ? null : itemstack1);
                 }
             }
         }
@@ -178,11 +188,18 @@ public class BlockDispenser extends BlockContainer
         return new TileEntityDispenser();
     }
 
+    /**
+     * Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the
+     * IBlockstate
+     */
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
         return this.getDefaultState().withProperty(FACING, BlockPistonBase.getFacingFromEntity(worldIn, pos, placer)).withProperty(TRIGGERED, Boolean.valueOf(false));
     }
 
+    /**
+     * Called by ItemBlocks after a block is set in the world, to allow post-place logic
+     */
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
     {
         worldIn.setBlockState(pos, state.withProperty(FACING, BlockPistonBase.getFacingFromEntity(worldIn, pos, placer)), 2);
@@ -242,7 +259,7 @@ public class BlockDispenser extends BlockContainer
     }
 
     /**
-     * The type of render function that is called for this block
+     * The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render
      */
     public int getRenderType()
     {
@@ -271,8 +288,8 @@ public class BlockDispenser extends BlockContainer
      */
     public int getMetaFromState(IBlockState state)
     {
-        byte b0 = 0;
-        int i = b0 | ((EnumFacing)state.getValue(FACING)).getIndex();
+        int i = 0;
+        i = i | ((EnumFacing)state.getValue(FACING)).getIndex();
 
         if (((Boolean)state.getValue(TRIGGERED)).booleanValue())
         {

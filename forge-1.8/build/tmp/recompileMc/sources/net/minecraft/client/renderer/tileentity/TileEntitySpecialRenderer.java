@@ -9,21 +9,20 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public abstract class TileEntitySpecialRenderer
+public abstract class TileEntitySpecialRenderer<T extends TileEntity>
 {
     protected static final ResourceLocation[] DESTROY_STAGES = new ResourceLocation[] {new ResourceLocation("textures/blocks/destroy_stage_0.png"), new ResourceLocation("textures/blocks/destroy_stage_1.png"), new ResourceLocation("textures/blocks/destroy_stage_2.png"), new ResourceLocation("textures/blocks/destroy_stage_3.png"), new ResourceLocation("textures/blocks/destroy_stage_4.png"), new ResourceLocation("textures/blocks/destroy_stage_5.png"), new ResourceLocation("textures/blocks/destroy_stage_6.png"), new ResourceLocation("textures/blocks/destroy_stage_7.png"), new ResourceLocation("textures/blocks/destroy_stage_8.png"), new ResourceLocation("textures/blocks/destroy_stage_9.png")};
     protected TileEntityRendererDispatcher rendererDispatcher;
-    private static final String __OBFID = "CL_00000964";
 
-    public abstract void renderTileEntityAt(TileEntity p_180535_1_, double posX, double posZ, double p_180535_6_, float p_180535_8_, int p_180535_9_);
+    public abstract void renderTileEntityAt(T te, double x, double y, double z, float partialTicks, int destroyStage);
 
-    protected void bindTexture(ResourceLocation p_147499_1_)
+    protected void bindTexture(ResourceLocation location)
     {
         TextureManager texturemanager = this.rendererDispatcher.renderEngine;
 
         if (texturemanager != null)
         {
-            texturemanager.bindTexture(p_147499_1_);
+            texturemanager.bindTexture(location);
         }
     }
 
@@ -32,13 +31,20 @@ public abstract class TileEntitySpecialRenderer
         return this.rendererDispatcher.worldObj;
     }
 
-    public void setRendererDispatcher(TileEntityRendererDispatcher p_147497_1_)
+    public void setRendererDispatcher(TileEntityRendererDispatcher rendererDispatcherIn)
     {
-        this.rendererDispatcher = p_147497_1_;
+        this.rendererDispatcher = rendererDispatcherIn;
     }
 
     public FontRenderer getFontRenderer()
     {
         return this.rendererDispatcher.getFontRenderer();
     }
+
+    public boolean func_181055_a()
+    {
+        return false;
+    }
+
+    public void renderTileEntityFast(T te, double x, double y, double z, float partialTicks, int destroyStage, net.minecraft.client.renderer.WorldRenderer worldRenderer) {}
 }

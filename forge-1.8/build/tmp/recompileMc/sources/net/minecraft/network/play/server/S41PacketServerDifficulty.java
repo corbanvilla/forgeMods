@@ -1,7 +1,6 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -9,23 +8,27 @@ import net.minecraft.world.EnumDifficulty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S41PacketServerDifficulty implements Packet
+public class S41PacketServerDifficulty implements Packet<INetHandlerPlayClient>
 {
-    private EnumDifficulty field_179833_a;
-    private boolean field_179832_b;
-    private static final String __OBFID = "CL_00002303";
+    private EnumDifficulty difficulty;
+    private boolean difficultyLocked;
 
-    public S41PacketServerDifficulty() {}
-
-    public S41PacketServerDifficulty(EnumDifficulty p_i45987_1_, boolean p_i45987_2_)
+    public S41PacketServerDifficulty()
     {
-        this.field_179833_a = p_i45987_1_;
-        this.field_179832_b = p_i45987_2_;
     }
 
-    public void func_179829_a(INetHandlerPlayClient p_179829_1_)
+    public S41PacketServerDifficulty(EnumDifficulty difficultyIn, boolean lockedIn)
     {
-        p_179829_1_.handleServerDifficulty(this);
+        this.difficulty = difficultyIn;
+        this.difficultyLocked = lockedIn;
+    }
+
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
+    public void processPacket(INetHandlerPlayClient handler)
+    {
+        handler.handleServerDifficulty(this);
     }
 
     /**
@@ -33,7 +36,7 @@ public class S41PacketServerDifficulty implements Packet
      */
     public void readPacketData(PacketBuffer buf) throws IOException
     {
-        this.field_179833_a = EnumDifficulty.getDifficultyEnum(buf.readUnsignedByte());
+        this.difficulty = EnumDifficulty.getDifficultyEnum(buf.readUnsignedByte());
     }
 
     /**
@@ -41,26 +44,18 @@ public class S41PacketServerDifficulty implements Packet
      */
     public void writePacketData(PacketBuffer buf) throws IOException
     {
-        buf.writeByte(this.field_179833_a.getDifficultyId());
+        buf.writeByte(this.difficulty.getDifficultyId());
     }
 
     @SideOnly(Side.CLIENT)
-    public boolean func_179830_a()
+    public boolean isDifficultyLocked()
     {
-        return this.field_179832_b;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.func_179829_a((INetHandlerPlayClient)handler);
+        return this.difficultyLocked;
     }
 
     @SideOnly(Side.CLIENT)
-    public EnumDifficulty func_179831_b()
+    public EnumDifficulty getDifficulty()
     {
-        return this.field_179833_a;
+        return this.difficulty;
     }
 }

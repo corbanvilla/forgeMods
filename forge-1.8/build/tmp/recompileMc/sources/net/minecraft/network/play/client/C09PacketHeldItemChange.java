@@ -1,19 +1,19 @@
 package net.minecraft.network.play.client;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class C09PacketHeldItemChange implements Packet
+public class C09PacketHeldItemChange implements Packet<INetHandlerPlayServer>
 {
     private int slotId;
-    private static final String __OBFID = "CL_00001368";
 
-    public C09PacketHeldItemChange() {}
+    public C09PacketHeldItemChange()
+    {
+    }
 
     @SideOnly(Side.CLIENT)
     public C09PacketHeldItemChange(int slotId)
@@ -48,13 +48,5 @@ public class C09PacketHeldItemChange implements Packet
     public int getSlotId()
     {
         return this.slotId;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayServer)handler);
     }
 }

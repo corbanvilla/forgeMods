@@ -2,6 +2,7 @@ package net.minecraft.client.resources.data;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumTypeAdapterFactory;
@@ -14,11 +15,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class IMetadataSerializer
 {
-    private final IRegistry metadataSectionSerializerRegistry = new RegistrySimple();
+    private final IRegistry < String, IMetadataSerializer.Registration <? extends IMetadataSection >> metadataSectionSerializerRegistry = new RegistrySimple();
     private final GsonBuilder gsonBuilder = new GsonBuilder();
     /** Cached Gson instance. Set to null when more sections are registered, and then re-created from the builder. */
     private Gson gson;
-    private static final String __OBFID = "CL_00001101";
 
     public IMetadataSerializer()
     {
@@ -27,14 +27,14 @@ public class IMetadataSerializer
         this.gsonBuilder.registerTypeAdapterFactory(new EnumTypeAdapterFactory());
     }
 
-    public void registerMetadataSectionType(IMetadataSectionSerializer p_110504_1_, Class p_110504_2_)
+    public <T extends IMetadataSection> void registerMetadataSectionType(IMetadataSectionSerializer<T> p_110504_1_, Class<T> p_110504_2_)
     {
-        this.metadataSectionSerializerRegistry.putObject(p_110504_1_.getSectionName(), new IMetadataSerializer.Registration(p_110504_1_, p_110504_2_, null));
+        this.metadataSectionSerializerRegistry.putObject(p_110504_1_.getSectionName(), new IMetadataSerializer.Registration(p_110504_1_, p_110504_2_));
         this.gsonBuilder.registerTypeAdapter(p_110504_2_, p_110504_1_);
         this.gson = null;
     }
 
-    public IMetadataSection parseMetadataSection(String p_110503_1_, JsonObject p_110503_2_)
+    public <T extends IMetadataSection> T parseMetadataSection(String p_110503_1_, JsonObject p_110503_2_)
     {
         if (p_110503_1_ == null)
         {
@@ -42,7 +42,7 @@ public class IMetadataSerializer
         }
         else if (!p_110503_2_.has(p_110503_1_))
         {
-            return null;
+            return (T)null;
         }
         else if (!p_110503_2_.get(p_110503_1_).isJsonObject())
         {
@@ -50,7 +50,7 @@ public class IMetadataSerializer
         }
         else
         {
-            IMetadataSerializer.Registration registration = (IMetadataSerializer.Registration)this.metadataSectionSerializerRegistry.getObject(p_110503_1_);
+            IMetadataSerializer.Registration<?> registration = (IMetadataSerializer.Registration)this.metadataSectionSerializerRegistry.getObject(p_110503_1_);
 
             if (registration == null)
             {
@@ -58,7 +58,7 @@ public class IMetadataSerializer
             }
             else
             {
-                return (IMetadataSection)this.getGson().fromJson(p_110503_2_.getAsJsonObject(p_110503_1_), registration.field_110500_b);
+                return (T)((IMetadataSection)this.getGson().fromJson((JsonElement)p_110503_2_.getAsJsonObject(p_110503_1_), registration.field_110500_b));
             }
         }
     }
@@ -77,21 +77,15 @@ public class IMetadataSerializer
     }
 
     @SideOnly(Side.CLIENT)
-    class Registration
+    class Registration<T extends IMetadataSection>
     {
-        final IMetadataSectionSerializer field_110502_a;
-        final Class field_110500_b;
-        private static final String __OBFID = "CL_00001103";
+        final IMetadataSectionSerializer<T> field_110502_a;
+        final Class<T> field_110500_b;
 
-        private Registration(IMetadataSectionSerializer p_i1305_2_, Class p_i1305_3_)
+        private Registration(IMetadataSectionSerializer<T> p_i1305_2_, Class<T> p_i1305_3_)
         {
             this.field_110502_a = p_i1305_2_;
             this.field_110500_b = p_i1305_3_;
-        }
-
-        Registration(IMetadataSectionSerializer p_i1306_2_, Class p_i1306_3_, Object p_i1306_4_)
-        {
-            this(p_i1306_2_, p_i1306_3_);
         }
     }
 }

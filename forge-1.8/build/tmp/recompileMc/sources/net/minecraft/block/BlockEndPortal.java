@@ -20,8 +20,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockEndPortal extends BlockContainer
 {
-    private static final String __OBFID = "CL_00000236";
-
     protected BlockEndPortal(Material materialIn)
     {
         super(materialIn);
@@ -50,11 +48,14 @@ public class BlockEndPortal extends BlockContainer
 
     /**
      * Add all collision boxes of this Block to the list that intersect with the given mask.
-     *  
-     * @param collidingEntity the Entity colliding with this Block
      */
-    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List list, Entity collidingEntity) {}
+    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity)
+    {
+    }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -107,6 +108,6 @@ public class BlockEndPortal extends BlockContainer
      */
     public MapColor getMapColor(IBlockState state)
     {
-        return MapColor.obsidianColor;
+        return MapColor.blackColor;
     }
 }

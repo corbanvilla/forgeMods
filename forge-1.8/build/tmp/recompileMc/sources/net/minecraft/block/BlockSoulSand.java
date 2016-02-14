@@ -1,5 +1,6 @@
 package net.minecraft.block;
 
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -10,11 +11,9 @@ import net.minecraft.world.World;
 
 public class BlockSoulSand extends Block
 {
-    private static final String __OBFID = "CL_00000310";
-
     public BlockSoulSand()
     {
-        super(Material.sand);
+        super(Material.sand, MapColor.brownColor);
         this.setCreativeTab(CreativeTabs.tabBlock);
     }
 

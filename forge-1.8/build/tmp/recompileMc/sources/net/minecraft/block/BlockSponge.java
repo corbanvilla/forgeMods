@@ -2,9 +2,8 @@ package net.minecraft.block;
 
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Random;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -18,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.StatCollector;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -26,7 +26,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BlockSponge extends Block
 {
     public static final PropertyBool WET = PropertyBool.create("wet");
-    private static final String __OBFID = "CL_00000311";
 
     protected BlockSponge()
     {
@@ -36,7 +35,16 @@ public class BlockSponge extends Block
     }
 
     /**
-     * Get the damage value that this Block should drop
+     * Gets the localized name of this block. Used for the statistics page.
+     */
+    public String getLocalizedName()
+    {
+        return StatCollector.translateToLocal(this.getUnlocalizedName() + ".dry.name");
+    }
+
+    /**
+     * Gets the metadata of the item this Block can drop. This method is called when the block gets destroyed. It
+     * returns the metadata of the dropped item based on the old metadata of the block.
      */
     public int damageDropped(IBlockState state)
     {
@@ -68,34 +76,30 @@ public class BlockSponge extends Block
 
     private boolean absorb(World worldIn, BlockPos pos)
     {
-        LinkedList linkedlist = Lists.newLinkedList();
-        ArrayList arraylist = Lists.newArrayList();
-        linkedlist.add(new Tuple(pos, Integer.valueOf(0)));
+        Queue<Tuple<BlockPos, Integer>> queue = Lists.<Tuple<BlockPos, Integer>>newLinkedList();
+        ArrayList<BlockPos> arraylist = Lists.<BlockPos>newArrayList();
+        queue.add(new Tuple(pos, Integer.valueOf(0)));
         int i = 0;
-        BlockPos blockpos1;
 
-        while (!linkedlist.isEmpty())
+        while (!((Queue)queue).isEmpty())
         {
-            Tuple tuple = (Tuple)linkedlist.poll();
-            blockpos1 = (BlockPos)tuple.getFirst();
+            Tuple<BlockPos, Integer> tuple = (Tuple)queue.poll();
+            BlockPos blockpos = (BlockPos)tuple.getFirst();
             int j = ((Integer)tuple.getSecond()).intValue();
-            EnumFacing[] aenumfacing = EnumFacing.values();
-            int k = aenumfacing.length;
 
-            for (int l = 0; l < k; ++l)
+            for (EnumFacing enumfacing : EnumFacing.values())
             {
-                EnumFacing enumfacing = aenumfacing[l];
-                BlockPos blockpos2 = blockpos1.offset(enumfacing);
+                BlockPos blockpos1 = blockpos.offset(enumfacing);
 
-                if (worldIn.getBlockState(blockpos2).getBlock().getMaterial() == Material.water)
+                if (worldIn.getBlockState(blockpos1).getBlock().getMaterial() == Material.water)
                 {
-                    worldIn.setBlockState(blockpos2, Blocks.air.getDefaultState(), 2);
-                    arraylist.add(blockpos2);
+                    worldIn.setBlockState(blockpos1, Blocks.air.getDefaultState(), 2);
+                    arraylist.add(blockpos1);
                     ++i;
 
                     if (j < 6)
                     {
-                        linkedlist.add(new Tuple(blockpos2, Integer.valueOf(j + 1)));
+                        queue.add(new Tuple(blockpos1, Integer.valueOf(j + 1)));
                     }
                 }
             }
@@ -106,12 +110,9 @@ public class BlockSponge extends Block
             }
         }
 
-        Iterator iterator = arraylist.iterator();
-
-        while (iterator.hasNext())
+        for (BlockPos blockpos2 : arraylist)
         {
-            blockpos1 = (BlockPos)iterator.next();
-            worldIn.notifyNeighborsOfStateChange(blockpos1, Blocks.air);
+            worldIn.notifyNeighborsOfStateChange(blockpos2, Blocks.air);
         }
 
         return i > 0;
@@ -121,7 +122,7 @@ public class BlockSponge extends Block
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
     {
         list.add(new ItemStack(itemIn, 1, 0));
         list.add(new ItemStack(itemIn, 1, 1));
@@ -163,13 +164,13 @@ public class BlockSponge extends Block
 
                 if (enumfacing == EnumFacing.DOWN)
                 {
-                    d1 -= 0.05D;
+                    d1 = d1 - 0.05D;
                     d0 += rand.nextDouble();
                     d2 += rand.nextDouble();
                 }
                 else
                 {
-                    d1 += rand.nextDouble() * 0.8D;
+                    d1 = d1 + rand.nextDouble() * 0.8D;
 
                     if (enumfacing.getAxis() == EnumFacing.Axis.X)
                     {

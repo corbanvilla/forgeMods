@@ -1,20 +1,20 @@
 package net.minecraft.network.play.client;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
 import net.minecraft.util.BlockPos;
 import org.apache.commons.lang3.StringUtils;
 
-public class C14PacketTabComplete implements Packet
+public class C14PacketTabComplete implements Packet<INetHandlerPlayServer>
 {
     private String message;
     private BlockPos targetBlock;
-    private static final String __OBFID = "CL_00001346";
 
-    public C14PacketTabComplete() {}
+    public C14PacketTabComplete()
+    {
+    }
 
     public C14PacketTabComplete(String msg)
     {
@@ -56,6 +56,9 @@ public class C14PacketTabComplete implements Packet
         }
     }
 
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
     public void processPacket(INetHandlerPlayServer handler)
     {
         handler.processTabComplete(this);
@@ -69,13 +72,5 @@ public class C14PacketTabComplete implements Packet
     public BlockPos getTargetBlock()
     {
         return this.targetBlock;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayServer)handler);
     }
 }

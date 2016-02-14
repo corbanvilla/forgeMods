@@ -2,14 +2,13 @@ package net.minecraft.network.play.server;
 
 import java.io.IOException;
 import net.minecraft.entity.player.PlayerCapabilities;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S39PacketPlayerAbilities implements Packet
+public class S39PacketPlayerAbilities implements Packet<INetHandlerPlayClient>
 {
     private boolean invulnerable;
     private boolean flying;
@@ -17,9 +16,10 @@ public class S39PacketPlayerAbilities implements Packet
     private boolean creativeMode;
     private float flySpeed;
     private float walkSpeed;
-    private static final String __OBFID = "CL_00001317";
 
-    public S39PacketPlayerAbilities() {}
+    public S39PacketPlayerAbilities()
+    {
+    }
 
     public S39PacketPlayerAbilities(PlayerCapabilities capabilities)
     {
@@ -77,9 +77,12 @@ public class S39PacketPlayerAbilities implements Packet
         buf.writeFloat(this.walkSpeed);
     }
 
-    public void func_180742_a(INetHandlerPlayClient p_180742_1_)
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
+    public void processPacket(INetHandlerPlayClient handler)
     {
-        p_180742_1_.handlePlayerAbilities(this);
+        handler.handlePlayerAbilities(this);
     }
 
     public boolean isInvulnerable()
@@ -142,13 +145,5 @@ public class S39PacketPlayerAbilities implements Packet
     public void setWalkSpeed(float walkSpeedIn)
     {
         this.walkSpeed = walkSpeedIn;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.func_180742_a((INetHandlerPlayClient)handler);
     }
 }

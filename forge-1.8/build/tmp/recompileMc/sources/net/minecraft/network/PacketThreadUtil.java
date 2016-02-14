@@ -4,21 +4,12 @@ import net.minecraft.util.IThreadListener;
 
 public class PacketThreadUtil
 {
-    private static final String __OBFID = "CL_00002306";
-
-    /**
-     * Handles pumping inbound packets across threads by checking whether the current thread is actually the main thread
-     * for the side in question. If not, then the packet is pumped into the handler queue in the main thread so that it
-     * can be handled synchronously by the recipient, it then throws an exception to terminate the current packet
-     * handler thread.
-     */
-    public static void checkThreadAndEnqueue(final Packet p_180031_0_, final INetHandler p_180031_1_, IThreadListener p_180031_2_)
+    public static <T extends INetHandler> void checkThreadAndEnqueue(final Packet<T> p_180031_0_, final T p_180031_1_, IThreadListener p_180031_2_) throws ThreadQuickExitException
     {
         if (!p_180031_2_.isCallingFromMinecraftThread())
         {
             p_180031_2_.addScheduledTask(new Runnable()
             {
-                private static final String __OBFID = "CL_00002305";
                 public void run()
                 {
                     p_180031_0_.processPacket(p_180031_1_);

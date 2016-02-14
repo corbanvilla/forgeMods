@@ -4,8 +4,6 @@ import net.minecraft.block.Block;
 
 public class ItemCloth extends ItemBlock
 {
-    private static final String __OBFID = "CL_00000075";
-
     public ItemCloth(Block block)
     {
         super(block);

@@ -16,13 +16,12 @@ public class EntityAIFindEntityNearest extends EntityAIBase
 {
     private static final Logger field_179444_a = LogManager.getLogger();
     private EntityLiving field_179442_b;
-    private final Predicate field_179443_c;
+    private final Predicate<EntityLivingBase> field_179443_c;
     private final EntityAINearestAttackableTarget.Sorter field_179440_d;
     private EntityLivingBase field_179441_e;
-    private Class field_179439_f;
-    private static final String __OBFID = "CL_00002250";
+    private Class <? extends EntityLivingBase > field_179439_f;
 
-    public EntityAIFindEntityNearest(EntityLiving p_i45884_1_, Class p_i45884_2_)
+    public EntityAIFindEntityNearest(EntityLiving p_i45884_1_, Class <? extends EntityLivingBase > p_i45884_2_)
     {
         this.field_179442_b = p_i45884_1_;
         this.field_179439_f = p_i45884_2_;
@@ -32,23 +31,18 @@ public class EntityAIFindEntityNearest extends EntityAIBase
             field_179444_a.warn("Use NearestAttackableTargetGoal.class for PathfinerMob mobs!");
         }
 
-        this.field_179443_c = new Predicate()
+        this.field_179443_c = new Predicate<EntityLivingBase>()
         {
-            private static final String __OBFID = "CL_00002249";
-            public boolean func_179876_a(EntityLivingBase p_179876_1_)
+            public boolean apply(EntityLivingBase p_apply_1_)
             {
                 double d0 = EntityAIFindEntityNearest.this.func_179438_f();
 
-                if (p_179876_1_.isSneaking())
+                if (p_apply_1_.isSneaking())
                 {
                     d0 *= 0.800000011920929D;
                 }
 
-                return p_179876_1_.isInvisible() ? false : ((double)p_179876_1_.getDistanceToEntity(EntityAIFindEntityNearest.this.field_179442_b) > d0 ? false : EntityAITarget.func_179445_a(EntityAIFindEntityNearest.this.field_179442_b, p_179876_1_, false, true));
-            }
-            public boolean apply(Object p_apply_1_)
-            {
-                return this.func_179876_a((EntityLivingBase)p_apply_1_);
+                return p_apply_1_.isInvisible() ? false : ((double)p_apply_1_.getDistanceToEntity(EntityAIFindEntityNearest.this.field_179442_b) > d0 ? false : EntityAITarget.isSuitableTarget(EntityAIFindEntityNearest.this.field_179442_b, p_apply_1_, false, true));
             }
         };
         this.field_179440_d = new EntityAINearestAttackableTarget.Sorter(p_i45884_1_);
@@ -60,7 +54,7 @@ public class EntityAIFindEntityNearest extends EntityAIBase
     public boolean shouldExecute()
     {
         double d0 = this.func_179438_f();
-        List list = this.field_179442_b.worldObj.getEntitiesWithinAABB(this.field_179439_f, this.field_179442_b.getEntityBoundingBox().expand(d0, 4.0D, d0), this.field_179443_c);
+        List<EntityLivingBase> list = this.field_179442_b.worldObj.<EntityLivingBase>getEntitiesWithinAABB(this.field_179439_f, this.field_179442_b.getEntityBoundingBox().expand(d0, 4.0D, d0), this.field_179443_c);
         Collections.sort(list, this.field_179440_d);
 
         if (list.isEmpty())

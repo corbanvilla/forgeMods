@@ -1,9 +1,9 @@
 package net.minecraft.client.renderer.block.model;
 
-import javax.vecmath.Vector3f;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.util.vector.Vector3f;
 
 @SideOnly(Side.CLIENT)
 public class BlockPartRotation
@@ -12,13 +12,12 @@ public class BlockPartRotation
     public final EnumFacing.Axis axis;
     public final float angle;
     public final boolean rescale;
-    private static final String __OBFID = "CL_00002506";
 
-    public BlockPartRotation(Vector3f p_i46229_1_, EnumFacing.Axis p_i46229_2_, float p_i46229_3_, boolean p_i46229_4_)
+    public BlockPartRotation(Vector3f originIn, EnumFacing.Axis axisIn, float angleIn, boolean rescaleIn)
     {
-        this.origin = p_i46229_1_;
-        this.axis = p_i46229_2_;
-        this.angle = p_i46229_3_;
-        this.rescale = p_i46229_4_;
+        this.origin = originIn;
+        this.axis = axisIn;
+        this.angle = angleIn;
+        this.rescale = rescaleIn;
     }
 }

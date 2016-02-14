@@ -4,8 +4,6 @@ import net.minecraft.util.ResourceLocation;
 
 public class EnchantmentArrowFire extends Enchantment
 {
-    private static final String __OBFID = "CL_00000099";
-
     public EnchantmentArrowFire(int enchID, ResourceLocation enchName, int enchWeight)
     {
         super(enchID, enchName, enchWeight, EnumEnchantmentType.BOW);

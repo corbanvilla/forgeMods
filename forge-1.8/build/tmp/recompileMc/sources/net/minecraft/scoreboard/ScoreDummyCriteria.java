@@ -1,11 +1,11 @@
 package net.minecraft.scoreboard;
 
 import java.util.List;
+import net.minecraft.entity.player.EntityPlayer;
 
 public class ScoreDummyCriteria implements IScoreObjectiveCriteria
 {
     private final String dummyName;
-    private static final String __OBFID = "CL_00000622";
 
     public ScoreDummyCriteria(String name)
     {
@@ -18,7 +18,7 @@ public class ScoreDummyCriteria implements IScoreObjectiveCriteria
         return this.dummyName;
     }
 
-    public int func_96635_a(List p_96635_1_)
+    public int func_96635_a(List<EntityPlayer> p_96635_1_)
     {
         return 0;
     }

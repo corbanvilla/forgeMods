@@ -11,7 +11,6 @@ public class SoundPoolEntry
     private final boolean streamingSound;
     private double pitch;
     private double volume;
-    private static final String __OBFID = "CL_00001140";
 
     public SoundPoolEntry(ResourceLocation locationIn, double pitchIn, double volumeIn, boolean streamingSoundIn)
     {

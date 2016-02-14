@@ -11,14 +11,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.ServerSocket;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Executors;
@@ -37,20 +36,16 @@ public class HttpUtil
     /** The number of download threads that we have started so far. */
     private static final AtomicInteger downloadThreadsStarted = new AtomicInteger(0);
     private static final Logger logger = LogManager.getLogger();
-    private static final String __OBFID = "CL_00001485";
 
     /**
      * Builds an encoded HTTP POST content string from a string map
      */
-    public static String buildPostString(Map data)
+    public static String buildPostString(Map<String, Object> data)
     {
         StringBuilder stringbuilder = new StringBuilder();
-        Iterator iterator = data.entrySet().iterator();
 
-        while (iterator.hasNext())
+        for (Entry<String, Object> entry : data.entrySet())
         {
-            Entry entry = (Entry)iterator.next();
-
             if (stringbuilder.length() > 0)
             {
                 stringbuilder.append('&');
@@ -86,7 +81,7 @@ public class HttpUtil
     /**
      * Sends a POST to the given URL using the map as the POST args
      */
-    public static String postMap(URL url, Map data, boolean skipLoggingErrors)
+    public static String postMap(URL url, Map<String, Object> data, boolean skipLoggingErrors)
     {
         /**
          * Sends a POST to the given URL
@@ -122,11 +117,11 @@ public class HttpUtil
             dataoutputstream.close();
             BufferedReader bufferedreader = new BufferedReader(new InputStreamReader(httpurlconnection.getInputStream()));
             StringBuffer stringbuffer = new StringBuffer();
-            String s1;
+            String s;
 
-            while ((s1 = bufferedreader.readLine()) != null)
+            while ((s = bufferedreader.readLine()) != null)
             {
-                stringbuffer.append(s1);
+                stringbuffer.append(s);
                 stringbuffer.append('\r');
             }
 
@@ -137,7 +132,7 @@ public class HttpUtil
         {
             if (!skipLoggingErrors)
             {
-                logger.error("Could not post to " + url, exception);
+                logger.error((String)("Could not post to " + url), (Throwable)exception);
             }
 
             return "";
@@ -145,15 +140,15 @@ public class HttpUtil
     }
 
     @SideOnly(Side.CLIENT)
-    public static ListenableFuture func_180192_a(final File p_180192_0_, final String p_180192_1_, final Map p_180192_2_, final int p_180192_3_, final IProgressUpdate p_180192_4_, final Proxy p_180192_5_)
+    public static ListenableFuture<Object> downloadResourcePack(final File saveFile, final String packUrl, final Map<String, String> p_180192_2_, final int maxSize, final IProgressUpdate p_180192_4_, final Proxy p_180192_5_)
     {
-        ListenableFuture listenablefuture = field_180193_a.submit(new Runnable()
+        ListenableFuture<?> listenablefuture = field_180193_a.submit(new Runnable()
         {
-            private static final String __OBFID = "CL_00001486";
             public void run()
             {
+                HttpURLConnection httpurlconnection = null;
                 InputStream inputstream = null;
-                DataOutputStream dataoutputstream = null;
+                OutputStream outputstream = null;
 
                 if (p_180192_4_ != null)
                 {
@@ -166,16 +161,14 @@ public class HttpUtil
                     try
                     {
                         byte[] abyte = new byte[4096];
-                        URL url = new URL(p_180192_1_);
-                        URLConnection urlconnection = url.openConnection(p_180192_5_);
+                        URL url = new URL(packUrl);
+                        httpurlconnection = (HttpURLConnection)url.openConnection(p_180192_5_);
                         float f = 0.0F;
                         float f1 = (float)p_180192_2_.entrySet().size();
-                        Iterator iterator = p_180192_2_.entrySet().iterator();
 
-                        while (iterator.hasNext())
+                        for (Entry<String, String> entry : p_180192_2_.entrySet())
                         {
-                            Entry entry = (Entry)iterator.next();
-                            urlconnection.setRequestProperty((String)entry.getKey(), (String)entry.getValue());
+                            httpurlconnection.setRequestProperty((String)entry.getKey(), (String)entry.getValue());
 
                             if (p_180192_4_ != null)
                             {
@@ -183,18 +176,18 @@ public class HttpUtil
                             }
                         }
 
-                        inputstream = urlconnection.getInputStream();
-                        f1 = (float)urlconnection.getContentLength();
-                        int i = urlconnection.getContentLength();
+                        inputstream = httpurlconnection.getInputStream();
+                        f1 = (float)httpurlconnection.getContentLength();
+                        int i = httpurlconnection.getContentLength();
 
                         if (p_180192_4_ != null)
                         {
                             p_180192_4_.displayLoadingString(String.format("Downloading file (%.2f MB)...", new Object[] {Float.valueOf(f1 / 1000.0F / 1000.0F)}));
                         }
 
-                        if (p_180192_0_.exists())
+                        if (saveFile.exists())
                         {
-                            long j = p_180192_0_.length();
+                            long j = saveFile.length();
 
                             if (j == (long)i)
                             {
@@ -206,28 +199,27 @@ public class HttpUtil
                                 return;
                             }
 
-                            HttpUtil.logger.warn("Deleting " + p_180192_0_ + " as it does not match what we currently have (" + i + " vs our " + j + ").");
-                            FileUtils.deleteQuietly(p_180192_0_);
+                            HttpUtil.logger.warn("Deleting " + saveFile + " as it does not match what we currently have (" + i + " vs our " + j + ").");
+                            FileUtils.deleteQuietly(saveFile);
                         }
-                        else if (p_180192_0_.getParentFile() != null)
+                        else if (saveFile.getParentFile() != null)
                         {
-                            p_180192_0_.getParentFile().mkdirs();
+                            saveFile.getParentFile().mkdirs();
                         }
 
-                        dataoutputstream = new DataOutputStream(new FileOutputStream(p_180192_0_));
+                        outputstream = new DataOutputStream(new FileOutputStream(saveFile));
 
-                        if (p_180192_3_ > 0 && f1 > (float)p_180192_3_)
+                        if (maxSize > 0 && f1 > (float)maxSize)
                         {
                             if (p_180192_4_ != null)
                             {
                                 p_180192_4_.setDoneWorking();
                             }
 
-                            throw new IOException("Filesize is bigger than maximum allowed (file is " + f + ", limit is " + p_180192_3_ + ")");
+                            throw new IOException("Filesize is bigger than maximum allowed (file is " + f + ", limit is " + maxSize + ")");
                         }
 
-                        boolean flag = false;
-                        int k;
+                        int k = 0;
 
                         while ((k = inputstream.read(abyte)) >= 0)
                         {
@@ -238,17 +230,29 @@ public class HttpUtil
                                 p_180192_4_.setLoadingProgress((int)(f / f1 * 100.0F));
                             }
 
-                            if (p_180192_3_ > 0 && f > (float)p_180192_3_)
+                            if (maxSize > 0 && f > (float)maxSize)
                             {
                                 if (p_180192_4_ != null)
                                 {
                                     p_180192_4_.setDoneWorking();
                                 }
 
-                                throw new IOException("Filesize was bigger than maximum allowed (got >= " + f + ", limit was " + p_180192_3_ + ")");
+                                throw new IOException("Filesize was bigger than maximum allowed (got >= " + f + ", limit was " + maxSize + ")");
                             }
 
-                            dataoutputstream.write(abyte, 0, k);
+                            if (Thread.interrupted())
+                            {
+                                HttpUtil.logger.error("INTERRUPTED");
+
+                                if (p_180192_4_ != null)
+                                {
+                                    p_180192_4_.setDoneWorking();
+                                }
+
+                                return;
+                            }
+
+                            outputstream.write(abyte, 0, k);
                         }
 
                         if (p_180192_4_ != null)
@@ -260,24 +264,43 @@ public class HttpUtil
                     catch (Throwable throwable)
                     {
                         throwable.printStackTrace();
+
+                        if (httpurlconnection != null)
+                        {
+                            InputStream inputstream1 = httpurlconnection.getErrorStream();
+
+                            try
+                            {
+                                HttpUtil.logger.error(IOUtils.toString(inputstream1));
+                            }
+                            catch (IOException ioexception)
+                            {
+                                ioexception.printStackTrace();
+                            }
+                        }
+
+                        if (p_180192_4_ != null)
+                        {
+                            p_180192_4_.setDoneWorking();
+                            return;
+                        }
                     }
                 }
                 finally
                 {
                     IOUtils.closeQuietly(inputstream);
-                    IOUtils.closeQuietly(dataoutputstream);
+                    IOUtils.closeQuietly(outputstream);
                 }
             }
         });
-        return listenablefuture;
+        return (ListenableFuture<Object>) listenablefuture;
     }
 
     @SideOnly(Side.CLIENT)
     public static int getSuitableLanPort() throws IOException
     {
         ServerSocket serversocket = null;
-        boolean flag = true;
-        int i;
+        int i = -1;
 
         try
         {
@@ -293,7 +316,7 @@ public class HttpUtil
                     serversocket.close();
                 }
             }
-            catch (IOException ioexception)
+            catch (IOException var8)
             {
                 ;
             }

@@ -5,6 +5,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import java.lang.reflect.Type;
 import net.minecraft.util.JsonUtils;
 import net.minecraftforge.fml.relauncher.Side;
@@ -12,74 +13,70 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.Validate;
 
 @SideOnly(Side.CLIENT)
-public class SoundListSerializer implements JsonDeserializer
+public class SoundListSerializer implements JsonDeserializer<SoundList>
 {
-    private static final String __OBFID = "CL_00001124";
-
-    public SoundList deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_)
+    public SoundList deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_) throws JsonParseException
     {
-        JsonObject jsonobject = JsonUtils.getElementAsJsonObject(p_deserialize_1_, "entry");
+        JsonObject jsonobject = JsonUtils.getJsonObject(p_deserialize_1_, "entry");
         SoundList soundlist = new SoundList();
-        soundlist.setReplaceExisting(JsonUtils.getJsonObjectBooleanFieldValueOrDefault(jsonobject, "replace", false));
-        SoundCategory soundcategory = SoundCategory.func_147154_a(JsonUtils.getJsonObjectStringFieldValueOrDefault(jsonobject, "category", SoundCategory.MASTER.getCategoryName()));
+        soundlist.setReplaceExisting(JsonUtils.getBoolean(jsonobject, "replace", false));
+        SoundCategory soundcategory = SoundCategory.getCategory(JsonUtils.getString(jsonobject, "category", SoundCategory.MASTER.getCategoryName()));
         soundlist.setSoundCategory(soundcategory);
         Validate.notNull(soundcategory, "Invalid category", new Object[0]);
 
         if (jsonobject.has("sounds"))
         {
-            JsonArray jsonarray = JsonUtils.getJsonObjectJsonArrayField(jsonobject, "sounds");
+            JsonArray jsonarray = JsonUtils.getJsonArray(jsonobject, "sounds");
 
             for (int i = 0; i < jsonarray.size(); ++i)
             {
-                JsonElement jsonelement1 = jsonarray.get(i);
-                SoundList.SoundEntry soundentry = new SoundList.SoundEntry();
+                JsonElement jsonelement = jsonarray.get(i);
+                SoundList.SoundEntry soundlist$soundentry = new SoundList.SoundEntry();
 
-                if (JsonUtils.jsonElementTypeIsString(jsonelement1))
+                if (JsonUtils.isString(jsonelement))
                 {
-                    soundentry.setSoundEntryName(JsonUtils.getJsonElementStringValue(jsonelement1, "sound"));
+                    soundlist$soundentry.setSoundEntryName(JsonUtils.getString(jsonelement, "sound"));
                 }
                 else
                 {
-                    JsonObject jsonobject1 = JsonUtils.getElementAsJsonObject(jsonelement1, "sound");
-                    soundentry.setSoundEntryName(JsonUtils.getJsonObjectStringFieldValue(jsonobject1, "name"));
+                    JsonObject jsonobject1 = JsonUtils.getJsonObject(jsonelement, "sound");
+                    soundlist$soundentry.setSoundEntryName(JsonUtils.getString(jsonobject1, "name"));
 
                     if (jsonobject1.has("type"))
                     {
-                        SoundList.SoundEntry.Type type1 = SoundList.SoundEntry.Type.getType(JsonUtils.getJsonObjectStringFieldValue(jsonobject1, "type"));
-                        Validate.notNull(type1, "Invalid type", new Object[0]);
-                        soundentry.setSoundEntryType(type1);
+                        SoundList.SoundEntry.Type soundlist$soundentry$type = SoundList.SoundEntry.Type.getType(JsonUtils.getString(jsonobject1, "type"));
+                        Validate.notNull(soundlist$soundentry$type, "Invalid type", new Object[0]);
+                        soundlist$soundentry.setSoundEntryType(soundlist$soundentry$type);
                     }
-
-                    float f;
 
                     if (jsonobject1.has("volume"))
                     {
-                        f = JsonUtils.getJsonObjectFloatFieldValue(jsonobject1, "volume");
+                        float f = JsonUtils.getFloat(jsonobject1, "volume");
                         Validate.isTrue(f > 0.0F, "Invalid volume", new Object[0]);
-                        soundentry.setSoundEntryVolume(f);
+                        soundlist$soundentry.setSoundEntryVolume(f);
                     }
 
                     if (jsonobject1.has("pitch"))
                     {
-                        f = JsonUtils.getJsonObjectFloatFieldValue(jsonobject1, "pitch");
-                        Validate.isTrue(f > 0.0F, "Invalid pitch", new Object[0]);
-                        soundentry.setSoundEntryPitch(f);
+                        float f1 = JsonUtils.getFloat(jsonobject1, "pitch");
+                        Validate.isTrue(f1 > 0.0F, "Invalid pitch", new Object[0]);
+                        soundlist$soundentry.setSoundEntryPitch(f1);
                     }
 
                     if (jsonobject1.has("weight"))
                     {
-                        int j = JsonUtils.getJsonObjectIntegerFieldValue(jsonobject1, "weight");
+                        int j = JsonUtils.getInt(jsonobject1, "weight");
                         Validate.isTrue(j > 0, "Invalid weight", new Object[0]);
-                        soundentry.setSoundEntryWeight(j);
+                        soundlist$soundentry.setSoundEntryWeight(j);
                     }
 
                     if (jsonobject1.has("stream"))
                     {
-                        soundentry.setStreaming(JsonUtils.getJsonObjectBooleanFieldValue(jsonobject1, "stream"));
+                        soundlist$soundentry.setStreaming(JsonUtils.getBoolean(jsonobject1, "stream"));
                     }
                 }
 
-                soundlist.getSoundList().add(soundentry);
+                soundlist.getSoundList().add(soundlist$soundentry);
             }
         }
 

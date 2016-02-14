@@ -3,17 +3,17 @@ package net.minecraft.network.login.client;
 import com.mojang.authlib.GameProfile;
 import java.io.IOException;
 import java.util.UUID;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.login.INetHandlerLoginServer;
 
-public class C00PacketLoginStart implements Packet
+public class C00PacketLoginStart implements Packet<INetHandlerLoginServer>
 {
     private GameProfile profile;
-    private static final String __OBFID = "CL_00001379";
 
-    public C00PacketLoginStart() {}
+    public C00PacketLoginStart()
+    {
+    }
 
     public C00PacketLoginStart(GameProfile profileIn)
     {
@@ -36,6 +36,9 @@ public class C00PacketLoginStart implements Packet
         buf.writeString(this.profile.getName());
     }
 
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
     public void processPacket(INetHandlerLoginServer handler)
     {
         handler.processLoginStart(this);
@@ -44,13 +47,5 @@ public class C00PacketLoginStart implements Packet
     public GameProfile getProfile()
     {
         return this.profile;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerLoginServer)handler);
     }
 }

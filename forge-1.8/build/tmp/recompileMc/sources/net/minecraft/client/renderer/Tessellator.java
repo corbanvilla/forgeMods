@@ -10,7 +10,6 @@ public class Tessellator
     private WorldVertexBufferUploader vboUploader = new WorldVertexBufferUploader();
     /** The static instance of the Tessellator. */
     private static final Tessellator instance = new Tessellator(2097152);
-    private static final String __OBFID = "CL_00000960";
 
     public static Tessellator getInstance()
     {
@@ -26,9 +25,10 @@ public class Tessellator
     /**
      * Draws the data set up in this tessellator and resets the state to prepare for new drawing.
      */
-    public int draw()
+    public void draw()
     {
-        return this.vboUploader.draw(this.worldRenderer, this.worldRenderer.finishDrawing());
+        this.worldRenderer.finishDrawing();
+        this.vboUploader.draw(this.worldRenderer);
     }
 
     public WorldRenderer getWorldRenderer()

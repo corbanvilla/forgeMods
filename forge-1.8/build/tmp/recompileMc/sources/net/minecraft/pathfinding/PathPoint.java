@@ -24,7 +24,6 @@ public class PathPoint
     PathPoint previous;
     /** True if the pathfinder has already visited this point */
     public boolean visited;
-    private static final String __OBFID = "CL_00000574";
 
     public PathPoint(int x, int y, int z)
     {
@@ -42,22 +41,22 @@ public class PathPoint
     /**
      * Returns the linear distance to another path point
      */
-    public float distanceTo(PathPoint p_75829_1_)
+    public float distanceTo(PathPoint pathpointIn)
     {
-        float f = (float)(p_75829_1_.xCoord - this.xCoord);
-        float f1 = (float)(p_75829_1_.yCoord - this.yCoord);
-        float f2 = (float)(p_75829_1_.zCoord - this.zCoord);
+        float f = (float)(pathpointIn.xCoord - this.xCoord);
+        float f1 = (float)(pathpointIn.yCoord - this.yCoord);
+        float f2 = (float)(pathpointIn.zCoord - this.zCoord);
         return MathHelper.sqrt_float(f * f + f1 * f1 + f2 * f2);
     }
 
     /**
      * Returns the squared distance to another path point
      */
-    public float distanceToSquared(PathPoint p_75832_1_)
+    public float distanceToSquared(PathPoint pathpointIn)
     {
-        float f = (float)(p_75832_1_.xCoord - this.xCoord);
-        float f1 = (float)(p_75832_1_.yCoord - this.yCoord);
-        float f2 = (float)(p_75832_1_.zCoord - this.zCoord);
+        float f = (float)(pathpointIn.xCoord - this.xCoord);
+        float f1 = (float)(pathpointIn.yCoord - this.yCoord);
+        float f2 = (float)(pathpointIn.zCoord - this.zCoord);
         return f * f + f1 * f1 + f2 * f2;
     }
 

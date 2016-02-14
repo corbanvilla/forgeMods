@@ -4,21 +4,23 @@ import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 import java.util.UUID;
 
-public class UserListOpsEntry extends UserListEntry
+public class UserListOpsEntry extends UserListEntry<GameProfile>
 {
     private final int field_152645_a;
-    private static final String __OBFID = "CL_00001878";
+    private final boolean field_183025_b;
 
-    public UserListOpsEntry(GameProfile profile, int p_i46328_2_)
+    public UserListOpsEntry(GameProfile p_i46492_1_, int p_i46492_2_, boolean p_i46492_3_)
     {
-        super(profile);
-        this.field_152645_a = p_i46328_2_;
+        super(p_i46492_1_);
+        this.field_152645_a = p_i46492_2_;
+        this.field_183025_b = p_i46492_3_;
     }
 
     public UserListOpsEntry(JsonObject p_i1150_1_)
     {
         super(func_152643_b(p_i1150_1_), p_i1150_1_);
         this.field_152645_a = p_i1150_1_.has("level") ? p_i1150_1_.get("level").getAsInt() : 0;
+        this.field_183025_b = p_i1150_1_.has("bypassesPlayerLimit") && p_i1150_1_.get("bypassesPlayerLimit").getAsBoolean();
     }
 
     /**
@@ -29,6 +31,11 @@ public class UserListOpsEntry extends UserListEntry
         return this.field_152645_a;
     }
 
+    public boolean func_183024_b()
+    {
+        return this.field_183025_b;
+    }
+
     protected void onSerialization(JsonObject data)
     {
         if (this.getValue() != null)
@@ -36,7 +43,8 @@ public class UserListOpsEntry extends UserListEntry
             data.addProperty("uuid", ((GameProfile)this.getValue()).getId() == null ? "" : ((GameProfile)this.getValue()).getId().toString());
             data.addProperty("name", ((GameProfile)this.getValue()).getName());
             super.onSerialization(data);
-            data.addProperty("level", Integer.valueOf(this.field_152645_a));
+            data.addProperty("level", (Number)Integer.valueOf(this.field_152645_a));
+            data.addProperty("bypassesPlayerLimit", Boolean.valueOf(this.field_183025_b));
         }
     }
 
@@ -51,7 +59,7 @@ public class UserListOpsEntry extends UserListEntry
             {
                 uuid = UUID.fromString(s);
             }
-            catch (Throwable throwable)
+            catch (Throwable var4)
             {
                 return null;
             }

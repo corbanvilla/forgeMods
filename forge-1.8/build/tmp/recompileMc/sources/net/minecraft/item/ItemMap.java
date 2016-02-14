@@ -2,6 +2,7 @@ package net.minecraft.item;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
 import java.util.List;
 import net.minecraft.block.Block;
@@ -24,8 +25,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemMap extends ItemMapBase
 {
-    private static final String __OBFID = "CL_00000047";
-
     protected ItemMap()
     {
         this.setHasSubtypes(true);
@@ -57,7 +56,7 @@ public class ItemMap extends ItemMapBase
             s = "map_" + stack.getMetadata();
             mapdata = new MapData(s);
             mapdata.scale = 3;
-            mapdata.func_176054_a((double)worldIn.getWorldInfo().getSpawnX(), (double)worldIn.getWorldInfo().getSpawnZ(), mapdata.scale);
+            mapdata.calculateMapCenter((double)worldIn.getWorldInfo().getSpawnX(), (double)worldIn.getWorldInfo().getSpawnZ(), mapdata.scale);
             mapdata.dimension = worldIn.provider.getDimensionId();
             mapdata.markDirty();
             worldIn.setItemData(s, mapdata);
@@ -82,13 +81,13 @@ public class ItemMap extends ItemMapBase
                 j1 /= 2;
             }
 
-            MapData.MapInfo mapinfo = data.getMapInfo((EntityPlayer)viewer);
-            ++mapinfo.field_82569_d;
+            MapData.MapInfo mapdata$mapinfo = data.getMapInfo((EntityPlayer)viewer);
+            ++mapdata$mapinfo.field_82569_d;
             boolean flag = false;
 
             for (int k1 = l - j1 + 1; k1 < l + j1; ++k1)
             {
-                if ((k1 & 15) == (mapinfo.field_82569_d & 15) || flag)
+                if ((k1 & 15) == (mapdata$mapinfo.field_82569_d & 15) || flag)
                 {
                     flag = false;
                     double d0 = 0.0D;
@@ -102,7 +101,7 @@ public class ItemMap extends ItemMapBase
                             boolean flag1 = i2 * i2 + j2 * j2 > (j1 - 2) * (j1 - 2);
                             int k2 = (j / i + k1 - 64) * i;
                             int l2 = (k / i + l1 - 64) * i;
-                            HashMultiset hashmultiset = HashMultiset.create();
+                            Multiset<MapColor> multiset = HashMultiset.<MapColor>create();
                             Chunk chunk = worldIn.getChunkFromBlockCoords(new BlockPos(k2, 0, l2));
 
                             if (!chunk.isEmpty())
@@ -111,91 +110,102 @@ public class ItemMap extends ItemMapBase
                                 int j3 = l2 & 15;
                                 int k3 = 0;
                                 double d1 = 0.0D;
-                                int l3;
 
                                 if (worldIn.provider.getHasNoSky())
                                 {
-                                    l3 = k2 + l2 * 231871;
+                                    int l3 = k2 + l2 * 231871;
                                     l3 = l3 * l3 * 31287121 + l3 * 11;
 
                                     if ((l3 >> 20 & 1) == 0)
                                     {
-                                        hashmultiset.add(Blocks.dirt.getMapColor(Blocks.dirt.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.DIRT)), 10);
+                                        multiset.add(Blocks.dirt.getMapColor(Blocks.dirt.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.DIRT)), 10);
                                     }
                                     else
                                     {
-                                        hashmultiset.add(Blocks.stone.getMapColor(Blocks.stone.getDefaultState().withProperty(BlockStone.VARIANT, BlockStone.EnumType.STONE)), 100);
+                                        multiset.add(Blocks.stone.getMapColor(Blocks.stone.getDefaultState().withProperty(BlockStone.VARIANT, BlockStone.EnumType.STONE)), 100);
                                     }
 
                                     d1 = 100.0D;
                                 }
                                 else
                                 {
-                                    for (l3 = 0; l3 < i; ++l3)
+                                    BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+
+                                    for (int i4 = 0; i4 < i; ++i4)
                                     {
-                                        for (int i4 = 0; i4 < i; ++i4)
+                                        for (int j4 = 0; j4 < i; ++j4)
                                         {
-                                            int j4 = chunk.getHeight(l3 + i3, i4 + j3) + 1;
+                                            int k4 = chunk.getHeightValue(i4 + i3, j4 + j3) + 1;
                                             IBlockState iblockstate = Blocks.air.getDefaultState();
 
-                                            if (j4 > 1)
+                                            if (k4 > 1)
                                             {
-                                                do
+                                                label541:
                                                 {
-                                                    --j4;
-                                                    iblockstate = chunk.getBlockState(new BlockPos(l3 + i3, j4, i4 + j3));
-                                                }
-                                                while (iblockstate.getBlock().getMapColor(iblockstate) == MapColor.airColor && j4 > 0);
-
-                                                if (j4 > 0 && iblockstate.getBlock().getMaterial().isLiquid())
-                                                {
-                                                    int k4 = j4 - 1;
-                                                    Block block;
-
-                                                    do
+                                                    while (true)
                                                     {
-                                                        block = chunk.getBlock(l3 + i3, k4--, i4 + j3);
-                                                        ++k3;
+                                                        --k4;
+                                                        iblockstate = chunk.getBlockState(blockpos$mutableblockpos.set(i4 + i3, k4, j4 + j3));
+
+                                                        if (iblockstate.getBlock().getMapColor(iblockstate) != MapColor.airColor || k4 <= 0)
+                                                        {
+                                                            break;
+                                                        }
                                                     }
-                                                    while (k4 > 0 && block.getMaterial().isLiquid());
+
+                                                    if (k4 > 0 && iblockstate.getBlock().getMaterial().isLiquid())
+                                                    {
+                                                        int l4 = k4 - 1;
+
+                                                        while (true)
+                                                        {
+                                                            Block block = chunk.getBlock(i4 + i3, l4--, j4 + j3);
+                                                            ++k3;
+
+                                                            if (l4 <= 0 || !block.getMaterial().isLiquid())
+                                                            {
+                                                                break label541;
+                                                            }
+                                                        }
+                                                    }
                                                 }
                                             }
 
-                                            d1 += (double)j4 / (double)(i * i);
-                                            hashmultiset.add(iblockstate.getBlock().getMapColor(iblockstate));
+                                            d1 += (double)k4 / (double)(i * i);
+                                            multiset.add(iblockstate.getBlock().getMapColor(iblockstate));
                                         }
                                     }
                                 }
 
-                                k3 /= i * i;
+                                k3 = k3 / (i * i);
                                 double d2 = (d1 - d0) * 4.0D / (double)(i + 4) + ((double)(k1 + l1 & 1) - 0.5D) * 0.4D;
-                                byte b0 = 1;
+                                int i5 = 1;
 
                                 if (d2 > 0.6D)
                                 {
-                                    b0 = 2;
+                                    i5 = 2;
                                 }
 
                                 if (d2 < -0.6D)
                                 {
-                                    b0 = 0;
+                                    i5 = 0;
                                 }
 
-                                MapColor mapcolor = (MapColor)Iterables.getFirst(Multisets.copyHighestCountFirst(hashmultiset), MapColor.airColor);
+                                MapColor mapcolor = (MapColor)Iterables.getFirst(Multisets.<MapColor>copyHighestCountFirst(multiset), MapColor.airColor);
 
                                 if (mapcolor == MapColor.waterColor)
                                 {
                                     d2 = (double)k3 * 0.1D + (double)(k1 + l1 & 1) * 0.2D;
-                                    b0 = 1;
+                                    i5 = 1;
 
                                     if (d2 < 0.5D)
                                     {
-                                        b0 = 2;
+                                        i5 = 2;
                                     }
 
                                     if (d2 > 0.9D)
                                     {
-                                        b0 = 0;
+                                        i5 = 0;
                                     }
                                 }
 
@@ -203,12 +213,12 @@ public class ItemMap extends ItemMapBase
 
                                 if (l1 >= 0 && i2 * i2 + j2 * j2 < j1 * j1 && (!flag1 || (k1 + l1 & 1) != 0))
                                 {
-                                    byte b1 = data.colors[k1 + l1 * 128];
-                                    byte b2 = (byte)(mapcolor.colorIndex * 4 + b0);
+                                    byte b0 = data.colors[k1 + l1 * 128];
+                                    byte b1 = (byte)(mapcolor.colorIndex * 4 + i5);
 
-                                    if (b1 != b2)
+                                    if (b0 != b1)
                                     {
-                                        data.colors[k1 + l1 * 128] = b2;
+                                        data.colors[k1 + l1 * 128] = b1;
                                         data.updateMapData(k1, l1);
                                         flag = true;
                                     }
@@ -266,7 +276,7 @@ public class ItemMap extends ItemMapBase
                 mapdata1.scale = 4;
             }
 
-            mapdata1.func_176054_a((double)mapdata.xCenter, (double)mapdata.zCenter, mapdata1.scale);
+            mapdata1.calculateMapCenter((double)mapdata.xCenter, (double)mapdata.zCenter, mapdata1.scale);
             mapdata1.dimension = mapdata.dimension;
             mapdata1.markDirty();
             worldIn.setItemData("map_" + stack.getMetadata(), mapdata1);
@@ -275,12 +285,9 @@ public class ItemMap extends ItemMapBase
 
     /**
      * allows items to add custom lines of information to the mouseover description
-     *  
-     * @param tooltip All lines to display in the Item's tooltip. This is a List of Strings.
-     * @param advanced Whether the setting "Advanced tooltips" is enabled
      */
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced)
+    public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced)
     {
         MapData mapdata = this.getMapData(stack, playerIn.worldObj);
 

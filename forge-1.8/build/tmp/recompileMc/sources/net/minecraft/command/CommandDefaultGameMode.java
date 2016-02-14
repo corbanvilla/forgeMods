@@ -1,6 +1,5 @@
 package net.minecraft.command;
 
-import java.util.Iterator;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentTranslation;
@@ -8,25 +7,31 @@ import net.minecraft.world.WorldSettings;
 
 public class CommandDefaultGameMode extends CommandGameMode
 {
-    private static final String __OBFID = "CL_00000296";
-
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
-    public String getName()
+    public String getCommandName()
     {
         return "defaultgamemode";
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.defaultgamemode.usage";
     }
 
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
-    public void execute(ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length <= 0)
         {
@@ -34,9 +39,9 @@ public class CommandDefaultGameMode extends CommandGameMode
         }
         else
         {
-            WorldSettings.GameType gametype = this.getGameModeFromCommand(sender, args[0]);
-            this.setGameType(gametype);
-            notifyOperators(sender, this, "commands.defaultgamemode.success", new Object[] {new ChatComponentTranslation("gameMode." + gametype.getName(), new Object[0])});
+            WorldSettings.GameType worldsettings$gametype = this.getGameModeFromCommand(sender, args[0]);
+            this.setGameType(worldsettings$gametype);
+            notifyOperators(sender, this, "commands.defaultgamemode.success", new Object[] {new ChatComponentTranslation("gameMode." + worldsettings$gametype.getName(), new Object[0])});
         }
     }
 
@@ -44,14 +49,13 @@ public class CommandDefaultGameMode extends CommandGameMode
     {
         MinecraftServer minecraftserver = MinecraftServer.getServer();
         minecraftserver.setGameType(p_71541_1_);
-        EntityPlayerMP entityplayermp;
 
         if (minecraftserver.getForceGamemode())
         {
-            for (Iterator iterator = MinecraftServer.getServer().getConfigurationManager().playerEntityList.iterator(); iterator.hasNext(); entityplayermp.fallDistance = 0.0F)
+            for (EntityPlayerMP entityplayermp : MinecraftServer.getServer().getConfigurationManager().getPlayerList())
             {
-                entityplayermp = (EntityPlayerMP)iterator.next();
                 entityplayermp.setGameType(p_71541_1_);
+                entityplayermp.fallDistance = 0.0F;
             }
         }
     }

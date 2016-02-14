@@ -15,8 +15,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockSand extends BlockFalling
 {
-    public static final PropertyEnum VARIANT = PropertyEnum.create("variant", BlockSand.EnumType.class);
-    private static final String __OBFID = "CL_00000303";
+    public static final PropertyEnum<BlockSand.EnumType> VARIANT = PropertyEnum.<BlockSand.EnumType>create("variant", BlockSand.EnumType.class);
 
     public BlockSand()
     {
@@ -24,7 +23,8 @@ public class BlockSand extends BlockFalling
     }
 
     /**
-     * Get the damage value that this Block should drop
+     * Gets the metadata of the item this Block can drop. This method is called when the block gets destroyed. It
+     * returns the metadata of the dropped item based on the old metadata of the block.
      */
     public int damageDropped(IBlockState state)
     {
@@ -35,15 +35,11 @@ public class BlockSand extends BlockFalling
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
     {
-        BlockSand.EnumType[] aenumtype = BlockSand.EnumType.values();
-        int i = aenumtype.length;
-
-        for (int j = 0; j < i; ++j)
+        for (BlockSand.EnumType blocksand$enumtype : BlockSand.EnumType.values())
         {
-            BlockSand.EnumType enumtype = aenumtype[j];
-            list.add(new ItemStack(itemIn, 1, enumtype.getMetadata()));
+            list.add(new ItemStack(itemIn, 1, blocksand$enumtype.getMetadata()));
         }
     }
 
@@ -79,14 +75,13 @@ public class BlockSand extends BlockFalling
     public static enum EnumType implements IStringSerializable
     {
         SAND(0, "sand", "default", MapColor.sandColor),
-        RED_SAND(1, "red_sand", "red", MapColor.dirtColor);
+        RED_SAND(1, "red_sand", "red", MapColor.adobeColor);
+
         private static final BlockSand.EnumType[] META_LOOKUP = new BlockSand.EnumType[values().length];
         private final int meta;
         private final String name;
         private final MapColor mapColor;
         private final String unlocalizedName;
-
-        private static final String __OBFID = "CL_00002069";
 
         private EnumType(int meta, String name, String unlocalizedName, MapColor mapColor)
         {
@@ -133,13 +128,9 @@ public class BlockSand extends BlockFalling
 
         static
         {
-            BlockSand.EnumType[] var0 = values();
-            int var1 = var0.length;
-
-            for (int var2 = 0; var2 < var1; ++var2)
+            for (BlockSand.EnumType blocksand$enumtype : values())
             {
-                BlockSand.EnumType var3 = var0[var2];
-                META_LOOKUP[var3.getMetadata()] = var3;
+                META_LOOKUP[blocksand$enumtype.getMetadata()] = blocksand$enumtype;
             }
         }
     }

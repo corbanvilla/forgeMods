@@ -11,6 +11,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityDaylightDetector;
 import net.minecraft.util.BlockPos;
@@ -26,7 +27,6 @@ public class BlockDaylightDetector extends BlockContainer
 {
     public static final PropertyInteger POWER = PropertyInteger.create("power", 0, 15);
     private final boolean inverted;
-    private static final String __OBFID = "CL_00000223";
 
     public BlockDaylightDetector(boolean inverted)
     {
@@ -45,7 +45,7 @@ public class BlockDaylightDetector extends BlockContainer
         this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.375F, 1.0F);
     }
 
-    public int isProvidingWeakPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
+    public int getWeakPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
     {
         return ((Integer)state.getValue(POWER)).intValue();
     }
@@ -58,7 +58,7 @@ public class BlockDaylightDetector extends BlockContainer
             int i = worldIn.getLightFor(EnumSkyBlock.SKY, pos) - worldIn.getSkylightSubtracted();
             float f = worldIn.getCelestialAngleRadians(1.0F);
             float f1 = f < (float)Math.PI ? 0.0F : ((float)Math.PI * 2F);
-            f += (f1 - f) * 0.2F;
+            f = f + (f1 - f) * 0.2F;
             i = Math.round((float)i * MathHelper.cos(f));
             i = MathHelper.clamp_int(i, 0, 15);
 
@@ -106,8 +106,6 @@ public class BlockDaylightDetector extends BlockContainer
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -125,13 +123,16 @@ public class BlockDaylightDetector extends BlockContainer
         return false;
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
     }
 
     /**
-     * The type of render function that is called for this block
+     * The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render
      */
     public int getRenderType()
     {
@@ -179,7 +180,7 @@ public class BlockDaylightDetector extends BlockContainer
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
     {
         if (!this.inverted)
         {

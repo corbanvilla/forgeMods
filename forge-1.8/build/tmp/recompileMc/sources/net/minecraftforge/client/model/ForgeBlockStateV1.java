@@ -38,6 +38,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
+@SuppressWarnings("deprecation")
 public class ForgeBlockStateV1 extends Marker
 {
     ForgeBlockStateV1.Variant defaults;
@@ -51,7 +52,7 @@ public class ForgeBlockStateV1 extends Marker
         {
             JsonObject json = element.getAsJsonObject();
             ForgeBlockStateV1 ret = new ForgeBlockStateV1();
-            ret.forge_marker = JsonUtils.getJsonObjectIntegerFieldValue(json, "forge_marker");
+            ret.forge_marker = JsonUtils.getInt(json, "forge_marker");
 
             if (json.has("defaults"))   // Load defaults Variant.
             {
@@ -147,13 +148,13 @@ public class ForgeBlockStateV1 extends Marker
                         part.state = state;
                     }
                 }
-                
+
                 Iterator<List<Variant>> iter = v.submodels.values().iterator();
-                
+
                 while (iter.hasNext())
                 {
                     List<Variant> submodel = iter.next();
-                    
+
                     if (submodel == null)
                         iter.remove();
                 }
@@ -275,6 +276,8 @@ public class ForgeBlockStateV1 extends Marker
         private boolean modelSet = false;
         private Optional<IModelState> state = Optional.absent();
         private Optional<Boolean> uvLock = Optional.absent();
+        private Optional<Boolean> smooth = Optional.absent();
+        private Optional<Boolean> gui3d = Optional.absent();
         private Optional<Integer> weight = Optional.absent();
         private Map<String, String> textures = Maps.newHashMap();
         private Map<String, List<ForgeBlockStateV1.Variant>> submodels = Maps.newHashMap();
@@ -292,6 +295,8 @@ public class ForgeBlockStateV1 extends Marker
             this.modelSet = other.modelSet;
             this.state = other.state;
             this.uvLock = other.uvLock;
+            this.smooth = other.smooth;
+            this.gui3d = other.gui3d;
             this.weight = other.weight;
             this.textures.putAll(other.textures);
             this.mergeModelPartVariants(this.submodels, other.submodels);
@@ -311,6 +316,8 @@ public class ForgeBlockStateV1 extends Marker
             }
             if (!this.state.isPresent()) this.state = parent.state;
             if (!this.uvLock.isPresent())   this.uvLock   = parent.uvLock;
+            if (!this.smooth.isPresent())   this.smooth   = parent.smooth;
+            if (!this.gui3d.isPresent())    this.gui3d    = parent.gui3d;
             if (!this.weight.isPresent())   this.weight   = parent.weight;
 
             for (Entry<String, String> e : parent.textures.entrySet())
@@ -400,6 +407,16 @@ public class ForgeBlockStateV1 extends Marker
             }
         }
 
+        public Optional<Boolean> getSmooth()
+        {
+            return smooth;
+        }
+
+        public Optional<Boolean> getGui3d()
+        {
+            return gui3d;
+        }
+
         public static class Deserializer implements JsonDeserializer<ForgeBlockStateV1.Variant>
         {
             static Variant.Deserializer INSTANCE = new Deserializer();
@@ -431,7 +448,7 @@ public class ForgeBlockStateV1 extends Marker
                     if (json.get("model").isJsonNull())
                         ret.model = null;   // Allow overriding base model to remove it from a state.
                     else
-                        ret.model = getBlockLocation(JsonUtils.getJsonObjectStringFieldValue(json, "model"));
+                        ret.model = getBlockLocation(JsonUtils.getString(json, "model"));
                     ret.modelSet = true;
                 }
 
@@ -448,8 +465,8 @@ public class ForgeBlockStateV1 extends Marker
 
                 if (json.has("x") || json.has("y"))
                 {   // Load rotation values.
-                    int x = JsonUtils.getJsonObjectIntegerFieldValueOrDefault(json, "x", 0);
-                    int y = JsonUtils.getJsonObjectIntegerFieldValueOrDefault(json, "y", 0);
+                    int x = JsonUtils.getInt(json, "x", 0);
+                    int y = JsonUtils.getInt(json, "y", 0);
                     ret.state = Optional.<IModelState>of(new TRSRTransformation(ModelRotation.getModelRotation(x, y)));
                     if (!ret.state.isPresent())
                         throw new JsonParseException("Invalid BlockModelRotation x: " + x + " y: " + y);
@@ -467,40 +484,40 @@ public class ForgeBlockStateV1 extends Marker
                         }
                         else if (transform.equals("forge:default-block"))
                         {
-                            IModelState thirdperson = TRSRTransformation.blockCenterToCorner(new TRSRTransformation(
+                            TRSRTransformation thirdperson = TRSRTransformation.blockCenterToCorner(new TRSRTransformation(
                                 new Vector3f(0, 1.5f / 16, -2.75f / 16),
                                 TRSRTransformation.quatFromYXZDegrees(new Vector3f(10, -45, 170)),
                                 new Vector3f(0.375f, 0.375f, 0.375f),
                                 null));
-                            ret.state = Optional.<IModelState>of(new IPerspectiveState.Impl(TRSRTransformation.identity(), ImmutableMap.of(TransformType.THIRD_PERSON, thirdperson)));
+                            ret.state = Optional.<IModelState>of(new SimpleModelState(ImmutableMap.of(TransformType.THIRD_PERSON, thirdperson)));
                         }
                         else if (transform.equals("forge:default-item"))
                         {
-                            IModelState thirdperson = TRSRTransformation.blockCenterToCorner(new TRSRTransformation(
+                            TRSRTransformation thirdperson = TRSRTransformation.blockCenterToCorner(new TRSRTransformation(
                                 new Vector3f(0, 1f / 16, -3f / 16),
                                 TRSRTransformation.quatFromYXZDegrees(new Vector3f(-90, 0, 0)),
                                 new Vector3f(0.55f, 0.55f, 0.55f),
                                 null));
-                            IModelState firstperson = TRSRTransformation.blockCenterToCorner(new TRSRTransformation(
+                            TRSRTransformation firstperson = TRSRTransformation.blockCenterToCorner(new TRSRTransformation(
                                 new Vector3f(0, 4f / 16, 2f / 16),
                                 TRSRTransformation.quatFromYXZDegrees(new Vector3f(0, -135, 25)),
                                 new Vector3f(1.7f, 1.7f, 1.7f),
                                 null));
-                            ret.state = Optional.<IModelState>of(new IPerspectiveState.Impl(TRSRTransformation.identity(), ImmutableMap.of(TransformType.THIRD_PERSON, thirdperson, TransformType.FIRST_PERSON, firstperson)));
+                            ret.state = Optional.<IModelState>of(new SimpleModelState(ImmutableMap.of(TransformType.THIRD_PERSON, thirdperson, TransformType.FIRST_PERSON, firstperson)));
                         }
                         else if (transform.equals("forge:default-tool"))
                         {
-                            IModelState thirdperson = TRSRTransformation.blockCenterToCorner(new TRSRTransformation(
+                            TRSRTransformation thirdperson = TRSRTransformation.blockCenterToCorner(new TRSRTransformation(
                                 new Vector3f(0, 1.25f / 16, -3.5f / 16),
                                 TRSRTransformation.quatFromYXZDegrees(new Vector3f(0, 90, -35)),
                                 new Vector3f(0.85f, 0.85f, 0.85f),
                                 null));
-                            IModelState firstperson = TRSRTransformation.blockCenterToCorner(new TRSRTransformation(
+                            TRSRTransformation firstperson = TRSRTransformation.blockCenterToCorner(new TRSRTransformation(
                                 new Vector3f(0, 4f / 16, 2f / 16),
                                 TRSRTransformation.quatFromYXZDegrees(new Vector3f(0, -135, 25)),
                                 new Vector3f(1.7f, 1.7f, 1.7f),
                                 null));
-                            ret.state = Optional.<IModelState>of(new IPerspectiveState.Impl(TRSRTransformation.identity(), ImmutableMap.of(TransformType.THIRD_PERSON, thirdperson, TransformType.FIRST_PERSON, firstperson)));
+                            ret.state = Optional.<IModelState>of(new SimpleModelState(ImmutableMap.of(TransformType.THIRD_PERSON, thirdperson, TransformType.FIRST_PERSON, firstperson)));
                         }
                         else
                         {
@@ -522,7 +539,7 @@ public class ForgeBlockStateV1 extends Marker
                     else
                     {
                         JsonObject transform = json.get("transform").getAsJsonObject();
-                        EnumMap<TransformType, IModelState> transforms = Maps.newEnumMap(TransformType.class);
+                        EnumMap<TransformType, TRSRTransformation> transforms = Maps.newEnumMap(TransformType.class);
                         if(transform.has("thirdperson"))
                         {
                             TRSRTransformation t = context.deserialize(transform.get("thirdperson"), TRSRTransformation.class);
@@ -535,17 +552,29 @@ public class ForgeBlockStateV1 extends Marker
                             transform.remove("firstperson");
                             transforms.put(TransformType.FIRST_PERSON, TRSRTransformation.blockCenterToCorner(t));
                         }
+                        if(transform.has("head"))
+                        {
+                            TRSRTransformation t = context.deserialize(transform.get("head"), TRSRTransformation.class);
+                            transform.remove("head");
+                            transforms.put(TransformType.HEAD, TRSRTransformation.blockCenterToCorner(t));
+                        }
                         if(transform.has("gui"))
                         {
                             TRSRTransformation t = context.deserialize(transform.get("gui"), TRSRTransformation.class);
                             transform.remove("gui");
                             transforms.put(TransformType.GUI, TRSRTransformation.blockCenterToCorner(t));
                         }
-                        if(transform.has("head"))
+                        if(transform.has("ground"))
                         {
-                            TRSRTransformation t = context.deserialize(transform.get("head"), TRSRTransformation.class);
-                            transform.remove("head");
-                            transforms.put(TransformType.HEAD, TRSRTransformation.blockCenterToCorner(t));
+                            TRSRTransformation t = context.deserialize(transform.get("ground"), TRSRTransformation.class);
+                            transform.remove("ground");
+                            transforms.put(TransformType.GROUND, TRSRTransformation.blockCenterToCorner(t));
+                        }
+                        if(transform.has("fixed"))
+                        {
+                            TRSRTransformation t = context.deserialize(transform.get("fixed"), TRSRTransformation.class);
+                            transform.remove("fixed");
+                            transforms.put(TransformType.FIXED, TRSRTransformation.blockCenterToCorner(t));
                         }
                         int k = transform.entrySet().size();
                         if(transform.has("matrix")) k--;
@@ -570,7 +599,7 @@ public class ForgeBlockStateV1 extends Marker
                         }
                         else
                         {
-                            state = new IPerspectiveState.Impl(base, Maps.immutableEnumMap(transforms));
+                            state = new SimpleModelState(Maps.immutableEnumMap(transforms), Optional.of(base));
                         }
                         ret.state = Optional.of(state);
                     }
@@ -578,12 +607,22 @@ public class ForgeBlockStateV1 extends Marker
 
                 if (json.has("uvlock"))
                 {   // Load uvlock.
-                    ret.uvLock = Optional.of(JsonUtils.getJsonObjectBooleanFieldValue(json, "uvlock"));
+                    ret.uvLock = Optional.of(JsonUtils.getBoolean(json, "uvlock"));
+                }
+
+                if (json.has("smooth_lighting"))
+                {
+                    ret.smooth = Optional.of(JsonUtils.getBoolean(json, "smooth_lighting"));
+                }
+
+                if (json.has("gui3d"))
+                {
+                    ret.gui3d = Optional.of(JsonUtils.getBoolean(json, "gui3d"));
                 }
 
                 if (json.has("weight"))
                 {   // Load weight.
-                    ret.weight = Optional.of(JsonUtils.getJsonObjectIntegerFieldValue(json, "weight"));
+                    ret.weight = Optional.of(JsonUtils.getInt(json, "weight"));
                 }
 
                 if (json.has("submodel"))

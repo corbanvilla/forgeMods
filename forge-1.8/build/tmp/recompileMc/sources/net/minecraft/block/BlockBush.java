@@ -1,6 +1,7 @@
 package net.minecraft.block;
 
 import java.util.Random;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -14,20 +15,23 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockBush extends Block implements net.minecraftforge.common.IPlantable
 {
-    private static final String __OBFID = "CL_00000208";
+    protected BlockBush()
+    {
+        this(Material.plants);
+    }
 
     protected BlockBush(Material materialIn)
     {
-        super(materialIn);
+        this(materialIn, materialIn.getMaterialMapColor());
+    }
+
+    protected BlockBush(Material p_i46452_1_, MapColor p_i46452_2_)
+    {
+        super(p_i46452_1_, p_i46452_2_);
         this.setTickRandomly(true);
         float f = 0.2F;
         this.setBlockBounds(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, f * 3.0F, 0.5F + f);
         this.setCreativeTab(CreativeTabs.tabDecorations);
-    }
-
-    protected BlockBush()
-    {
-        this(Material.plants);
     }
 
     public boolean canPlaceBlockAt(World worldIn, BlockPos pos)
@@ -79,6 +83,9 @@ public class BlockBush extends Block implements net.minecraftforge.common.IPlant
         return null;
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;

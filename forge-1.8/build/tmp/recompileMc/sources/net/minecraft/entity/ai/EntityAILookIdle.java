@@ -12,11 +12,10 @@ public class EntityAILookIdle extends EntityAIBase
     private double lookZ;
     /** A decrementing tick that stops the entity from being idle once it reaches 0. */
     private int idleTime;
-    private static final String __OBFID = "CL_00001607";
 
-    public EntityAILookIdle(EntityLiving p_i1647_1_)
+    public EntityAILookIdle(EntityLiving entitylivingIn)
     {
-        this.idleEntity = p_i1647_1_;
+        this.idleEntity = entitylivingIn;
         this.setMutexBits(3);
     }
 

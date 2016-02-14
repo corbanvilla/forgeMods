@@ -25,8 +25,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockTallGrass extends BlockBush implements IGrowable, net.minecraftforge.common.IShearable
 {
-    public static final PropertyEnum TYPE = PropertyEnum.create("type", BlockTallGrass.EnumType.class);
-    private static final String __OBFID = "CL_00000321";
+    public static final PropertyEnum<BlockTallGrass.EnumType> TYPE = PropertyEnum.<BlockTallGrass.EnumType>create("type", BlockTallGrass.EnumType.class);
 
     protected BlockTallGrass()
     {
@@ -55,30 +54,8 @@ public class BlockTallGrass extends BlockBush implements IGrowable, net.minecraf
         return true;
     }
 
-    @SideOnly(Side.CLIENT)
-    public int getRenderColor(IBlockState state)
-    {
-        if (state.getBlock() != this)
-        {
-            return super.getRenderColor(state);
-        }
-        else
-        {
-            BlockTallGrass.EnumType enumtype = (BlockTallGrass.EnumType)state.getValue(TYPE);
-            return enumtype == BlockTallGrass.EnumType.DEAD_BUSH ? 16777215 : ColorizerGrass.getGrassColor(0.5D, 1.0D);
-        }
-    }
-
-    @SideOnly(Side.CLIENT)
-    public int colorMultiplier(IBlockAccess worldIn, BlockPos pos, int renderPass)
-    {
-        return worldIn.getBiomeGenForCoords(pos).getGrassColorAtPos(pos);
-    }
-
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -100,6 +77,26 @@ public class BlockTallGrass extends BlockBush implements IGrowable, net.minecraf
         }
     }
 
+    @SideOnly(Side.CLIENT)
+    public int getRenderColor(IBlockState state)
+    {
+        if (state.getBlock() != this)
+        {
+            return super.getRenderColor(state);
+        }
+        else
+        {
+            BlockTallGrass.EnumType blocktallgrass$enumtype = (BlockTallGrass.EnumType)state.getValue(TYPE);
+            return blocktallgrass$enumtype == BlockTallGrass.EnumType.DEAD_BUSH ? 16777215 : ColorizerGrass.getGrassColor(0.5D, 1.0D);
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    public int colorMultiplier(IBlockAccess worldIn, BlockPos pos, int renderPass)
+    {
+        return worldIn.getBiomeGenForCoords(pos).getGrassColorAtPos(pos);
+    }
+
     public int getDamageValue(World worldIn, BlockPos pos)
     {
         IBlockState iblockstate = worldIn.getBlockState(pos);
@@ -110,7 +107,7 @@ public class BlockTallGrass extends BlockBush implements IGrowable, net.minecraf
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
     {
         for (int i = 1; i < 3; ++i)
         {
@@ -133,16 +130,16 @@ public class BlockTallGrass extends BlockBush implements IGrowable, net.minecraf
 
     public void grow(World worldIn, Random rand, BlockPos pos, IBlockState state)
     {
-        BlockDoublePlant.EnumPlantType enumplanttype = BlockDoublePlant.EnumPlantType.GRASS;
+        BlockDoublePlant.EnumPlantType blockdoubleplant$enumplanttype = BlockDoublePlant.EnumPlantType.GRASS;
 
         if (state.getValue(TYPE) == BlockTallGrass.EnumType.FERN)
         {
-            enumplanttype = BlockDoublePlant.EnumPlantType.FERN;
+            blockdoubleplant$enumplanttype = BlockDoublePlant.EnumPlantType.FERN;
         }
 
         if (Blocks.double_plant.canPlaceBlockAt(worldIn, pos))
         {
-            Blocks.double_plant.placeAt(worldIn, pos, enumplanttype, 2);
+            Blocks.double_plant.placeAt(worldIn, pos, blockdoubleplant$enumplanttype, 2);
         }
     }
 
@@ -181,11 +178,10 @@ public class BlockTallGrass extends BlockBush implements IGrowable, net.minecraf
         DEAD_BUSH(0, "dead_bush"),
         GRASS(1, "tall_grass"),
         FERN(2, "fern");
+
         private static final BlockTallGrass.EnumType[] META_LOOKUP = new BlockTallGrass.EnumType[values().length];
         private final int meta;
         private final String name;
-
-        private static final String __OBFID = "CL_00002055";
 
         private EnumType(int meta, String name)
         {
@@ -220,13 +216,9 @@ public class BlockTallGrass extends BlockBush implements IGrowable, net.minecraf
 
         static
         {
-            BlockTallGrass.EnumType[] var0 = values();
-            int var1 = var0.length;
-
-            for (int var2 = 0; var2 < var1; ++var2)
+            for (BlockTallGrass.EnumType blocktallgrass$enumtype : values())
             {
-                BlockTallGrass.EnumType var3 = var0[var2];
-                META_LOOKUP[var3.getMeta()] = var3;
+                META_LOOKUP[blocktallgrass$enumtype.getMeta()] = blocktallgrass$enumtype;
             }
         }
     }

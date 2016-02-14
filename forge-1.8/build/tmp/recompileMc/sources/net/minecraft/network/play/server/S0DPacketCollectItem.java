@@ -1,25 +1,25 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S0DPacketCollectItem implements Packet
+public class S0DPacketCollectItem implements Packet<INetHandlerPlayClient>
 {
-    private int field_149357_a;
-    private int field_149356_b;
-    private static final String __OBFID = "CL_00001339";
+    private int collectedItemEntityId;
+    private int entityId;
 
-    public S0DPacketCollectItem() {}
-
-    public S0DPacketCollectItem(int p_i45232_1_, int p_i45232_2_)
+    public S0DPacketCollectItem()
     {
-        this.field_149357_a = p_i45232_1_;
-        this.field_149356_b = p_i45232_2_;
+    }
+
+    public S0DPacketCollectItem(int collectedItemEntityIdIn, int entityIdIn)
+    {
+        this.collectedItemEntityId = collectedItemEntityIdIn;
+        this.entityId = entityIdIn;
     }
 
     /**
@@ -27,8 +27,8 @@ public class S0DPacketCollectItem implements Packet
      */
     public void readPacketData(PacketBuffer buf) throws IOException
     {
-        this.field_149357_a = buf.readVarIntFromBuffer();
-        this.field_149356_b = buf.readVarIntFromBuffer();
+        this.collectedItemEntityId = buf.readVarIntFromBuffer();
+        this.entityId = buf.readVarIntFromBuffer();
     }
 
     /**
@@ -36,8 +36,8 @@ public class S0DPacketCollectItem implements Packet
      */
     public void writePacketData(PacketBuffer buf) throws IOException
     {
-        buf.writeVarIntToBuffer(this.field_149357_a);
-        buf.writeVarIntToBuffer(this.field_149356_b);
+        buf.writeVarIntToBuffer(this.collectedItemEntityId);
+        buf.writeVarIntToBuffer(this.entityId);
     }
 
     /**
@@ -49,22 +49,14 @@ public class S0DPacketCollectItem implements Packet
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_149354_c()
+    public int getCollectedItemEntityID()
     {
-        return this.field_149357_a;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayClient)handler);
+        return this.collectedItemEntityId;
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_149353_d()
+    public int getEntityID()
     {
-        return this.field_149356_b;
+        return this.entityId;
     }
 }

@@ -21,7 +21,6 @@ public class ExtendedBlockStorage
     private NibbleArray blocklightArray;
     /** The NibbleArray containing a block of Sky-light data. */
     private NibbleArray skylightArray;
-    private static final String __OBFID = "CL_00000375";
 
     public ExtendedBlockStorage(int y, boolean storeSkylight)
     {
@@ -45,8 +44,8 @@ public class ExtendedBlockStorage
     {
         if (state instanceof net.minecraftforge.common.property.IExtendedBlockState)
             state = ((net.minecraftforge.common.property.IExtendedBlockState) state).getClean();
-        IBlockState iblockstate1 = this.get(x, y, z);
-        Block block = iblockstate1.getBlock();
+        IBlockState iblockstate = this.get(x, y, z);
+        Block block = iblockstate.getBlock();
         Block block1 = state.getBlock();
 
         if (block != Blocks.air)

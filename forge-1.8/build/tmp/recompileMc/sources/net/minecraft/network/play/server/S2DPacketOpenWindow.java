@@ -1,7 +1,6 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -9,16 +8,17 @@ import net.minecraft.util.IChatComponent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S2DPacketOpenWindow implements Packet
+public class S2DPacketOpenWindow implements Packet<INetHandlerPlayClient>
 {
     private int windowId;
     private String inventoryType;
     private IChatComponent windowTitle;
     private int slotCount;
     private int entityId;
-    private static final String __OBFID = "CL_00001293";
 
-    public S2DPacketOpenWindow() {}
+    public S2DPacketOpenWindow()
+    {
+    }
 
     public S2DPacketOpenWindow(int incomingWindowId, String incomingWindowTitle, IChatComponent windowTitleIn)
     {
@@ -83,14 +83,6 @@ public class S2DPacketOpenWindow implements Packet
     public int getWindowId()
     {
         return this.windowId;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayClient)handler);
     }
 
     @SideOnly(Side.CLIENT)

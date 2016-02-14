@@ -1,7 +1,6 @@
 package net.minecraft.client.gui;
 
 import com.google.common.collect.Lists;
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerList;
@@ -13,39 +12,38 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ServerSelectionList extends GuiListExtended
 {
     private final GuiMultiplayer owner;
-    private final List field_148198_l = Lists.newArrayList();
-    private final List field_148199_m = Lists.newArrayList();
+    private final List<ServerListEntryNormal> field_148198_l = Lists.<ServerListEntryNormal>newArrayList();
+    private final List<ServerListEntryLanDetected> field_148199_m = Lists.<ServerListEntryLanDetected>newArrayList();
     private final GuiListExtended.IGuiListEntry lanScanEntry = new ServerListEntryLanScan();
-    private int field_148197_o = -1;
-    private static final String __OBFID = "CL_00000819";
+    private int selectedSlotIndex = -1;
 
-    public ServerSelectionList(GuiMultiplayer p_i45049_1_, Minecraft mcIn, int p_i45049_3_, int p_i45049_4_, int p_i45049_5_, int p_i45049_6_, int p_i45049_7_)
+    public ServerSelectionList(GuiMultiplayer ownerIn, Minecraft mcIn, int widthIn, int heightIn, int topIn, int bottomIn, int slotHeightIn)
     {
-        super(mcIn, p_i45049_3_, p_i45049_4_, p_i45049_5_, p_i45049_6_, p_i45049_7_);
-        this.owner = p_i45049_1_;
+        super(mcIn, widthIn, heightIn, topIn, bottomIn, slotHeightIn);
+        this.owner = ownerIn;
     }
 
     /**
      * Gets the IGuiListEntry object for the given index
      */
-    public GuiListExtended.IGuiListEntry getListEntry(int p_148180_1_)
+    public GuiListExtended.IGuiListEntry getListEntry(int index)
     {
-        if (p_148180_1_ < this.field_148198_l.size())
+        if (index < this.field_148198_l.size())
         {
-            return (GuiListExtended.IGuiListEntry)this.field_148198_l.get(p_148180_1_);
+            return (GuiListExtended.IGuiListEntry)this.field_148198_l.get(index);
         }
         else
         {
-            p_148180_1_ -= this.field_148198_l.size();
+            index = index - this.field_148198_l.size();
 
-            if (p_148180_1_ == 0)
+            if (index == 0)
             {
                 return this.lanScanEntry;
             }
             else
             {
-                --p_148180_1_;
-                return (GuiListExtended.IGuiListEntry)this.field_148199_m.get(p_148180_1_);
+                --index;
+                return (GuiListExtended.IGuiListEntry)this.field_148199_m.get(index);
             }
         }
     }
@@ -55,9 +53,9 @@ public class ServerSelectionList extends GuiListExtended
         return this.field_148198_l.size() + 1 + this.field_148199_m.size();
     }
 
-    public void func_148192_c(int p_148192_1_)
+    public void setSelectedSlotIndex(int selectedSlotIndexIn)
     {
-        this.field_148197_o = p_148192_1_;
+        this.selectedSlotIndex = selectedSlotIndexIn;
     }
 
     /**
@@ -65,12 +63,12 @@ public class ServerSelectionList extends GuiListExtended
      */
     protected boolean isSelected(int slotIndex)
     {
-        return slotIndex == this.field_148197_o;
+        return slotIndex == this.selectedSlotIndex;
     }
 
     public int func_148193_k()
     {
-        return this.field_148197_o;
+        return this.selectedSlotIndex;
     }
 
     public void func_148195_a(ServerList p_148195_1_)
@@ -83,15 +81,13 @@ public class ServerSelectionList extends GuiListExtended
         }
     }
 
-    public void func_148194_a(List p_148194_1_)
+    public void func_148194_a(List<LanServerDetector.LanServer> p_148194_1_)
     {
         this.field_148199_m.clear();
-        Iterator iterator = p_148194_1_.iterator();
 
-        while (iterator.hasNext())
+        for (LanServerDetector.LanServer lanserverdetector$lanserver : p_148194_1_)
         {
-            LanServerDetector.LanServer lanserver = (LanServerDetector.LanServer)iterator.next();
-            this.field_148199_m.add(new ServerListEntryLanDetected(this.owner, lanserver));
+            this.field_148199_m.add(new ServerListEntryLanDetected(this.owner, lanserverdetector$lanserver));
         }
     }
 

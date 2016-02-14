@@ -18,10 +18,9 @@ public class EntityMinecartCommandBlock extends EntityMinecart
 {
     private final CommandBlockLogic commandBlockLogic = new CommandBlockLogic()
     {
-        private static final String __OBFID = "CL_00001673";
-        public void func_145756_e()
+        public void updateCommand()
         {
-            EntityMinecartCommandBlock.this.getDataWatcher().updateObject(23, this.getCustomName());
+            EntityMinecartCommandBlock.this.getDataWatcher().updateObject(23, this.getCommand());
             EntityMinecartCommandBlock.this.getDataWatcher().updateObject(24, IChatComponent.Serializer.componentToJson(this.getLastOutput()));
         }
         @SideOnly(Side.CLIENT)
@@ -34,14 +33,26 @@ public class EntityMinecartCommandBlock extends EntityMinecart
         {
             p_145757_1_.writeInt(EntityMinecartCommandBlock.this.getEntityId());
         }
+        /**
+         * Get the position in the world. <b>{@code null} is not allowed!</b> If you are not an entity in the world,
+         * return the coordinates 0, 0, 0
+         */
         public BlockPos getPosition()
         {
             return new BlockPos(EntityMinecartCommandBlock.this.posX, EntityMinecartCommandBlock.this.posY + 0.5D, EntityMinecartCommandBlock.this.posZ);
         }
+        /**
+         * Get the position vector. <b>{@code null} is not allowed!</b> If you are not an entity in the world, return
+         * 0.0D, 0.0D, 0.0D
+         */
         public Vec3 getPositionVector()
         {
             return new Vec3(EntityMinecartCommandBlock.this.posX, EntityMinecartCommandBlock.this.posY, EntityMinecartCommandBlock.this.posZ);
         }
+        /**
+         * Get the world, if available. <b>{@code null} is not allowed!</b> If you are not an entity in the world,
+         * return the overworld
+         */
         public World getEntityWorld()
         {
             return EntityMinecartCommandBlock.this.worldObj;
@@ -56,16 +67,15 @@ public class EntityMinecartCommandBlock extends EntityMinecart
     };
     /** Cooldown before command block logic runs again in ticks */
     private int activatorRailCooldown = 0;
-    private static final String __OBFID = "CL_00001672";
 
     public EntityMinecartCommandBlock(World worldIn)
     {
         super(worldIn);
     }
 
-    public EntityMinecartCommandBlock(World worldIn, double p_i45322_2_, double p_i45322_4_, double p_i45322_6_)
+    public EntityMinecartCommandBlock(World worldIn, double x, double y, double z)
     {
-        super(worldIn, p_i45322_2_, p_i45322_4_, p_i45322_6_);
+        super(worldIn, x, y, z);
     }
 
     protected void entityInit()
@@ -82,7 +92,7 @@ public class EntityMinecartCommandBlock extends EntityMinecart
     {
         super.readEntityFromNBT(tagCompund);
         this.commandBlockLogic.readDataFromNBT(tagCompund);
-        this.getDataWatcher().updateObject(23, this.getCommandBlockLogic().getCustomName());
+        this.getDataWatcher().updateObject(23, this.getCommandBlockLogic().getCommand());
         this.getDataWatcher().updateObject(24, IChatComponent.Serializer.componentToJson(this.getCommandBlockLogic().getLastOutput()));
     }
 
@@ -113,9 +123,9 @@ public class EntityMinecartCommandBlock extends EntityMinecart
     /**
      * Called every tick the minecart is on an activator rail. Args: x, y, z, is the rail receiving power
      */
-    public void onActivatorRailPass(int p_96095_1_, int p_96095_2_, int p_96095_3_, boolean p_96095_4_)
+    public void onActivatorRailPass(int x, int y, int z, boolean receivingPower)
     {
-        if (p_96095_4_ && this.ticksExisted - this.activatorRailCooldown >= 4)
+        if (receivingPower && this.ticksExisted - this.activatorRailCooldown >= 4)
         {
             this.getCommandBlockLogic().trigger(this.worldObj);
             this.activatorRailCooldown = this.ticksExisted;
@@ -128,26 +138,26 @@ public class EntityMinecartCommandBlock extends EntityMinecart
     public boolean interactFirst(EntityPlayer playerIn)
     {
         if(net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.minecart.MinecartInteractEvent(this, playerIn))) return true;
-        this.commandBlockLogic.func_175574_a(playerIn);
+        this.commandBlockLogic.tryOpenEditCommandBlock(playerIn);
         return false;
     }
 
-    public void func_145781_i(int p_145781_1_)
+    public void onDataWatcherUpdate(int dataID)
     {
-        super.func_145781_i(p_145781_1_);
+        super.onDataWatcherUpdate(dataID);
 
-        if (p_145781_1_ == 24)
+        if (dataID == 24)
         {
             try
             {
                 this.commandBlockLogic.setLastOutput(IChatComponent.Serializer.jsonToComponent(this.getDataWatcher().getWatchableObjectString(24)));
             }
-            catch (Throwable throwable)
+            catch (Throwable var3)
             {
                 ;
             }
         }
-        else if (p_145781_1_ == 23)
+        else if (dataID == 23)
         {
             this.commandBlockLogic.setCommand(this.getDataWatcher().getWatchableObjectString(23));
         }

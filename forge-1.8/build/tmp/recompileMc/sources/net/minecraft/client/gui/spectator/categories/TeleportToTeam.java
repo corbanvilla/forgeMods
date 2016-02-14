@@ -1,7 +1,6 @@
 package net.minecraft.client.gui.spectator.categories;
 
 import com.google.common.collect.Lists;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import net.minecraft.client.Minecraft;
@@ -26,22 +25,19 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class TeleportToTeam implements ISpectatorMenuView, ISpectatorMenuObject
 {
-    private final List field_178672_a = Lists.newArrayList();
-    private static final String __OBFID = "CL_00001920";
+    private final List<ISpectatorMenuObject> field_178672_a = Lists.<ISpectatorMenuObject>newArrayList();
 
     public TeleportToTeam()
     {
         Minecraft minecraft = Minecraft.getMinecraft();
-        Iterator iterator = minecraft.theWorld.getScoreboard().getTeams().iterator();
 
-        while (iterator.hasNext())
+        for (ScorePlayerTeam scoreplayerteam : minecraft.theWorld.getScoreboard().getTeams())
         {
-            ScorePlayerTeam scoreplayerteam = (ScorePlayerTeam)iterator.next();
             this.field_178672_a.add(new TeleportToTeam.TeamSelectionObject(scoreplayerteam));
         }
     }
 
-    public List func_178669_a()
+    public List<ISpectatorMenuObject> func_178669_a()
     {
         return this.field_178672_a;
     }
@@ -51,17 +47,17 @@ public class TeleportToTeam implements ISpectatorMenuView, ISpectatorMenuObject
         return new ChatComponentText("Select a team to teleport to");
     }
 
-    public void func_178661_a(SpectatorMenu p_178661_1_)
+    public void func_178661_a(SpectatorMenu menu)
     {
-        p_178661_1_.func_178647_a(this);
+        menu.func_178647_a(this);
     }
 
-    public IChatComponent func_178664_z_()
+    public IChatComponent getSpectatorName()
     {
         return new ChatComponentText("Teleport to team member");
     }
 
-    public void func_178663_a(float p_178663_1_, int p_178663_2_)
+    public void func_178663_a(float p_178663_1_, int alpha)
     {
         Minecraft.getMinecraft().getTextureManager().bindTexture(GuiSpectator.field_175269_a);
         Gui.drawModalRectWithCustomSizedTexture(0, 0, 16.0F, 0.0F, 16, 16, 256.0F, 256.0F);
@@ -69,21 +65,15 @@ public class TeleportToTeam implements ISpectatorMenuView, ISpectatorMenuObject
 
     public boolean func_178662_A_()
     {
-        Iterator iterator = this.field_178672_a.iterator();
-        ISpectatorMenuObject ispectatormenuobject;
-
-        do
+        for (ISpectatorMenuObject ispectatormenuobject : this.field_178672_a)
         {
-            if (!iterator.hasNext())
+            if (ispectatormenuobject.func_178662_A_())
             {
-                return false;
+                return true;
             }
-
-            ispectatormenuobject = (ISpectatorMenuObject)iterator.next();
         }
-        while (!ispectatormenuobject.func_178662_A_());
 
-        return true;
+        return false;
     }
 
     @SideOnly(Side.CLIENT)
@@ -91,19 +81,16 @@ public class TeleportToTeam implements ISpectatorMenuView, ISpectatorMenuObject
     {
         private final ScorePlayerTeam field_178676_b;
         private final ResourceLocation field_178677_c;
-        private final List field_178675_d;
-        private static final String __OBFID = "CL_00001919";
+        private final List<NetworkPlayerInfo> field_178675_d;
 
         public TeamSelectionObject(ScorePlayerTeam p_i45492_2_)
         {
             this.field_178676_b = p_i45492_2_;
-            this.field_178675_d = Lists.newArrayList();
-            Iterator iterator = p_i45492_2_.getMembershipCollection().iterator();
+            this.field_178675_d = Lists.<NetworkPlayerInfo>newArrayList();
 
-            while (iterator.hasNext())
+            for (String s : p_i45492_2_.getMembershipCollection())
             {
-                String s = (String)iterator.next();
-                NetworkPlayerInfo networkplayerinfo = Minecraft.getMinecraft().getNetHandler().func_175104_a(s);
+                NetworkPlayerInfo networkplayerinfo = Minecraft.getMinecraft().getNetHandler().getPlayerInfo(s);
 
                 if (networkplayerinfo != null)
                 {
@@ -123,36 +110,36 @@ public class TeleportToTeam implements ISpectatorMenuView, ISpectatorMenuObject
             }
         }
 
-        public void func_178661_a(SpectatorMenu p_178661_1_)
+        public void func_178661_a(SpectatorMenu menu)
         {
-            p_178661_1_.func_178647_a(new TeleportToPlayer(this.field_178675_d));
+            menu.func_178647_a(new TeleportToPlayer(this.field_178675_d));
         }
 
-        public IChatComponent func_178664_z_()
+        public IChatComponent getSpectatorName()
         {
-            return new ChatComponentText(this.field_178676_b.func_96669_c());
+            return new ChatComponentText(this.field_178676_b.getTeamName());
         }
 
-        public void func_178663_a(float p_178663_1_, int p_178663_2_)
+        public void func_178663_a(float p_178663_1_, int alpha)
         {
-            int j = -1;
+            int i = -1;
             String s = FontRenderer.getFormatFromString(this.field_178676_b.getColorPrefix());
 
             if (s.length() >= 2)
             {
-                j = Minecraft.getMinecraft().fontRendererObj.getColorCode(s.charAt(1));
+                i = Minecraft.getMinecraft().fontRendererObj.getColorCode(s.charAt(1));
             }
 
-            if (j >= 0)
+            if (i >= 0)
             {
-                float f1 = (float)(j >> 16 & 255) / 255.0F;
-                float f2 = (float)(j >> 8 & 255) / 255.0F;
-                float f3 = (float)(j & 255) / 255.0F;
-                Gui.drawRect(1, 1, 15, 15, MathHelper.func_180183_b(f1 * p_178663_1_, f2 * p_178663_1_, f3 * p_178663_1_) | p_178663_2_ << 24);
+                float f = (float)(i >> 16 & 255) / 255.0F;
+                float f1 = (float)(i >> 8 & 255) / 255.0F;
+                float f2 = (float)(i & 255) / 255.0F;
+                Gui.drawRect(1, 1, 15, 15, MathHelper.func_180183_b(f * p_178663_1_, f1 * p_178663_1_, f2 * p_178663_1_) | alpha << 24);
             }
 
             Minecraft.getMinecraft().getTextureManager().bindTexture(this.field_178677_c);
-            GlStateManager.color(p_178663_1_, p_178663_1_, p_178663_1_, (float)p_178663_2_ / 255.0F);
+            GlStateManager.color(p_178663_1_, p_178663_1_, p_178663_1_, (float)alpha / 255.0F);
             Gui.drawScaledCustomSizeModalRect(2, 2, 8.0F, 8.0F, 8, 8, 12, 12, 64.0F, 64.0F);
             Gui.drawScaledCustomSizeModalRect(2, 2, 40.0F, 8.0F, 8, 8, 12, 12, 64.0F, 64.0F);
         }

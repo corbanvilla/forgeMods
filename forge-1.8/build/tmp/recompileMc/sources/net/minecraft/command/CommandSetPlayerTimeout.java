@@ -4,12 +4,10 @@ import net.minecraft.server.MinecraftServer;
 
 public class CommandSetPlayerTimeout extends CommandBase
 {
-    private static final String __OBFID = "CL_00000999";
-
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
-    public String getName()
+    public String getCommandName()
     {
         return "setidletimeout";
     }
@@ -22,15 +20,23 @@ public class CommandSetPlayerTimeout extends CommandBase
         return 3;
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.setidletimeout.usage";
     }
 
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
-    public void execute(ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length != 1)
         {

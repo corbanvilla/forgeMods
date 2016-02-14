@@ -1,6 +1,7 @@
 package net.minecraft.block;
 
 import java.util.List;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
@@ -18,8 +19,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockStainedGlassPane extends BlockPane
 {
-    public static final PropertyEnum COLOR = PropertyEnum.create("color", EnumDyeColor.class);
-    private static final String __OBFID = "CL_00000313";
+    public static final PropertyEnum<EnumDyeColor> COLOR = PropertyEnum.<EnumDyeColor>create("color", EnumDyeColor.class);
 
     public BlockStainedGlassPane()
     {
@@ -29,7 +29,8 @@ public class BlockStainedGlassPane extends BlockPane
     }
 
     /**
-     * Get the damage value that this Block should drop
+     * Gets the metadata of the item this Block can drop. This method is called when the block gets destroyed. It
+     * returns the metadata of the dropped item based on the old metadata of the block.
      */
     public int damageDropped(IBlockState state)
     {
@@ -40,7 +41,7 @@ public class BlockStainedGlassPane extends BlockPane
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
     {
         for (int i = 0; i < EnumDyeColor.values().length; ++i)
         {
@@ -49,17 +50,25 @@ public class BlockStainedGlassPane extends BlockPane
     }
 
     /**
-     * Convert the given metadata into a BlockState for this Block
+     * Get the MapColor for this Block and the given BlockState
      */
-    public IBlockState getStateFromMeta(int meta)
+    public MapColor getMapColor(IBlockState state)
     {
-        return this.getDefaultState().withProperty(COLOR, EnumDyeColor.byMetadata(meta));
+        return ((EnumDyeColor)state.getValue(COLOR)).getMapColor();
     }
 
     @SideOnly(Side.CLIENT)
     public EnumWorldBlockLayer getBlockLayer()
     {
         return EnumWorldBlockLayer.TRANSLUCENT;
+    }
+
+    /**
+     * Convert the given metadata into a BlockState for this Block
+     */
+    public IBlockState getStateFromMeta(int meta)
+    {
+        return this.getDefaultState().withProperty(COLOR, EnumDyeColor.byMetadata(meta));
     }
 
     /**

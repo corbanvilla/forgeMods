@@ -12,82 +12,67 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-@SideOnly(Side.SERVER)
 public class RConConsoleSource implements ICommandSender
 {
     /** Single instance of RConConsoleSource */
     private static final RConConsoleSource instance = new RConConsoleSource();
     /** RCon string buffer for log. */
     private StringBuffer buffer = new StringBuffer();
-    private static final String __OBFID = "CL_00001800";
-
-    public static RConConsoleSource getInstance()
-    {
-        /** Single instance of RConConsoleSource */
-        return instance;
-    }
 
     /**
-     * Clears the RCon log
-     */
-    public void resetLog()
-    {
-        this.buffer.setLength(0);
-    }
-
-    /**
-     * Gets the contents of the RCon log
-     */
-    public String getLogContents()
-    {
-        return this.buffer.toString();
-    }
-
-    /**
-     * Gets the name of this command sender (usually username, but possibly "Rcon")
+     * Get the name of this object. For players this returns their username
      */
     public String getName()
     {
         return "Rcon";
     }
 
+    /**
+     * Get the formatted ChatComponent that will be used for the sender's username in chat
+     */
     public IChatComponent getDisplayName()
     {
         return new ChatComponentText(this.getName());
     }
 
     /**
-     * Notifies this sender of some sort of information.  This is for messages intended to display to the user.  Used
-     * for typical output (like "you asked for whether or not this game rule is set, so here's your answer"), warnings
-     * (like "I fetched this block for you by ID, but I'd like you to know that every time you do this, I die a little
-     * inside"), and errors (like "it's not called iron_pixacke, silly").
+     * Send a chat message to the CommandSender
      */
-    public void addChatMessage(IChatComponent message)
+    public void addChatMessage(IChatComponent component)
     {
-        this.buffer.append(message.getUnformattedText());
+        this.buffer.append(component.getUnformattedText());
     }
 
     /**
-     * Returns true if the CommandSender may execute the given command
-     *  
-     * @param permLevel The permission level required to execute the command
-     * @param commandName The name of the command
+     * Returns {@code true} if the CommandSender is allowed to execute the command, {@code false} if not
      */
-    public boolean canUseCommand(int permLevel, String commandName)
+    public boolean canCommandSenderUseCommand(int permLevel, String commandName)
     {
         return true;
     }
 
+    /**
+     * Get the position in the world. <b>{@code null} is not allowed!</b> If you are not an entity in the world, return
+     * the coordinates 0, 0, 0
+     */
     public BlockPos getPosition()
     {
         return new BlockPos(0, 0, 0);
     }
 
+    /**
+     * Get the position vector. <b>{@code null} is not allowed!</b> If you are not an entity in the world, return 0.0D,
+     * 0.0D, 0.0D
+     */
     public Vec3 getPositionVector()
     {
         return new Vec3(0.0D, 0.0D, 0.0D);
     }
 
+    /**
+     * Get the world, if available. <b>{@code null} is not allowed!</b> If you are not an entity in the world, return
+     * the overworld
+     */
     public World getEntityWorld()
     {
         return MinecraftServer.getServer().getEntityWorld();
@@ -109,5 +94,32 @@ public class RConConsoleSource implements ICommandSender
         return true;
     }
 
-    public void setCommandStat(CommandResultStats.Type type, int amount) {}
+    public void setCommandStat(CommandResultStats.Type type, int amount)
+    {
+    }
+
+    @SideOnly(Side.SERVER)
+    public static RConConsoleSource getInstance()
+    {
+        /** Single instance of RConConsoleSource */
+        return instance;
+    }
+
+    /**
+     * Clears the RCon log
+     */
+    @SideOnly(Side.SERVER)
+    public void resetLog()
+    {
+        this.buffer.setLength(0);
+    }
+
+    /**
+     * Gets the contents of the RCon log
+     */
+    @SideOnly(Side.SERVER)
+    public String getLogContents()
+    {
+        return this.buffer.toString();
+    }
 }

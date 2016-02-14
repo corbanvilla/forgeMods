@@ -10,47 +10,44 @@ import org.apache.logging.log4j.Logger;
 public class EntityAITasks
 {
     private static final Logger logger = LogManager.getLogger();
-    /** A list of EntityAITaskEntrys in EntityAITasks. */
-    public List taskEntries = Lists.newArrayList();
-    /** A list of EntityAITaskEntrys that are currently being executed. */
-    private List executingTaskEntries = Lists.newArrayList();
+    public List<EntityAITasks.EntityAITaskEntry> taskEntries = Lists.<EntityAITasks.EntityAITaskEntry>newArrayList();
+    private List<EntityAITasks.EntityAITaskEntry> executingTaskEntries = Lists.<EntityAITasks.EntityAITaskEntry>newArrayList();
     /** Instance of Profiler. */
     private final Profiler theProfiler;
     private int tickCount;
     private int tickRate = 3;
-    private static final String __OBFID = "CL_00001588";
 
-    public EntityAITasks(Profiler p_i1628_1_)
+    public EntityAITasks(Profiler profilerIn)
     {
-        this.theProfiler = p_i1628_1_;
+        this.theProfiler = profilerIn;
     }
 
     /**
      * Add a now AITask. Args : priority, task
      */
-    public void addTask(int p_75776_1_, EntityAIBase p_75776_2_)
+    public void addTask(int priority, EntityAIBase task)
     {
-        this.taskEntries.add(new EntityAITasks.EntityAITaskEntry(p_75776_1_, p_75776_2_));
+        this.taskEntries.add(new EntityAITasks.EntityAITaskEntry(priority, task));
     }
 
     /**
      * removes the indicated task from the entity's AI tasks.
      */
-    public void removeTask(EntityAIBase p_85156_1_)
+    public void removeTask(EntityAIBase task)
     {
-        Iterator iterator = this.taskEntries.iterator();
+        Iterator<EntityAITasks.EntityAITaskEntry> iterator = this.taskEntries.iterator();
 
         while (iterator.hasNext())
         {
-            EntityAITasks.EntityAITaskEntry entityaitaskentry = (EntityAITasks.EntityAITaskEntry)iterator.next();
-            EntityAIBase entityaibase1 = entityaitaskentry.action;
+            EntityAITasks.EntityAITaskEntry entityaitasks$entityaitaskentry = (EntityAITasks.EntityAITaskEntry)iterator.next();
+            EntityAIBase entityaibase = entityaitasks$entityaitaskentry.action;
 
-            if (entityaibase1 == p_85156_1_)
+            if (entityaibase == task)
             {
-                if (this.executingTaskEntries.contains(entityaitaskentry))
+                if (this.executingTaskEntries.contains(entityaitasks$entityaitaskentry))
                 {
-                    entityaibase1.resetTask();
-                    this.executingTaskEntries.remove(entityaitaskentry);
+                    entityaibase.resetTask();
+                    this.executingTaskEntries.remove(entityaitasks$entityaitaskentry);
                 }
 
                 iterator.remove();
@@ -61,60 +58,68 @@ public class EntityAITasks
     public void onUpdateTasks()
     {
         this.theProfiler.startSection("goalSetup");
-        Iterator iterator;
-        EntityAITasks.EntityAITaskEntry entityaitaskentry;
 
         if (this.tickCount++ % this.tickRate == 0)
         {
-            iterator = this.taskEntries.iterator();
+            Iterator iterator = this.taskEntries.iterator();
+            label38:
 
-            while (iterator.hasNext())
+            while (true)
             {
-                entityaitaskentry = (EntityAITasks.EntityAITaskEntry)iterator.next();
-                boolean flag = this.executingTaskEntries.contains(entityaitaskentry);
+                EntityAITasks.EntityAITaskEntry entityaitasks$entityaitaskentry;
 
-                if (flag)
+                while (true)
                 {
-                    if (this.canUse(entityaitaskentry) && this.canContinue(entityaitaskentry))
+                    if (!iterator.hasNext())
                     {
-                        continue;
+                        break label38;
                     }
 
-                    entityaitaskentry.action.resetTask();
-                    this.executingTaskEntries.remove(entityaitaskentry);
+                    entityaitasks$entityaitaskentry = (EntityAITasks.EntityAITaskEntry)iterator.next();
+                    boolean flag = this.executingTaskEntries.contains(entityaitasks$entityaitaskentry);
+
+                    if (!flag)
+                    {
+                        break;
+                    }
+
+                    if (!this.canUse(entityaitasks$entityaitaskentry) || !this.canContinue(entityaitasks$entityaitaskentry))
+                    {
+                        entityaitasks$entityaitaskentry.action.resetTask();
+                        this.executingTaskEntries.remove(entityaitasks$entityaitaskentry);
+                        break;
+                    }
                 }
 
-                if (this.canUse(entityaitaskentry) && entityaitaskentry.action.shouldExecute())
+                if (this.canUse(entityaitasks$entityaitaskentry) && entityaitasks$entityaitaskentry.action.shouldExecute())
                 {
-                    entityaitaskentry.action.startExecuting();
-                    this.executingTaskEntries.add(entityaitaskentry);
+                    entityaitasks$entityaitaskentry.action.startExecuting();
+                    this.executingTaskEntries.add(entityaitasks$entityaitaskentry);
                 }
             }
         }
         else
         {
-            iterator = this.executingTaskEntries.iterator();
+            Iterator<EntityAITasks.EntityAITaskEntry> iterator1 = this.executingTaskEntries.iterator();
 
-            while (iterator.hasNext())
+            while (iterator1.hasNext())
             {
-                entityaitaskentry = (EntityAITasks.EntityAITaskEntry)iterator.next();
+                EntityAITasks.EntityAITaskEntry entityaitasks$entityaitaskentry1 = (EntityAITasks.EntityAITaskEntry)iterator1.next();
 
-                if (!this.canContinue(entityaitaskentry))
+                if (!this.canContinue(entityaitasks$entityaitaskentry1))
                 {
-                    entityaitaskentry.action.resetTask();
-                    iterator.remove();
+                    entityaitasks$entityaitaskentry1.action.resetTask();
+                    iterator1.remove();
                 }
             }
         }
 
         this.theProfiler.endSection();
         this.theProfiler.startSection("goalTick");
-        iterator = this.executingTaskEntries.iterator();
 
-        while (iterator.hasNext())
+        for (EntityAITasks.EntityAITaskEntry entityaitasks$entityaitaskentry2 : this.executingTaskEntries)
         {
-            entityaitaskentry = (EntityAITasks.EntityAITaskEntry)iterator.next();
-            entityaitaskentry.action.updateTask();
+            entityaitasks$entityaitaskentry2.action.updateTask();
         }
 
         this.theProfiler.endSection();
@@ -123,9 +128,9 @@ public class EntityAITasks
     /**
      * Determine if a specific AI Task should continue being executed.
      */
-    private boolean canContinue(EntityAITasks.EntityAITaskEntry p_75773_1_)
+    private boolean canContinue(EntityAITasks.EntityAITaskEntry taskEntry)
     {
-        boolean flag = p_75773_1_.action.continueExecuting();
+        boolean flag = taskEntry.action.continueExecuting();
         return flag;
     }
 
@@ -133,24 +138,20 @@ public class EntityAITasks
      * Determine if a specific AI Task can be executed, which means that all running higher (= lower int value) priority
      * tasks are compatible with it or all lower priority tasks can be interrupted.
      */
-    private boolean canUse(EntityAITasks.EntityAITaskEntry p_75775_1_)
+    private boolean canUse(EntityAITasks.EntityAITaskEntry taskEntry)
     {
-        Iterator iterator = this.taskEntries.iterator();
-
-        while (iterator.hasNext())
+        for (EntityAITasks.EntityAITaskEntry entityaitasks$entityaitaskentry : this.taskEntries)
         {
-            EntityAITasks.EntityAITaskEntry entityaitaskentry = (EntityAITasks.EntityAITaskEntry)iterator.next();
-
-            if (entityaitaskentry != p_75775_1_)
+            if (entityaitasks$entityaitaskentry != taskEntry)
             {
-                if (p_75775_1_.priority >= entityaitaskentry.priority)
+                if (taskEntry.priority >= entityaitasks$entityaitaskentry.priority)
                 {
-                    if (!this.areTasksCompatible(p_75775_1_, entityaitaskentry) && this.executingTaskEntries.contains(entityaitaskentry))
+                    if (!this.areTasksCompatible(taskEntry, entityaitasks$entityaitaskentry) && this.executingTaskEntries.contains(entityaitasks$entityaitaskentry))
                     {
                         return false;
                     }
                 }
-                else if (!entityaitaskentry.action.isInterruptible() && this.executingTaskEntries.contains(entityaitaskentry))
+                else if (!entityaitasks$entityaitaskentry.action.isInterruptible() && this.executingTaskEntries.contains(entityaitasks$entityaitaskentry))
                 {
                     return false;
                 }
@@ -163,9 +164,9 @@ public class EntityAITasks
     /**
      * Returns whether two EntityAITaskEntries can be executed concurrently
      */
-    private boolean areTasksCompatible(EntityAITasks.EntityAITaskEntry p_75777_1_, EntityAITasks.EntityAITaskEntry p_75777_2_)
+    private boolean areTasksCompatible(EntityAITasks.EntityAITaskEntry taskEntry1, EntityAITasks.EntityAITaskEntry taskEntry2)
     {
-        return (p_75777_1_.action.getMutexBits() & p_75777_2_.action.getMutexBits()) == 0;
+        return (taskEntry1.action.getMutexBits() & taskEntry2.action.getMutexBits()) == 0;
     }
 
     public class EntityAITaskEntry
@@ -174,12 +175,11 @@ public class EntityAITasks
         public EntityAIBase action;
         /** Priority of the EntityAIBase */
         public int priority;
-        private static final String __OBFID = "CL_00001589";
 
-        public EntityAITaskEntry(int p_i1627_2_, EntityAIBase p_i1627_3_)
+        public EntityAITaskEntry(int priorityIn, EntityAIBase task)
         {
-            this.priority = p_i1627_2_;
-            this.action = p_i1627_3_;
+            this.priority = priorityIn;
+            this.action = task;
         }
     }
 }

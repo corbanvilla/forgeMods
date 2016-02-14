@@ -7,7 +7,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.SyntaxErrorException;
 import net.minecraft.command.WrongUsageException;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentProcessor;
@@ -16,12 +16,10 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 
 public class CommandMessageRaw extends CommandBase
 {
-    private static final String __OBFID = "CL_00000667";
-
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
-    public String getName()
+    public String getCommandName()
     {
         return "tellraw";
     }
@@ -34,15 +32,23 @@ public class CommandMessageRaw extends CommandBase
         return 2;
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.tellraw.usage";
     }
 
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
-    public void execute(ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 2)
         {
@@ -50,13 +56,13 @@ public class CommandMessageRaw extends CommandBase
         }
         else
         {
-            EntityPlayerMP entityplayermp = getPlayer(sender, args[0]);
-            String s = func_180529_a(args, 1);
+            EntityPlayer entityplayer = getPlayer(sender, args[0]);
+            String s = buildString(args, 1);
 
             try
             {
                 IChatComponent ichatcomponent = IChatComponent.Serializer.jsonToComponent(s);
-                entityplayermp.addChatMessage(ChatComponentProcessor.func_179985_a(sender, ichatcomponent, entityplayermp));
+                entityplayer.addChatMessage(ChatComponentProcessor.processComponent(sender, ichatcomponent, entityplayer));
             }
             catch (JsonParseException jsonparseexception)
             {
@@ -66,13 +72,15 @@ public class CommandMessageRaw extends CommandBase
         }
     }
 
-    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
         return args.length == 1 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames()) : null;
     }
 
     /**
      * Return whether the specified command parameter index is a username parameter.
+     *  
+     * @param args The arguments that were passed
      */
     public boolean isUsernameIndex(String[] args, int index)
     {

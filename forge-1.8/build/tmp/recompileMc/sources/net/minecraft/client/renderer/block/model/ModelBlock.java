@@ -12,10 +12,7 @@ import com.google.gson.JsonParseException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -32,15 +29,14 @@ public class ModelBlock
 {
     private static final Logger LOGGER = LogManager.getLogger();
     static final Gson SERIALIZER = (new GsonBuilder()).registerTypeAdapter(ModelBlock.class, new ModelBlock.Deserializer()).registerTypeAdapter(BlockPart.class, new BlockPart.Deserializer()).registerTypeAdapter(BlockPartFace.class, new BlockPartFace.Deserializer()).registerTypeAdapter(BlockFaceUV.class, new BlockFaceUV.Deserializer()).registerTypeAdapter(ItemTransformVec3f.class, new ItemTransformVec3f.Deserializer()).registerTypeAdapter(ItemCameraTransforms.class, new ItemCameraTransforms.Deserializer()).create();
-    private final List elements;
+    private final List<BlockPart> elements;
     private final boolean gui3d;
-    private final boolean ambientOcclusion;
+    public final boolean ambientOcclusion;
     private ItemCameraTransforms cameraTransforms;
     public String name;
-    public final Map textures;
+    public final Map<String, String> textures;
     public ModelBlock parent;
     protected ResourceLocation parentLocation;
-    private static final String __OBFID = "CL_00002503";
 
     public static ModelBlock deserialize(Reader p_178307_0_)
     {
@@ -52,28 +48,28 @@ public class ModelBlock
         return deserialize(new StringReader(p_178294_0_));
     }
 
-    protected ModelBlock(List p_i46225_1_, Map p_i46225_2_, boolean p_i46225_3_, boolean p_i46225_4_, ItemCameraTransforms p_i46225_5_)
+    protected ModelBlock(List<BlockPart> p_i46225_1_, Map<String, String> p_i46225_2_, boolean p_i46225_3_, boolean p_i46225_4_, ItemCameraTransforms p_i46225_5_)
     {
         this((ResourceLocation)null, p_i46225_1_, p_i46225_2_, p_i46225_3_, p_i46225_4_, p_i46225_5_);
     }
 
-    protected ModelBlock(ResourceLocation p_i46226_1_, Map p_i46226_2_, boolean p_i46226_3_, boolean p_i46226_4_, ItemCameraTransforms p_i46226_5_)
+    protected ModelBlock(ResourceLocation p_i46226_1_, Map<String, String> p_i46226_2_, boolean p_i46226_3_, boolean p_i46226_4_, ItemCameraTransforms p_i46226_5_)
     {
-        this(p_i46226_1_, Collections.emptyList(), p_i46226_2_, p_i46226_3_, p_i46226_4_, p_i46226_5_);
+        this(p_i46226_1_, Collections.<BlockPart>emptyList(), p_i46226_2_, p_i46226_3_, p_i46226_4_, p_i46226_5_);
     }
 
-    public ModelBlock(ResourceLocation p_i46227_1_, List p_i46227_2_, Map p_i46227_3_, boolean p_i46227_4_, boolean p_i46227_5_, ItemCameraTransforms p_i46227_6_)
+    public ModelBlock(ResourceLocation parentLocationIn, List<BlockPart> elementsIn, Map<String, String> texturesIn, boolean ambientOcclusionIn, boolean gui3dIn, ItemCameraTransforms cameraTransformsIn)
     {
         this.name = "";
-        this.elements = p_i46227_2_;
-        this.ambientOcclusion = p_i46227_4_;
-        this.gui3d = p_i46227_5_;
-        this.textures = p_i46227_3_;
-        this.parentLocation = p_i46227_1_;
-        this.cameraTransforms = p_i46227_6_;
+        this.elements = elementsIn;
+        this.ambientOcclusion = ambientOcclusionIn;
+        this.gui3d = gui3dIn;
+        this.textures = texturesIn;
+        this.parentLocation = parentLocationIn;
+        this.cameraTransforms = cameraTransformsIn;
     }
 
-    public List getElements()
+    public List<BlockPart> getElements()
     {
         return this.hasParent() ? this.parent.getElements() : this.elements;
     }
@@ -98,7 +94,7 @@ public class ModelBlock
         return this.parentLocation == null || this.parent != null && this.parent.isResolved();
     }
 
-    public void getParentFromMap(Map p_178299_1_)
+    public void getParentFromMap(Map<ResourceLocation, ModelBlock> p_178299_1_)
     {
         if (this.parentLocation != null)
         {
@@ -106,58 +102,58 @@ public class ModelBlock
         }
     }
 
-    public boolean isTexturePresent(String p_178300_1_)
+    public boolean isTexturePresent(String textureName)
     {
-        return !"missingno".equals(this.resolveTextureName(p_178300_1_));
+        return !"missingno".equals(this.resolveTextureName(textureName));
     }
 
-    public String resolveTextureName(String p_178308_1_)
+    public String resolveTextureName(String textureName)
     {
-        if (!this.startsWithHash(p_178308_1_))
+        if (!this.startsWithHash(textureName))
         {
-            p_178308_1_ = '#' + p_178308_1_;
+            textureName = '#' + textureName;
         }
 
-        return this.resolveTextureName(p_178308_1_, new ModelBlock.Bookkeep(null));
+        return this.resolveTextureName(textureName, new ModelBlock.Bookkeep(this));
     }
 
-    private String resolveTextureName(String p_178302_1_, ModelBlock.Bookkeep p_178302_2_)
+    private String resolveTextureName(String textureName, ModelBlock.Bookkeep p_178302_2_)
     {
-        if (this.startsWithHash(p_178302_1_))
+        if (this.startsWithHash(textureName))
         {
             if (this == p_178302_2_.modelExt)
             {
-                LOGGER.warn("Unable to resolve texture due to upward reference: " + p_178302_1_ + " in " + this.name);
+                LOGGER.warn("Unable to resolve texture due to upward reference: " + textureName + " in " + this.name);
                 return "missingno";
             }
             else
             {
-                String s1 = (String)this.textures.get(p_178302_1_.substring(1));
+                String s = (String)this.textures.get(textureName.substring(1));
 
-                if (s1 == null && this.hasParent())
+                if (s == null && this.hasParent())
                 {
-                    s1 = this.parent.resolveTextureName(p_178302_1_, p_178302_2_);
+                    s = this.parent.resolveTextureName(textureName, p_178302_2_);
                 }
 
                 p_178302_2_.modelExt = this;
 
-                if (s1 != null && this.startsWithHash(s1))
+                if (s != null && this.startsWithHash(s))
                 {
-                    s1 = p_178302_2_.model.resolveTextureName(s1, p_178302_2_);
+                    s = p_178302_2_.model.resolveTextureName(s, p_178302_2_);
                 }
 
-                return s1 != null && !this.startsWithHash(s1) ? s1 : "missingno";
+                return s != null && !this.startsWithHash(s) ? s : "missingno";
             }
         }
         else
         {
-            return p_178302_1_;
+            return textureName;
         }
     }
 
-    private boolean startsWithHash(String p_178304_1_)
+    private boolean startsWithHash(String hash)
     {
-        return p_178304_1_.charAt(0) == 35;
+        return hash.charAt(0) == 35;
     }
 
     public ResourceLocation getParentLocation()
@@ -170,34 +166,26 @@ public class ModelBlock
         return this.hasParent() ? this.parent.getRootModel() : this;
     }
 
-    public ItemTransformVec3f getThirdPersonTransform()
+    public ItemCameraTransforms func_181682_g()
     {
-        return this.parent != null && this.cameraTransforms.thirdPerson == ItemTransformVec3f.DEFAULT ? this.parent.getThirdPersonTransform() : this.cameraTransforms.thirdPerson;
+        ItemTransformVec3f itemtransformvec3f = this.func_181681_a(ItemCameraTransforms.TransformType.THIRD_PERSON);
+        ItemTransformVec3f itemtransformvec3f1 = this.func_181681_a(ItemCameraTransforms.TransformType.FIRST_PERSON);
+        ItemTransformVec3f itemtransformvec3f2 = this.func_181681_a(ItemCameraTransforms.TransformType.HEAD);
+        ItemTransformVec3f itemtransformvec3f3 = this.func_181681_a(ItemCameraTransforms.TransformType.GUI);
+        ItemTransformVec3f itemtransformvec3f4 = this.func_181681_a(ItemCameraTransforms.TransformType.GROUND);
+        ItemTransformVec3f itemtransformvec3f5 = this.func_181681_a(ItemCameraTransforms.TransformType.FIXED);
+        return new ItemCameraTransforms(itemtransformvec3f, itemtransformvec3f1, itemtransformvec3f2, itemtransformvec3f3, itemtransformvec3f4, itemtransformvec3f5);
     }
 
-    public ItemTransformVec3f getFirstPersonTransform()
+    private ItemTransformVec3f func_181681_a(ItemCameraTransforms.TransformType p_181681_1_)
     {
-        return this.parent != null && this.cameraTransforms.firstPerson == ItemTransformVec3f.DEFAULT ? this.parent.getFirstPersonTransform() : this.cameraTransforms.firstPerson;
+        return this.parent != null && !this.cameraTransforms.func_181687_c(p_181681_1_) ? this.parent.func_181681_a(p_181681_1_) : this.cameraTransforms.getTransform(p_181681_1_);
     }
 
-    public ItemTransformVec3f getHeadTransform()
+    public static void checkModelHierarchy(Map<ResourceLocation, ModelBlock> p_178312_0_)
     {
-        return this.parent != null && this.cameraTransforms.head == ItemTransformVec3f.DEFAULT ? this.parent.getHeadTransform() : this.cameraTransforms.head;
-    }
-
-    public ItemTransformVec3f getInGuiTransform()
-    {
-        return this.parent != null && this.cameraTransforms.gui == ItemTransformVec3f.DEFAULT ? this.parent.getInGuiTransform() : this.cameraTransforms.gui;
-    }
-
-    public static void checkModelHierarchy(Map p_178312_0_)
-    {
-        Iterator iterator = p_178312_0_.values().iterator();
-
-        while (iterator.hasNext())
+        for (ModelBlock modelblock : p_178312_0_.values())
         {
-            ModelBlock modelblock = (ModelBlock)iterator.next();
-
             try
             {
                 ModelBlock modelblock1 = modelblock.parent;
@@ -209,7 +197,7 @@ public class ModelBlock
 
                 throw new ModelBlock.LoopException();
             }
-            catch (NullPointerException nullpointerexception)
+            catch (NullPointerException var5)
             {
                 ;
             }
@@ -217,32 +205,24 @@ public class ModelBlock
     }
 
     @SideOnly(Side.CLIENT)
-    final class Bookkeep
-    {
-        public final ModelBlock model;
-        public ModelBlock modelExt;
-        private static final String __OBFID = "CL_00002501";
-
-        private Bookkeep()
+    static final class Bookkeep
         {
-            this.model = ModelBlock.this;
-        }
+            public final ModelBlock model;
+            public ModelBlock modelExt;
 
-        Bookkeep(Object p_i46224_2_)
-        {
-            this();
+            private Bookkeep(ModelBlock p_i46223_1_)
+            {
+                this.model = p_i46223_1_;
+            }
         }
-    }
 
     @SideOnly(Side.CLIENT)
-    public static class Deserializer implements JsonDeserializer
+    public static class Deserializer implements JsonDeserializer<ModelBlock>
         {
-            private static final String __OBFID = "CL_00002500";
-
-            public ModelBlock parseModelBlock(JsonElement p_178327_1_, Type p_178327_2_, JsonDeserializationContext p_178327_3_)
+            public ModelBlock deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_) throws JsonParseException
             {
-                JsonObject jsonobject = p_178327_1_.getAsJsonObject();
-                List list = this.getModelElements(p_178327_3_, jsonobject);
+                JsonObject jsonobject = p_deserialize_1_.getAsJsonObject();
+                List<BlockPart> list = this.getModelElements(p_deserialize_3_, jsonobject);
                 String s = this.getParent(jsonobject);
                 boolean flag = StringUtils.isEmpty(s);
                 boolean flag1 = list.isEmpty();
@@ -257,76 +237,65 @@ public class ModelBlock
                 }
                 else
                 {
-                    Map map = this.getTextures(jsonobject);
+                    Map<String, String> map = this.getTextures(jsonobject);
                     boolean flag2 = this.getAmbientOcclusionEnabled(jsonobject);
                     ItemCameraTransforms itemcameratransforms = ItemCameraTransforms.DEFAULT;
 
                     if (jsonobject.has("display"))
                     {
                         JsonObject jsonobject1 = JsonUtils.getJsonObject(jsonobject, "display");
-                        itemcameratransforms = (ItemCameraTransforms)p_178327_3_.deserialize(jsonobject1, ItemCameraTransforms.class);
+                        itemcameratransforms = (ItemCameraTransforms)p_deserialize_3_.deserialize(jsonobject1, ItemCameraTransforms.class);
                     }
 
                     return flag1 ? new ModelBlock(new ResourceLocation(s), map, flag2, true, itemcameratransforms) : new ModelBlock(list, map, flag2, true, itemcameratransforms);
                 }
             }
 
-            private Map getTextures(JsonObject p_178329_1_)
+            private Map<String, String> getTextures(JsonObject p_178329_1_)
             {
-                HashMap hashmap = Maps.newHashMap();
+                Map<String, String> map = Maps.<String, String>newHashMap();
 
                 if (p_178329_1_.has("textures"))
                 {
-                    JsonObject jsonobject1 = p_178329_1_.getAsJsonObject("textures");
-                    Iterator iterator = jsonobject1.entrySet().iterator();
+                    JsonObject jsonobject = p_178329_1_.getAsJsonObject("textures");
 
-                    while (iterator.hasNext())
+                    for (Entry<String, JsonElement> entry : jsonobject.entrySet())
                     {
-                        Entry entry = (Entry)iterator.next();
-                        hashmap.put(entry.getKey(), ((JsonElement)entry.getValue()).getAsString());
+                        map.put(entry.getKey(), ((JsonElement)entry.getValue()).getAsString());
                     }
                 }
 
-                return hashmap;
+                return map;
             }
 
             private String getParent(JsonObject p_178326_1_)
             {
-                return JsonUtils.getJsonObjectStringFieldValueOrDefault(p_178326_1_, "parent", "");
+                return JsonUtils.getString(p_178326_1_, "parent", "");
             }
 
             protected boolean getAmbientOcclusionEnabled(JsonObject p_178328_1_)
             {
-                return JsonUtils.getJsonObjectBooleanFieldValueOrDefault(p_178328_1_, "ambientocclusion", true);
+                return JsonUtils.getBoolean(p_178328_1_, "ambientocclusion", true);
             }
 
-            protected List getModelElements(JsonDeserializationContext p_178325_1_, JsonObject p_178325_2_)
+            protected List<BlockPart> getModelElements(JsonDeserializationContext p_178325_1_, JsonObject p_178325_2_)
             {
-                ArrayList arraylist = Lists.newArrayList();
+                List<BlockPart> list = Lists.<BlockPart>newArrayList();
 
                 if (p_178325_2_.has("elements"))
                 {
-                    Iterator iterator = JsonUtils.getJsonObjectJsonArrayField(p_178325_2_, "elements").iterator();
-
-                    while (iterator.hasNext())
+                    for (JsonElement jsonelement : JsonUtils.getJsonArray(p_178325_2_, "elements"))
                     {
-                        JsonElement jsonelement = (JsonElement)iterator.next();
-                        arraylist.add((BlockPart)p_178325_1_.deserialize(jsonelement, BlockPart.class));
+                        list.add((BlockPart)p_178325_1_.deserialize(jsonelement, BlockPart.class));
                     }
                 }
 
-                return arraylist;
-            }
-
-            public Object deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_)
-            {
-                return this.parseModelBlock(p_deserialize_1_, p_deserialize_2_, p_deserialize_3_);
+                return list;
             }
         }
 
     @SideOnly(Side.CLIENT)
     public static class LoopException extends RuntimeException
         {
-            private static final String __OBFID = "CL_00002499";
         }
 }

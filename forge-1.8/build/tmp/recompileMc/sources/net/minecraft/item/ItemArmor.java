@@ -3,7 +3,6 @@ package net.minecraft.item;
 import com.google.common.base.Predicates;
 import java.util.List;
 import net.minecraft.block.BlockDispenser;
-import net.minecraft.command.IEntitySelector;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.dispenser.BehaviorDefaultDispenseItem;
 import net.minecraft.dispenser.IBehaviorDispenseItem;
@@ -15,6 +14,7 @@ import net.minecraft.init.Items;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EntitySelectors;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -26,7 +26,6 @@ public class ItemArmor extends Item
     public static final String[] EMPTY_SLOT_NAMES = new String[] {"minecraft:items/empty_armor_slot_helmet", "minecraft:items/empty_armor_slot_chestplate", "minecraft:items/empty_armor_slot_leggings", "minecraft:items/empty_armor_slot_boots"};
     private static final IBehaviorDispenseItem dispenserBehavior = new BehaviorDefaultDispenseItem()
     {
-        private static final String __OBFID = "CL_00001767";
         /**
          * Dispense the specified stack, play the dispense sound and spawn particles.
          */
@@ -37,16 +36,16 @@ public class ItemArmor extends Item
             int j = blockpos.getY();
             int k = blockpos.getZ();
             AxisAlignedBB axisalignedbb = new AxisAlignedBB((double)i, (double)j, (double)k, (double)(i + 1), (double)(j + 1), (double)(k + 1));
-            List list = source.getWorld().getEntitiesWithinAABB(EntityLivingBase.class, axisalignedbb, Predicates.and(IEntitySelector.NOT_SPECTATING, new IEntitySelector.ArmoredMob(stack)));
+            List<EntityLivingBase> list = source.getWorld().<EntityLivingBase>getEntitiesWithinAABB(EntityLivingBase.class, axisalignedbb, Predicates.<EntityLivingBase>and(EntitySelectors.NOT_SPECTATING, new EntitySelectors.ArmoredMob(stack)));
 
             if (list.size() > 0)
             {
                 EntityLivingBase entitylivingbase = (EntityLivingBase)list.get(0);
                 int l = 0;// Forge: We fix the indexes. Mojang Stop hard coding this!
                 int i1 = EntityLiving.getArmorPosition(stack);
-                ItemStack itemstack1 = stack.copy();
-                itemstack1.stackSize = 1;
-                entitylivingbase.setCurrentItemOrArmor(i1 - l, itemstack1);
+                ItemStack itemstack = stack.copy();
+                itemstack.stackSize = 1;
+                entitylivingbase.setCurrentItemOrArmor(i1 - l, itemstack);
 
                 if (entitylivingbase instanceof EntityLiving)
                 {
@@ -73,7 +72,6 @@ public class ItemArmor extends Item
     public final int renderIndex;
     /** The EnumArmorMaterial used for this ItemArmor */
     private final ItemArmor.ArmorMaterial material;
-    private static final String __OBFID = "CL_00001766";
 
     public ItemArmor(ItemArmor.ArmorMaterial material, int renderIndex, int armorType)
     {
@@ -96,14 +94,14 @@ public class ItemArmor extends Item
         }
         else
         {
-            int j = this.getColor(stack);
+            int i = this.getColor(stack);
 
-            if (j < 0)
+            if (i < 0)
             {
-                j = 16777215;
+                i = 16777215;
             }
 
-            return j;
+            return i;
         }
     }
 
@@ -211,9 +209,6 @@ public class ItemArmor extends Item
 
     /**
      * Return whether this item is repairable in an anvil.
-     *  
-     * @param toRepair The ItemStack to be repaired
-     * @param repair The ItemStack that should repair this Item (leather for leather armor, etc.)
      */
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair)
     {
@@ -226,9 +221,9 @@ public class ItemArmor extends Item
     public ItemStack onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn)
     {
         int i = EntityLiving.getArmorPosition(itemStackIn) - 1;
-        ItemStack itemstack1 = playerIn.getCurrentArmor(i);
+        ItemStack itemstack = playerIn.getCurrentArmor(i);
 
-        if (itemstack1 == null)
+        if (itemstack == null)
         {
             playerIn.setCurrentItemOrArmor(i + 1, itemStackIn.copy()); //Forge: Vanilla bug fix associated with fixed setCurrentItemOrArmor indexs for players.
             itemStackIn.stackSize = 0;
@@ -244,6 +239,7 @@ public class ItemArmor extends Item
         IRON("iron", 15, new int[]{2, 6, 5, 2}, 9),
         GOLD("gold", 7, new int[]{2, 5, 3, 1}, 25),
         DIAMOND("diamond", 33, new int[]{3, 8, 6, 3}, 10);
+
         private final String name;
         /**
          * Holds the maximum damage factor (each piece multiply this by it's own value) of the material, this is the
@@ -258,15 +254,13 @@ public class ItemArmor extends Item
         /** Return the enchantability factor of the material */
         private final int enchantability;
 
-        private static final String __OBFID = "CL_00001768";
-
         //Added by forge for custom Armor materials.
         public Item customCraftingMaterial = null;
 
-        private ArmorMaterial(String name, int p_i45789_4_, int[] reductionAmounts, int enchantability)
+        private ArmorMaterial(String name, int maxDamage, int[] reductionAmounts, int enchantability)
         {
             this.name = name;
-            this.maxDamageFactor = p_i45789_4_;
+            this.maxDamageFactor = maxDamage;
             this.damageReductionAmountArray = reductionAmounts;
             this.enchantability = enchantability;
         }

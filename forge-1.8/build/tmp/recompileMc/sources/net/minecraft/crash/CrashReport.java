@@ -5,11 +5,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import net.minecraft.util.ReportedException;
@@ -30,13 +30,11 @@ public class CrashReport
     private final Throwable cause;
     /** Category of crash */
     private final CrashReportCategory theReportCategory = new CrashReportCategory(this, "System Details");
-    /** Holds the keys and values of all crash report sections. */
-    private final List crashReportSections = Lists.newArrayList();
+    private final List<CrashReportCategory> crashReportSections = Lists.<CrashReportCategory>newArrayList();
     /** File of crash report. */
     private File crashReportFile;
     private boolean field_85059_f = true;
     private StackTraceElement[] stacktrace = new StackTraceElement[0];
-    private static final String __OBFID = "CL_00000990";
 
     public CrashReport(String descriptionIn, Throwable causeThrowable)
     {
@@ -51,41 +49,36 @@ public class CrashReport
      */
     private void populateEnvironment()
     {
-        this.theReportCategory.addCrashSectionCallable("Minecraft Version", new Callable()
+        this.theReportCategory.addCrashSectionCallable("Minecraft Version", new Callable<String>()
         {
-            private static final String __OBFID = "CL_00001197";
             public String call()
             {
-                return "1.8";
+                return "1.8.9";
             }
         });
-        this.theReportCategory.addCrashSectionCallable("Operating System", new Callable()
+        this.theReportCategory.addCrashSectionCallable("Operating System", new Callable<String>()
         {
-            private static final String __OBFID = "CL_00001222";
             public String call()
             {
                 return System.getProperty("os.name") + " (" + System.getProperty("os.arch") + ") version " + System.getProperty("os.version");
             }
         });
-        this.theReportCategory.addCrashSectionCallable("Java Version", new Callable()
+        this.theReportCategory.addCrashSectionCallable("Java Version", new Callable<String>()
         {
-            private static final String __OBFID = "CL_00001248";
             public String call()
             {
                 return System.getProperty("java.version") + ", " + System.getProperty("java.vendor");
             }
         });
-        this.theReportCategory.addCrashSectionCallable("Java VM Version", new Callable()
+        this.theReportCategory.addCrashSectionCallable("Java VM Version", new Callable<String>()
         {
-            private static final String __OBFID = "CL_00001275";
             public String call()
             {
                 return System.getProperty("java.vm.name") + " (" + System.getProperty("java.vm.info") + "), " + System.getProperty("java.vm.vendor");
             }
         });
-        this.theReportCategory.addCrashSectionCallable("Memory", new Callable()
+        this.theReportCategory.addCrashSectionCallable("Memory", new Callable<String>()
         {
-            private static final String __OBFID = "CL_00001302";
             public String call()
             {
                 Runtime runtime = Runtime.getRuntime();
@@ -98,21 +91,17 @@ public class CrashReport
                 return k + " bytes (" + j1 + " MB) / " + j + " bytes (" + i1 + " MB) up to " + i + " bytes (" + l + " MB)";
             }
         });
-        this.theReportCategory.addCrashSectionCallable("JVM Flags", new Callable()
+        this.theReportCategory.addCrashSectionCallable("JVM Flags", new Callable<String>()
         {
-            private static final String __OBFID = "CL_00001329";
             public String call()
             {
                 RuntimeMXBean runtimemxbean = ManagementFactory.getRuntimeMXBean();
-                List list = runtimemxbean.getInputArguments();
+                List<String> list = runtimemxbean.getInputArguments();
                 int i = 0;
                 StringBuilder stringbuilder = new StringBuilder();
-                Iterator iterator = list.iterator();
 
-                while (iterator.hasNext())
+                for (String s : list)
                 {
-                    String s = (String)iterator.next();
-
                     if (s.startsWith("-X"))
                     {
                         if (i++ > 0)
@@ -127,10 +116,9 @@ public class CrashReport
                 return String.format("%d total; %s", new Object[] {Integer.valueOf(i), stringbuilder.toString()});
             }
         });
-        this.theReportCategory.addCrashSectionCallable("IntCache", new Callable()
+        this.theReportCategory.addCrashSectionCallable("IntCache", new Callable<String>()
         {
-            private static final String __OBFID = "CL_00001355";
-            public String call()
+            public String call() throws Exception
             {
                 return IntCache.getCacheSizes();
             }
@@ -168,12 +156,9 @@ public class CrashReport
         {
             builder.append("-- Head --\n");
             builder.append("Stacktrace:\n");
-            StackTraceElement[] astacktraceelement = this.stacktrace;
-            int i = astacktraceelement.length;
 
-            for (int j = 0; j < i; ++j)
+            for (StackTraceElement stacktraceelement : this.stacktrace)
             {
-                StackTraceElement stacktraceelement = astacktraceelement[j];
                 builder.append("\t").append("at ").append(stacktraceelement.toString());
                 builder.append("\n");
             }
@@ -181,11 +166,8 @@ public class CrashReport
             builder.append("\n");
         }
 
-        Iterator iterator = this.crashReportSections.iterator();
-
-        while (iterator.hasNext())
+        for (CrashReportCategory crashreportcategory : this.crashReportSections)
         {
-            CrashReportCategory crashreportcategory = (CrashReportCategory)iterator.next();
             crashreportcategory.appendToStringBuilder(builder);
             builder.append("\n\n");
         }
@@ -200,39 +182,39 @@ public class CrashReport
     {
         StringWriter stringwriter = null;
         PrintWriter printwriter = null;
-        Object object = this.cause;
+        Throwable throwable = this.cause;
 
-        if (((Throwable)object).getMessage() == null)
+        if (throwable.getMessage() == null)
         {
-            if (object instanceof NullPointerException)
+            if (throwable instanceof NullPointerException)
             {
-                object = new NullPointerException(this.description);
+                throwable = new NullPointerException(this.description);
             }
-            else if (object instanceof StackOverflowError)
+            else if (throwable instanceof StackOverflowError)
             {
-                object = new StackOverflowError(this.description);
+                throwable = new StackOverflowError(this.description);
             }
-            else if (object instanceof OutOfMemoryError)
+            else if (throwable instanceof OutOfMemoryError)
             {
-                object = new OutOfMemoryError(this.description);
+                throwable = new OutOfMemoryError(this.description);
             }
 
-            ((Throwable)object).setStackTrace(this.cause.getStackTrace());
+            throwable.setStackTrace(this.cause.getStackTrace());
         }
 
-        String s = ((Throwable)object).toString();
+        String s = throwable.toString();
 
         try
         {
             stringwriter = new StringWriter();
             printwriter = new PrintWriter(stringwriter);
-            ((Throwable)object).printStackTrace(printwriter);
+            throwable.printStackTrace(printwriter);
             s = stringwriter.toString();
         }
         finally
         {
-            IOUtils.closeQuietly(stringwriter);
-            IOUtils.closeQuietly(printwriter);
+            IOUtils.closeQuietly((Writer)stringwriter);
+            IOUtils.closeQuietly((Writer)printwriter);
         }
 
         return s;
@@ -332,37 +314,37 @@ public class CrashReport
 
         if (this.field_85059_f)
         {
-            int j = crashreportcategory.getPrunedStackTrace(stacktraceLength);
+            int i = crashreportcategory.getPrunedStackTrace(stacktraceLength);
             StackTraceElement[] astacktraceelement = this.cause.getStackTrace();
             StackTraceElement stacktraceelement = null;
             StackTraceElement stacktraceelement1 = null;
-            int k = astacktraceelement.length - j;
+            int j = astacktraceelement.length - i;
 
-            if (k < 0)
+            if (j < 0)
             {
-                System.out.println("Negative index in crash report handler (" + astacktraceelement.length + "/" + j + ")");
+                System.out.println("Negative index in crash report handler (" + astacktraceelement.length + "/" + i + ")");
             }
 
-            if (astacktraceelement != null && 0 <= k && k < astacktraceelement.length)
+            if (astacktraceelement != null && 0 <= j && j < astacktraceelement.length)
             {
-                stacktraceelement = astacktraceelement[k];
+                stacktraceelement = astacktraceelement[j];
 
-                if (astacktraceelement.length + 1 - j < astacktraceelement.length)
+                if (astacktraceelement.length + 1 - i < astacktraceelement.length)
                 {
-                    stacktraceelement1 = astacktraceelement[astacktraceelement.length + 1 - j];
+                    stacktraceelement1 = astacktraceelement[astacktraceelement.length + 1 - i];
                 }
             }
 
             this.field_85059_f = crashreportcategory.firstTwoElementsOfStackTraceMatch(stacktraceelement, stacktraceelement1);
 
-            if (j > 0 && !this.crashReportSections.isEmpty())
+            if (i > 0 && !this.crashReportSections.isEmpty())
             {
                 CrashReportCategory crashreportcategory1 = (CrashReportCategory)this.crashReportSections.get(this.crashReportSections.size() - 1);
-                crashreportcategory1.trimStackTraceEntriesFromBottom(j);
+                crashreportcategory1.trimStackTraceEntriesFromBottom(i);
             }
-            else if (astacktraceelement != null && astacktraceelement.length >= j && 0 <= k && k < astacktraceelement.length)
+            else if (astacktraceelement != null && astacktraceelement.length >= i && 0 <= j && j < astacktraceelement.length)
             {
-                this.stacktrace = new StackTraceElement[k];
+                this.stacktrace = new StackTraceElement[j];
                 System.arraycopy(astacktraceelement, 0, this.stacktrace, 0, this.stacktrace.length);
             }
             else
@@ -386,7 +368,7 @@ public class CrashReport
         {
             return astring[(int)(System.nanoTime() % (long)astring.length)];
         }
-        catch (Throwable throwable)
+        catch (Throwable var2)
         {
             return "Witty comment unavailable :(";
         }

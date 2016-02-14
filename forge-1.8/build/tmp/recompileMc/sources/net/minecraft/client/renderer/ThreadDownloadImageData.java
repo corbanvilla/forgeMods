@@ -29,14 +29,13 @@ public class ThreadDownloadImageData extends SimpleTexture
     private BufferedImage bufferedImage;
     private Thread imageThread;
     private boolean textureUploaded;
-    private static final String __OBFID = "CL_00001049";
 
-    public ThreadDownloadImageData(File p_i1049_1_, String p_i1049_2_, ResourceLocation p_i1049_3_, IImageBuffer p_i1049_4_)
+    public ThreadDownloadImageData(File cacheFileIn, String imageUrlIn, ResourceLocation textureResourceLocation, IImageBuffer imageBufferIn)
     {
-        super(p_i1049_3_);
-        this.cacheFile = p_i1049_1_;
-        this.imageUrl = p_i1049_2_;
-        this.imageBuffer = p_i1049_4_;
+        super(textureResourceLocation);
+        this.cacheFile = cacheFileIn;
+        this.imageUrl = imageUrlIn;
+        this.imageBuffer = imageBufferIn;
     }
 
     private void checkTextureUploaded()
@@ -62,9 +61,9 @@ public class ThreadDownloadImageData extends SimpleTexture
         return super.getGlTextureId();
     }
 
-    public void setBufferedImage(BufferedImage p_147641_1_)
+    public void setBufferedImage(BufferedImage bufferedImageIn)
     {
-        this.bufferedImage = p_147641_1_;
+        this.bufferedImage = bufferedImageIn;
 
         if (this.imageBuffer != null)
         {
@@ -96,7 +95,7 @@ public class ThreadDownloadImageData extends SimpleTexture
                 }
                 catch (IOException ioexception)
                 {
-                    logger.error("Couldn\'t load skin " + this.cacheFile, ioexception);
+                    logger.error((String)("Couldn\'t load skin " + this.cacheFile), (Throwable)ioexception);
                     this.loadTextureFromServer();
                 }
             }
@@ -111,7 +110,6 @@ public class ThreadDownloadImageData extends SimpleTexture
     {
         this.imageThread = new Thread("Texture Downloader #" + threadDownloadCounter.incrementAndGet())
         {
-            private static final String __OBFID = "CL_00001050";
             public void run()
             {
                 HttpURLConnection httpurlconnection = null;
@@ -124,33 +122,33 @@ public class ThreadDownloadImageData extends SimpleTexture
                     httpurlconnection.setDoOutput(false);
                     httpurlconnection.connect();
 
-                    if (httpurlconnection.getResponseCode() / 100 != 2)
+                    if (httpurlconnection.getResponseCode() / 100 == 2)
                     {
+                        BufferedImage bufferedimage;
+
+                        if (ThreadDownloadImageData.this.cacheFile != null)
+                        {
+                            FileUtils.copyInputStreamToFile(httpurlconnection.getInputStream(), ThreadDownloadImageData.this.cacheFile);
+                            bufferedimage = ImageIO.read(ThreadDownloadImageData.this.cacheFile);
+                        }
+                        else
+                        {
+                            bufferedimage = TextureUtil.readBufferedImage(httpurlconnection.getInputStream());
+                        }
+
+                        if (ThreadDownloadImageData.this.imageBuffer != null)
+                        {
+                            bufferedimage = ThreadDownloadImageData.this.imageBuffer.parseUserSkin(bufferedimage);
+                        }
+
+                        ThreadDownloadImageData.this.setBufferedImage(bufferedimage);
                         return;
                     }
-
-                    BufferedImage bufferedimage;
-
-                    if (ThreadDownloadImageData.this.cacheFile != null)
-                    {
-                        FileUtils.copyInputStreamToFile(httpurlconnection.getInputStream(), ThreadDownloadImageData.this.cacheFile);
-                        bufferedimage = ImageIO.read(ThreadDownloadImageData.this.cacheFile);
-                    }
-                    else
-                    {
-                        bufferedimage = TextureUtil.readBufferedImage(httpurlconnection.getInputStream());
-                    }
-
-                    if (ThreadDownloadImageData.this.imageBuffer != null)
-                    {
-                        bufferedimage = ThreadDownloadImageData.this.imageBuffer.parseUserSkin(bufferedimage);
-                    }
-
-                    ThreadDownloadImageData.this.setBufferedImage(bufferedimage);
                 }
                 catch (Exception exception)
                 {
-                    ThreadDownloadImageData.logger.error("Couldn\'t download http texture", exception);
+                    ThreadDownloadImageData.logger.error((String)"Couldn\'t download http texture", (Throwable)exception);
+                    return;
                 }
                 finally
                 {

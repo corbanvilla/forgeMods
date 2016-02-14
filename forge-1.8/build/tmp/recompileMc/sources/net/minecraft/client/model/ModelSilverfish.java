@@ -17,7 +17,6 @@ public class ModelSilverfish extends ModelBase
     private static final int[][] silverfishBoxLength = new int[][] {{3, 2, 2}, {4, 3, 2}, {6, 4, 3}, {3, 3, 3}, {2, 2, 3}, {2, 1, 2}, {1, 1, 2}};
     /** The texture positions for the silverfish's model's boxes. */
     private static final int[][] silverfishTexturePositions = new int[][] {{0, 0}, {0, 4}, {0, 9}, {0, 16}, {0, 22}, {11, 0}, {13, 4}};
-    private static final String __OBFID = "CL_00000855";
 
     public ModelSilverfish()
     {
@@ -51,19 +50,18 @@ public class ModelSilverfish extends ModelBase
     /**
      * Sets the models various rotation angles then renders the model.
      */
-    public void render(Entity p_78088_1_, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float p_78088_7_)
+    public void render(Entity entityIn, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float scale)
     {
-        this.setRotationAngles(p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, p_78088_7_, p_78088_1_);
-        int i;
+        this.setRotationAngles(p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, scale, entityIn);
 
-        for (i = 0; i < this.silverfishBodyParts.length; ++i)
+        for (int i = 0; i < this.silverfishBodyParts.length; ++i)
         {
-            this.silverfishBodyParts[i].render(p_78088_7_);
+            this.silverfishBodyParts[i].render(scale);
         }
 
-        for (i = 0; i < this.silverfishWings.length; ++i)
+        for (int j = 0; j < this.silverfishWings.length; ++j)
         {
-            this.silverfishWings[i].render(p_78088_7_);
+            this.silverfishWings[j].render(scale);
         }
     }
 
@@ -72,7 +70,7 @@ public class ModelSilverfish extends ModelBase
      * and legs, where par1 represents the time(so that arms and legs swing back and forth) and par2 represents how
      * "far" arms and legs can swing at most.
      */
-    public void setRotationAngles(float p_78087_1_, float p_78087_2_, float p_78087_3_, float p_78087_4_, float p_78087_5_, float p_78087_6_, Entity p_78087_7_)
+    public void setRotationAngles(float p_78087_1_, float p_78087_2_, float p_78087_3_, float p_78087_4_, float p_78087_5_, float p_78087_6_, Entity entityIn)
     {
         for (int i = 0; i < this.silverfishBodyParts.length; ++i)
         {

@@ -2,8 +2,6 @@ package net.minecraft.client.gui.stream;
 
 import com.google.common.collect.Lists;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import net.minecraft.client.gui.GuiButton;
@@ -28,160 +26,153 @@ public class GuiTwitchUserMode extends GuiScreen
     private static final EnumChatFormatting field_152336_g = EnumChatFormatting.DARK_PURPLE;
     private final ChatUserInfo field_152337_h;
     private final IChatComponent field_152338_i;
-    private final List field_152332_r = Lists.newArrayList();
-    private final IStream field_152333_s;
+    private final List<IChatComponent> field_152332_r = Lists.<IChatComponent>newArrayList();
+    private final IStream stream;
     private int field_152334_t;
-    private static final String __OBFID = "CL_00001837";
 
-    public GuiTwitchUserMode(IStream p_i1064_1_, ChatUserInfo p_i1064_2_)
+    public GuiTwitchUserMode(IStream streamIn, ChatUserInfo p_i1064_2_)
     {
-        this.field_152333_s = p_i1064_1_;
+        this.stream = streamIn;
         this.field_152337_h = p_i1064_2_;
         this.field_152338_i = new ChatComponentText(p_i1064_2_.displayName);
-        this.field_152332_r.addAll(func_152328_a(p_i1064_2_.modes, p_i1064_2_.subscriptions, p_i1064_1_));
+        this.field_152332_r.addAll(func_152328_a(p_i1064_2_.modes, p_i1064_2_.subscriptions, streamIn));
     }
 
-    public static List func_152328_a(Set p_152328_0_, Set p_152328_1_, IStream p_152328_2_)
+    public static List<IChatComponent> func_152328_a(Set<ChatUserMode> p_152328_0_, Set<ChatUserSubscription> p_152328_1_, IStream p_152328_2_)
     {
         String s = p_152328_2_ == null ? null : p_152328_2_.func_152921_C();
         boolean flag = p_152328_2_ != null && p_152328_2_.func_152927_B();
-        ArrayList arraylist = Lists.newArrayList();
-        Iterator iterator = p_152328_0_.iterator();
-        IChatComponent ichatcomponent;
-        ChatComponentText chatcomponenttext;
+        List<IChatComponent> list = Lists.<IChatComponent>newArrayList();
 
-        while (iterator.hasNext())
+        for (ChatUserMode chatusermode : p_152328_0_)
         {
-            ChatUserMode chatusermode = (ChatUserMode)iterator.next();
-            ichatcomponent = func_152329_a(chatusermode, s, flag);
+            IChatComponent ichatcomponent = func_152329_a(chatusermode, s, flag);
 
             if (ichatcomponent != null)
             {
-                chatcomponenttext = new ChatComponentText("- ");
-                chatcomponenttext.appendSibling(ichatcomponent);
-                arraylist.add(chatcomponenttext);
+                IChatComponent ichatcomponent1 = new ChatComponentText("- ");
+                ichatcomponent1.appendSibling(ichatcomponent);
+                list.add(ichatcomponent1);
             }
         }
 
-        iterator = p_152328_1_.iterator();
-
-        while (iterator.hasNext())
+        for (ChatUserSubscription chatusersubscription : p_152328_1_)
         {
-            ChatUserSubscription chatusersubscription = (ChatUserSubscription)iterator.next();
-            ichatcomponent = func_152330_a(chatusersubscription, s, flag);
+            IChatComponent ichatcomponent2 = func_152330_a(chatusersubscription, s, flag);
 
-            if (ichatcomponent != null)
+            if (ichatcomponent2 != null)
             {
-                chatcomponenttext = new ChatComponentText("- ");
-                chatcomponenttext.appendSibling(ichatcomponent);
-                arraylist.add(chatcomponenttext);
+                IChatComponent ichatcomponent3 = new ChatComponentText("- ");
+                ichatcomponent3.appendSibling(ichatcomponent2);
+                list.add(ichatcomponent3);
             }
         }
 
-        return arraylist;
+        return list;
     }
 
     public static IChatComponent func_152330_a(ChatUserSubscription p_152330_0_, String p_152330_1_, boolean p_152330_2_)
     {
-        ChatComponentTranslation chatcomponenttranslation = null;
+        IChatComponent ichatcomponent = null;
 
         if (p_152330_0_ == ChatUserSubscription.TTV_CHAT_USERSUB_SUBSCRIBER)
         {
             if (p_152330_1_ == null)
             {
-                chatcomponenttranslation = new ChatComponentTranslation("stream.user.subscription.subscriber", new Object[0]);
+                ichatcomponent = new ChatComponentTranslation("stream.user.subscription.subscriber", new Object[0]);
             }
             else if (p_152330_2_)
             {
-                chatcomponenttranslation = new ChatComponentTranslation("stream.user.subscription.subscriber.self", new Object[0]);
+                ichatcomponent = new ChatComponentTranslation("stream.user.subscription.subscriber.self", new Object[0]);
             }
             else
             {
-                chatcomponenttranslation = new ChatComponentTranslation("stream.user.subscription.subscriber.other", new Object[] {p_152330_1_});
+                ichatcomponent = new ChatComponentTranslation("stream.user.subscription.subscriber.other", new Object[] {p_152330_1_});
             }
 
-            chatcomponenttranslation.getChatStyle().setColor(field_152331_a);
+            ichatcomponent.getChatStyle().setColor(field_152331_a);
         }
         else if (p_152330_0_ == ChatUserSubscription.TTV_CHAT_USERSUB_TURBO)
         {
-            chatcomponenttranslation = new ChatComponentTranslation("stream.user.subscription.turbo", new Object[0]);
-            chatcomponenttranslation.getChatStyle().setColor(field_152336_g);
+            ichatcomponent = new ChatComponentTranslation("stream.user.subscription.turbo", new Object[0]);
+            ichatcomponent.getChatStyle().setColor(field_152336_g);
         }
 
-        return chatcomponenttranslation;
+        return ichatcomponent;
     }
 
     public static IChatComponent func_152329_a(ChatUserMode p_152329_0_, String p_152329_1_, boolean p_152329_2_)
     {
-        ChatComponentTranslation chatcomponenttranslation = null;
+        IChatComponent ichatcomponent = null;
 
         if (p_152329_0_ == ChatUserMode.TTV_CHAT_USERMODE_ADMINSTRATOR)
         {
-            chatcomponenttranslation = new ChatComponentTranslation("stream.user.mode.administrator", new Object[0]);
-            chatcomponenttranslation.getChatStyle().setColor(field_152336_g);
+            ichatcomponent = new ChatComponentTranslation("stream.user.mode.administrator", new Object[0]);
+            ichatcomponent.getChatStyle().setColor(field_152336_g);
         }
         else if (p_152329_0_ == ChatUserMode.TTV_CHAT_USERMODE_BANNED)
         {
             if (p_152329_1_ == null)
             {
-                chatcomponenttranslation = new ChatComponentTranslation("stream.user.mode.banned", new Object[0]);
+                ichatcomponent = new ChatComponentTranslation("stream.user.mode.banned", new Object[0]);
             }
             else if (p_152329_2_)
             {
-                chatcomponenttranslation = new ChatComponentTranslation("stream.user.mode.banned.self", new Object[0]);
+                ichatcomponent = new ChatComponentTranslation("stream.user.mode.banned.self", new Object[0]);
             }
             else
             {
-                chatcomponenttranslation = new ChatComponentTranslation("stream.user.mode.banned.other", new Object[] {p_152329_1_});
+                ichatcomponent = new ChatComponentTranslation("stream.user.mode.banned.other", new Object[] {p_152329_1_});
             }
 
-            chatcomponenttranslation.getChatStyle().setColor(field_152335_f);
+            ichatcomponent.getChatStyle().setColor(field_152335_f);
         }
         else if (p_152329_0_ == ChatUserMode.TTV_CHAT_USERMODE_BROADCASTER)
         {
             if (p_152329_1_ == null)
             {
-                chatcomponenttranslation = new ChatComponentTranslation("stream.user.mode.broadcaster", new Object[0]);
+                ichatcomponent = new ChatComponentTranslation("stream.user.mode.broadcaster", new Object[0]);
             }
             else if (p_152329_2_)
             {
-                chatcomponenttranslation = new ChatComponentTranslation("stream.user.mode.broadcaster.self", new Object[0]);
+                ichatcomponent = new ChatComponentTranslation("stream.user.mode.broadcaster.self", new Object[0]);
             }
             else
             {
-                chatcomponenttranslation = new ChatComponentTranslation("stream.user.mode.broadcaster.other", new Object[0]);
+                ichatcomponent = new ChatComponentTranslation("stream.user.mode.broadcaster.other", new Object[0]);
             }
 
-            chatcomponenttranslation.getChatStyle().setColor(field_152331_a);
+            ichatcomponent.getChatStyle().setColor(field_152331_a);
         }
         else if (p_152329_0_ == ChatUserMode.TTV_CHAT_USERMODE_MODERATOR)
         {
             if (p_152329_1_ == null)
             {
-                chatcomponenttranslation = new ChatComponentTranslation("stream.user.mode.moderator", new Object[0]);
+                ichatcomponent = new ChatComponentTranslation("stream.user.mode.moderator", new Object[0]);
             }
             else if (p_152329_2_)
             {
-                chatcomponenttranslation = new ChatComponentTranslation("stream.user.mode.moderator.self", new Object[0]);
+                ichatcomponent = new ChatComponentTranslation("stream.user.mode.moderator.self", new Object[0]);
             }
             else
             {
-                chatcomponenttranslation = new ChatComponentTranslation("stream.user.mode.moderator.other", new Object[] {p_152329_1_});
+                ichatcomponent = new ChatComponentTranslation("stream.user.mode.moderator.other", new Object[] {p_152329_1_});
             }
 
-            chatcomponenttranslation.getChatStyle().setColor(field_152331_a);
+            ichatcomponent.getChatStyle().setColor(field_152331_a);
         }
         else if (p_152329_0_ == ChatUserMode.TTV_CHAT_USERMODE_STAFF)
         {
-            chatcomponenttranslation = new ChatComponentTranslation("stream.user.mode.staff", new Object[0]);
-            chatcomponenttranslation.getChatStyle().setColor(field_152336_g);
+            ichatcomponent = new ChatComponentTranslation("stream.user.mode.staff", new Object[0]);
+            ichatcomponent.getChatStyle().setColor(field_152336_g);
         }
 
-        return chatcomponenttranslation;
+        return ichatcomponent;
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
     public void initGui()
     {
@@ -194,39 +185,41 @@ public class GuiTwitchUserMode extends GuiScreen
         this.buttonList.add(new GuiButton(3, i * 1 + j / 2, this.height - 45, 130, 20, I18n.format("stream.userinfo.unban", new Object[0])));
         this.buttonList.add(new GuiButton(4, i * 2 + j / 2, this.height - 45, 130, 20, I18n.format("stream.userinfo.unmod", new Object[0])));
         int k = 0;
-        IChatComponent ichatcomponent;
 
-        for (Iterator iterator = this.field_152332_r.iterator(); iterator.hasNext(); k = Math.max(k, this.fontRendererObj.getStringWidth(ichatcomponent.getFormattedText())))
+        for (IChatComponent ichatcomponent : this.field_152332_r)
         {
-            ichatcomponent = (IChatComponent)iterator.next();
+            k = Math.max(k, this.fontRendererObj.getStringWidth(ichatcomponent.getFormattedText()));
         }
 
         this.field_152334_t = this.width / 2 - k / 2;
     }
 
+    /**
+     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
+     */
     protected void actionPerformed(GuiButton button) throws IOException
     {
         if (button.enabled)
         {
             if (button.id == 0)
             {
-                this.field_152333_s.func_152917_b("/ban " + this.field_152337_h.displayName);
+                this.stream.func_152917_b("/ban " + this.field_152337_h.displayName);
             }
             else if (button.id == 3)
             {
-                this.field_152333_s.func_152917_b("/unban " + this.field_152337_h.displayName);
+                this.stream.func_152917_b("/unban " + this.field_152337_h.displayName);
             }
             else if (button.id == 2)
             {
-                this.field_152333_s.func_152917_b("/mod " + this.field_152337_h.displayName);
+                this.stream.func_152917_b("/mod " + this.field_152337_h.displayName);
             }
             else if (button.id == 4)
             {
-                this.field_152333_s.func_152917_b("/unmod " + this.field_152337_h.displayName);
+                this.stream.func_152917_b("/unmod " + this.field_152337_h.displayName);
             }
             else if (button.id == 1)
             {
-                this.field_152333_s.func_152917_b("/timeout " + this.field_152337_h.displayName);
+                this.stream.func_152917_b("/timeout " + this.field_152337_h.displayName);
             }
 
             this.mc.displayGuiScreen((GuiScreen)null);
@@ -240,12 +233,12 @@ public class GuiTwitchUserMode extends GuiScreen
     {
         this.drawDefaultBackground();
         this.drawCenteredString(this.fontRendererObj, this.field_152338_i.getUnformattedText(), this.width / 2, 70, 16777215);
-        int k = 80;
+        int i = 80;
 
-        for (Iterator iterator = this.field_152332_r.iterator(); iterator.hasNext(); k += this.fontRendererObj.FONT_HEIGHT)
+        for (IChatComponent ichatcomponent : this.field_152332_r)
         {
-            IChatComponent ichatcomponent = (IChatComponent)iterator.next();
-            this.drawString(this.fontRendererObj, ichatcomponent.getFormattedText(), this.field_152334_t, k, 16777215);
+            this.drawString(this.fontRendererObj, ichatcomponent.getFormattedText(), this.field_152334_t, i, 16777215);
+            i += this.fontRendererObj.FONT_HEIGHT;
         }
 
         super.drawScreen(mouseX, mouseY, partialTicks);

@@ -6,8 +6,6 @@ import net.minecraft.util.ResourceLocation;
 
 public class EnchantmentUntouching extends Enchantment
 {
-    private static final String __OBFID = "CL_00000123";
-
     protected EnchantmentUntouching(int p_i45763_1_, ResourceLocation p_i45763_2_, int p_i45763_3_)
     {
         super(p_i45763_1_, p_i45763_2_, p_i45763_3_, EnumEnchantmentType.DIGGER);
@@ -40,8 +38,6 @@ public class EnchantmentUntouching extends Enchantment
 
     /**
      * Determines if the enchantment passed can be applyied together with this enchantment.
-     *  
-     * @param ench A possible enchantment that may be applied along side this enchantment, depending on the results.
      */
     public boolean canApplyTogether(Enchantment ench)
     {
@@ -50,8 +46,6 @@ public class EnchantmentUntouching extends Enchantment
 
     /**
      * Determines if this enchantment can be applied to a specific ItemStack.
-     *  
-     * @param stack The ItemStack that is attempting to become enchanted with with enchantment.
      */
     public boolean canApply(ItemStack stack)
     {

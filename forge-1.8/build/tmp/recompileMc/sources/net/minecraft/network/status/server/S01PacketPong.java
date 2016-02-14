@@ -1,17 +1,17 @@
 package net.minecraft.network.status.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.status.INetHandlerStatusClient;
 
-public class S01PacketPong implements Packet
+public class S01PacketPong implements Packet<INetHandlerStatusClient>
 {
     private long clientTime;
-    private static final String __OBFID = "CL_00001383";
 
-    public S01PacketPong() {}
+    public S01PacketPong()
+    {
+    }
 
     public S01PacketPong(long time)
     {
@@ -40,13 +40,5 @@ public class S01PacketPong implements Packet
     public void processPacket(INetHandlerStatusClient handler)
     {
         handler.handlePong(this);
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerStatusClient)handler);
     }
 }

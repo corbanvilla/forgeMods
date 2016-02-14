@@ -3,9 +3,8 @@ package net.minecraft.client.renderer.block.statemap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
@@ -17,30 +16,29 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class StateMap extends StateMapperBase
 {
-    private final IProperty property;
+    private final IProperty<?> name;
     private final String suffix;
-    private final List listProperties;
-    private static final String __OBFID = "CL_00002476";
+    private final List < IProperty<? >> ignored;
 
-    private StateMap(IProperty p_i46210_1_, String p_i46210_2_, List p_i46210_3_)
+    private StateMap(IProperty<?> name, String suffix, List < IProperty<? >> ignored)
     {
-        this.property = p_i46210_1_;
-        this.suffix = p_i46210_2_;
-        this.listProperties = p_i46210_3_;
+        this.name = name;
+        this.suffix = suffix;
+        this.ignored = ignored;
     }
 
-    protected ModelResourceLocation getModelResourceLocation(IBlockState p_178132_1_)
+    protected ModelResourceLocation getModelResourceLocation(IBlockState state)
     {
-        LinkedHashMap linkedhashmap = Maps.newLinkedHashMap(p_178132_1_.getProperties());
+        Map<IProperty, Comparable> map = Maps.<IProperty, Comparable>newLinkedHashMap(state.getProperties());
         String s;
 
-        if (this.property == null)
+        if (this.name == null)
         {
-            s = ((ResourceLocation)Block.blockRegistry.getNameForObject(p_178132_1_.getBlock())).toString();
+            s = ((ResourceLocation)Block.blockRegistry.getNameForObject(state.getBlock())).toString();
         }
         else
         {
-            s = String.format("%s:%s", ((ResourceLocation)Block.blockRegistry.getNameForObject(p_178132_1_.getBlock())).getResourceDomain(), this.property.getName((Comparable)linkedhashmap.remove(this.property)));
+            s = String.format("%s:%s", ((ResourceLocation)Block.blockRegistry.getNameForObject(state.getBlock())).getResourceDomain(), ((IProperty)this.name).getName((Comparable)map.remove(this.name)));
         }
 
         if (this.suffix != null)
@@ -48,39 +46,30 @@ public class StateMap extends StateMapperBase
             s = s + this.suffix;
         }
 
-        Iterator iterator = this.listProperties.iterator();
-
-        while (iterator.hasNext())
+        for (IProperty<?> iproperty : this.ignored)
         {
-            IProperty iproperty = (IProperty)iterator.next();
-            linkedhashmap.remove(iproperty);
+            map.remove(iproperty);
         }
 
-        return new ModelResourceLocation(s, this.getPropertyString(linkedhashmap));
-    }
-
-    StateMap(IProperty p_i46211_1_, String p_i46211_2_, List p_i46211_3_, Object p_i46211_4_)
-    {
-        this(p_i46211_1_, p_i46211_2_, p_i46211_3_);
+        return new ModelResourceLocation(s, this.getPropertyString(map));
     }
 
     @SideOnly(Side.CLIENT)
     public static class Builder
         {
-            private IProperty builderProperty;
-            private String builderSuffix;
-            private final List builderListProperties = Lists.newArrayList();
-            private static final String __OBFID = "CL_00002474";
+            private IProperty<?> name;
+            private String suffix;
+            private final List < IProperty<? >> ignored = Lists. < IProperty<? >> newArrayList();
 
-            public StateMap.Builder setProperty(IProperty p_178440_1_)
+            public StateMap.Builder withName(IProperty<?> builderPropertyIn)
             {
-                this.builderProperty = p_178440_1_;
+                this.name = builderPropertyIn;
                 return this;
             }
 
-            public StateMap.Builder setBuilderSuffix(String p_178439_1_)
+            public StateMap.Builder withSuffix(String builderSuffixIn)
             {
-                this.builderSuffix = p_178439_1_;
+                this.suffix = builderSuffixIn;
                 return this;
             }
 
@@ -88,15 +77,15 @@ public class StateMap extends StateMapperBase
              * Add properties that will not be used to compute all possible states of a block, used for block rendering
              * to ignore some property that does not alter block's appearance
              */
-            public StateMap.Builder addPropertiesToIgnore(IProperty ... p_178442_1_)
+            public StateMap.Builder ignore(IProperty<?>... p_178442_1_)
             {
-                Collections.addAll(this.builderListProperties, p_178442_1_);
+                Collections.addAll(this.ignored, p_178442_1_);
                 return this;
             }
 
             public StateMap build()
             {
-                return new StateMap(this.builderProperty, this.builderSuffix, this.builderListProperties, null);
+                return new StateMap(this.name, this.suffix, this.ignored);
             }
         }
 }

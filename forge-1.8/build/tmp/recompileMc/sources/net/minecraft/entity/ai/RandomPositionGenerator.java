@@ -13,64 +13,63 @@ public class RandomPositionGenerator
      * MULTIPLE findTowards and findAway calls, will share this var
      */
     private static Vec3 staticVector = new Vec3(0.0D, 0.0D, 0.0D);
-    private static final String __OBFID = "CL_00001629";
 
     /**
      * finds a random target within par1(x,z) and par2 (y) blocks
      */
-    public static Vec3 findRandomTarget(EntityCreature p_75463_0_, int p_75463_1_, int p_75463_2_)
+    public static Vec3 findRandomTarget(EntityCreature entitycreatureIn, int xz, int y)
     {
         /**
          * searches 10 blocks at random in a within par1(x,z) and par2 (y) distance, ignores those not in the direction
          * of par3Vec3, then points to the tile for which creature.getBlockPathWeight returns the highest number
          */
-        return findRandomTargetBlock(p_75463_0_, p_75463_1_, p_75463_2_, (Vec3)null);
+        return findRandomTargetBlock(entitycreatureIn, xz, y, (Vec3)null);
     }
 
     /**
      * finds a random target within par1(x,z) and par2 (y) blocks in the direction of the point par3
      */
-    public static Vec3 findRandomTargetBlockTowards(EntityCreature p_75464_0_, int p_75464_1_, int p_75464_2_, Vec3 p_75464_3_)
+    public static Vec3 findRandomTargetBlockTowards(EntityCreature entitycreatureIn, int xz, int y, Vec3 targetVec3)
     {
-        staticVector = p_75464_3_.subtract(p_75464_0_.posX, p_75464_0_.posY, p_75464_0_.posZ);
+        staticVector = targetVec3.subtract(entitycreatureIn.posX, entitycreatureIn.posY, entitycreatureIn.posZ);
         /**
          * searches 10 blocks at random in a within par1(x,z) and par2 (y) distance, ignores those not in the direction
          * of par3Vec3, then points to the tile for which creature.getBlockPathWeight returns the highest number
          */
-        return findRandomTargetBlock(p_75464_0_, p_75464_1_, p_75464_2_, staticVector);
+        return findRandomTargetBlock(entitycreatureIn, xz, y, staticVector);
     }
 
     /**
      * finds a random target within par1(x,z) and par2 (y) blocks in the reverse direction of the point par3
      */
-    public static Vec3 findRandomTargetBlockAwayFrom(EntityCreature p_75461_0_, int p_75461_1_, int p_75461_2_, Vec3 p_75461_3_)
+    public static Vec3 findRandomTargetBlockAwayFrom(EntityCreature entitycreatureIn, int xz, int y, Vec3 targetVec3)
     {
-        staticVector = (new Vec3(p_75461_0_.posX, p_75461_0_.posY, p_75461_0_.posZ)).subtract(p_75461_3_);
+        staticVector = (new Vec3(entitycreatureIn.posX, entitycreatureIn.posY, entitycreatureIn.posZ)).subtract(targetVec3);
         /**
          * searches 10 blocks at random in a within par1(x,z) and par2 (y) distance, ignores those not in the direction
          * of par3Vec3, then points to the tile for which creature.getBlockPathWeight returns the highest number
          */
-        return findRandomTargetBlock(p_75461_0_, p_75461_1_, p_75461_2_, staticVector);
+        return findRandomTargetBlock(entitycreatureIn, xz, y, staticVector);
     }
 
     /**
      * searches 10 blocks at random in a within par1(x,z) and par2 (y) distance, ignores those not in the direction of
      * par3Vec3, then points to the tile for which creature.getBlockPathWeight returns the highest number
      */
-    private static Vec3 findRandomTargetBlock(EntityCreature p_75462_0_, int p_75462_1_, int p_75462_2_, Vec3 p_75462_3_)
+    private static Vec3 findRandomTargetBlock(EntityCreature entitycreatureIn, int xz, int y, Vec3 targetVec3)
     {
-        Random random = p_75462_0_.getRNG();
+        Random random = entitycreatureIn.getRNG();
         boolean flag = false;
+        int i = 0;
+        int j = 0;
         int k = 0;
-        int l = 0;
-        int i1 = 0;
         float f = -99999.0F;
         boolean flag1;
 
-        if (p_75462_0_.hasHome())
+        if (entitycreatureIn.hasHome())
         {
-            double d0 = p_75462_0_.func_180486_cf().distanceSq((double)MathHelper.floor_double(p_75462_0_.posX), (double)MathHelper.floor_double(p_75462_0_.posY), (double)MathHelper.floor_double(p_75462_0_.posZ)) + 4.0D;
-            double d1 = (double)(p_75462_0_.getMaximumHomeDistance() + (float)p_75462_1_);
+            double d0 = entitycreatureIn.getHomePosition().distanceSq((double)MathHelper.floor_double(entitycreatureIn.posX), (double)MathHelper.floor_double(entitycreatureIn.posY), (double)MathHelper.floor_double(entitycreatureIn.posZ)) + 4.0D;
+            double d1 = (double)(entitycreatureIn.getMaximumHomeDistance() + (float)xz);
             flag1 = d0 < d1 * d1;
         }
         else
@@ -78,54 +77,52 @@ public class RandomPositionGenerator
             flag1 = false;
         }
 
-        for (int l1 = 0; l1 < 10; ++l1)
+        for (int j1 = 0; j1 < 10; ++j1)
         {
-            int j1 = random.nextInt(2 * p_75462_1_ + 1) - p_75462_1_;
-            int i2 = random.nextInt(2 * p_75462_2_ + 1) - p_75462_2_;
-            int k1 = random.nextInt(2 * p_75462_1_ + 1) - p_75462_1_;
+            int l = random.nextInt(2 * xz + 1) - xz;
+            int k1 = random.nextInt(2 * y + 1) - y;
+            int i1 = random.nextInt(2 * xz + 1) - xz;
 
-            if (p_75462_3_ == null || (double)j1 * p_75462_3_.xCoord + (double)k1 * p_75462_3_.zCoord >= 0.0D)
+            if (targetVec3 == null || (double)l * targetVec3.xCoord + (double)i1 * targetVec3.zCoord >= 0.0D)
             {
-                BlockPos blockpos;
-
-                if (p_75462_0_.hasHome() && p_75462_1_ > 1)
+                if (entitycreatureIn.hasHome() && xz > 1)
                 {
-                    blockpos = p_75462_0_.func_180486_cf();
+                    BlockPos blockpos = entitycreatureIn.getHomePosition();
 
-                    if (p_75462_0_.posX > (double)blockpos.getX())
+                    if (entitycreatureIn.posX > (double)blockpos.getX())
                     {
-                        j1 -= random.nextInt(p_75462_1_ / 2);
+                        l -= random.nextInt(xz / 2);
                     }
                     else
                     {
-                        j1 += random.nextInt(p_75462_1_ / 2);
+                        l += random.nextInt(xz / 2);
                     }
 
-                    if (p_75462_0_.posZ > (double)blockpos.getZ())
+                    if (entitycreatureIn.posZ > (double)blockpos.getZ())
                     {
-                        k1 -= random.nextInt(p_75462_1_ / 2);
+                        i1 -= random.nextInt(xz / 2);
                     }
                     else
                     {
-                        k1 += random.nextInt(p_75462_1_ / 2);
+                        i1 += random.nextInt(xz / 2);
                     }
                 }
 
-                j1 += MathHelper.floor_double(p_75462_0_.posX);
-                i2 += MathHelper.floor_double(p_75462_0_.posY);
-                k1 += MathHelper.floor_double(p_75462_0_.posZ);
-                blockpos = new BlockPos(j1, i2, k1);
+                l = l + MathHelper.floor_double(entitycreatureIn.posX);
+                k1 = k1 + MathHelper.floor_double(entitycreatureIn.posY);
+                i1 = i1 + MathHelper.floor_double(entitycreatureIn.posZ);
+                BlockPos blockpos1 = new BlockPos(l, k1, i1);
 
-                if (!flag1 || p_75462_0_.func_180485_d(blockpos))
+                if (!flag1 || entitycreatureIn.isWithinHomeDistanceFromPosition(blockpos1))
                 {
-                    float f1 = p_75462_0_.func_180484_a(blockpos);
+                    float f1 = entitycreatureIn.getBlockPathWeight(blockpos1);
 
                     if (f1 > f)
                     {
                         f = f1;
-                        k = j1;
-                        l = i2;
-                        i1 = k1;
+                        i = l;
+                        j = k1;
+                        k = i1;
                         flag = true;
                     }
                 }
@@ -134,7 +131,7 @@ public class RandomPositionGenerator
 
         if (flag)
         {
-            return new Vec3((double)k, (double)l, (double)i1);
+            return new Vec3((double)i, (double)j, (double)k);
         }
         else
         {

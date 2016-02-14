@@ -19,30 +19,26 @@ public class ContainerPlayer extends Container
     /** Determines if inventory manipulation should be handled. */
     public boolean isLocalWorld;
     private final EntityPlayer thePlayer;
-    private static final String __OBFID = "CL_00001754";
 
     public ContainerPlayer(final InventoryPlayer playerInventory, boolean localWorld, EntityPlayer player)
     {
         this.isLocalWorld = localWorld;
         this.thePlayer = player;
         this.addSlotToContainer(new SlotCrafting(playerInventory.player, this.craftMatrix, this.craftResult, 0, 144, 36));
-        int i;
-        int j;
 
-        for (i = 0; i < 2; ++i)
+        for (int i = 0; i < 2; ++i)
         {
-            for (j = 0; j < 2; ++j)
+            for (int j = 0; j < 2; ++j)
             {
                 this.addSlotToContainer(new Slot(this.craftMatrix, j + i * 2, 88 + j * 18, 26 + i * 18));
             }
         }
 
-        for (i = 0; i < 4; ++i)
+        for (int k = 0; k < 4; ++k)
         {
-            final int k = i;
-            this.addSlotToContainer(new Slot(playerInventory, playerInventory.getSizeInventory() - 1 - i, 8, 8 + i * 18)
+            final int k_f = k;
+            this.addSlotToContainer(new Slot(playerInventory, playerInventory.getSizeInventory() - 1 - k, 8, 8 + k * 18)
             {
-                private static final String __OBFID = "CL_00001755";
                 /**
                  * Returns the maximum stack size for a given slot (usually the same as getInventoryStackLimit(), but 1
                  * in the case of armor slots)
@@ -57,27 +53,27 @@ public class ContainerPlayer extends Container
                 public boolean isItemValid(ItemStack stack)
                 {
                     if (stack == null) return false;
-                    return stack.getItem().isValidArmor(stack, k, thePlayer);
+                    return stack.getItem().isValidArmor(stack, k_f, thePlayer);
                 }
                 @SideOnly(Side.CLIENT)
                 public String getSlotTexture()
                 {
-                    return ItemArmor.EMPTY_SLOT_NAMES[k];
+                    return ItemArmor.EMPTY_SLOT_NAMES[k_f];
                 }
             });
         }
 
-        for (i = 0; i < 3; ++i)
+        for (int l = 0; l < 3; ++l)
         {
-            for (j = 0; j < 9; ++j)
+            for (int j1 = 0; j1 < 9; ++j1)
             {
-                this.addSlotToContainer(new Slot(playerInventory, j + (i + 1) * 9, 8 + j * 18, 84 + i * 18));
+                this.addSlotToContainer(new Slot(playerInventory, j1 + (l + 1) * 9, 8 + j1 * 18, 84 + l * 18));
             }
         }
 
-        for (i = 0; i < 9; ++i)
+        for (int i1 = 0; i1 < 9; ++i1)
         {
-            this.addSlotToContainer(new Slot(playerInventory, i, 8 + i * 18, 142));
+            this.addSlotToContainer(new Slot(playerInventory, i1, 8 + i1 * 18, 142));
         }
 
         this.onCraftMatrixChanged(this.craftMatrix);
@@ -100,7 +96,7 @@ public class ContainerPlayer extends Container
 
         for (int i = 0; i < 4; ++i)
         {
-            ItemStack itemstack = this.craftMatrix.getStackInSlotOnClosing(i);
+            ItemStack itemstack = this.craftMatrix.removeStackFromSlot(i);
 
             if (itemstack != null)
             {
@@ -154,9 +150,9 @@ public class ContainerPlayer extends Container
             }
             else if (itemstack.getItem() instanceof ItemArmor && !((Slot)this.inventorySlots.get(5 + ((ItemArmor)itemstack.getItem()).armorType)).getHasStack())
             {
-                int j = 5 + ((ItemArmor)itemstack.getItem()).armorType;
+                int i = 5 + ((ItemArmor)itemstack.getItem()).armorType;
 
-                if (!this.mergeItemStack(itemstack1, j, j + 1, false))
+                if (!this.mergeItemStack(itemstack1, i, i + 1, false))
                 {
                     return null;
                 }
@@ -204,8 +200,8 @@ public class ContainerPlayer extends Container
      * Called to determine if the current slot is valid for the stack merging (double-click) code. The stack passed in
      * is null for the initial slot that was double-clicked.
      */
-    public boolean canMergeSlot(ItemStack p_94530_1_, Slot p_94530_2_)
+    public boolean canMergeSlot(ItemStack stack, Slot p_94530_2_)
     {
-        return p_94530_2_.inventory != this.craftResult && super.canMergeSlot(p_94530_1_, p_94530_2_);
+        return p_94530_2_.inventory != this.craftResult && super.canMergeSlot(stack, p_94530_2_);
     }
 }

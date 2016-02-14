@@ -1,6 +1,7 @@
 package net.minecraft.block;
 
 import java.util.Random;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -19,11 +20,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BlockMycelium extends Block
 {
     public static final PropertyBool SNOWY = PropertyBool.create("snowy");
-    private static final String __OBFID = "CL_00000273";
 
     protected BlockMycelium()
     {
-        super(Material.grass);
+        super(Material.grass, MapColor.purpleColor);
         this.setDefaultState(this.blockState.getBaseState().withProperty(SNOWY, Boolean.valueOf(false)));
         this.setTickRandomly(true);
         this.setCreativeTab(CreativeTabs.tabBlock);
@@ -53,13 +53,13 @@ public class BlockMycelium extends Block
                 {
                     for (int i = 0; i < 4; ++i)
                     {
-                        BlockPos blockpos1 = pos.add(rand.nextInt(3) - 1, rand.nextInt(5) - 3, rand.nextInt(3) - 1);
-                        IBlockState iblockstate1 = worldIn.getBlockState(blockpos1);
-                        Block block = worldIn.getBlockState(blockpos1.up()).getBlock();
+                        BlockPos blockpos = pos.add(rand.nextInt(3) - 1, rand.nextInt(5) - 3, rand.nextInt(3) - 1);
+                        IBlockState iblockstate = worldIn.getBlockState(blockpos);
+                        Block block = worldIn.getBlockState(blockpos.up()).getBlock();
 
-                        if (iblockstate1.getBlock() == Blocks.dirt && iblockstate1.getValue(BlockDirt.VARIANT) == BlockDirt.DirtType.DIRT && worldIn.getLightFromNeighbors(blockpos1.up()) >= 4 && block.getLightOpacity(worldIn, blockpos1.up()) <= 2)
+                        if (iblockstate.getBlock() == Blocks.dirt && iblockstate.getValue(BlockDirt.VARIANT) == BlockDirt.DirtType.DIRT && worldIn.getLightFromNeighbors(blockpos.up()) >= 4 && block.getLightOpacity(worldIn, blockpos.up()) <= 2)
                         {
-                            worldIn.setBlockState(blockpos1, this.getDefaultState());
+                            worldIn.setBlockState(blockpos, this.getDefaultState());
                         }
                     }
                 }
@@ -80,8 +80,6 @@ public class BlockMycelium extends Block
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {

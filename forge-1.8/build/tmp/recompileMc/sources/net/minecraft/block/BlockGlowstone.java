@@ -11,8 +11,6 @@ import net.minecraft.util.MathHelper;
 
 public class BlockGlowstone extends Block
 {
-    private static final String __OBFID = "CL_00000250";
-
     public BlockGlowstone(Material materialIn)
     {
         super(materialIn);
@@ -37,8 +35,6 @@ public class BlockGlowstone extends Block
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {

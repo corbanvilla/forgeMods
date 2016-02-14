@@ -18,7 +18,6 @@ public class GuiIngestServers extends GuiScreen
     private final GuiScreen field_152309_a;
     private String field_152310_f;
     private GuiIngestServers.ServerList field_152311_g;
-    private static final String __OBFID = "CL_00001843";
 
     public GuiIngestServers(GuiScreen p_i46312_1_)
     {
@@ -26,7 +25,8 @@ public class GuiIngestServers extends GuiScreen
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
     public void initGui()
     {
@@ -62,6 +62,9 @@ public class GuiIngestServers extends GuiScreen
         }
     }
 
+    /**
+     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
+     */
     protected void actionPerformed(GuiButton button) throws IOException
     {
         if (button.enabled)
@@ -92,8 +95,6 @@ public class GuiIngestServers extends GuiScreen
     @SideOnly(Side.CLIENT)
     class ServerList extends GuiSlot
     {
-        private static final String __OBFID = "CL_00001842";
-
         public ServerList(Minecraft mcIn)
         {
             super(mcIn, GuiIngestServers.this.width, GuiIngestServers.this.height, 32, GuiIngestServers.this.height - 35, (int)((double)mcIn.fontRendererObj.FONT_HEIGHT * 3.5D));
@@ -122,9 +123,11 @@ public class GuiIngestServers extends GuiScreen
             return this.mc.getTwitchStream().func_152925_v()[slotIndex].serverUrl.equals(this.mc.gameSettings.streamPreferredServer);
         }
 
-        protected void drawBackground() {}
+        protected void drawBackground()
+        {
+        }
 
-        protected void drawSlot(int entryID, int p_180791_2_, int p_180791_3_, int p_180791_4_, int p_180791_5_, int p_180791_6_)
+        protected void drawSlot(int entryID, int p_180791_2_, int p_180791_3_, int p_180791_4_, int mouseXIn, int mouseYIn)
         {
             IngestServer ingestserver = this.mc.getTwitchStream().func_152925_v()[entryID];
             String s = ingestserver.serverUrl.replaceAll("\\{stream_key\\}", "");
@@ -156,7 +159,7 @@ public class GuiIngestServers extends GuiScreen
                 s1 = EnumChatFormatting.RED + "Down!";
             }
 
-            p_180791_2_ -= 15;
+            p_180791_2_ = p_180791_2_ - 15;
 
             if (this.isSelected(entryID))
             {

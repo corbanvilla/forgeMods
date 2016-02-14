@@ -1,7 +1,6 @@
 package net.minecraft.block;
 
 import com.google.common.base.Predicate;
-import java.util.Iterator;
 import java.util.Random;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -25,20 +24,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BlockStem extends BlockBush implements IGrowable
 {
     public static final PropertyInteger AGE = PropertyInteger.create("age", 0, 7);
-    public static final PropertyDirection FACING = PropertyDirection.create("facing", new Predicate()
+    public static final PropertyDirection FACING = PropertyDirection.create("facing", new Predicate<EnumFacing>()
     {
-        private static final String __OBFID = "CL_00002059";
-        public boolean apply(EnumFacing facing)
+        public boolean apply(EnumFacing p_apply_1_)
         {
-            return facing != EnumFacing.DOWN;
-        }
-        public boolean apply(Object p_apply_1_)
-        {
-            return this.apply((EnumFacing)p_apply_1_);
+            return p_apply_1_ != EnumFacing.DOWN;
         }
     });
     private final Block crop;
-    private static final String __OBFID = "CL_00000316";
 
     protected BlockStem(Block crop)
     {
@@ -57,12 +50,9 @@ public class BlockStem extends BlockBush implements IGrowable
     public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
     {
         state = state.withProperty(FACING, EnumFacing.UP);
-        Iterator iterator = EnumFacing.Plane.HORIZONTAL.iterator();
 
-        while (iterator.hasNext())
+        for (EnumFacing enumfacing : EnumFacing.Plane.HORIZONTAL)
         {
-            EnumFacing enumfacing = (EnumFacing)iterator.next();
-
             if (worldIn.getBlockState(pos.offset(enumfacing)).getBlock() == this.crop)
             {
                 state = state.withProperty(FACING, enumfacing);
@@ -100,12 +90,8 @@ public class BlockStem extends BlockBush implements IGrowable
                 }
                 else
                 {
-                    Iterator iterator = EnumFacing.Plane.HORIZONTAL.iterator();
-
-                    while (iterator.hasNext())
+                    for (EnumFacing enumfacing : EnumFacing.Plane.HORIZONTAL)
                     {
-                        EnumFacing enumfacing = (EnumFacing)iterator.next();
-
                         if (worldIn.getBlockState(pos.offset(enumfacing)).getBlock() == this.crop)
                         {
                             return;
@@ -147,6 +133,12 @@ public class BlockStem extends BlockBush implements IGrowable
         }
     }
 
+    @SideOnly(Side.CLIENT)
+    public int colorMultiplier(IBlockAccess worldIn, BlockPos pos, int renderPass)
+    {
+        return this.getRenderColor(worldIn.getBlockState(pos));
+    }
+
     /**
      * Sets the block's bounds for rendering it as an item
      */
@@ -154,12 +146,6 @@ public class BlockStem extends BlockBush implements IGrowable
     {
         float f = 0.125F;
         this.setBlockBounds(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, 0.25F, 0.5F + f);
-    }
-
-    @SideOnly(Side.CLIENT)
-    public int colorMultiplier(IBlockAccess worldIn, BlockPos pos, int renderPass)
-    {
-        return this.getRenderColor(worldIn.getBlockState(pos));
     }
 
     public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
@@ -171,9 +157,6 @@ public class BlockStem extends BlockBush implements IGrowable
 
     /**
      * Spawns this Block's drops into the World as EntityItems.
-     *  
-     * @param chance The chance that each Item is actually spawned (1.0 = always, 0.0 = never)
-     * @param fortune The player's fortune level
      */
     public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune)
     {
@@ -189,11 +172,11 @@ public class BlockStem extends BlockBush implements IGrowable
 
             if (item != null)
             {
-                int j = ((Integer)state.getValue(AGE)).intValue();
+                int i = ((Integer)state.getValue(AGE)).intValue();
 
-                for (int k = 0; k < 3; ++k)
+                for (int j = 0; j < 3; ++j)
                 {
-                    if (RANDOM.nextInt(15) <= j)
+                    if (RANDOM.nextInt(15) <= i)
                     {
                         ret.add(new ItemStack(item));
                     }
@@ -210,8 +193,6 @@ public class BlockStem extends BlockBush implements IGrowable
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {

@@ -2,7 +2,7 @@ package net.minecraft.command;
 
 import java.util.List;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.MinecraftServer;
@@ -10,12 +10,10 @@ import net.minecraft.util.BlockPos;
 
 public class CommandEnchant extends CommandBase
 {
-    private static final String __OBFID = "CL_00000377";
-
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
-    public String getName()
+    public String getCommandName()
     {
         return "enchant";
     }
@@ -28,15 +26,23 @@ public class CommandEnchant extends CommandBase
         return 2;
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.enchant.usage";
     }
 
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
-    public void execute(ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 2)
         {
@@ -44,7 +50,7 @@ public class CommandEnchant extends CommandBase
         }
         else
         {
-            EntityPlayerMP entityplayermp = getPlayer(sender, args[0]);
+            EntityPlayer entityplayer = getPlayer(sender, args[0]);
             sender.setCommandStat(CommandResultStats.Type.AFFECTED_ITEMS, 0);
             int i;
 
@@ -65,7 +71,7 @@ public class CommandEnchant extends CommandBase
             }
 
             int j = 1;
-            ItemStack itemstack = entityplayermp.getCurrentEquippedItem();
+            ItemStack itemstack = entityplayer.getCurrentEquippedItem();
 
             if (itemstack == null)
             {
@@ -98,11 +104,11 @@ public class CommandEnchant extends CommandBase
                         {
                             for (int k = 0; k < nbttaglist.tagCount(); ++k)
                             {
-                                short short1 = nbttaglist.getCompoundTagAt(k).getShort("id");
+                                int l = nbttaglist.getCompoundTagAt(k).getShort("id");
 
-                                if (Enchantment.getEnchantmentById(short1) != null)
+                                if (Enchantment.getEnchantmentById(l) != null)
                                 {
-                                    Enchantment enchantment2 = Enchantment.getEnchantmentById(short1);
+                                    Enchantment enchantment2 = Enchantment.getEnchantmentById(l);
 
                                     if (!enchantment2.canApplyTogether(enchantment1) || !enchantment1.canApplyTogether(enchantment2)) //Forge BugFix: Let Both enchantments veto being together
                                     {
@@ -121,9 +127,9 @@ public class CommandEnchant extends CommandBase
         }
     }
 
-    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
-        return args.length == 1 ? getListOfStringsMatchingLastWord(args, this.getListOfPlayers()) : (args.length == 2 ? getListOfStringsMatchingLastWord(args, Enchantment.getLocationNames()) : null);
+        return args.length == 1 ? getListOfStringsMatchingLastWord(args, this.getListOfPlayers()) : (args.length == 2 ? getListOfStringsMatchingLastWord(args, Enchantment.func_181077_c()) : null);
     }
 
     protected String[] getListOfPlayers()
@@ -133,6 +139,8 @@ public class CommandEnchant extends CommandBase
 
     /**
      * Return whether the specified command parameter index is a username parameter.
+     *  
+     * @param args The arguments that were passed
      */
     public boolean isUsernameIndex(String[] args, int index)
     {

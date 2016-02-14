@@ -17,7 +17,6 @@ public class GuiShareToLan extends GuiScreen
     private GuiButton field_146597_g;
     private String field_146599_h = "survival";
     private boolean field_146600_i;
-    private static final String __OBFID = "CL_00000713";
 
     public GuiShareToLan(GuiScreen p_i1055_1_)
     {
@@ -25,7 +24,8 @@ public class GuiShareToLan extends GuiScreen
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
     public void initGui()
     {
@@ -52,6 +52,9 @@ public class GuiShareToLan extends GuiScreen
         }
     }
 
+    /**
+     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
+     */
     protected void actionPerformed(GuiButton button) throws IOException
     {
         if (button.id == 102)
@@ -88,18 +91,18 @@ public class GuiShareToLan extends GuiScreen
         {
             this.mc.displayGuiScreen((GuiScreen)null);
             String s = this.mc.getIntegratedServer().shareToLAN(WorldSettings.GameType.getByName(this.field_146599_h), this.field_146600_i);
-            Object object;
+            IChatComponent ichatcomponent;
 
             if (s != null)
             {
-                object = new ChatComponentTranslation("commands.publish.started", new Object[] {s});
+                ichatcomponent = new ChatComponentTranslation("commands.publish.started", new Object[] {s});
             }
             else
             {
-                object = new ChatComponentText("commands.publish.failed");
+                ichatcomponent = new ChatComponentText("commands.publish.failed");
             }
 
-            this.mc.ingameGUI.getChatGUI().printChatMessage((IChatComponent)object);
+            this.mc.ingameGUI.getChatGUI().printChatMessage(ichatcomponent);
         }
     }
 

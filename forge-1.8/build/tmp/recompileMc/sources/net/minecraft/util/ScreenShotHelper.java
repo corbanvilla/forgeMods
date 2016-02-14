@@ -29,7 +29,6 @@ public class ScreenShotHelper
     private static IntBuffer pixelBuffer;
     /** The built-up array that contains all the pixel values returned by OpenGL. */
     private static int[] pixelValues;
-    private static final String __OBFID = "CL_00000656";
 
     /**
      * Saves a screenshot in the game directory with a time-stamped filename.  Args: gameDirectory,
@@ -52,8 +51,8 @@ public class ScreenShotHelper
     {
         try
         {
-            File file2 = new File(gameDirectory, "screenshots");
-            file2.mkdir();
+            File file1 = new File(gameDirectory, "screenshots");
+            file1.mkdir();
 
             if (OpenGlHelper.isFramebufferEnabled())
             {
@@ -61,12 +60,12 @@ public class ScreenShotHelper
                 height = buffer.framebufferTextureHeight;
             }
 
-            int k = width * height;
+            int i = width * height;
 
-            if (pixelBuffer == null || pixelBuffer.capacity() < k)
+            if (pixelBuffer == null || pixelBuffer.capacity() < i)
             {
-                pixelBuffer = BufferUtils.createIntBuffer(k);
-                pixelValues = new int[k];
+                pixelBuffer = BufferUtils.createIntBuffer(i);
+                pixelValues = new int[i];
             }
 
             GL11.glPixelStorei(GL11.GL_PACK_ALIGNMENT, 1);
@@ -76,11 +75,11 @@ public class ScreenShotHelper
             if (OpenGlHelper.isFramebufferEnabled())
             {
                 GlStateManager.bindTexture(buffer.framebufferTexture);
-                GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, pixelBuffer);
+                GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, (IntBuffer)pixelBuffer);
             }
             else
             {
-                GL11.glReadPixels(0, 0, width, height, GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, pixelBuffer);
+                GL11.glReadPixels(0, 0, width, height, GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, (IntBuffer)pixelBuffer);
             }
 
             pixelBuffer.get(pixelValues);
@@ -90,13 +89,13 @@ public class ScreenShotHelper
             if (OpenGlHelper.isFramebufferEnabled())
             {
                 bufferedimage = new BufferedImage(buffer.framebufferWidth, buffer.framebufferHeight, 1);
-                int l = buffer.framebufferTextureHeight - buffer.framebufferHeight;
+                int j = buffer.framebufferTextureHeight - buffer.framebufferHeight;
 
-                for (int i1 = l; i1 < buffer.framebufferTextureHeight; ++i1)
+                for (int k = j; k < buffer.framebufferTextureHeight; ++k)
                 {
-                    for (int j1 = 0; j1 < buffer.framebufferWidth; ++j1)
+                    for (int l = 0; l < buffer.framebufferWidth; ++l)
                     {
-                        bufferedimage.setRGB(j1, i1 - l, pixelValues[i1 * buffer.framebufferTextureWidth + j1]);
+                        bufferedimage.setRGB(l, k - j, pixelValues[k * buffer.framebufferTextureWidth + l]);
                     }
                 }
             }
@@ -106,26 +105,26 @@ public class ScreenShotHelper
                 bufferedimage.setRGB(0, 0, width, height, pixelValues, 0, width);
             }
 
-            File file3;
+            File file2;
 
             if (screenshotName == null)
             {
-                file3 = getTimestampedPNGFileForDirectory(file2);
+                file2 = getTimestampedPNGFileForDirectory(file1);
             }
             else
             {
-                file3 = new File(file2, screenshotName);
+                file2 = new File(file1, screenshotName);
             }
 
-            ImageIO.write(bufferedimage, "png", file3);
-            ChatComponentText chatcomponenttext = new ChatComponentText(file3.getName());
-            chatcomponenttext.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file3.getAbsolutePath()));
-            chatcomponenttext.getChatStyle().setUnderlined(Boolean.valueOf(true));
-            return new ChatComponentTranslation("screenshot.success", new Object[] {chatcomponenttext});
+            ImageIO.write(bufferedimage, "png", (File)file2);
+            IChatComponent ichatcomponent = new ChatComponentText(file2.getName());
+            ichatcomponent.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file2.getAbsolutePath()));
+            ichatcomponent.getChatStyle().setUnderlined(Boolean.valueOf(true));
+            return new ChatComponentTranslation("screenshot.success", new Object[] {ichatcomponent});
         }
         catch (Exception exception)
         {
-            logger.warn("Couldn\'t save screenshot", exception);
+            logger.warn((String)"Couldn\'t save screenshot", (Throwable)exception);
             return new ChatComponentTranslation("screenshot.failure", new Object[] {exception.getMessage()});
         }
     }
@@ -143,11 +142,11 @@ public class ScreenShotHelper
 
         while (true)
         {
-            File file2 = new File(gameDirectory, s + (i == 1 ? "" : "_" + i) + ".png");
+            File file1 = new File(gameDirectory, s + (i == 1 ? "" : "_" + i) + ".png");
 
-            if (!file2.exists())
+            if (!file1.exists())
             {
-                return file2;
+                return file1;
             }
 
             ++i;

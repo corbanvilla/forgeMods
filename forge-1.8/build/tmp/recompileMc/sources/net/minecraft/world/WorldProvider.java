@@ -35,7 +35,6 @@ public abstract class WorldProvider
     protected int dimensionId;
     /** Array for sunrise/sunset colors (RGBA) */
     private final float[] colorsSunriseSunset = new float[4];
-    private static final String __OBFID = "CL_00000386";
 
     /**
      * associate an existing world with a World provider, and setup its lightbrightness table
@@ -92,23 +91,22 @@ public abstract class WorldProvider
      */
     public float calculateCelestialAngle(long p_76563_1_, float p_76563_3_)
     {
-        int j = (int)(p_76563_1_ % 24000L);
-        float f1 = ((float)j + p_76563_3_) / 24000.0F - 0.25F;
+        int i = (int)(p_76563_1_ % 24000L);
+        float f = ((float)i + p_76563_3_) / 24000.0F - 0.25F;
 
-        if (f1 < 0.0F)
+        if (f < 0.0F)
         {
-            ++f1;
+            ++f;
         }
 
-        if (f1 > 1.0F)
+        if (f > 1.0F)
         {
-            --f1;
+            --f;
         }
 
-        float f2 = f1;
-        f1 = 1.0F - (float)((Math.cos((double)f1 * Math.PI) + 1.0D) / 2.0D);
-        f1 = f2 + (f1 - f2) / 3.0F;
-        return f1;
+        float f1 = 1.0F - (float)((Math.cos((double)f * Math.PI) + 1.0D) / 2.0D);
+        f = f + (f1 - f) / 3.0F;
+        return f;
     }
 
     public int getMoonPhase(long p_76559_1_)
@@ -130,19 +128,19 @@ public abstract class WorldProvider
     @SideOnly(Side.CLIENT)
     public float[] calcSunriseSunsetColors(float celestialAngle, float partialTicks)
     {
-        float f2 = 0.4F;
-        float f3 = MathHelper.cos(celestialAngle * (float)Math.PI * 2.0F) - 0.0F;
-        float f4 = -0.0F;
+        float f = 0.4F;
+        float f1 = MathHelper.cos(celestialAngle * (float)Math.PI * 2.0F) - 0.0F;
+        float f2 = -0.0F;
 
-        if (f3 >= f4 - f2 && f3 <= f4 + f2)
+        if (f1 >= f2 - f && f1 <= f2 + f)
         {
-            float f5 = (f3 - f4) / f2 * 0.5F + 0.5F;
-            float f6 = 1.0F - (1.0F - MathHelper.sin(f5 * (float)Math.PI)) * 0.99F;
-            f6 *= f6;
-            this.colorsSunriseSunset[0] = f5 * 0.3F + 0.7F;
-            this.colorsSunriseSunset[1] = f5 * f5 * 0.7F + 0.2F;
-            this.colorsSunriseSunset[2] = f5 * f5 * 0.0F + 0.2F;
-            this.colorsSunriseSunset[3] = f6;
+            float f3 = (f1 - f2) / f * 0.5F + 0.5F;
+            float f4 = 1.0F - (1.0F - MathHelper.sin(f3 * (float)Math.PI)) * 0.99F;
+            f4 = f4 * f4;
+            this.colorsSunriseSunset[0] = f3 * 0.3F + 0.7F;
+            this.colorsSunriseSunset[1] = f3 * f3 * 0.7F + 0.2F;
+            this.colorsSunriseSunset[2] = f3 * f3 * 0.0F + 0.2F;
+            this.colorsSunriseSunset[3] = f4;
             return this.colorsSunriseSunset;
         }
         else
@@ -157,15 +155,15 @@ public abstract class WorldProvider
     @SideOnly(Side.CLIENT)
     public Vec3 getFogColor(float p_76562_1_, float p_76562_2_)
     {
-        float f2 = MathHelper.cos(p_76562_1_ * (float)Math.PI * 2.0F) * 2.0F + 0.5F;
-        f2 = MathHelper.clamp_float(f2, 0.0F, 1.0F);
-        float f3 = 0.7529412F;
-        float f4 = 0.84705883F;
-        float f5 = 1.0F;
-        f3 *= f2 * 0.94F + 0.06F;
-        f4 *= f2 * 0.94F + 0.06F;
-        f5 *= f2 * 0.91F + 0.09F;
-        return new Vec3((double)f3, (double)f4, (double)f5);
+        float f = MathHelper.cos(p_76562_1_ * (float)Math.PI * 2.0F) * 2.0F + 0.5F;
+        f = MathHelper.clamp_float(f, 0.0F, 1.0F);
+        float f1 = 0.7529412F;
+        float f2 = 0.84705883F;
+        float f3 = 1.0F;
+        f1 = f1 * (f * 0.94F + 0.06F);
+        f2 = f2 * (f * 0.94F + 0.06F);
+        f3 = f3 * (f * 0.91F + 0.09F);
+        return new Vec3((double)f1, (double)f2, (double)f3);
     }
 
     /**

@@ -15,7 +15,6 @@ public class ContainerMerchant extends Container
     private InventoryMerchant merchantInventory;
     /** Instance of World. */
     private final World theWorld;
-    private static final String __OBFID = "CL_00001757";
 
     public ContainerMerchant(InventoryPlayer playerInventory, IMerchant merchant, World worldIn)
     {
@@ -25,9 +24,8 @@ public class ContainerMerchant extends Container
         this.addSlotToContainer(new Slot(this.merchantInventory, 0, 36, 53));
         this.addSlotToContainer(new Slot(this.merchantInventory, 1, 62, 53));
         this.addSlotToContainer(new SlotMerchantResult(playerInventory.player, merchant, this.merchantInventory, 2, 120, 53));
-        int i;
 
-        for (i = 0; i < 3; ++i)
+        for (int i = 0; i < 3; ++i)
         {
             for (int j = 0; j < 9; ++j)
             {
@@ -35,9 +33,9 @@ public class ContainerMerchant extends Container
             }
         }
 
-        for (i = 0; i < 9; ++i)
+        for (int k = 0; k < 9; ++k)
         {
-            this.addSlotToContainer(new Slot(playerInventory, i, 8 + i * 18, 142));
+            this.addSlotToContainer(new Slot(playerInventory, k, 8 + k * 18, 142));
         }
     }
 
@@ -46,12 +44,9 @@ public class ContainerMerchant extends Container
         return this.merchantInventory;
     }
 
-    /**
-     * Add the given Listener to the list of Listeners. Method name is for legacy.
-     */
-    public void addCraftingToCrafters(ICrafting listener)
+    public void onCraftGuiOpened(ICrafting listener)
     {
-        super.addCraftingToCrafters(listener);
+        super.onCraftGuiOpened(listener);
     }
 
     /**
@@ -71,13 +66,15 @@ public class ContainerMerchant extends Container
         super.onCraftMatrixChanged(inventoryIn);
     }
 
-    public void setCurrentRecipeIndex(int p_75175_1_)
+    public void setCurrentRecipeIndex(int currentRecipeIndex)
     {
-        this.merchantInventory.setCurrentRecipeIndex(p_75175_1_);
+        this.merchantInventory.setCurrentRecipeIndex(currentRecipeIndex);
     }
 
     @SideOnly(Side.CLIENT)
-    public void updateProgressBar(int id, int data) {}
+    public void updateProgressBar(int id, int data)
+    {
+    }
 
     public boolean canInteractWith(EntityPlayer playerIn)
     {
@@ -156,14 +153,14 @@ public class ContainerMerchant extends Container
 
         if (!this.theWorld.isRemote)
         {
-            ItemStack itemstack = this.merchantInventory.getStackInSlotOnClosing(0);
+            ItemStack itemstack = this.merchantInventory.removeStackFromSlot(0);
 
             if (itemstack != null)
             {
                 playerIn.dropPlayerItemWithRandomChoice(itemstack, false);
             }
 
-            itemstack = this.merchantInventory.getStackInSlotOnClosing(1);
+            itemstack = this.merchantInventory.removeStackFromSlot(1);
 
             if (itemstack != null)
             {

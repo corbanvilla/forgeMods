@@ -6,8 +6,6 @@ import net.minecraft.tileentity.TileEntityFurnace;
 
 public class SlotFurnaceFuel extends Slot
 {
-    private static final String __OBFID = "CL_00002184";
-
     public SlotFurnaceFuel(IInventory inventoryIn, int slotIndex, int xPosition, int yPosition)
     {
         super(inventoryIn, slotIndex, xPosition, yPosition);

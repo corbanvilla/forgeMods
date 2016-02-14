@@ -52,13 +52,12 @@ public class EntityWolf extends EntityTameable
     /** This time increases while wolf is shaking and emitting water particles. */
     private float timeWolfIsShaking;
     private float prevTimeWolfIsShaking;
-    private static final String __OBFID = "CL_00001654";
 
     public EntityWolf(World worldIn)
     {
         super(worldIn);
         this.setSize(0.6F, 0.8F);
-        ((PathNavigateGround)this.getNavigator()).func_179690_a(true);
+        ((PathNavigateGround)this.getNavigator()).setAvoidsWater(true);
         this.tasks.addTask(1, new EntityAISwimming(this));
         this.tasks.addTask(2, this.aiSit);
         this.tasks.addTask(3, new EntityAILeapAtTarget(this, 0.4F));
@@ -72,16 +71,11 @@ public class EntityWolf extends EntityTameable
         this.targetTasks.addTask(1, new EntityAIOwnerHurtByTarget(this));
         this.targetTasks.addTask(2, new EntityAIOwnerHurtTarget(this));
         this.targetTasks.addTask(3, new EntityAIHurtByTarget(this, true, new Class[0]));
-        this.targetTasks.addTask(4, new EntityAITargetNonTamed(this, EntityAnimal.class, false, new Predicate()
+        this.targetTasks.addTask(4, new EntityAITargetNonTamed(this, EntityAnimal.class, false, new Predicate<Entity>()
         {
-            private static final String __OBFID = "CL_00002229";
-            public boolean func_180094_a(Entity p_180094_1_)
+            public boolean apply(Entity p_apply_1_)
             {
-                return p_180094_1_ instanceof EntitySheep || p_180094_1_ instanceof EntityRabbit;
-            }
-            public boolean apply(Object p_apply_1_)
-            {
-                return this.func_180094_a((Entity)p_apply_1_);
+                return p_apply_1_ instanceof EntitySheep || p_apply_1_ instanceof EntityRabbit;
             }
         }));
         this.targetTasks.addTask(5, new EntityAINearestAttackableTarget(this, EntitySkeleton.class, false));
@@ -109,11 +103,11 @@ public class EntityWolf extends EntityTameable
     /**
      * Sets the active target the Task system uses for tracking
      */
-    public void setAttackTarget(EntityLivingBase p_70624_1_)
+    public void setAttackTarget(EntityLivingBase entitylivingbaseIn)
     {
-        super.setAttackTarget(p_70624_1_);
+        super.setAttackTarget(entitylivingbaseIn);
 
-        if (p_70624_1_ == null)
+        if (entitylivingbaseIn == null)
         {
             this.setAngry(false);
         }
@@ -136,7 +130,7 @@ public class EntityWolf extends EntityTameable
         this.dataWatcher.addObject(20, new Byte((byte)EnumDyeColor.RED.getMetadata()));
     }
 
-    protected void playStepSound(BlockPos p_180429_1_, Block p_180429_2_)
+    protected void playStepSound(BlockPos pos, Block blockIn)
     {
         this.playSound("mob.wolf.step", 0.15F, 1.0F);
     }
@@ -232,7 +226,7 @@ public class EntityWolf extends EntityTameable
         super.onUpdate();
         this.headRotationCourseOld = this.headRotationCourse;
 
-        if (this.func_70922_bv())
+        if (this.isBegging())
         {
             this.headRotationCourse += (1.0F - this.headRotationCourse) * 0.4F;
         }
@@ -302,18 +296,18 @@ public class EntityWolf extends EntityTameable
     @SideOnly(Side.CLIENT)
     public float getShakeAngle(float p_70923_1_, float p_70923_2_)
     {
-        float f2 = (this.prevTimeWolfIsShaking + (this.timeWolfIsShaking - this.prevTimeWolfIsShaking) * p_70923_1_ + p_70923_2_) / 1.8F;
+        float f = (this.prevTimeWolfIsShaking + (this.timeWolfIsShaking - this.prevTimeWolfIsShaking) * p_70923_1_ + p_70923_2_) / 1.8F;
 
-        if (f2 < 0.0F)
+        if (f < 0.0F)
         {
-            f2 = 0.0F;
+            f = 0.0F;
         }
-        else if (f2 > 1.0F)
+        else if (f > 1.0F)
         {
-            f2 = 1.0F;
+            f = 1.0F;
         }
 
-        return MathHelper.sin(f2 * (float)Math.PI) * MathHelper.sin(f2 * (float)Math.PI * 11.0F) * 0.15F * (float)Math.PI;
+        return MathHelper.sin(f * (float)Math.PI) * MathHelper.sin(f * (float)Math.PI * 11.0F) * 0.15F * (float)Math.PI;
     }
 
     @SideOnly(Side.CLIENT)
@@ -359,13 +353,13 @@ public class EntityWolf extends EntityTameable
         }
     }
 
-    public boolean attackEntityAsMob(Entity p_70652_1_)
+    public boolean attackEntityAsMob(Entity entityIn)
     {
-        boolean flag = p_70652_1_.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getEntityAttribute(SharedMonsterAttributes.attackDamage).getAttributeValue()));
+        boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getEntityAttribute(SharedMonsterAttributes.attackDamage).getAttributeValue()));
 
         if (flag)
         {
-            this.func_174815_a(this, p_70652_1_);
+            this.applyEnchantments(this, entityIn);
         }
 
         return flag;
@@ -484,9 +478,9 @@ public class EntityWolf extends EntityTameable
     }
 
     @SideOnly(Side.CLIENT)
-    public void handleHealthUpdate(byte p_70103_1_)
+    public void handleStatusUpdate(byte id)
     {
-        if (p_70103_1_ == 8)
+        if (id == 8)
         {
             this.isShaking = true;
             this.timeWolfIsShaking = 0.0F;
@@ -494,7 +488,7 @@ public class EntityWolf extends EntityTameable
         }
         else
         {
-            super.handleHealthUpdate(p_70103_1_);
+            super.handleStatusUpdate(id);
         }
     }
 
@@ -570,9 +564,9 @@ public class EntityWolf extends EntityTameable
         return entitywolf;
     }
 
-    public void func_70918_i(boolean p_70918_1_)
+    public void setBegging(boolean beg)
     {
-        if (p_70918_1_)
+        if (beg)
         {
             this.dataWatcher.updateObject(19, Byte.valueOf((byte)1));
         }
@@ -606,7 +600,7 @@ public class EntityWolf extends EntityTameable
         }
     }
 
-    public boolean func_70922_bv()
+    public boolean isBegging()
     {
         return this.dataWatcher.getWatchableObjectByte(19) == 1;
     }
@@ -619,7 +613,7 @@ public class EntityWolf extends EntityTameable
         return !this.isTamed() && this.ticksExisted > 2400;
     }
 
-    public boolean func_142018_a(EntityLivingBase p_142018_1_, EntityLivingBase p_142018_2_)
+    public boolean shouldAttackEntity(EntityLivingBase p_142018_1_, EntityLivingBase p_142018_2_)
     {
         if (!(p_142018_1_ instanceof EntityCreeper) && !(p_142018_1_ instanceof EntityGhast))
         {
@@ -627,7 +621,7 @@ public class EntityWolf extends EntityTameable
             {
                 EntityWolf entitywolf = (EntityWolf)p_142018_1_;
 
-                if (entitywolf.isTamed() && entitywolf.getOwnerEntity() == p_142018_2_)
+                if (entitywolf.isTamed() && entitywolf.getOwner() == p_142018_2_)
                 {
                     return false;
                 }

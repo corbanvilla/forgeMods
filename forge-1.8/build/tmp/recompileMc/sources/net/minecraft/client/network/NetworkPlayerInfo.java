@@ -27,13 +27,13 @@ public class NetworkPlayerInfo
     private ResourceLocation locationSkin;
     private ResourceLocation locationCape;
     private String skinType;
-    private IChatComponent field_178872_h;
+    /** When this is non-null, it is displayed instead of the player's real name */
+    private IChatComponent displayName;
     private int field_178873_i = 0;
     private int field_178870_j = 0;
     private long field_178871_k = 0L;
     private long field_178868_l = 0L;
     private long field_178869_m = 0L;
-    private static final String __OBFID = "CL_00000888";
 
     public NetworkPlayerInfo(GameProfile p_i46294_1_)
     {
@@ -42,9 +42,10 @@ public class NetworkPlayerInfo
 
     public NetworkPlayerInfo(S38PacketPlayerListItem.AddPlayerData p_i46295_1_)
     {
-        this.gameProfile = p_i46295_1_.func_179962_a();
-        this.gameType = p_i46295_1_.func_179960_c();
-        this.responseTime = p_i46295_1_.func_179963_b();
+        this.gameProfile = p_i46295_1_.getProfile();
+        this.gameType = p_i46295_1_.getGameMode();
+        this.responseTime = p_i46295_1_.getPing();
+        this.displayName = p_i46295_1_.getDisplayName();
     }
 
     /**
@@ -119,14 +120,13 @@ public class NetworkPlayerInfo
                 this.playerTexturesLoaded = true;
                 Minecraft.getMinecraft().getSkinManager().loadProfileTextures(this.gameProfile, new SkinManager.SkinAvailableCallback()
                 {
-                    private static final String __OBFID = "CL_00002619";
-                    public void skinAvailable(Type p_180521_1_, ResourceLocation p_180521_2_, MinecraftProfileTexture p_180521_3_)
+                    public void skinAvailable(Type p_180521_1_, ResourceLocation location, MinecraftProfileTexture profileTexture)
                     {
-                        switch (NetworkPlayerInfo.SwitchType.field_178875_a[p_180521_1_.ordinal()])
+                        switch (p_180521_1_)
                         {
-                            case 1:
-                                NetworkPlayerInfo.this.locationSkin = p_180521_2_;
-                                NetworkPlayerInfo.this.skinType = p_180521_3_.getMetadata("model");
+                            case SKIN:
+                                NetworkPlayerInfo.this.locationSkin = location;
+                                NetworkPlayerInfo.this.skinType = profileTexture.getMetadata("model");
 
                                 if (NetworkPlayerInfo.this.skinType == null)
                                 {
@@ -134,8 +134,8 @@ public class NetworkPlayerInfo
                                 }
 
                                 break;
-                            case 2:
-                                NetworkPlayerInfo.this.locationCape = p_180521_2_;
+                            case CAPE:
+                                NetworkPlayerInfo.this.locationCape = location;
                         }
                     }
                 }, true);
@@ -143,14 +143,14 @@ public class NetworkPlayerInfo
         }
     }
 
-    public void func_178859_a(IChatComponent p_178859_1_)
+    public void setDisplayName(IChatComponent displayNameIn)
     {
-        this.field_178872_h = p_178859_1_;
+        this.displayName = displayNameIn;
     }
 
-    public IChatComponent func_178854_k()
+    public IChatComponent getDisplayName()
     {
-        return this.field_178872_h;
+        return this.displayName;
     }
 
     public int func_178835_l()
@@ -202,33 +202,4 @@ public class NetworkPlayerInfo
     {
         this.field_178869_m = p_178843_1_;
     }
-
-    @SideOnly(Side.CLIENT)
-
-    static final class SwitchType
-        {
-            static final int[] field_178875_a = new int[Type.values().length];
-            private static final String __OBFID = "CL_00002618";
-
-            static
-            {
-                try
-                {
-                    field_178875_a[Type.SKIN.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_178875_a[Type.CAPE.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
-            }
-        }
 }

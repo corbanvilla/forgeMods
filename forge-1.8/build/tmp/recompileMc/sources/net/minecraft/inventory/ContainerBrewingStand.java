@@ -14,18 +14,16 @@ public class ContainerBrewingStand extends Container
     /** Instance of Slot. */
     private final Slot theSlot;
     private int brewTime;
-    private static final String __OBFID = "CL_00001737";
 
-    public ContainerBrewingStand(InventoryPlayer playerInventory, IInventory p_i45802_2_)
+    public ContainerBrewingStand(InventoryPlayer playerInventory, IInventory tileBrewingStandIn)
     {
-        this.tileBrewingStand = p_i45802_2_;
-        this.addSlotToContainer(new ContainerBrewingStand.Potion(playerInventory.player, p_i45802_2_, 0, 56, 46));
-        this.addSlotToContainer(new ContainerBrewingStand.Potion(playerInventory.player, p_i45802_2_, 1, 79, 53));
-        this.addSlotToContainer(new ContainerBrewingStand.Potion(playerInventory.player, p_i45802_2_, 2, 102, 46));
-        this.theSlot = this.addSlotToContainer(new ContainerBrewingStand.Ingredient(p_i45802_2_, 3, 79, 17));
-        int i;
+        this.tileBrewingStand = tileBrewingStandIn;
+        this.addSlotToContainer(new ContainerBrewingStand.Potion(playerInventory.player, tileBrewingStandIn, 0, 56, 46));
+        this.addSlotToContainer(new ContainerBrewingStand.Potion(playerInventory.player, tileBrewingStandIn, 1, 79, 53));
+        this.addSlotToContainer(new ContainerBrewingStand.Potion(playerInventory.player, tileBrewingStandIn, 2, 102, 46));
+        this.theSlot = this.addSlotToContainer(new ContainerBrewingStand.Ingredient(tileBrewingStandIn, 3, 79, 17));
 
-        for (i = 0; i < 3; ++i)
+        for (int i = 0; i < 3; ++i)
         {
             for (int j = 0; j < 9; ++j)
             {
@@ -33,19 +31,16 @@ public class ContainerBrewingStand extends Container
             }
         }
 
-        for (i = 0; i < 9; ++i)
+        for (int k = 0; k < 9; ++k)
         {
-            this.addSlotToContainer(new Slot(playerInventory, i, 8 + i * 18, 142));
+            this.addSlotToContainer(new Slot(playerInventory, k, 8 + k * 18, 142));
         }
     }
 
-    /**
-     * Add the given Listener to the list of Listeners. Method name is for legacy.
-     */
-    public void addCraftingToCrafters(ICrafting listener)
+    public void onCraftGuiOpened(ICrafting listener)
     {
-        super.addCraftingToCrafters(listener);
-        listener.func_175173_a(this, this.tileBrewingStand);
+        super.onCraftGuiOpened(listener);
+        listener.sendAllWindowProperties(this, this.tileBrewingStand);
     }
 
     /**
@@ -159,11 +154,9 @@ public class ContainerBrewingStand extends Container
 
     class Ingredient extends Slot
     {
-        private static final String __OBFID = "CL_00001738";
-
-        public Ingredient(IInventory p_i1803_2_, int p_i1803_3_, int p_i1803_4_, int p_i1803_5_)
+        public Ingredient(IInventory inventoryIn, int index, int xPosition, int yPosition)
         {
-            super(p_i1803_2_, p_i1803_3_, p_i1803_4_, p_i1803_5_);
+            super(inventoryIn, index, xPosition, yPosition);
         }
 
         /**
@@ -188,12 +181,11 @@ public class ContainerBrewingStand extends Container
         {
             /** The player that has this container open. */
             private EntityPlayer player;
-            private static final String __OBFID = "CL_00001740";
 
-            public Potion(EntityPlayer p_i1804_1_, IInventory p_i1804_2_, int p_i1804_3_, int p_i1804_4_, int p_i1804_5_)
+            public Potion(EntityPlayer playerIn, IInventory inventoryIn, int index, int xPosition, int yPosition)
             {
-                super(p_i1804_2_, p_i1804_3_, p_i1804_4_, p_i1804_5_);
-                this.player = p_i1804_1_;
+                super(inventoryIn, index, xPosition, yPosition);
+                this.player = playerIn;
             }
 
             /**
@@ -229,9 +221,9 @@ public class ContainerBrewingStand extends Container
             /**
              * Returns true if this itemstack can be filled with a potion
              */
-            public static boolean canHoldPotion(ItemStack p_75243_0_)
+            public static boolean canHoldPotion(ItemStack stack)
             {
-                return net.minecraftforge.common.brewing.BrewingRecipeRegistry.isValidInput(p_75243_0_);
+                return net.minecraftforge.common.brewing.BrewingRecipeRegistry.isValidInput(stack);
             }
         }
 }

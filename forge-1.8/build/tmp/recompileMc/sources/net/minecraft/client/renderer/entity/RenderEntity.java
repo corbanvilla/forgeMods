@@ -7,13 +7,11 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderEntity extends Render
+public class RenderEntity extends Render<Entity>
 {
-    private static final String __OBFID = "CL_00000986";
-
-    public RenderEntity(RenderManager p_i46185_1_)
+    public RenderEntity(RenderManager renderManagerIn)
     {
-        super(p_i46185_1_);
+        super(renderManagerIn);
     }
 
     /**
@@ -22,12 +20,12 @@ public class RenderEntity extends Render
      * (Render<T extends Entity>) and this method has signature public void func_76986_a(T entity, double d, double d1,
      * double d2, float f, float f1). But JAD is pre 1.5 so doe
      */
-    public void doRender(Entity entity, double x, double y, double z, float p_76986_8_, float partialTicks)
+    public void doRender(Entity entity, double x, double y, double z, float entityYaw, float partialTicks)
     {
         GlStateManager.pushMatrix();
         renderOffsetAABB(entity.getEntityBoundingBox(), x - entity.lastTickPosX, y - entity.lastTickPosY, z - entity.lastTickPosZ);
         GlStateManager.popMatrix();
-        super.doRender(entity, x, y, z, p_76986_8_, partialTicks);
+        super.doRender(entity, x, y, z, entityYaw, partialTicks);
     }
 
     /**

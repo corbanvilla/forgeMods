@@ -21,7 +21,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemDye extends Item
 {
     public static final int[] dyeColors = new int[] {1973019, 11743532, 3887386, 5320730, 2437522, 8073150, 2651799, 11250603, 4408131, 14188952, 4312372, 14602026, 6719955, 12801229, 15435844, 15790320};
-    private static final String __OBFID = "CL_00000022";
 
     public ItemDye()
     {
@@ -42,9 +41,6 @@ public class ItemDye extends Item
 
     /**
      * Called when a Block is right-clicked with this Item
-     *  
-     * @param pos The block being right-clicked
-     * @param side The side being right-clicked
      */
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
@@ -157,7 +153,7 @@ public class ItemDye extends Item
         {
             block.setBlockBoundsBasedOnState(worldIn, pos);
 
-            for (int j = 0; j < amount; ++j)
+            for (int i = 0; i < amount; ++i)
             {
                 double d0 = itemRand.nextGaussian() * 0.02D;
                 double d1 = itemRand.nextGaussian() * 0.02D;
@@ -203,11 +199,9 @@ public class ItemDye extends Item
 
     /**
      * returns a list of items with the same ID, but different meta (eg: dye returns 16 items)
-     *  
-     * @param subItems The List of sub-items. This is a List of ItemStacks.
      */
     @SideOnly(Side.CLIENT)
-    public void getSubItems(Item itemIn, CreativeTabs tab, List subItems)
+    public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems)
     {
         for (int i = 0; i < 16; ++i)
         {

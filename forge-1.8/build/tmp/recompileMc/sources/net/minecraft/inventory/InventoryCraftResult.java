@@ -10,7 +10,6 @@ public class InventoryCraftResult implements IInventory
 {
     /** A list of one item containing the result of the crafting formula */
     private ItemStack[] stackResult = new ItemStack[1];
-    private static final String __OBFID = "CL_00001760";
 
     /**
      * Returns the number of slots in the inventory.
@@ -21,7 +20,7 @@ public class InventoryCraftResult implements IInventory
     }
 
     /**
-     * Returns the stack in slot i
+     * Returns the stack in the given slot.
      */
     public ItemStack getStackInSlot(int index)
     {
@@ -29,7 +28,7 @@ public class InventoryCraftResult implements IInventory
     }
 
     /**
-     * Gets the name of this command sender (usually username, but possibly "Rcon")
+     * Get the name of this object. For players this returns their username
      */
     public String getName()
     {
@@ -44,14 +43,16 @@ public class InventoryCraftResult implements IInventory
         return false;
     }
 
+    /**
+     * Get the formatted ChatComponent that will be used for the sender's username in chat
+     */
     public IChatComponent getDisplayName()
     {
         return (IChatComponent)(this.hasCustomName() ? new ChatComponentText(this.getName()) : new ChatComponentTranslation(this.getName(), new Object[0]));
     }
 
     /**
-     * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a
-     * new stack.
+     * Removes up to a specified number of items from an inventory slot and returns them in a new stack.
      */
     public ItemStack decrStackSize(int index, int count)
     {
@@ -68,10 +69,9 @@ public class InventoryCraftResult implements IInventory
     }
 
     /**
-     * When some containers are closed they call this on each slot, then drop whatever it returns as an EntityItem -
-     * like when you close a workbench GUI.
+     * Removes a stack from the given slot and returns it.
      */
-    public ItemStack getStackInSlotOnClosing(int index)
+    public ItemStack removeStackFromSlot(int index)
     {
         if (this.stackResult[0] != null)
         {
@@ -94,8 +94,7 @@ public class InventoryCraftResult implements IInventory
     }
 
     /**
-     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended. *Isn't
-     * this more of a set than a get?*
+     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended.
      */
     public int getInventoryStackLimit()
     {
@@ -106,7 +105,9 @@ public class InventoryCraftResult implements IInventory
      * For tile entities, ensures the chunk containing the tile entity is saved to disk later - the game won't think it
      * hasn't changed and skip it.
      */
-    public void markDirty() {}
+    public void markDirty()
+    {
+    }
 
     /**
      * Do not make give this method the name canInteractWith because it clashes with Container
@@ -116,9 +117,13 @@ public class InventoryCraftResult implements IInventory
         return true;
     }
 
-    public void openInventory(EntityPlayer player) {}
+    public void openInventory(EntityPlayer player)
+    {
+    }
 
-    public void closeInventory(EntityPlayer player) {}
+    public void closeInventory(EntityPlayer player)
+    {
+    }
 
     /**
      * Returns true if automation is allowed to insert the given stack (ignoring stack size) into the given slot.
@@ -133,7 +138,9 @@ public class InventoryCraftResult implements IInventory
         return 0;
     }
 
-    public void setField(int id, int value) {}
+    public void setField(int id, int value)
+    {
+    }
 
     public int getFieldCount()
     {

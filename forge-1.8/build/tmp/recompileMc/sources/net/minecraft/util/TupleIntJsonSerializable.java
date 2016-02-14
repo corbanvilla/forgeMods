@@ -4,7 +4,6 @@ public class TupleIntJsonSerializable
 {
     private int integerValue;
     private IJsonSerializable jsonSerializableValue;
-    private static final String __OBFID = "CL_00001478";
 
     /**
      * Gets the integer value stored in this tuple.
@@ -22,12 +21,9 @@ public class TupleIntJsonSerializable
         this.integerValue = integerValueIn;
     }
 
-    /**
-     * Gets the JsonSerializable value stored in this tuple.
-     */
-    public IJsonSerializable getJsonSerializableValue()
+    public <T extends IJsonSerializable> T getJsonSerializableValue()
     {
-        return this.jsonSerializableValue;
+        return (T)this.jsonSerializableValue;
     }
 
     /**

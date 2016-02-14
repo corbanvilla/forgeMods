@@ -5,6 +5,8 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.util.UUIDTypeAdapter;
 import java.util.Map;
 import java.util.UUID;
+
+import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -15,7 +17,6 @@ public class Session
     private final String playerID;
     private final String token;
     private final Session.Type sessionType;
-    private static final String __OBFID = "CL_00000659";
     /** Forge: Cache of the local session's GameProfile properties. */
     private com.mojang.authlib.properties.PropertyMap properties;
 
@@ -25,13 +26,13 @@ public class Session
         {
             usernameIn = "MissingName";
             playerIDIn = tokenIn = "NotValid";
-            System.out.println("=========================================================");
-            System.out.println("Warning the username was not set for this session, typically");
-            System.out.println("this means you installed Forge incorrectly. We have set your");
-            System.out.println("name to \"MissingName\" and your session to nothing. Please");
-            System.out.println("check your instllation and post a console log from the launcher");
-            System.out.println("when asking for help!");
-            System.out.println("=========================================================");
+            FMLLog.getLogger().log(org.apache.logging.log4j.Level.WARN, "=========================================================");
+            FMLLog.getLogger().log(org.apache.logging.log4j.Level.WARN, "WARNING!! the username was not set for this session, typically");
+            FMLLog.getLogger().log(org.apache.logging.log4j.Level.WARN, "this means you installed Forge incorrectly. We have set your");
+            FMLLog.getLogger().log(org.apache.logging.log4j.Level.WARN, "name to \"MissingName\" and your session to nothing. Please");
+            FMLLog.getLogger().log(org.apache.logging.log4j.Level.WARN, "check your installation and post a console log from the launcher");
+            FMLLog.getLogger().log(org.apache.logging.log4j.Level.WARN, "when asking for help!");
+            FMLLog.getLogger().log(org.apache.logging.log4j.Level.WARN, "=========================================================");
         }
 
         this.username = usernameIn;
@@ -69,7 +70,7 @@ public class Session
             if (properties != null) ret.getProperties().putAll(properties); // Helps to cut down on calls to the session service,
             return ret;                                                     // which helps to fix MC-52974.
         }
-        catch (IllegalArgumentException illegalargumentexception)
+        catch (IllegalArgumentException var2)
         {
             return new GameProfile(net.minecraft.entity.player.EntityPlayer.getUUID(new GameProfile((UUID)null, this.getUsername())), this.getUsername());
         }
@@ -101,10 +102,9 @@ public class Session
     {
         LEGACY("legacy"),
         MOJANG("mojang");
-        private static final Map SESSION_TYPES = Maps.newHashMap();
-        private final String sessionType;
 
-        private static final String __OBFID = "CL_00001851";
+        private static final Map<String, Session.Type> SESSION_TYPES = Maps.<String, Session.Type>newHashMap();
+        private final String sessionType;
 
         private Type(String sessionTypeIn)
         {
@@ -118,13 +118,9 @@ public class Session
 
         static
         {
-            Session.Type[] var0 = values();
-            int var1 = var0.length;
-
-            for (int var2 = 0; var2 < var1; ++var2)
+            for (Session.Type session$type : values())
             {
-                Session.Type var3 = var0[var2];
-                SESSION_TYPES.put(var3.sessionType, var3);
+                SESSION_TYPES.put(session$type.sessionType, session$type);
             }
         }
     }

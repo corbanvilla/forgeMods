@@ -27,7 +27,6 @@ public class BlockPane extends Block
     public static final PropertyBool SOUTH = PropertyBool.create("south");
     public static final PropertyBool WEST = PropertyBool.create("west");
     private final boolean canDrop;
-    private static final String __OBFID = "CL_00000322";
 
     protected BlockPane(Material materialIn, boolean canDrop)
     {
@@ -51,14 +50,15 @@ public class BlockPane extends Block
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
         return !this.canDrop ? null : super.getItemDropped(state, rand, fortune);
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -77,10 +77,8 @@ public class BlockPane extends Block
 
     /**
      * Add all collision boxes of this Block to the list that intersect with the given mask.
-     *  
-     * @param collidingEntity the Entity colliding with this Block
      */
-    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List list, Entity collidingEntity)
+    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity)
     {
         boolean flag = this.canPaneConnectTo(worldIn, pos, EnumFacing.NORTH);
         boolean flag1 = this.canPaneConnectTo(worldIn, pos, EnumFacing.SOUTH);

@@ -1,6 +1,5 @@
 package net.minecraft.entity.projectile;
 
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Items;
@@ -19,34 +18,33 @@ public class EntityPotion extends EntityThrowable
 {
     /** The damage value of the thrown potion that this EntityPotion represents. */
     private ItemStack potionDamage;
-    private static final String __OBFID = "CL_00001727";
 
     public EntityPotion(World worldIn)
     {
         super(worldIn);
     }
 
-    public EntityPotion(World worldIn, EntityLivingBase p_i1789_2_, int p_i1789_3_)
+    public EntityPotion(World worldIn, EntityLivingBase throwerIn, int meta)
     {
-        this(worldIn, p_i1789_2_, new ItemStack(Items.potionitem, 1, p_i1789_3_));
+        this(worldIn, throwerIn, new ItemStack(Items.potionitem, 1, meta));
     }
 
-    public EntityPotion(World worldIn, EntityLivingBase p_i1790_2_, ItemStack p_i1790_3_)
+    public EntityPotion(World worldIn, EntityLivingBase throwerIn, ItemStack potionDamageIn)
     {
-        super(worldIn, p_i1790_2_);
-        this.potionDamage = p_i1790_3_;
+        super(worldIn, throwerIn);
+        this.potionDamage = potionDamageIn;
     }
 
     @SideOnly(Side.CLIENT)
-    public EntityPotion(World worldIn, double p_i1791_2_, double p_i1791_4_, double p_i1791_6_, int p_i1791_8_)
+    public EntityPotion(World worldIn, double x, double y, double z, int p_i1791_8_)
     {
-        this(worldIn, p_i1791_2_, p_i1791_4_, p_i1791_6_, new ItemStack(Items.potionitem, 1, p_i1791_8_));
+        this(worldIn, x, y, z, new ItemStack(Items.potionitem, 1, p_i1791_8_));
     }
 
-    public EntityPotion(World worldIn, double p_i1792_2_, double p_i1792_4_, double p_i1792_6_, ItemStack p_i1792_8_)
+    public EntityPotion(World worldIn, double x, double y, double z, ItemStack potionDamageIn)
     {
-        super(worldIn, p_i1792_2_, p_i1792_4_, p_i1792_6_);
-        this.potionDamage = p_i1792_8_;
+        super(worldIn, x, y, z);
+        this.potionDamage = potionDamageIn;
     }
 
     /**
@@ -100,20 +98,17 @@ public class EntityPotion extends EntityThrowable
     {
         if (!this.worldObj.isRemote)
         {
-            List list = Items.potionitem.getEffects(this.potionDamage);
+            List<PotionEffect> list = Items.potionitem.getEffects(this.potionDamage);
 
             if (list != null && !list.isEmpty())
             {
                 AxisAlignedBB axisalignedbb = this.getEntityBoundingBox().expand(4.0D, 2.0D, 4.0D);
-                List list1 = this.worldObj.getEntitiesWithinAABB(EntityLivingBase.class, axisalignedbb);
+                List<EntityLivingBase> list1 = this.worldObj.<EntityLivingBase>getEntitiesWithinAABB(EntityLivingBase.class, axisalignedbb);
 
                 if (!list1.isEmpty())
                 {
-                    Iterator iterator = list1.iterator();
-
-                    while (iterator.hasNext())
+                    for (EntityLivingBase entitylivingbase : list1)
                     {
-                        EntityLivingBase entitylivingbase = (EntityLivingBase)iterator.next();
                         double d0 = this.getDistanceSqToEntity(entitylivingbase);
 
                         if (d0 < 16.0D)
@@ -125,11 +120,8 @@ public class EntityPotion extends EntityThrowable
                                 d1 = 1.0D;
                             }
 
-                            Iterator iterator1 = list.iterator();
-
-                            while (iterator1.hasNext())
+                            for (PotionEffect potioneffect : list)
                             {
-                                PotionEffect potioneffect = (PotionEffect)iterator1.next();
                                 int i = potioneffect.getPotionID();
 
                                 if (Potion.potionTypes[i].isInstant())

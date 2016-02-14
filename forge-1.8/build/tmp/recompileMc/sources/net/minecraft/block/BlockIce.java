@@ -19,8 +19,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockIce extends BlockBreakable
 {
-    private static final String __OBFID = "CL_00000259";
-
     public BlockIce()
     {
         super(Material.ice, false);

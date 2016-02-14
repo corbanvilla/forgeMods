@@ -12,10 +12,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public abstract class GuiResourcePackList extends GuiListExtended
 {
     protected final Minecraft mc;
-    protected final List field_148204_l;
-    private static final String __OBFID = "CL_00000825";
+    protected final List<ResourcePackListEntry> field_148204_l;
 
-    public GuiResourcePackList(Minecraft mcIn, int p_i45055_2_, int p_i45055_3_, List p_i45055_4_)
+    public GuiResourcePackList(Minecraft mcIn, int p_i45055_2_, int p_i45055_3_, List<ResourcePackListEntry> p_i45055_4_)
     {
         super(mcIn, p_i45055_2_, p_i45055_3_, 32, p_i45055_3_ - 55 + 4, 36);
         this.mc = mcIn;
@@ -35,7 +34,7 @@ public abstract class GuiResourcePackList extends GuiListExtended
 
     protected abstract String getListHeader();
 
-    public List getList()
+    public List<ResourcePackListEntry> getList()
     {
         return this.field_148204_l;
     }
@@ -48,9 +47,9 @@ public abstract class GuiResourcePackList extends GuiListExtended
     /**
      * Gets the IGuiListEntry object for the given index
      */
-    public ResourcePackListEntry getListEntry(int p_148180_1_)
+    public ResourcePackListEntry getListEntry(int index)
     {
-        return (ResourcePackListEntry)this.getList().get(p_148180_1_);
+        return (ResourcePackListEntry)this.getList().get(index);
     }
 
     /**

@@ -2,23 +2,23 @@ package net.minecraft.network.handshake.client;
 
 import java.io.IOException;
 import net.minecraft.network.EnumConnectionState;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.handshake.INetHandlerHandshakeServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class C00Handshake implements Packet
+public class C00Handshake implements Packet<INetHandlerHandshakeServer>
 {
     private int protocolVersion;
     private String ip;
     private int port;
     private EnumConnectionState requestedState;
-    private static final String __OBFID = "CL_00001372";
     private boolean hasFMLMarker = false;
 
-    public C00Handshake() {}
+    public C00Handshake()
+    {
+    }
 
     @SideOnly(Side.CLIENT)
     public C00Handshake(int version, String ip, int port, EnumConnectionState requestedState)
@@ -59,7 +59,10 @@ public class C00Handshake implements Packet
         buf.writeVarIntToBuffer(this.requestedState.getId());
     }
 
-    public void handle(INetHandlerHandshakeServer handler)
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
+    public void processPacket(INetHandlerHandshakeServer handler)
     {
         handler.processHandshake(this);
     }
@@ -72,14 +75,6 @@ public class C00Handshake implements Packet
     public int getProtocolVersion()
     {
         return this.protocolVersion;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.handle((INetHandlerHandshakeServer)handler);
     }
 
     public boolean hasFMLMarker()

@@ -21,7 +21,6 @@ public class GuiScreenOptionsSounds extends GuiScreen
     private final GameSettings game_settings_4;
     protected String field_146507_a = "Options";
     private String field_146508_h;
-    private static final String __OBFID = "CL_00000716";
 
     public GuiScreenOptionsSounds(GuiScreen p_i45025_1_, GameSettings p_i45025_2_)
     {
@@ -30,32 +29,32 @@ public class GuiScreenOptionsSounds extends GuiScreen
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
     public void initGui()
     {
-        byte b0 = 0;
+        int i = 0;
         this.field_146507_a = I18n.format("options.sounds.title", new Object[0]);
         this.field_146508_h = I18n.format("options.off", new Object[0]);
-        this.buttonList.add(new GuiScreenOptionsSounds.Button(SoundCategory.MASTER.getCategoryId(), this.width / 2 - 155 + b0 % 2 * 160, this.height / 6 - 12 + 24 * (b0 >> 1), SoundCategory.MASTER, true));
-        int k = b0 + 2;
-        SoundCategory[] asoundcategory = SoundCategory.values();
-        int i = asoundcategory.length;
+        this.buttonList.add(new GuiScreenOptionsSounds.Button(SoundCategory.MASTER.getCategoryId(), this.width / 2 - 155 + i % 2 * 160, this.height / 6 - 12 + 24 * (i >> 1), SoundCategory.MASTER, true));
+        i = i + 2;
 
-        for (int j = 0; j < i; ++j)
+        for (SoundCategory soundcategory : SoundCategory.values())
         {
-            SoundCategory soundcategory = asoundcategory[j];
-
             if (soundcategory != SoundCategory.MASTER)
             {
-                this.buttonList.add(new GuiScreenOptionsSounds.Button(soundcategory.getCategoryId(), this.width / 2 - 155 + k % 2 * 160, this.height / 6 - 12 + 24 * (k >> 1), soundcategory, false));
-                ++k;
+                this.buttonList.add(new GuiScreenOptionsSounds.Button(soundcategory.getCategoryId(), this.width / 2 - 155 + i % 2 * 160, this.height / 6 - 12 + 24 * (i >> 1), soundcategory, false));
+                ++i;
             }
         }
 
         this.buttonList.add(new GuiButton(200, this.width / 2 - 100, this.height / 6 + 168, I18n.format("gui.done", new Object[0])));
     }
 
+    /**
+     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
+     */
     protected void actionPerformed(GuiButton button) throws IOException
     {
         if (button.enabled)
@@ -91,7 +90,6 @@ public class GuiScreenOptionsSounds extends GuiScreen
         private final String field_146152_s;
         public float field_146156_o = 1.0F;
         public boolean field_146155_p;
-        private static final String __OBFID = "CL_00000717";
 
         public Button(int p_i45024_2_, int p_i45024_3_, int p_i45024_4_, SoundCategory p_i45024_5_, boolean p_i45024_6_)
         {
@@ -155,7 +153,9 @@ public class GuiScreenOptionsSounds extends GuiScreen
             }
         }
 
-        public void playPressSound(SoundHandler soundHandlerIn) {}
+        public void playPressSound(SoundHandler soundHandlerIn)
+        {
+        }
 
         /**
          * Fired when the mouse button is released. Equivalent of MouseListener.mouseReleased(MouseEvent e).

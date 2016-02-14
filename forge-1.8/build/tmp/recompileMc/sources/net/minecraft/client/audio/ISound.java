@@ -30,13 +30,12 @@ public interface ISound
     {
         NONE(0),
         LINEAR(2);
+
         private final int type;
 
-        private static final String __OBFID = "CL_00001126";
-
-        private AttenuationType(int p_i45110_3_)
+        private AttenuationType(int typeIn)
         {
-            this.type = p_i45110_3_;
+            this.type = typeIn;
         }
 
         public int getTypeInt()

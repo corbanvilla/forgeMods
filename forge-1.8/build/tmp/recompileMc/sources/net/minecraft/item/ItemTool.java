@@ -14,15 +14,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemTool extends Item
 {
-    private Set effectiveBlocks;
+    private Set<Block> effectiveBlocks;
     protected float efficiencyOnProperMaterial = 4.0F;
     /** Damage versus entities. */
     private float damageVsEntity;
     /** The material this tool is made from. */
     protected Item.ToolMaterial toolMaterial;
-    private static final String __OBFID = "CL_00000019";
 
-    protected ItemTool(float attackDamage, Item.ToolMaterial material, Set effectiveBlocks)
+    protected ItemTool(float attackDamage, Item.ToolMaterial material, Set<Block> effectiveBlocks)
     {
         this.toolMaterial = material;
         this.effectiveBlocks = effectiveBlocks;
@@ -53,9 +52,6 @@ public class ItemTool extends Item
     /**
      * Current implementations of this method in child classes do not use the entry argument beside ev. They just raise
      * the damage on the stack.
-     *  
-     * @param target The Entity being hit
-     * @param attacker the attacking entity
      */
     public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker)
     {
@@ -108,9 +104,6 @@ public class ItemTool extends Item
 
     /**
      * Return whether this item is repairable in an anvil.
-     *  
-     * @param toRepair The ItemStack to be repaired
-     * @param repair The ItemStack that should repair this Item (leather for leather armor, etc.)
      */
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair)
     {
@@ -119,12 +112,9 @@ public class ItemTool extends Item
         return super.getIsRepairable(toRepair, repair);
     }
 
-    /**
-     * Gets a map of item attribute modifiers, used by ItemSword to increase hit damage.
-     */
-    public Multimap getItemAttributeModifiers()
+    public Multimap<String, AttributeModifier> getItemAttributeModifiers()
     {
-        Multimap multimap = super.getItemAttributeModifiers();
+        Multimap<String, AttributeModifier> multimap = super.getItemAttributeModifiers();
         multimap.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(), new AttributeModifier(itemModifierUUID, "Tool modifier", (double)this.damageVsEntity, 0));
         return multimap;
     }

@@ -4,10 +4,9 @@ import com.google.common.base.Predicate;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 
-public class BlockHelper implements Predicate
+public class BlockHelper implements Predicate<IBlockState>
 {
     private final Block block;
-    private static final String __OBFID = "CL_00002020";
 
     private BlockHelper(Block blockType)
     {
@@ -19,13 +18,8 @@ public class BlockHelper implements Predicate
         return new BlockHelper(blockType);
     }
 
-    public boolean isBlockEqualTo(IBlockState state)
+    public boolean apply(IBlockState p_apply_1_)
     {
-        return state != null && state.getBlock() == this.block;
-    }
-
-    public boolean apply(Object p_apply_1_)
-    {
-        return this.isBlockEqualTo((IBlockState)p_apply_1_);
+        return p_apply_1_ != null && p_apply_1_.getBlock() == this.block;
     }
 }

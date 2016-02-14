@@ -6,7 +6,6 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelMinecart;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
@@ -15,16 +14,15 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderMinecart extends Render
+public class RenderMinecart<T extends EntityMinecart> extends Render<T>
 {
     private static final ResourceLocation minecartTextures = new ResourceLocation("textures/entity/minecart.png");
     /** instance of ModelMinecart for rendering */
     protected ModelBase modelMinecart = new ModelMinecart();
-    private static final String __OBFID = "CL_00001013";
 
-    public RenderMinecart(RenderManager p_i46155_1_)
+    public RenderMinecart(RenderManager renderManagerIn)
     {
-        super(p_i46155_1_);
+        super(renderManagerIn);
         this.shadowSize = 0.5F;
     }
 
@@ -34,27 +32,27 @@ public class RenderMinecart extends Render
      * (Render<T extends Entity>) and this method has signature public void func_76986_a(T entity, double d, double d1,
      * double d2, float f, float f1). But JAD is pre 1.5 so doe
      */
-    public void doRender(EntityMinecart entity, double x, double y, double z, float p_76986_8_, float partialTicks)
+    public void doRender(T entity, double x, double y, double z, float entityYaw, float partialTicks)
     {
         GlStateManager.pushMatrix();
         this.bindEntityTexture(entity);
         long i = (long)entity.getEntityId() * 493286711L;
         i = i * i * 4392167121L + i * 98761L;
-        float f2 = (((float)(i >> 16 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
-        float f3 = (((float)(i >> 20 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
-        float f4 = (((float)(i >> 24 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
-        GlStateManager.translate(f2, f3, f4);
-        double d3 = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * (double)partialTicks;
-        double d4 = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * (double)partialTicks;
-        double d5 = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * (double)partialTicks;
-        double d6 = 0.30000001192092896D;
-        Vec3 vec3 = entity.func_70489_a(d3, d4, d5);
-        float f5 = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks;
+        float f = (((float)(i >> 16 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
+        float f1 = (((float)(i >> 20 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
+        float f2 = (((float)(i >> 24 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
+        GlStateManager.translate(f, f1, f2);
+        double d0 = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * (double)partialTicks;
+        double d1 = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * (double)partialTicks;
+        double d2 = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * (double)partialTicks;
+        double d3 = 0.30000001192092896D;
+        Vec3 vec3 = entity.func_70489_a(d0, d1, d2);
+        float f3 = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks;
 
         if (vec3 != null)
         {
-            Vec3 vec31 = entity.func_70495_a(d3, d4, d5, d6);
-            Vec3 vec32 = entity.func_70495_a(d3, d4, d5, -d6);
+            Vec3 vec31 = entity.func_70495_a(d0, d1, d2, d3);
+            Vec3 vec32 = entity.func_70495_a(d0, d1, d2, -d3);
 
             if (vec31 == null)
             {
@@ -66,33 +64,33 @@ public class RenderMinecart extends Render
                 vec32 = vec3;
             }
 
-            x += vec3.xCoord - d3;
-            y += (vec31.yCoord + vec32.yCoord) / 2.0D - d4;
-            z += vec3.zCoord - d5;
+            x += vec3.xCoord - d0;
+            y += (vec31.yCoord + vec32.yCoord) / 2.0D - d1;
+            z += vec3.zCoord - d2;
             Vec3 vec33 = vec32.addVector(-vec31.xCoord, -vec31.yCoord, -vec31.zCoord);
 
             if (vec33.lengthVector() != 0.0D)
             {
                 vec33 = vec33.normalize();
-                p_76986_8_ = (float)(Math.atan2(vec33.zCoord, vec33.xCoord) * 180.0D / Math.PI);
-                f5 = (float)(Math.atan(vec33.yCoord) * 73.0D);
+                entityYaw = (float)(Math.atan2(vec33.zCoord, vec33.xCoord) * 180.0D / Math.PI);
+                f3 = (float)(Math.atan(vec33.yCoord) * 73.0D);
             }
         }
 
         GlStateManager.translate((float)x, (float)y + 0.375F, (float)z);
-        GlStateManager.rotate(180.0F - p_76986_8_, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(-f5, 0.0F, 0.0F, 1.0F);
-        float f7 = (float)entity.getRollingAmplitude() - partialTicks;
-        float f8 = entity.getDamage() - partialTicks;
+        GlStateManager.rotate(180.0F - entityYaw, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(-f3, 0.0F, 0.0F, 1.0F);
+        float f5 = (float)entity.getRollingAmplitude() - partialTicks;
+        float f6 = entity.getDamage() - partialTicks;
 
-        if (f8 < 0.0F)
+        if (f6 < 0.0F)
         {
-            f8 = 0.0F;
+            f6 = 0.0F;
         }
 
-        if (f7 > 0.0F)
+        if (f5 > 0.0F)
         {
-            GlStateManager.rotate(MathHelper.sin(f7) * f7 * f8 / 10.0F * (float)entity.getRollingDirection(), 1.0F, 0.0F, 0.0F);
+            GlStateManager.rotate(MathHelper.sin(f5) * f5 * f6 / 10.0F * (float)entity.getRollingDirection(), 1.0F, 0.0F, 0.0F);
         }
 
         int j = entity.getDisplayTileOffset();
@@ -102,8 +100,8 @@ public class RenderMinecart extends Render
         {
             GlStateManager.pushMatrix();
             this.bindTexture(TextureMap.locationBlocksTexture);
-            float f6 = 0.75F;
-            GlStateManager.scale(f6, f6, f6);
+            float f4 = 0.75F;
+            GlStateManager.scale(f4, f4, f4);
             GlStateManager.translate(-0.5F, (float)(j - 8) / 16.0F, 0.5F);
             this.func_180560_a(entity, partialTicks, iblockstate);
             GlStateManager.popMatrix();
@@ -114,40 +112,21 @@ public class RenderMinecart extends Render
         GlStateManager.scale(-1.0F, -1.0F, 1.0F);
         this.modelMinecart.render(entity, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
         GlStateManager.popMatrix();
-        super.doRender(entity, x, y, z, p_76986_8_, partialTicks);
+        super.doRender(entity, x, y, z, entityYaw, partialTicks);
     }
 
     /**
      * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
      */
-    protected ResourceLocation getEntityTexture(EntityMinecart entity)
+    protected ResourceLocation getEntityTexture(T entity)
     {
         return minecartTextures;
     }
 
-    protected void func_180560_a(EntityMinecart p_180560_1_, float p_180560_2_, IBlockState p_180560_3_)
+    protected void func_180560_a(T minecart, float partialTicks, IBlockState state)
     {
         GlStateManager.pushMatrix();
-        Minecraft.getMinecraft().getBlockRendererDispatcher().renderBlockBrightness(p_180560_3_, p_180560_1_.getBrightness(p_180560_2_));
+        Minecraft.getMinecraft().getBlockRendererDispatcher().renderBlockBrightness(state, minecart.getBrightness(partialTicks));
         GlStateManager.popMatrix();
-    }
-
-    /**
-     * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
-     */
-    protected ResourceLocation getEntityTexture(Entity entity)
-    {
-        return this.getEntityTexture((EntityMinecart)entity);
-    }
-
-    /**
-     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
-     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
-     * (Render<T extends Entity>) and this method has signature public void func_76986_a(T entity, double d, double d1,
-     * double d2, float f, float f1). But JAD is pre 1.5 so doe
-     */
-    public void doRender(Entity entity, double x, double y, double z, float p_76986_8_, float partialTicks)
-    {
-        this.doRender((EntityMinecart)entity, x, y, z, p_76986_8_, partialTicks);
     }
 }

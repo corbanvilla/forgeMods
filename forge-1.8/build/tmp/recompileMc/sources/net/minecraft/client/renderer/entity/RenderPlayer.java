@@ -2,7 +2,6 @@ package net.minecraft.client.renderer.entity;
 
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.layers.LayerArrow;
@@ -11,8 +10,6 @@ import net.minecraft.client.renderer.entity.layers.LayerCape;
 import net.minecraft.client.renderer.entity.layers.LayerCustomHead;
 import net.minecraft.client.renderer.entity.layers.LayerDeadmau5Head;
 import net.minecraft.client.renderer.entity.layers.LayerHeldItem;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EnumPlayerModelParts;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
@@ -24,11 +21,10 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderPlayer extends RendererLivingEntity
+public class RenderPlayer extends RendererLivingEntity<AbstractClientPlayer>
 {
     /** this field is used to indicate the 3-pixel wide arms */
     private boolean smallArms;
-    private static final String __OBFID = "CL_00001020";
 
     public RenderPlayer(RenderManager renderManager)
     {
@@ -44,40 +40,43 @@ public class RenderPlayer extends RendererLivingEntity
         this.addLayer(new LayerArrow(this));
         this.addLayer(new LayerDeadmau5Head(this));
         this.addLayer(new LayerCape(this));
-        this.addLayer(new LayerCustomHead(this.getPlayerModel().bipedHead));
+        this.addLayer(new LayerCustomHead(this.getMainModel().bipedHead));
     }
 
-    /**
-     * returns the more specialized type of the model as the player model.
-     */
-    public ModelPlayer getPlayerModel()
+    public ModelPlayer getMainModel()
     {
         return (ModelPlayer)super.getMainModel();
     }
 
-    public void func_180596_a(AbstractClientPlayer p_180596_1_, double p_180596_2_, double p_180596_4_, double p_180596_6_, float p_180596_8_, float p_180596_9_)
+    /**
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity>) and this method has signature public void func_76986_a(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doe
+     */
+    public void doRender(AbstractClientPlayer entity, double x, double y, double z, float entityYaw, float partialTicks)
     {
-        if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderPlayerEvent.Pre(p_180596_1_, this, p_180596_9_, p_180596_2_, p_180596_4_, p_180596_6_))) return;
-        if (!p_180596_1_.isUser() || this.renderManager.livingPlayer == p_180596_1_)
+        if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderPlayerEvent.Pre(entity, this, partialTicks, x, y, z))) return;
+        if (!entity.isUser() || this.renderManager.livingPlayer == entity)
         {
-            double d3 = p_180596_4_;
+            double d0 = y;
 
-            if (p_180596_1_.isSneaking() && !(p_180596_1_ instanceof EntityPlayerSP))
+            if (entity.isSneaking() && !(entity instanceof EntityPlayerSP))
             {
-                d3 = p_180596_4_ - 0.125D;
+                d0 = y - 0.125D;
             }
 
-            this.func_177137_d(p_180596_1_);
-            super.doRender((EntityLivingBase)p_180596_1_, p_180596_2_, d3, p_180596_6_, p_180596_8_, p_180596_9_);
+            this.setModelVisibilities(entity);
+            super.doRender(entity, x, d0, z, entityYaw, partialTicks);
         }
-        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderPlayerEvent.Post(p_180596_1_, this, p_180596_9_, p_180596_2_, p_180596_4_, p_180596_6_));
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderPlayerEvent.Post(entity, this, partialTicks, x, y, z));
     }
 
-    private void func_177137_d(AbstractClientPlayer p_177137_1_)
+    private void setModelVisibilities(AbstractClientPlayer clientPlayer)
     {
-        ModelPlayer modelplayer = this.getPlayerModel();
+        ModelPlayer modelplayer = this.getMainModel();
 
-        if (p_177137_1_.isSpectator())
+        if (clientPlayer.isSpectator())
         {
             modelplayer.setInvisible(false);
             modelplayer.bipedHead.showModel = true;
@@ -85,17 +84,17 @@ public class RenderPlayer extends RendererLivingEntity
         }
         else
         {
-            ItemStack itemstack = p_177137_1_.inventory.getCurrentItem();
+            ItemStack itemstack = clientPlayer.inventory.getCurrentItem();
             modelplayer.setInvisible(true);
-            modelplayer.bipedHeadwear.showModel = p_177137_1_.func_175148_a(EnumPlayerModelParts.HAT);
-            modelplayer.bipedBodyWear.showModel = p_177137_1_.func_175148_a(EnumPlayerModelParts.JACKET);
-            modelplayer.bipedLeftLegwear.showModel = p_177137_1_.func_175148_a(EnumPlayerModelParts.LEFT_PANTS_LEG);
-            modelplayer.bipedRightLegwear.showModel = p_177137_1_.func_175148_a(EnumPlayerModelParts.RIGHT_PANTS_LEG);
-            modelplayer.bipedLeftArmwear.showModel = p_177137_1_.func_175148_a(EnumPlayerModelParts.LEFT_SLEEVE);
-            modelplayer.bipedRightArmwear.showModel = p_177137_1_.func_175148_a(EnumPlayerModelParts.RIGHT_SLEEVE);
+            modelplayer.bipedHeadwear.showModel = clientPlayer.isWearing(EnumPlayerModelParts.HAT);
+            modelplayer.bipedBodyWear.showModel = clientPlayer.isWearing(EnumPlayerModelParts.JACKET);
+            modelplayer.bipedLeftLegwear.showModel = clientPlayer.isWearing(EnumPlayerModelParts.LEFT_PANTS_LEG);
+            modelplayer.bipedRightLegwear.showModel = clientPlayer.isWearing(EnumPlayerModelParts.RIGHT_PANTS_LEG);
+            modelplayer.bipedLeftArmwear.showModel = clientPlayer.isWearing(EnumPlayerModelParts.LEFT_SLEEVE);
+            modelplayer.bipedRightArmwear.showModel = clientPlayer.isWearing(EnumPlayerModelParts.RIGHT_SLEEVE);
             modelplayer.heldItemLeft = 0;
             modelplayer.aimedBow = false;
-            modelplayer.isSneak = p_177137_1_.isSneaking();
+            modelplayer.isSneak = clientPlayer.isSneaking();
 
             if (itemstack == null)
             {
@@ -105,7 +104,7 @@ public class RenderPlayer extends RendererLivingEntity
             {
                 modelplayer.heldItemRight = 1;
 
-                if (p_177137_1_.getItemInUseCount() > 0)
+                if (clientPlayer.getItemInUseCount() > 0)
                 {
                     EnumAction enumaction = itemstack.getItemUseAction();
 
@@ -122,12 +121,15 @@ public class RenderPlayer extends RendererLivingEntity
         }
     }
 
-    protected ResourceLocation func_180594_a(AbstractClientPlayer p_180594_1_)
+    /**
+     * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
+     */
+    protected ResourceLocation getEntityTexture(AbstractClientPlayer entity)
     {
-        return p_180594_1_.getLocationSkin();
+        return entity.getLocationSkin();
     }
 
-    public void func_82422_c()
+    public void transformHeldFull3DItemLayer()
     {
         GlStateManager.translate(0.0F, 0.1875F, 0.0F);
     }
@@ -136,142 +138,80 @@ public class RenderPlayer extends RendererLivingEntity
      * Allows the render to do any OpenGL state modifications necessary before the model is rendered. Args:
      * entityLiving, partialTickTime
      */
-    protected void preRenderCallback(AbstractClientPlayer p_77041_1_, float p_77041_2_)
+    protected void preRenderCallback(AbstractClientPlayer entitylivingbaseIn, float partialTickTime)
     {
-        float f1 = 0.9375F;
-        GlStateManager.scale(f1, f1, f1);
+        float f = 0.9375F;
+        GlStateManager.scale(f, f, f);
     }
 
-    protected void renderOffsetLivingLabel(AbstractClientPlayer p_96449_1_, double p_96449_2_, double p_96449_4_, double p_96449_6_, String p_96449_8_, float p_96449_9_, double p_96449_10_)
+    protected void renderOffsetLivingLabel(AbstractClientPlayer entityIn, double x, double y, double z, String str, float p_177069_9_, double p_177069_10_)
     {
-        if (p_96449_10_ < 100.0D)
+        if (p_177069_10_ < 100.0D)
         {
-            Scoreboard scoreboard = p_96449_1_.getWorldScoreboard();
+            Scoreboard scoreboard = entityIn.getWorldScoreboard();
             ScoreObjective scoreobjective = scoreboard.getObjectiveInDisplaySlot(2);
 
             if (scoreobjective != null)
             {
-                Score score = scoreboard.getValueFromObjective(p_96449_1_.getName(), scoreobjective);
-                this.renderLivingLabel(p_96449_1_, score.getScorePoints() + " " + scoreobjective.getDisplayName(), p_96449_2_, p_96449_4_, p_96449_6_, 64);
-                p_96449_4_ += (double)((float)this.getFontRendererFromRenderManager().FONT_HEIGHT * 1.15F * p_96449_9_);
+                Score score = scoreboard.getValueFromObjective(entityIn.getName(), scoreobjective);
+                this.renderLivingLabel(entityIn, score.getScorePoints() + " " + scoreobjective.getDisplayName(), x, y, z, 64);
+                y += (double)((float)this.getFontRendererFromRenderManager().FONT_HEIGHT * 1.15F * p_177069_9_);
             }
         }
 
-        super.func_177069_a(p_96449_1_, p_96449_2_, p_96449_4_, p_96449_6_, p_96449_8_, p_96449_9_, p_96449_10_);
+        super.renderOffsetLivingLabel(entityIn, x, y, z, str, p_177069_9_, p_177069_10_);
     }
 
-    public void func_177138_b(AbstractClientPlayer p_177138_1_)
+    public void renderRightArm(AbstractClientPlayer clientPlayer)
     {
         float f = 1.0F;
         GlStateManager.color(f, f, f);
-        ModelPlayer modelplayer = this.getPlayerModel();
-        this.func_177137_d(p_177138_1_);
+        ModelPlayer modelplayer = this.getMainModel();
+        this.setModelVisibilities(clientPlayer);
         modelplayer.swingProgress = 0.0F;
         modelplayer.isSneak = false;
-        modelplayer.setRotationAngles(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F, p_177138_1_);
-        modelplayer.func_178725_a();
+        modelplayer.setRotationAngles(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F, clientPlayer);
+        modelplayer.renderRightArm();
     }
 
-    public void func_177139_c(AbstractClientPlayer p_177139_1_)
+    public void renderLeftArm(AbstractClientPlayer clientPlayer)
     {
         float f = 1.0F;
         GlStateManager.color(f, f, f);
-        ModelPlayer modelplayer = this.getPlayerModel();
-        this.func_177137_d(p_177139_1_);
+        ModelPlayer modelplayer = this.getMainModel();
+        this.setModelVisibilities(clientPlayer);
         modelplayer.isSneak = false;
         modelplayer.swingProgress = 0.0F;
-        modelplayer.setRotationAngles(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F, p_177139_1_);
-        modelplayer.func_178726_b();
+        modelplayer.setRotationAngles(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F, clientPlayer);
+        modelplayer.renderLeftArm();
     }
 
     /**
      * Sets a simple glTranslate on a LivingEntity.
      */
-    protected void renderLivingAt(AbstractClientPlayer p_77039_1_, double p_77039_2_, double p_77039_4_, double p_77039_6_)
+    protected void renderLivingAt(AbstractClientPlayer entityLivingBaseIn, double x, double y, double z)
     {
-        if (p_77039_1_.isEntityAlive() && p_77039_1_.isPlayerSleeping())
+        if (entityLivingBaseIn.isEntityAlive() && entityLivingBaseIn.isPlayerSleeping())
         {
-            super.renderLivingAt(p_77039_1_, p_77039_2_ + (double)p_77039_1_.renderOffsetX, p_77039_4_ + (double)p_77039_1_.renderOffsetY, p_77039_6_ + (double)p_77039_1_.renderOffsetZ);
+            super.renderLivingAt(entityLivingBaseIn, x + (double)entityLivingBaseIn.renderOffsetX, y + (double)entityLivingBaseIn.renderOffsetY, z + (double)entityLivingBaseIn.renderOffsetZ);
         }
         else
         {
-            super.renderLivingAt(p_77039_1_, p_77039_2_, p_77039_4_, p_77039_6_);
+            super.renderLivingAt(entityLivingBaseIn, x, y, z);
         }
     }
 
-    protected void func_180595_a(AbstractClientPlayer p_180595_1_, float p_180595_2_, float p_180595_3_, float p_180595_4_)
+    protected void rotateCorpse(AbstractClientPlayer bat, float p_77043_2_, float p_77043_3_, float partialTicks)
     {
-        if (p_180595_1_.isEntityAlive() && p_180595_1_.isPlayerSleeping())
+        if (bat.isEntityAlive() && bat.isPlayerSleeping())
         {
-            GlStateManager.rotate(p_180595_1_.getBedOrientationInDegrees(), 0.0F, 1.0F, 0.0F);
-            GlStateManager.rotate(this.getDeathMaxRotation(p_180595_1_), 0.0F, 0.0F, 1.0F);
+            GlStateManager.rotate(bat.getBedOrientationInDegrees(), 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(this.getDeathMaxRotation(bat), 0.0F, 0.0F, 1.0F);
             GlStateManager.rotate(270.0F, 0.0F, 1.0F, 0.0F);
         }
         else
         {
-            super.rotateCorpse(p_180595_1_, p_180595_2_, p_180595_3_, p_180595_4_);
+            super.rotateCorpse(bat, p_77043_2_, p_77043_3_, partialTicks);
         }
-    }
-
-    /**
-     * Allows the render to do any OpenGL state modifications necessary before the model is rendered. Args:
-     * entityLiving, partialTickTime
-     */
-    protected void preRenderCallback(EntityLivingBase p_77041_1_, float p_77041_2_)
-    {
-        this.preRenderCallback((AbstractClientPlayer)p_77041_1_, p_77041_2_);
-    }
-
-    protected void rotateCorpse(EntityLivingBase p_77043_1_, float p_77043_2_, float p_77043_3_, float p_77043_4_)
-    {
-        this.func_180595_a((AbstractClientPlayer)p_77043_1_, p_77043_2_, p_77043_3_, p_77043_4_);
-    }
-
-    /**
-     * Sets a simple glTranslate on a LivingEntity.
-     */
-    protected void renderLivingAt(EntityLivingBase p_77039_1_, double p_77039_2_, double p_77039_4_, double p_77039_6_)
-    {
-        this.renderLivingAt((AbstractClientPlayer)p_77039_1_, p_77039_2_, p_77039_4_, p_77039_6_);
-    }
-
-    /**
-     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
-     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
-     * (Render<T extends Entity>) and this method has signature public void func_76986_a(T entity, double d, double d1,
-     * double d2, float f, float f1). But JAD is pre 1.5 so doe
-     */
-    public void doRender(EntityLivingBase entity, double x, double y, double z, float p_76986_8_, float partialTicks)
-    {
-        this.func_180596_a((AbstractClientPlayer)entity, x, y, z, p_76986_8_, partialTicks);
-    }
-
-    public ModelBase getMainModel()
-    {
-        return this.getPlayerModel();
-    }
-
-    /**
-     * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
-     */
-    protected ResourceLocation getEntityTexture(Entity entity)
-    {
-        return this.func_180594_a((AbstractClientPlayer)entity);
-    }
-
-    protected void func_177069_a(Entity p_177069_1_, double p_177069_2_, double p_177069_4_, double p_177069_6_, String p_177069_8_, float p_177069_9_, double p_177069_10_)
-    {
-        this.renderOffsetLivingLabel((AbstractClientPlayer)p_177069_1_, p_177069_2_, p_177069_4_, p_177069_6_, p_177069_8_, p_177069_9_, p_177069_10_);
-    }
-
-    /**
-     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
-     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
-     * (Render<T extends Entity>) and this method has signature public void func_76986_a(T entity, double d, double d1,
-     * double d2, float f, float f1). But JAD is pre 1.5 so doe
-     */
-    public void doRender(Entity entity, double x, double y, double z, float p_76986_8_, float partialTicks)
-    {
-        this.func_180596_a((AbstractClientPlayer)entity, x, y, z, p_76986_8_, partialTicks);
     }
 }

@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
+import net.minecraft.util.IJsonSerializable;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -33,16 +34,15 @@ public class Achievement extends StatBase
      * achieve.
      */
     private boolean isSpecial;
-    private static final String __OBFID = "CL_00001466";
 
-    public Achievement(String p_i46327_1_, String p_i46327_2_, int column, int row, Item p_i46327_5_, Achievement p_i46327_6_)
+    public Achievement(String p_i46327_1_, String p_i46327_2_, int column, int row, Item p_i46327_5_, Achievement parent)
     {
-        this(p_i46327_1_, p_i46327_2_, column, row, new ItemStack(p_i46327_5_), p_i46327_6_);
+        this(p_i46327_1_, p_i46327_2_, column, row, new ItemStack(p_i46327_5_), parent);
     }
 
-    public Achievement(String p_i45301_1_, String p_i45301_2_, int column, int row, Block p_i45301_5_, Achievement p_i45301_6_)
+    public Achievement(String p_i45301_1_, String p_i45301_2_, int column, int row, Block p_i45301_5_, Achievement parent)
     {
-        this(p_i45301_1_, p_i45301_2_, column, row, new ItemStack(p_i45301_5_), p_i45301_6_);
+        this(p_i45301_1_, p_i45301_2_, column, row, new ItemStack(p_i45301_5_), parent);
     }
 
     public Achievement(String p_i45302_1_, String p_i45302_2_, int column, int row, ItemStack p_i45302_5_, Achievement parent)
@@ -76,7 +76,11 @@ public class Achievement extends StatBase
         this.parentAchievement = parent;
     }
 
-    public Achievement setIndependent()
+    /**
+     * Initializes the current stat as independent (i.e., lacking prerequisites for being updated) and returns the
+     * current instance.
+     */
+    public Achievement initIndependentStat()
     {
         this.isIndependent = true;
         return this;
@@ -92,7 +96,10 @@ public class Achievement extends StatBase
         return this;
     }
 
-    public Achievement func_180788_c()
+    /**
+     * Register the stat into StatList.
+     */
+    public Achievement registerStat()
     {
         super.registerStat();
         AchievementList.achievementList.add(this);
@@ -114,9 +121,9 @@ public class Achievement extends StatBase
         return ichatcomponent;
     }
 
-    public Achievement func_180787_a(Class p_180787_1_)
+    public Achievement func_150953_b(Class <? extends IJsonSerializable > p_150953_1_)
     {
-        return (Achievement)super.func_150953_b(p_180787_1_);
+        return (Achievement)super.func_150953_b(p_150953_1_);
     }
 
     /**
@@ -145,27 +152,5 @@ public class Achievement extends StatBase
     public boolean getSpecial()
     {
         return this.isSpecial;
-    }
-
-    public StatBase func_150953_b(Class p_150953_1_)
-    {
-        return this.func_180787_a(p_150953_1_);
-    }
-
-    /**
-     * Register the stat into StatList.
-     */
-    public StatBase registerStat()
-    {
-        return this.func_180788_c();
-    }
-
-    /**
-     * Initializes the current stat as independent (i.e., lacking prerequisites for being updated) and returns the
-     * current instance.
-     */
-    public StatBase initIndependentStat()
-    {
-        return this.setIndependent();
     }
 }

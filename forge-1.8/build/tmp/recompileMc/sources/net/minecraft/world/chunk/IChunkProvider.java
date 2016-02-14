@@ -5,6 +5,7 @@ import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.IProgressUpdate;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeGenBase;
 
 public interface IChunkProvider
 {
@@ -32,7 +33,7 @@ public interface IChunkProvider
      * Two modes of operation: if passed true, save all Chunks in one go.  If passed false, save up to two chunks.
      * Return true if all chunks have been saved.
      */
-    boolean saveChunks(boolean p_73151_1_, IProgressUpdate p_73151_2_);
+    boolean saveChunks(boolean p_73151_1_, IProgressUpdate progressCallback);
 
     /**
      * Unloads chunks that are marked to be unloaded. This is not guaranteed to unload every such chunk.
@@ -49,9 +50,9 @@ public interface IChunkProvider
      */
     String makeString();
 
-    List func_177458_a(EnumCreatureType p_177458_1_, BlockPos p_177458_2_);
+    List<BiomeGenBase.SpawnListEntry> getPossibleCreatures(EnumCreatureType creatureType, BlockPos pos);
 
-    BlockPos getStrongholdGen(World worldIn, String p_180513_2_, BlockPos p_180513_3_);
+    BlockPos getStrongholdGen(World worldIn, String structureName, BlockPos position);
 
     int getLoadedChunkCount();
 

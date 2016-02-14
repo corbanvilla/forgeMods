@@ -7,7 +7,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemLeaves extends ItemBlock
 {
     private final BlockLeaves leaves;
-    private static final String __OBFID = "CL_00000046";
 
     public ItemLeaves(BlockLeaves block)
     {

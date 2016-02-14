@@ -8,11 +8,10 @@ public class ThreadedFileIOBase implements Runnable
 {
     /** Instance of ThreadedFileIOBase */
     private static final ThreadedFileIOBase threadedIOInstance = new ThreadedFileIOBase();
-    private List threadedIOQueue = Collections.synchronizedList(Lists.newArrayList());
+    private List<IThreadedFileIO> threadedIOQueue = Collections.<IThreadedFileIO>synchronizedList(Lists.<IThreadedFileIO>newArrayList());
     private volatile long writeQueuedCounter;
     private volatile long savedIOCounter;
     private volatile boolean isThreadWaiting;
-    private static final String __OBFID = "CL_00000605";
 
     private ThreadedFileIOBase()
     {
@@ -33,7 +32,9 @@ public class ThreadedFileIOBase implements Runnable
     public void run()
     {
         while (true)
+        {
             this.processQueue();
+        }
     }
 
     /**

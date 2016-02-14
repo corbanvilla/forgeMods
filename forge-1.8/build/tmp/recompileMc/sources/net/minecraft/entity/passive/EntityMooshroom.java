@@ -11,13 +11,11 @@ import net.minecraft.world.World;
 
 public class EntityMooshroom extends EntityCow implements net.minecraftforge.common.IShearable
 {
-    private static final String __OBFID = "CL_00001645";
-
     public EntityMooshroom(World worldIn)
     {
         super(worldIn);
         this.setSize(0.9F, 1.3F);
-        this.field_175506_bl = Blocks.mycelium;
+        this.spawnableBlock = Blocks.mycelium;
     }
 
     /**

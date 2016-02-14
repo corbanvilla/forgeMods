@@ -12,6 +12,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenBigTree;
 import net.minecraft.world.gen.feature.WorldGenCanopyTree;
@@ -27,9 +28,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockSapling extends BlockBush implements IGrowable
 {
-    public static final PropertyEnum TYPE = PropertyEnum.create("type", BlockPlanks.EnumType.class);
+    public static final PropertyEnum<BlockPlanks.EnumType> TYPE = PropertyEnum.<BlockPlanks.EnumType>create("type", BlockPlanks.EnumType.class);
     public static final PropertyInteger STAGE = PropertyInteger.create("stage", 0, 1);
-    private static final String __OBFID = "CL_00000305";
 
     protected BlockSapling()
     {
@@ -37,6 +37,14 @@ public class BlockSapling extends BlockBush implements IGrowable
         float f = 0.4F;
         this.setBlockBounds(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, f * 2.0F, 0.5F + f);
         this.setCreativeTab(CreativeTabs.tabDecorations);
+    }
+
+    /**
+     * Gets the localized name of this block. Used for the statistics page.
+     */
+    public String getLocalizedName()
+    {
+        return StatCollector.translateToLocal(this.getUnlocalizedName() + "." + BlockPlanks.EnumType.OAK.getUnlocalizedName() + ".name");
     }
 
     public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
@@ -67,25 +75,25 @@ public class BlockSapling extends BlockBush implements IGrowable
     public void generateTree(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
         if (!net.minecraftforge.event.terraingen.TerrainGen.saplingGrowTree(worldIn, rand, pos)) return;
-        Object object = rand.nextInt(10) == 0 ? new WorldGenBigTree(true) : new WorldGenTrees(true);
+        WorldGenerator worldgenerator = (WorldGenerator)(rand.nextInt(10) == 0 ? new WorldGenBigTree(true) : new WorldGenTrees(true));
         int i = 0;
         int j = 0;
         boolean flag = false;
 
-        switch (BlockSapling.SwitchEnumType.WOOD_TYPE_LOOKUP[((BlockPlanks.EnumType)state.getValue(TYPE)).ordinal()])
+        switch ((BlockPlanks.EnumType)state.getValue(TYPE))
         {
-            case 1:
-                label78:
+            case SPRUCE:
+                label114:
 
                 for (i = 0; i >= -1; --i)
                 {
                     for (j = 0; j >= -1; --j)
                     {
-                        if (this.isTypeAt(worldIn, pos.add(i, 0, j), BlockPlanks.EnumType.SPRUCE) && this.isTypeAt(worldIn, pos.add(i + 1, 0, j), BlockPlanks.EnumType.SPRUCE) && this.isTypeAt(worldIn, pos.add(i, 0, j + 1), BlockPlanks.EnumType.SPRUCE) && this.isTypeAt(worldIn, pos.add(i + 1, 0, j + 1), BlockPlanks.EnumType.SPRUCE))
+                        if (this.func_181624_a(worldIn, pos, i, j, BlockPlanks.EnumType.SPRUCE))
                         {
-                            object = new WorldGenMegaPineTree(false, rand.nextBoolean());
+                            worldgenerator = new WorldGenMegaPineTree(false, rand.nextBoolean());
                             flag = true;
-                            break label78;
+                            break label114;
                         }
                     }
                 }
@@ -94,25 +102,27 @@ public class BlockSapling extends BlockBush implements IGrowable
                 {
                     j = 0;
                     i = 0;
-                    object = new WorldGenTaiga2(true);
+                    worldgenerator = new WorldGenTaiga2(true);
                 }
 
                 break;
-            case 2:
-                object = new WorldGenForest(true, false);
+            case BIRCH:
+                worldgenerator = new WorldGenForest(true, false);
                 break;
-            case 3:
-                label93:
+            case JUNGLE:
+                IBlockState iblockstate = Blocks.log.getDefaultState().withProperty(BlockOldLog.VARIANT, BlockPlanks.EnumType.JUNGLE);
+                IBlockState iblockstate1 = Blocks.leaves.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.JUNGLE).withProperty(BlockLeaves.CHECK_DECAY, Boolean.valueOf(false));
+                label269:
 
                 for (i = 0; i >= -1; --i)
                 {
                     for (j = 0; j >= -1; --j)
                     {
-                        if (this.isTypeAt(worldIn, pos.add(i, 0, j), BlockPlanks.EnumType.JUNGLE) && this.isTypeAt(worldIn, pos.add(i + 1, 0, j), BlockPlanks.EnumType.JUNGLE) && this.isTypeAt(worldIn, pos.add(i, 0, j + 1), BlockPlanks.EnumType.JUNGLE) && this.isTypeAt(worldIn, pos.add(i + 1, 0, j + 1), BlockPlanks.EnumType.JUNGLE))
+                        if (this.func_181624_a(worldIn, pos, i, j, BlockPlanks.EnumType.JUNGLE))
                         {
-                            object = new WorldGenMegaJungle(true, 10, 20, BlockPlanks.EnumType.JUNGLE.getMetadata(), BlockPlanks.EnumType.JUNGLE.getMetadata());
+                            worldgenerator = new WorldGenMegaJungle(true, 10, 20, iblockstate, iblockstate1);
                             flag = true;
-                            break label93;
+                            break label269;
                         }
                     }
                 }
@@ -121,25 +131,25 @@ public class BlockSapling extends BlockBush implements IGrowable
                 {
                     j = 0;
                     i = 0;
-                    object = new WorldGenTrees(true, 4 + rand.nextInt(7), BlockPlanks.EnumType.JUNGLE.getMetadata(), BlockPlanks.EnumType.JUNGLE.getMetadata(), false);
+                    worldgenerator = new WorldGenTrees(true, 4 + rand.nextInt(7), iblockstate, iblockstate1, false);
                 }
 
                 break;
-            case 4:
-                object = new WorldGenSavannaTree(true);
+            case ACACIA:
+                worldgenerator = new WorldGenSavannaTree(true);
                 break;
-            case 5:
-                label108:
+            case DARK_OAK:
+                label390:
 
                 for (i = 0; i >= -1; --i)
                 {
                     for (j = 0; j >= -1; --j)
                     {
-                        if (this.isTypeAt(worldIn, pos.add(i, 0, j), BlockPlanks.EnumType.DARK_OAK) && this.isTypeAt(worldIn, pos.add(i + 1, 0, j), BlockPlanks.EnumType.DARK_OAK) && this.isTypeAt(worldIn, pos.add(i, 0, j + 1), BlockPlanks.EnumType.DARK_OAK) && this.isTypeAt(worldIn, pos.add(i + 1, 0, j + 1), BlockPlanks.EnumType.DARK_OAK))
+                        if (this.func_181624_a(worldIn, pos, i, j, BlockPlanks.EnumType.DARK_OAK))
                         {
-                            object = new WorldGenCanopyTree(true);
+                            worldgenerator = new WorldGenCanopyTree(true);
                             flag = true;
-                            break label108;
+                            break label390;
                         }
                     }
                 }
@@ -148,24 +158,25 @@ public class BlockSapling extends BlockBush implements IGrowable
                 {
                     return;
                 }
-            case 6:
+
+            case OAK:
         }
 
-        IBlockState iblockstate1 = Blocks.air.getDefaultState();
+        IBlockState iblockstate2 = Blocks.air.getDefaultState();
 
         if (flag)
         {
-            worldIn.setBlockState(pos.add(i, 0, j), iblockstate1, 4);
-            worldIn.setBlockState(pos.add(i + 1, 0, j), iblockstate1, 4);
-            worldIn.setBlockState(pos.add(i, 0, j + 1), iblockstate1, 4);
-            worldIn.setBlockState(pos.add(i + 1, 0, j + 1), iblockstate1, 4);
+            worldIn.setBlockState(pos.add(i, 0, j), iblockstate2, 4);
+            worldIn.setBlockState(pos.add(i + 1, 0, j), iblockstate2, 4);
+            worldIn.setBlockState(pos.add(i, 0, j + 1), iblockstate2, 4);
+            worldIn.setBlockState(pos.add(i + 1, 0, j + 1), iblockstate2, 4);
         }
         else
         {
-            worldIn.setBlockState(pos, iblockstate1, 4);
+            worldIn.setBlockState(pos, iblockstate2, 4);
         }
 
-        if (!((WorldGenerator)object).generate(worldIn, rand, pos.add(i, 0, j)))
+        if (!worldgenerator.generate(worldIn, rand, pos.add(i, 0, j)))
         {
             if (flag)
             {
@@ -181,6 +192,11 @@ public class BlockSapling extends BlockBush implements IGrowable
         }
     }
 
+    private boolean func_181624_a(World p_181624_1_, BlockPos p_181624_2_, int p_181624_3_, int p_181624_4_, BlockPlanks.EnumType p_181624_5_)
+    {
+        return this.isTypeAt(p_181624_1_, p_181624_2_.add(p_181624_3_, 0, p_181624_4_), p_181624_5_) && this.isTypeAt(p_181624_1_, p_181624_2_.add(p_181624_3_ + 1, 0, p_181624_4_), p_181624_5_) && this.isTypeAt(p_181624_1_, p_181624_2_.add(p_181624_3_, 0, p_181624_4_ + 1), p_181624_5_) && this.isTypeAt(p_181624_1_, p_181624_2_.add(p_181624_3_ + 1, 0, p_181624_4_ + 1), p_181624_5_);
+    }
+
     /**
      * Check whether the given BlockPos has a Sapling of the given type
      */
@@ -191,7 +207,8 @@ public class BlockSapling extends BlockBush implements IGrowable
     }
 
     /**
-     * Get the damage value that this Block should drop
+     * Gets the metadata of the item this Block can drop. This method is called when the block gets destroyed. It
+     * returns the metadata of the dropped item based on the old metadata of the block.
      */
     public int damageDropped(IBlockState state)
     {
@@ -202,15 +219,11 @@ public class BlockSapling extends BlockBush implements IGrowable
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
     {
-        BlockPlanks.EnumType[] aenumtype = BlockPlanks.EnumType.values();
-        int i = aenumtype.length;
-
-        for (int j = 0; j < i; ++j)
+        for (BlockPlanks.EnumType blockplanks$enumtype : BlockPlanks.EnumType.values())
         {
-            BlockPlanks.EnumType enumtype = aenumtype[j];
-            list.add(new ItemStack(itemIn, 1, enumtype.getMetadata()));
+            list.add(new ItemStack(itemIn, 1, blockplanks$enumtype.getMetadata()));
         }
     }
 
@@ -245,9 +258,9 @@ public class BlockSapling extends BlockBush implements IGrowable
      */
     public int getMetaFromState(IBlockState state)
     {
-        byte b0 = 0;
-        int i = b0 | ((BlockPlanks.EnumType)state.getValue(TYPE)).getMetadata();
-        i |= ((Integer)state.getValue(STAGE)).intValue() << 3;
+        int i = 0;
+        i = i | ((BlockPlanks.EnumType)state.getValue(TYPE)).getMetadata();
+        i = i | ((Integer)state.getValue(STAGE)).intValue() << 3;
         return i;
     }
 
@@ -255,67 +268,4 @@ public class BlockSapling extends BlockBush implements IGrowable
     {
         return new BlockState(this, new IProperty[] {TYPE, STAGE});
     }
-
-    static final class SwitchEnumType
-        {
-            static final int[] WOOD_TYPE_LOOKUP = new int[BlockPlanks.EnumType.values().length];
-            private static final String __OBFID = "CL_00002067";
-
-            static
-            {
-                try
-                {
-                    WOOD_TYPE_LOOKUP[BlockPlanks.EnumType.SPRUCE.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var6)
-                {
-                    ;
-                }
-
-                try
-                {
-                    WOOD_TYPE_LOOKUP[BlockPlanks.EnumType.BIRCH.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var5)
-                {
-                    ;
-                }
-
-                try
-                {
-                    WOOD_TYPE_LOOKUP[BlockPlanks.EnumType.JUNGLE.ordinal()] = 3;
-                }
-                catch (NoSuchFieldError var4)
-                {
-                    ;
-                }
-
-                try
-                {
-                    WOOD_TYPE_LOOKUP[BlockPlanks.EnumType.ACACIA.ordinal()] = 4;
-                }
-                catch (NoSuchFieldError var3)
-                {
-                    ;
-                }
-
-                try
-                {
-                    WOOD_TYPE_LOOKUP[BlockPlanks.EnumType.DARK_OAK.ordinal()] = 5;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
-
-                try
-                {
-                    WOOD_TYPE_LOOKUP[BlockPlanks.EnumType.OAK.ordinal()] = 6;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
-            }
-        }
 }

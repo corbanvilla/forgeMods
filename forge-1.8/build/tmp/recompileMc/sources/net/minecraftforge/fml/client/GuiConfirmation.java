@@ -13,9 +13,9 @@ public class GuiConfirmation extends GuiNotification
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
-    @SuppressWarnings("unchecked")
     @Override
     public void initGui()
     {
@@ -23,6 +23,9 @@ public class GuiConfirmation extends GuiNotification
         this.buttonList.add(new GuiOptionButton(1, this.width / 2 - 155 + 160, this.height - 38, I18n.format("gui.no")));
     }
 
+    /**
+     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
+     */
     @Override
     protected void actionPerformed(GuiButton button)
     {

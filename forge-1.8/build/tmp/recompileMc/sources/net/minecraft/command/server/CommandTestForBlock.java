@@ -1,6 +1,5 @@
 package net.minecraft.command.server;
 
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -11,22 +10,19 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.command.NumberInvalidException;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
 public class CommandTestForBlock extends CommandBase
 {
-    private static final String __OBFID = "CL_00001181";
-
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
-    public String getName()
+    public String getCommandName()
     {
         return "testforblock";
     }
@@ -39,15 +35,23 @@ public class CommandTestForBlock extends CommandBase
         return 2;
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.testforblock.usage";
     }
 
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
-    public void execute(ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 4)
         {
@@ -56,7 +60,7 @@ public class CommandTestForBlock extends CommandBase
         else
         {
             sender.setCommandStat(CommandResultStats.Type.AFFECTED_BLOCKS, 0);
-            BlockPos blockpos = func_175757_a(sender, args, 0, false);
+            BlockPos blockpos = parseBlockPos(sender, args, 0, false);
             Block block = Block.getBlockFromName(args[3]);
 
             if (block == null)
@@ -89,7 +93,7 @@ public class CommandTestForBlock extends CommandBase
 
                         try
                         {
-                            nbttagcompound = JsonToNBT.func_180713_a(s);
+                            nbttagcompound = JsonToNBT.getTagFromJson(s);
                             flag = true;
                         }
                         catch (NBTException nbtexception)
@@ -129,7 +133,7 @@ public class CommandTestForBlock extends CommandBase
                             NBTTagCompound nbttagcompound1 = new NBTTagCompound();
                             tileentity.writeToNBT(nbttagcompound1);
 
-                            if (!func_175775_a(nbttagcompound, nbttagcompound1, true))
+                            if (!NBTUtil.func_181123_a(nbttagcompound, nbttagcompound1, true))
                             {
                                 throw new CommandException("commands.testforblock.failed.nbt", new Object[] {Integer.valueOf(blockpos.getX()), Integer.valueOf(blockpos.getY()), Integer.valueOf(blockpos.getZ())});
                             }
@@ -143,99 +147,8 @@ public class CommandTestForBlock extends CommandBase
         }
     }
 
-    public static boolean func_175775_a(NBTBase p_175775_0_, NBTBase p_175775_1_, boolean p_175775_2_)
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
-        if (p_175775_0_ == p_175775_1_)
-        {
-            return true;
-        }
-        else if (p_175775_0_ == null)
-        {
-            return true;
-        }
-        else if (p_175775_1_ == null)
-        {
-            return false;
-        }
-        else if (!p_175775_0_.getClass().equals(p_175775_1_.getClass()))
-        {
-            return false;
-        }
-        else if (p_175775_0_ instanceof NBTTagCompound)
-        {
-            NBTTagCompound nbttagcompound = (NBTTagCompound)p_175775_0_;
-            NBTTagCompound nbttagcompound1 = (NBTTagCompound)p_175775_1_;
-            Iterator iterator = nbttagcompound.getKeySet().iterator();
-            String s;
-            NBTBase nbtbase3;
-
-            do
-            {
-                if (!iterator.hasNext())
-                {
-                    return true;
-                }
-
-                s = (String)iterator.next();
-                nbtbase3 = nbttagcompound.getTag(s);
-            }
-            while (func_175775_a(nbtbase3, nbttagcompound1.getTag(s), p_175775_2_));
-
-            return false;
-        }
-        else if (p_175775_0_ instanceof NBTTagList && p_175775_2_)
-        {
-            NBTTagList nbttaglist = (NBTTagList)p_175775_0_;
-            NBTTagList nbttaglist1 = (NBTTagList)p_175775_1_;
-
-            if (nbttaglist.tagCount() == 0)
-            {
-                return nbttaglist1.tagCount() == 0;
-            }
-            else
-            {
-                int i = 0;
-
-                while (i < nbttaglist.tagCount())
-                {
-                    NBTBase nbtbase2 = nbttaglist.get(i);
-                    boolean flag1 = false;
-                    int j = 0;
-
-                    while (true)
-                    {
-                        if (j < nbttaglist1.tagCount())
-                        {
-                            if (!func_175775_a(nbtbase2, nbttaglist1.get(j), p_175775_2_))
-                            {
-                                ++j;
-                                continue;
-                            }
-
-                            flag1 = true;
-                        }
-
-                        if (!flag1)
-                        {
-                            return false;
-                        }
-
-                        ++i;
-                        break;
-                    }
-                }
-
-                return true;
-            }
-        }
-        else
-        {
-            return p_175775_0_.equals(p_175775_1_);
-        }
-    }
-
-    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
-    {
-        return args.length > 0 && args.length <= 3 ? func_175771_a(args, 0, pos) : (args.length == 4 ? func_175762_a(args, Block.blockRegistry.getKeys()) : null);
+        return args.length > 0 && args.length <= 3 ? func_175771_a(args, 0, pos) : (args.length == 4 ? getListOfStringsMatchingLastWord(args, Block.blockRegistry.getKeys()) : null);
     }
 }

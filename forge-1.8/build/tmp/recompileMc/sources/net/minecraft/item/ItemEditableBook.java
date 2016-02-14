@@ -21,8 +21,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemEditableBook extends Item
 {
-    private static final String __OBFID = "CL_00000077";
-
     public ItemEditableBook()
     {
         this.setMaxStackSize(1);
@@ -47,8 +45,6 @@ public class ItemEditableBook extends Item
 
     /**
      * Gets the generation of the book (how many times it has been cloned)
-     *  
-     * @param book The book to get the generation of
      */
     public static int getGeneration(ItemStack book)
     {
@@ -73,12 +69,9 @@ public class ItemEditableBook extends Item
 
     /**
      * allows items to add custom lines of information to the mouseover description
-     *  
-     * @param tooltip All lines to display in the Item's tooltip. This is a List of Strings.
-     * @param advanced Whether the setting "Advanced tooltips" is enabled
      */
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced)
+    public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced)
     {
         if (stack.hasTagCompound())
         {
@@ -126,19 +119,19 @@ public class ItemEditableBook extends Item
                     for (int i = 0; i < nbttaglist.tagCount(); ++i)
                     {
                         String s = nbttaglist.getStringTagAt(i);
-                        Object object;
+                        IChatComponent ichatcomponent;
 
                         try
                         {
-                            IChatComponent ichatcomponent = IChatComponent.Serializer.jsonToComponent(s);
-                            object = ChatComponentProcessor.func_179985_a(player, ichatcomponent, player);
+                            ichatcomponent = IChatComponent.Serializer.jsonToComponent(s);
+                            ichatcomponent = ChatComponentProcessor.processComponent(player, ichatcomponent, player);
                         }
-                        catch (Exception exception)
+                        catch (Exception var9)
                         {
-                            object = new ChatComponentText(s);
+                            ichatcomponent = new ChatComponentText(s);
                         }
 
-                        nbttaglist.set(i, new NBTTagString(IChatComponent.Serializer.componentToJson((IChatComponent)object)));
+                        nbttaglist.set(i, new NBTTagString(IChatComponent.Serializer.componentToJson(ichatcomponent)));
                     }
 
                     nbttagcompound.setTag("pages", nbttaglist);

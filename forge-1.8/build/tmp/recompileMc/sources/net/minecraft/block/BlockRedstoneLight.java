@@ -14,7 +14,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BlockRedstoneLight extends Block
 {
     private final boolean isOn;
-    private static final String __OBFID = "CL_00000297";
 
     public BlockRedstoneLight(boolean isOn)
     {
@@ -73,8 +72,6 @@ public class BlockRedstoneLight extends Block
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {

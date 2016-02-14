@@ -16,12 +16,11 @@ public class BlockFaceUV
 {
     public float[] uvs;
     public final int rotation;
-    private static final String __OBFID = "CL_00002505";
 
-    public BlockFaceUV(float[] p_i46228_1_, int p_i46228_2_)
+    public BlockFaceUV(float[] uvsIn, int rotationIn)
     {
-        this.uvs = p_i46228_1_;
-        this.rotation = p_i46228_2_;
+        this.uvs = uvsIn;
+        this.rotation = rotationIn;
     }
 
     public float func_178348_a(int p_178348_1_)
@@ -32,8 +31,8 @@ public class BlockFaceUV
         }
         else
         {
-            int j = this.func_178347_d(p_178348_1_);
-            return j != 0 && j != 1 ? this.uvs[2] : this.uvs[0];
+            int i = this.func_178347_d(p_178348_1_);
+            return i != 0 && i != 1 ? this.uvs[2] : this.uvs[0];
         }
     }
 
@@ -45,8 +44,8 @@ public class BlockFaceUV
         }
         else
         {
-            int j = this.func_178347_d(p_178346_1_);
-            return j != 0 && j != 3 ? this.uvs[3] : this.uvs[1];
+            int i = this.func_178347_d(p_178346_1_);
+            return i != 0 && i != 3 ? this.uvs[3] : this.uvs[1];
         }
     }
 
@@ -60,22 +59,20 @@ public class BlockFaceUV
         return (p_178345_1_ + (4 - this.rotation / 90)) % 4;
     }
 
-    public void setUvs(float[] p_178349_1_)
+    public void setUvs(float[] uvsIn)
     {
         if (this.uvs == null)
         {
-            this.uvs = p_178349_1_;
+            this.uvs = uvsIn;
         }
     }
 
     @SideOnly(Side.CLIENT)
-    static class Deserializer implements JsonDeserializer
+    static class Deserializer implements JsonDeserializer<BlockFaceUV>
         {
-            private static final String __OBFID = "CL_00002504";
-
-            public BlockFaceUV parseBlockFaceUV(JsonElement p_178293_1_, Type p_178293_2_, JsonDeserializationContext p_178293_3_)
+            public BlockFaceUV deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_) throws JsonParseException
             {
-                JsonObject jsonobject = p_178293_1_.getAsJsonObject();
+                JsonObject jsonobject = p_deserialize_1_.getAsJsonObject();
                 float[] afloat = this.parseUV(jsonobject);
                 int i = this.parseRotation(jsonobject);
                 return new BlockFaceUV(afloat, i);
@@ -83,7 +80,7 @@ public class BlockFaceUV
 
             protected int parseRotation(JsonObject p_178291_1_)
             {
-                int i = JsonUtils.getJsonObjectIntegerFieldValueOrDefault(p_178291_1_, "rotation", 0);
+                int i = JsonUtils.getInt(p_178291_1_, "rotation", 0);
 
                 if (i >= 0 && i % 90 == 0 && i / 90 <= 3)
                 {
@@ -103,7 +100,7 @@ public class BlockFaceUV
                 }
                 else
                 {
-                    JsonArray jsonarray = JsonUtils.getJsonObjectJsonArrayField(p_178292_1_, "uv");
+                    JsonArray jsonarray = JsonUtils.getJsonArray(p_178292_1_, "uv");
 
                     if (jsonarray.size() != 4)
                     {
@@ -115,17 +112,12 @@ public class BlockFaceUV
 
                         for (int i = 0; i < afloat.length; ++i)
                         {
-                            afloat[i] = JsonUtils.getJsonElementFloatValue(jsonarray.get(i), "uv[" + i + "]");
+                            afloat[i] = JsonUtils.getFloat(jsonarray.get(i), "uv[" + i + "]");
                         }
 
                         return afloat;
                     }
                 }
-            }
-
-            public Object deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_)
-            {
-                return this.parseBlockFaceUV(p_deserialize_1_, p_deserialize_2_, p_deserialize_3_);
             }
         }
 }

@@ -20,8 +20,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemBanner extends ItemBlock
 {
-    private static final String __OBFID = "CL_00002181";
-
     public ItemBanner()
     {
         super(Blocks.standing_banner);
@@ -33,9 +31,6 @@ public class ItemBanner extends ItemBlock
 
     /**
      * Called when a Block is right-clicked with this Item
-     *  
-     * @param pos The block being right-clicked
-     * @param side The side being right-clicked
      */
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
@@ -98,12 +93,9 @@ public class ItemBanner extends ItemBlock
 
     /**
      * allows items to add custom lines of information to the mouseover description
-     *  
-     * @param tooltip All lines to display in the Item's tooltip. This is a List of Strings.
-     * @param advanced Whether the setting "Advanced tooltips" is enabled
      */
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced)
+    public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced)
     {
         NBTTagCompound nbttagcompound = stack.getSubCompound("BlockEntityTag", false);
 
@@ -115,11 +107,11 @@ public class ItemBanner extends ItemBlock
             {
                 NBTTagCompound nbttagcompound1 = nbttaglist.getCompoundTagAt(i);
                 EnumDyeColor enumdyecolor = EnumDyeColor.byDyeDamage(nbttagcompound1.getInteger("Color"));
-                TileEntityBanner.EnumBannerPattern enumbannerpattern = TileEntityBanner.EnumBannerPattern.getPatternByID(nbttagcompound1.getString("Pattern"));
+                TileEntityBanner.EnumBannerPattern tileentitybanner$enumbannerpattern = TileEntityBanner.EnumBannerPattern.getPatternByID(nbttagcompound1.getString("Pattern"));
 
-                if (enumbannerpattern != null)
+                if (tileentitybanner$enumbannerpattern != null)
                 {
-                    tooltip.add(StatCollector.translateToLocal("item.banner." + enumbannerpattern.getPatternName() + "." + enumdyecolor.getUnlocalizedName()));
+                    tooltip.add(StatCollector.translateToLocal("item.banner." + tileentitybanner$enumbannerpattern.getPatternName() + "." + enumdyecolor.getUnlocalizedName()));
                 }
             }
         }
@@ -141,19 +133,19 @@ public class ItemBanner extends ItemBlock
 
     /**
      * returns a list of items with the same ID, but different meta (eg: dye returns 16 items)
-     *  
-     * @param subItems The List of sub-items. This is a List of ItemStacks.
      */
     @SideOnly(Side.CLIENT)
-    public void getSubItems(Item itemIn, CreativeTabs tab, List subItems)
+    public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems)
     {
-        EnumDyeColor[] aenumdyecolor = EnumDyeColor.values();
-        int i = aenumdyecolor.length;
-
-        for (int j = 0; j < i; ++j)
+        for (EnumDyeColor enumdyecolor : EnumDyeColor.values())
         {
-            EnumDyeColor enumdyecolor = aenumdyecolor[j];
-            subItems.add(new ItemStack(itemIn, 1, enumdyecolor.getDyeDamage()));
+            NBTTagCompound nbttagcompound = new NBTTagCompound();
+            TileEntityBanner.func_181020_a(nbttagcompound, enumdyecolor.getDyeDamage(), (NBTTagList)null);
+            NBTTagCompound nbttagcompound1 = new NBTTagCompound();
+            nbttagcompound1.setTag("BlockEntityTag", nbttagcompound);
+            ItemStack itemstack = new ItemStack(itemIn, 1, enumdyecolor.getDyeDamage());
+            itemstack.setTagCompound(nbttagcompound1);
+            subItems.add(itemstack);
         }
     }
 

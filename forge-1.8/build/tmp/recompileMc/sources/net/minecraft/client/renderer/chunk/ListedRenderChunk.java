@@ -12,16 +12,15 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ListedRenderChunk extends RenderChunk
 {
     private final int baseDisplayList = GLAllocation.generateDisplayLists(EnumWorldBlockLayer.values().length);
-    private static final String __OBFID = "CL_00002453";
 
-    public ListedRenderChunk(World worldIn, RenderGlobal p_i46198_2_, BlockPos pos, int p_i46198_4_)
+    public ListedRenderChunk(World worldIn, RenderGlobal renderGlobalIn, BlockPos pos, int indexIn)
     {
-        super(worldIn, p_i46198_2_, pos, p_i46198_4_);
+        super(worldIn, renderGlobalIn, pos, indexIn);
     }
 
-    public int getDisplayList(EnumWorldBlockLayer p_178600_1_, CompiledChunk p_178600_2_)
+    public int getDisplayList(EnumWorldBlockLayer layer, CompiledChunk p_178600_2_)
     {
-        return !p_178600_2_.isLayerEmpty(p_178600_1_) ? this.baseDisplayList + p_178600_1_.ordinal() : -1;
+        return !p_178600_2_.isLayerEmpty(layer) ? this.baseDisplayList + layer.ordinal() : -1;
     }
 
     public void deleteGlResources()

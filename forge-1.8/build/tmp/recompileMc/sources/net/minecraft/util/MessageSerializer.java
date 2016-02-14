@@ -15,19 +15,18 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
-public class MessageSerializer extends MessageToByteEncoder
+public class MessageSerializer extends MessageToByteEncoder<Packet>
 {
     private static final Logger logger = LogManager.getLogger();
     private static final Marker RECEIVED_PACKET_MARKER = MarkerManager.getMarker("PACKET_SENT", NetworkManager.logMarkerPackets);
     private final EnumPacketDirection direction;
-    private static final String __OBFID = "CL_00001253";
 
     public MessageSerializer(EnumPacketDirection direction)
     {
         this.direction = direction;
     }
 
-    protected void encode(ChannelHandlerContext p_encode_1_, Packet p_encode_2_, ByteBuf p_encode_3_) throws IOException
+    protected void encode(ChannelHandlerContext p_encode_1_, Packet p_encode_2_, ByteBuf p_encode_3_) throws IOException, Exception
     {
         Integer integer = ((EnumConnectionState)p_encode_1_.channel().attr(NetworkManager.attrKeyConnectionState).get()).getPacketId(this.direction, p_encode_2_);
 
@@ -47,22 +46,12 @@ public class MessageSerializer extends MessageToByteEncoder
 
             try
             {
-                if (p_encode_2_ instanceof S0CPacketSpawnPlayer)
-                {
-                    //p_encode_2_ = p_encode_2_; FML: Kill warning
-                }
-
                 p_encode_2_.writePacketData(packetbuffer);
             }
             catch (Throwable throwable)
             {
-                logger.error(throwable);
+                logger.error((Object)throwable);
             }
         }
-    }
-
-    protected void encode(ChannelHandlerContext p_encode_1_, Object p_encode_2_, ByteBuf p_encode_3_) throws IOException
-    {
-        this.encode(p_encode_1_, (Packet)p_encode_2_, p_encode_3_);
     }
 }

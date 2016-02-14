@@ -19,31 +19,35 @@ public class ResourcePackListEntryDefault extends ResourcePackListEntry
     private static final Logger logger = LogManager.getLogger();
     private final IResourcePack field_148320_d;
     private final ResourceLocation resourcePackIcon;
-    private static final String __OBFID = "CL_00000822";
 
-    public ResourcePackListEntryDefault(GuiScreenResourcePacks p_i45052_1_)
+    public ResourcePackListEntryDefault(GuiScreenResourcePacks resourcePacksGUIIn)
     {
-        super(p_i45052_1_);
-        this.field_148320_d = this.field_148317_a.getResourcePackRepository().rprDefaultResourcePack;
+        super(resourcePacksGUIIn);
+        this.field_148320_d = this.mc.getResourcePackRepository().rprDefaultResourcePack;
         DynamicTexture dynamictexture;
 
         try
         {
             dynamictexture = new DynamicTexture(this.field_148320_d.getPackImage());
         }
-        catch (IOException ioexception)
+        catch (IOException var4)
         {
             dynamictexture = TextureUtil.missingTexture;
         }
 
-        this.resourcePackIcon = this.field_148317_a.getTextureManager().getDynamicTextureLocation("texturepackicon", dynamictexture);
+        this.resourcePackIcon = this.mc.getTextureManager().getDynamicTextureLocation("texturepackicon", dynamictexture);
+    }
+
+    protected int func_183019_a()
+    {
+        return 1;
     }
 
     protected String func_148311_a()
     {
         try
         {
-            PackMetadataSection packmetadatasection = (PackMetadataSection)this.field_148320_d.getPackMetadata(this.field_148317_a.getResourcePackRepository().rprMetadataSerializer, "pack");
+            PackMetadataSection packmetadatasection = (PackMetadataSection)this.field_148320_d.getPackMetadata(this.mc.getResourcePackRepository().rprMetadataSerializer, "pack");
 
             if (packmetadatasection != null)
             {
@@ -52,11 +56,11 @@ public class ResourcePackListEntryDefault extends ResourcePackListEntry
         }
         catch (JsonParseException jsonparseexception)
         {
-            logger.error("Couldn\'t load metadata info", jsonparseexception);
+            logger.error((String)"Couldn\'t load metadata info", (Throwable)jsonparseexception);
         }
         catch (IOException ioexception)
         {
-            logger.error("Couldn\'t load metadata info", ioexception);
+            logger.error((String)"Couldn\'t load metadata info", (Throwable)ioexception);
         }
 
         return EnumChatFormatting.RED + "Missing " + "pack.mcmeta" + " :(";
@@ -89,7 +93,7 @@ public class ResourcePackListEntryDefault extends ResourcePackListEntry
 
     protected void func_148313_c()
     {
-        this.field_148317_a.getTextureManager().bindTexture(this.resourcePackIcon);
+        this.mc.getTextureManager().bindTexture(this.resourcePackIcon);
     }
 
     protected boolean func_148310_d()

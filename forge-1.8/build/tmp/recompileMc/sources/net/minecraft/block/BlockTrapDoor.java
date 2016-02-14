@@ -29,8 +29,7 @@ public class BlockTrapDoor extends Block
     public static boolean disableValidation = false;
     public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
     public static final PropertyBool OPEN = PropertyBool.create("open");
-    public static final PropertyEnum HALF = PropertyEnum.create("half", BlockTrapDoor.DoorHalf.class);
-    private static final String __OBFID = "CL_00000327";
+    public static final PropertyEnum<BlockTrapDoor.DoorHalf> HALF = PropertyEnum.<BlockTrapDoor.DoorHalf>create("half", BlockTrapDoor.DoorHalf.class);
 
     protected BlockTrapDoor(Material materialIn)
     {
@@ -42,6 +41,9 @@ public class BlockTrapDoor extends Block
         this.setCreativeTab(CreativeTabs.tabRedstone);
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -150,9 +152,9 @@ public class BlockTrapDoor extends Block
         if (!worldIn.isRemote)
         {
             EnumFacing direction = (EnumFacing)state.getValue(FACING);
-            BlockPos blockpos1 = pos.offset(((EnumFacing)state.getValue(FACING)).getOpposite());
+            BlockPos blockpos = pos.offset(((EnumFacing)state.getValue(FACING)).getOpposite());
 
-            if (!(isValidSupportBlock(worldIn.getBlockState(blockpos1).getBlock()) || worldIn.isSideSolid(blockpos1, direction, true)))
+            if (!(isValidSupportBlock(worldIn.getBlockState(blockpos).getBlock()) || worldIn.isSideSolid(blockpos, direction, true)))
             {
                 worldIn.setBlockToAir(pos);
                 this.dropBlockAsItem(worldIn, pos, state, 0);
@@ -177,9 +179,6 @@ public class BlockTrapDoor extends Block
 
     /**
      * Ray traces through the blocks collision from start vector to end vector returning a ray trace hit.
-     *  
-     * @param start The start vector
-     * @param end The end vector
      */
     public MovingObjectPosition collisionRayTrace(World worldIn, BlockPos pos, Vec3 start, Vec3 end)
     {
@@ -187,6 +186,10 @@ public class BlockTrapDoor extends Block
         return super.collisionRayTrace(worldIn, pos, start, end);
     }
 
+    /**
+     * Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the
+     * IBlockstate
+     */
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
         IBlockState iblockstate = this.getDefaultState();
@@ -229,15 +232,15 @@ public class BlockTrapDoor extends Block
 
     protected static int getMetaForFacing(EnumFacing facing)
     {
-        switch (BlockTrapDoor.SwitchEnumFacing.FACING_LOOKUP[facing.ordinal()])
+        switch (facing)
         {
-            case 1:
+            case NORTH:
                 return 0;
-            case 2:
+            case SOUTH:
                 return 1;
-            case 3:
+            case WEST:
                 return 2;
-            case 4:
+            case EAST:
             default:
                 return 3;
         }
@@ -268,8 +271,8 @@ public class BlockTrapDoor extends Block
      */
     public int getMetaFromState(IBlockState state)
     {
-        byte b0 = 0;
-        int i = b0 | getMetaForFacing((EnumFacing)state.getValue(FACING));
+        int i = 0;
+        i = i | getMetaForFacing((EnumFacing)state.getValue(FACING));
 
         if (((Boolean)state.getValue(OPEN)).booleanValue())
         {
@@ -293,9 +296,8 @@ public class BlockTrapDoor extends Block
     {
         TOP("top"),
         BOTTOM("bottom");
-        private final String name;
 
-        private static final String __OBFID = "CL_00002051";
+        private final String name;
 
         private DoorHalf(String name)
         {
@@ -312,49 +314,4 @@ public class BlockTrapDoor extends Block
             return this.name;
         }
     }
-
-    static final class SwitchEnumFacing
-        {
-            static final int[] FACING_LOOKUP = new int[EnumFacing.values().length];
-            private static final String __OBFID = "CL_00002052";
-
-            static
-            {
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.NORTH.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var4)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.SOUTH.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var3)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.WEST.ordinal()] = 3;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.EAST.ordinal()] = 4;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
-            }
-        }
 }

@@ -2,13 +2,13 @@ package net.minecraft.client.shader;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import javax.vecmath.Matrix4f;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.util.vector.Matrix4f;
 
 @SideOnly(Side.CLIENT)
 public class ShaderUniform
@@ -22,7 +22,6 @@ public class ShaderUniform
     private final String shaderName;
     private boolean dirty;
     private final ShaderManager shaderManager;
-    private static final String __OBFID = "CL_00001046";
 
     public ShaderUniform(String name, int type, int count, ShaderManager manager)
     {
@@ -58,33 +57,33 @@ public class ShaderUniform
 
     public static int parseType(String p_148085_0_)
     {
-        byte b0 = -1;
+        int i = -1;
 
         if (p_148085_0_.equals("int"))
         {
-            b0 = 0;
+            i = 0;
         }
         else if (p_148085_0_.equals("float"))
         {
-            b0 = 4;
+            i = 4;
         }
         else if (p_148085_0_.startsWith("matrix"))
         {
             if (p_148085_0_.endsWith("2x2"))
             {
-                b0 = 8;
+                i = 8;
             }
             else if (p_148085_0_.endsWith("3x3"))
             {
-                b0 = 9;
+                i = 9;
             }
             else if (p_148085_0_.endsWith("4x4"))
             {
-                b0 = 10;
+                i = 10;
             }
         }
 
-        return b0;
+        return i;
     }
 
     public void setUniformLocation(int p_148084_1_)

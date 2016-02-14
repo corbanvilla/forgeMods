@@ -13,6 +13,7 @@ import net.minecraft.item.Item;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.StatCollector;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -22,12 +23,19 @@ public class BlockRedstoneRepeater extends BlockRedstoneDiode
 {
     public static final PropertyBool LOCKED = PropertyBool.create("locked");
     public static final PropertyInteger DELAY = PropertyInteger.create("delay", 1, 4);
-    private static final String __OBFID = "CL_00000301";
 
     protected BlockRedstoneRepeater(boolean powered)
     {
         super(powered);
         this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH).withProperty(DELAY, Integer.valueOf(1)).withProperty(LOCKED, Boolean.valueOf(false)));
+    }
+
+    /**
+     * Gets the localized name of this block. Used for the statistics page.
+     */
+    public String getLocalizedName()
+    {
+        return StatCollector.translateToLocal("item.diode.name");
     }
 
     /**
@@ -75,8 +83,6 @@ public class BlockRedstoneRepeater extends BlockRedstoneDiode
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -115,7 +121,7 @@ public class BlockRedstoneRepeater extends BlockRedstoneDiode
                 f = (float)(((Integer)state.getValue(DELAY)).intValue() * 2 - 1);
             }
 
-            f /= 16.0F;
+            f = f / 16.0F;
             double d3 = (double)(f * (float)enumfacing.getFrontOffsetX());
             double d4 = (double)(f * (float)enumfacing.getFrontOffsetZ());
             worldIn.spawnParticle(EnumParticleTypes.REDSTONE, d0 + d3, d1, d2 + d4, 0.0D, 0.0D, 0.0D, new int[0]);
@@ -141,9 +147,9 @@ public class BlockRedstoneRepeater extends BlockRedstoneDiode
      */
     public int getMetaFromState(IBlockState state)
     {
-        byte b0 = 0;
-        int i = b0 | ((EnumFacing)state.getValue(FACING)).getHorizontalIndex();
-        i |= ((Integer)state.getValue(DELAY)).intValue() - 1 << 2;
+        int i = 0;
+        i = i | ((EnumFacing)state.getValue(FACING)).getHorizontalIndex();
+        i = i | ((Integer)state.getValue(DELAY)).intValue() - 1 << 2;
         return i;
     }
 

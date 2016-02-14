@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import net.minecraftforge.fml.relauncher.Side;
@@ -22,15 +21,12 @@ public abstract class RConThreadBase implements Runnable
     /** Thread for this runnable class */
     protected Thread rconThread;
     protected int field_72615_d = 5;
-    /** A list of registered DatagramSockets */
-    protected List socketList = Lists.newArrayList();
-    /** A list of registered ServerSockets */
-    protected List serverSocketList = Lists.newArrayList();
-    private static final String __OBFID = "CL_00001801";
+    protected List<DatagramSocket> socketList = Lists.<DatagramSocket>newArrayList();
+    protected List<ServerSocket> serverSocketList = Lists.<ServerSocket>newArrayList();
 
-    protected RConThreadBase(IServer p_i45300_1_, String threadName)
+    protected RConThreadBase(IServer serverIn, String threadName)
     {
-        this.server = p_i45300_1_;
+        this.server = serverIn;
         this.threadName = threadName;
 
         if (this.server.isDebuggingEnabled())
@@ -119,12 +115,12 @@ public abstract class RConThreadBase implements Runnable
         }
         else
         {
-            boolean flag1 = false;
+            boolean flag = false;
 
             if (!socket.isClosed())
             {
                 socket.close();
-                flag1 = true;
+                flag = true;
             }
 
             if (removeFromList)
@@ -132,7 +128,7 @@ public abstract class RConThreadBase implements Runnable
                 this.socketList.remove(socket);
             }
 
-            return flag1;
+            return flag;
         }
     }
 
@@ -157,14 +153,14 @@ public abstract class RConThreadBase implements Runnable
         }
         else
         {
-            boolean flag1 = false;
+            boolean flag = false;
 
             try
             {
                 if (!socket.isClosed())
                 {
                     socket.close();
-                    flag1 = true;
+                    flag = true;
                 }
             }
             catch (IOException ioexception)
@@ -177,7 +173,7 @@ public abstract class RConThreadBase implements Runnable
                 this.serverSocketList.remove(socket);
             }
 
-            return flag1;
+            return flag;
         }
     }
 
@@ -195,12 +191,9 @@ public abstract class RConThreadBase implements Runnable
     protected void closeAllSockets_do(boolean logWarning)
     {
         int i = 0;
-        Iterator iterator = this.socketList.iterator();
 
-        while (iterator.hasNext())
+        for (DatagramSocket datagramsocket : this.socketList)
         {
-            DatagramSocket datagramsocket = (DatagramSocket)iterator.next();
-
             if (this.closeSocket(datagramsocket, false))
             {
                 ++i;
@@ -208,12 +201,9 @@ public abstract class RConThreadBase implements Runnable
         }
 
         this.socketList.clear();
-        iterator = this.serverSocketList.iterator();
 
-        while (iterator.hasNext())
+        for (ServerSocket serversocket : this.serverSocketList)
         {
-            ServerSocket serversocket = (ServerSocket)iterator.next();
-
             if (this.closeServerSocket_do(serversocket, false))
             {
                 ++i;

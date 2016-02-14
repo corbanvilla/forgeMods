@@ -9,11 +9,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class StatCrafting extends StatBase
 {
     private final Item field_150960_a;
-    private static final String __OBFID = "CL_00001470";
 
-    public StatCrafting(String p_i45910_1_, String p_i45910_2_, IChatComponent p_i45910_3_, Item p_i45910_4_)
+    public StatCrafting(String p_i45910_1_, String p_i45910_2_, IChatComponent statNameIn, Item p_i45910_4_)
     {
-        super(p_i45910_1_ + p_i45910_2_, p_i45910_3_);
+        super(p_i45910_1_ + p_i45910_2_, statNameIn);
         this.field_150960_a = p_i45910_4_;
         int i = Item.getIdFromItem(p_i45910_4_);
 

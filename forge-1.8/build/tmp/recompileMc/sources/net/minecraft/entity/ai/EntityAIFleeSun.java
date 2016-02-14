@@ -14,13 +14,12 @@ public class EntityAIFleeSun extends EntityAIBase
     private double shelterZ;
     private double movementSpeed;
     private World theWorld;
-    private static final String __OBFID = "CL_00001583";
 
-    public EntityAIFleeSun(EntityCreature p_i1623_1_, double p_i1623_2_)
+    public EntityAIFleeSun(EntityCreature theCreatureIn, double movementSpeedIn)
     {
-        this.theCreature = p_i1623_1_;
-        this.movementSpeed = p_i1623_2_;
-        this.theWorld = p_i1623_1_.worldObj;
+        this.theCreature = theCreatureIn;
+        this.movementSpeed = movementSpeedIn;
+        this.theWorld = theCreatureIn.worldObj;
         this.setMutexBits(1);
     }
 
@@ -84,7 +83,7 @@ public class EntityAIFleeSun extends EntityAIBase
         {
             BlockPos blockpos1 = blockpos.add(random.nextInt(20) - 10, random.nextInt(6) - 3, random.nextInt(20) - 10);
 
-            if (!this.theWorld.canSeeSky(blockpos1) && this.theCreature.func_180484_a(blockpos1) < 0.0F)
+            if (!this.theWorld.canSeeSky(blockpos1) && this.theCreature.getBlockPathWeight(blockpos1) < 0.0F)
             {
                 return new Vec3((double)blockpos1.getX(), (double)blockpos1.getY(), (double)blockpos1.getZ());
             }

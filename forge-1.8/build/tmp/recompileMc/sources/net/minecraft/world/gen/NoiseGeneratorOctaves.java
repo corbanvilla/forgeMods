@@ -8,16 +8,15 @@ public class NoiseGeneratorOctaves extends NoiseGenerator
     /** Collection of noise generation functions.  Output is combined to produce different octaves of noise. */
     private NoiseGeneratorImproved[] generatorCollection;
     private int octaves;
-    private static final String __OBFID = "CL_00000535";
 
     public NoiseGeneratorOctaves(Random p_i2111_1_, int p_i2111_2_)
     {
         this.octaves = p_i2111_2_;
         this.generatorCollection = new NoiseGeneratorImproved[p_i2111_2_];
 
-        for (int j = 0; j < p_i2111_2_; ++j)
+        for (int i = 0; i < p_i2111_2_; ++i)
         {
-            this.generatorCollection[j] = new NoiseGeneratorImproved(p_i2111_1_);
+            this.generatorCollection[i] = new NoiseGeneratorImproved(p_i2111_1_);
         }
     }
 
@@ -33,29 +32,29 @@ public class NoiseGeneratorOctaves extends NoiseGenerator
         }
         else
         {
-            for (int k1 = 0; k1 < p_76304_1_.length; ++k1)
+            for (int i = 0; i < p_76304_1_.length; ++i)
             {
-                p_76304_1_[k1] = 0.0D;
+                p_76304_1_[i] = 0.0D;
             }
         }
 
-        double d6 = 1.0D;
+        double d3 = 1.0D;
 
-        for (int l1 = 0; l1 < this.octaves; ++l1)
+        for (int j = 0; j < this.octaves; ++j)
         {
-            double d3 = (double)p_76304_2_ * d6 * p_76304_8_;
-            double d4 = (double)p_76304_3_ * d6 * p_76304_10_;
-            double d5 = (double)p_76304_4_ * d6 * p_76304_12_;
-            long i2 = MathHelper.floor_double_long(d3);
-            long j2 = MathHelper.floor_double_long(d5);
-            d3 -= (double)i2;
-            d5 -= (double)j2;
-            i2 %= 16777216L;
-            j2 %= 16777216L;
-            d3 += (double)i2;
-            d5 += (double)j2;
-            this.generatorCollection[l1].populateNoiseArray(p_76304_1_, d3, d4, d5, p_76304_5_, p_76304_6_, p_76304_7_, p_76304_8_ * d6, p_76304_10_ * d6, p_76304_12_ * d6, d6);
-            d6 /= 2.0D;
+            double d0 = (double)p_76304_2_ * d3 * p_76304_8_;
+            double d1 = (double)p_76304_3_ * d3 * p_76304_10_;
+            double d2 = (double)p_76304_4_ * d3 * p_76304_12_;
+            long k = MathHelper.floor_double_long(d0);
+            long l = MathHelper.floor_double_long(d2);
+            d0 = d0 - (double)k;
+            d2 = d2 - (double)l;
+            k = k % 16777216L;
+            l = l % 16777216L;
+            d0 = d0 + (double)k;
+            d2 = d2 + (double)l;
+            this.generatorCollection[j].populateNoiseArray(p_76304_1_, d0, d1, d2, p_76304_5_, p_76304_6_, p_76304_7_, p_76304_8_ * d3, p_76304_10_ * d3, p_76304_12_ * d3, d3);
+            d3 /= 2.0D;
         }
 
         return p_76304_1_;

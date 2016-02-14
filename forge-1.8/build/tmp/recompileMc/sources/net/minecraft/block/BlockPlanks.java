@@ -1,6 +1,7 @@
 package net.minecraft.block;
 
 import java.util.List;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
@@ -15,8 +16,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockPlanks extends Block
 {
-    public static final PropertyEnum VARIANT = PropertyEnum.create("variant", BlockPlanks.EnumType.class);
-    private static final String __OBFID = "CL_00002082";
+    public static final PropertyEnum<BlockPlanks.EnumType> VARIANT = PropertyEnum.<BlockPlanks.EnumType>create("variant", BlockPlanks.EnumType.class);
 
     public BlockPlanks()
     {
@@ -26,7 +26,8 @@ public class BlockPlanks extends Block
     }
 
     /**
-     * Get the damage value that this Block should drop
+     * Gets the metadata of the item this Block can drop. This method is called when the block gets destroyed. It
+     * returns the metadata of the dropped item based on the old metadata of the block.
      */
     public int damageDropped(IBlockState state)
     {
@@ -37,15 +38,11 @@ public class BlockPlanks extends Block
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
     {
-        BlockPlanks.EnumType[] aenumtype = BlockPlanks.EnumType.values();
-        int i = aenumtype.length;
-
-        for (int j = 0; j < i; ++j)
+        for (BlockPlanks.EnumType blockplanks$enumtype : BlockPlanks.EnumType.values())
         {
-            BlockPlanks.EnumType enumtype = aenumtype[j];
-            list.add(new ItemStack(itemIn, 1, enumtype.getMetadata()));
+            list.add(new ItemStack(itemIn, 1, blockplanks$enumtype.getMetadata()));
         }
     }
 
@@ -55,6 +52,14 @@ public class BlockPlanks extends Block
     public IBlockState getStateFromMeta(int meta)
     {
         return this.getDefaultState().withProperty(VARIANT, BlockPlanks.EnumType.byMetadata(meta));
+    }
+
+    /**
+     * Get the MapColor for this Block and the given BlockState
+     */
+    public MapColor getMapColor(IBlockState state)
+    {
+        return ((BlockPlanks.EnumType)state.getValue(VARIANT)).func_181070_c();
     }
 
     /**
@@ -72,34 +77,40 @@ public class BlockPlanks extends Block
 
     public static enum EnumType implements IStringSerializable
     {
-        OAK(0, "oak"),
-        SPRUCE(1, "spruce"),
-        BIRCH(2, "birch"),
-        JUNGLE(3, "jungle"),
-        ACACIA(4, "acacia"),
-        DARK_OAK(5, "dark_oak", "big_oak");
+        OAK(0, "oak", MapColor.woodColor),
+        SPRUCE(1, "spruce", MapColor.obsidianColor),
+        BIRCH(2, "birch", MapColor.sandColor),
+        JUNGLE(3, "jungle", MapColor.dirtColor),
+        ACACIA(4, "acacia", MapColor.adobeColor),
+        DARK_OAK(5, "dark_oak", "big_oak", MapColor.brownColor);
+
         private static final BlockPlanks.EnumType[] META_LOOKUP = new BlockPlanks.EnumType[values().length];
         private final int meta;
         private final String name;
         private final String unlocalizedName;
+        private final MapColor field_181071_k;
 
-        private static final String __OBFID = "CL_00002081";
-
-        private EnumType(int meta, String name)
+        private EnumType(int p_i46388_3_, String p_i46388_4_, MapColor p_i46388_5_)
         {
-            this(meta, name, name);
+            this(p_i46388_3_, p_i46388_4_, p_i46388_4_, p_i46388_5_);
         }
 
-        private EnumType(int meta, String name, String unlocalizedName)
+        private EnumType(int p_i46389_3_, String p_i46389_4_, String p_i46389_5_, MapColor p_i46389_6_)
         {
-            this.meta = meta;
-            this.name = name;
-            this.unlocalizedName = unlocalizedName;
+            this.meta = p_i46389_3_;
+            this.name = p_i46389_4_;
+            this.unlocalizedName = p_i46389_5_;
+            this.field_181071_k = p_i46389_6_;
         }
 
         public int getMetadata()
         {
             return this.meta;
+        }
+
+        public MapColor func_181070_c()
+        {
+            return this.field_181071_k;
         }
 
         public String toString()
@@ -129,13 +140,9 @@ public class BlockPlanks extends Block
 
         static
         {
-            BlockPlanks.EnumType[] var0 = values();
-            int var1 = var0.length;
-
-            for (int var2 = 0; var2 < var1; ++var2)
+            for (BlockPlanks.EnumType blockplanks$enumtype : values())
             {
-                BlockPlanks.EnumType var3 = var0[var2];
-                META_LOOKUP[var3.getMetadata()] = var3;
+                META_LOOKUP[blockplanks$enumtype.getMetadata()] = blockplanks$enumtype;
             }
         }
     }

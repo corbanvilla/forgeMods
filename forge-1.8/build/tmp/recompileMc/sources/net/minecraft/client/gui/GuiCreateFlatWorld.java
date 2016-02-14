@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -30,11 +31,10 @@ public class GuiCreateFlatWorld extends GuiScreen
     private GuiButton field_146389_t;
     private GuiButton field_146388_u;
     private GuiButton field_146386_v;
-    private static final String __OBFID = "CL_00000687";
 
-    public GuiCreateFlatWorld(GuiCreateWorld p_i1029_1_, String p_i1029_2_)
+    public GuiCreateFlatWorld(GuiCreateWorld createWorldGuiIn, String p_i1029_2_)
     {
-        this.createWorldGui = p_i1029_1_;
+        this.createWorldGui = createWorldGuiIn;
         this.func_146383_a(p_i1029_2_);
     }
 
@@ -49,7 +49,8 @@ public class GuiCreateFlatWorld extends GuiScreen
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
     public void initGui()
     {
@@ -78,6 +79,9 @@ public class GuiCreateFlatWorld extends GuiScreen
         this.createFlatWorldListSlotGui.handleMouseInput();
     }
 
+    /**
+     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
+     */
     protected void actionPerformed(GuiButton button) throws IOException
     {
         int i = this.theFlatGeneratorInfo.getFlatLayers().size() - this.createFlatWorldListSlotGui.field_148228_k - 1;
@@ -127,9 +131,9 @@ public class GuiCreateFlatWorld extends GuiScreen
         this.drawDefaultBackground();
         this.createFlatWorldListSlotGui.drawScreen(mouseX, mouseY, partialTicks);
         this.drawCenteredString(this.fontRendererObj, this.flatWorldTitle, this.width / 2, 8, 16777215);
-        int k = this.width / 2 - 92 - 16;
-        this.drawString(this.fontRendererObj, this.field_146394_i, k, 32, 16777215);
-        this.drawString(this.fontRendererObj, this.field_146391_r, k + 2 + 213 - this.fontRendererObj.getStringWidth(this.field_146391_r), 32, 16777215);
+        int i = this.width / 2 - 92 - 16;
+        this.drawString(this.fontRendererObj, this.field_146394_i, i, 32, 16777215);
+        this.drawString(this.fontRendererObj, this.field_146391_r, i + 2 + 213 - this.fontRendererObj.getStringWidth(this.field_146391_r), 32, 16777215);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
@@ -137,7 +141,6 @@ public class GuiCreateFlatWorld extends GuiScreen
     class Details extends GuiSlot
     {
         public int field_148228_k = -1;
-        private static final String __OBFID = "CL_00000688";
 
         public Details()
         {
@@ -170,15 +173,15 @@ public class GuiCreateFlatWorld extends GuiScreen
             this.mc.getTextureManager().bindTexture(Gui.statIcons);
             float f = 0.0078125F;
             float f1 = 0.0078125F;
-            boolean flag = true;
-            boolean flag1 = true;
+            int i = 18;
+            int j = 18;
             Tessellator tessellator = Tessellator.getInstance();
             WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-            worldrenderer.startDrawingQuads();
-            worldrenderer.addVertexWithUV((double)(p_148224_1_ + 0), (double)(p_148224_2_ + 18), (double)GuiCreateFlatWorld.this.zLevel, (double)((float)(p_148224_3_ + 0) * 0.0078125F), (double)((float)(p_148224_4_ + 18) * 0.0078125F));
-            worldrenderer.addVertexWithUV((double)(p_148224_1_ + 18), (double)(p_148224_2_ + 18), (double)GuiCreateFlatWorld.this.zLevel, (double)((float)(p_148224_3_ + 18) * 0.0078125F), (double)((float)(p_148224_4_ + 18) * 0.0078125F));
-            worldrenderer.addVertexWithUV((double)(p_148224_1_ + 18), (double)(p_148224_2_ + 0), (double)GuiCreateFlatWorld.this.zLevel, (double)((float)(p_148224_3_ + 18) * 0.0078125F), (double)((float)(p_148224_4_ + 0) * 0.0078125F));
-            worldrenderer.addVertexWithUV((double)(p_148224_1_ + 0), (double)(p_148224_2_ + 0), (double)GuiCreateFlatWorld.this.zLevel, (double)((float)(p_148224_3_ + 0) * 0.0078125F), (double)((float)(p_148224_4_ + 0) * 0.0078125F));
+            worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
+            worldrenderer.pos((double)(p_148224_1_ + 0), (double)(p_148224_2_ + 18), (double)GuiCreateFlatWorld.this.zLevel).tex((double)((float)(p_148224_3_ + 0) * 0.0078125F), (double)((float)(p_148224_4_ + 18) * 0.0078125F)).endVertex();
+            worldrenderer.pos((double)(p_148224_1_ + 18), (double)(p_148224_2_ + 18), (double)GuiCreateFlatWorld.this.zLevel).tex((double)((float)(p_148224_3_ + 18) * 0.0078125F), (double)((float)(p_148224_4_ + 18) * 0.0078125F)).endVertex();
+            worldrenderer.pos((double)(p_148224_1_ + 18), (double)(p_148224_2_ + 0), (double)GuiCreateFlatWorld.this.zLevel).tex((double)((float)(p_148224_3_ + 18) * 0.0078125F), (double)((float)(p_148224_4_ + 0) * 0.0078125F)).endVertex();
+            worldrenderer.pos((double)(p_148224_1_ + 0), (double)(p_148224_2_ + 0), (double)GuiCreateFlatWorld.this.zLevel).tex((double)((float)(p_148224_3_ + 0) * 0.0078125F), (double)((float)(p_148224_4_ + 0) * 0.0078125F)).endVertex();
             tessellator.draw();
         }
 
@@ -204,9 +207,11 @@ public class GuiCreateFlatWorld extends GuiScreen
             return slotIndex == this.field_148228_k;
         }
 
-        protected void drawBackground() {}
+        protected void drawBackground()
+        {
+        }
 
-        protected void drawSlot(int entryID, int p_180791_2_, int p_180791_3_, int p_180791_4_, int p_180791_5_, int p_180791_6_)
+        protected void drawSlot(int entryID, int p_180791_2_, int p_180791_3_, int p_180791_4_, int mouseXIn, int mouseYIn)
         {
             FlatLayerInfo flatlayerinfo = (FlatLayerInfo)GuiCreateFlatWorld.this.theFlatGeneratorInfo.getFlatLayers().get(GuiCreateFlatWorld.this.theFlatGeneratorInfo.getFlatLayers().size() - entryID - 1);
             IBlockState iblockstate = flatlayerinfo.func_175900_c();

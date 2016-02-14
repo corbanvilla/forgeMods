@@ -26,7 +26,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BlockSnow extends Block
 {
     public static final PropertyInteger LAYERS = PropertyInteger.create("layers", 1, 8);
-    private static final String __OBFID = "CL_00000309";
 
     protected BlockSnow()
     {
@@ -50,6 +49,9 @@ public class BlockSnow extends Block
         return new AxisAlignedBB((double)pos.getX() + this.minX, (double)pos.getY() + this.minY, (double)pos.getZ() + this.minZ, (double)pos.getX() + this.maxX, (double)((float)pos.getY() + (float)i * f), (double)pos.getZ() + this.maxZ);
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -83,7 +85,7 @@ public class BlockSnow extends Block
     {
         IBlockState iblockstate = worldIn.getBlockState(pos.down());
         Block block = iblockstate.getBlock();
-        return block != Blocks.ice && block != Blocks.packed_ice ? (block.isLeaves(worldIn, pos.down()) ? true : (block == this && ((Integer)iblockstate.getValue(LAYERS)).intValue() == 7 ? true : block.isOpaqueCube() && block.blockMaterial.blocksMovement())) : false;
+        return block != Blocks.ice && block != Blocks.packed_ice ? (block.isLeaves(worldIn, pos.down()) ? true : (block == this && ((Integer)iblockstate.getValue(LAYERS)).intValue() >= 7 ? true : block.isOpaqueCube() && block.blockMaterial.blocksMovement())) : false;
     }
 
     /**
@@ -94,11 +96,11 @@ public class BlockSnow extends Block
         this.checkAndDropBlock(worldIn, pos, state);
     }
 
-    private boolean checkAndDropBlock(World worldIn, BlockPos p_176314_2_, IBlockState p_176314_3_)
+    private boolean checkAndDropBlock(World worldIn, BlockPos pos, IBlockState state)
     {
-        if (!this.canPlaceBlockAt(worldIn, p_176314_2_))
+        if (!this.canPlaceBlockAt(worldIn, pos))
         {
-            worldIn.setBlockToAir(p_176314_2_);
+            worldIn.setBlockToAir(pos);
             return false;
         }
         else
@@ -115,8 +117,6 @@ public class BlockSnow extends Block
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {

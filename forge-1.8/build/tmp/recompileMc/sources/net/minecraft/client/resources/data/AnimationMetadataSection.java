@@ -1,8 +1,6 @@
 package net.minecraft.client.resources.data;
 
 import com.google.common.collect.Sets;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import net.minecraftforge.fml.relauncher.Side;
@@ -11,14 +9,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class AnimationMetadataSection implements IMetadataSection
 {
-    private final List animationFrames;
+    private final List<AnimationFrame> animationFrames;
     private final int frameWidth;
     private final int frameHeight;
     private final int frameTime;
     private final boolean interpolate;
-    private static final String __OBFID = "CL_00001106";
 
-    public AnimationMetadataSection(List p_i46088_1_, int p_i46088_2_, int p_i46088_3_, int p_i46088_4_, boolean p_i46088_5_)
+    public AnimationMetadataSection(List<AnimationFrame> p_i46088_1_, int p_i46088_2_, int p_i46088_3_, int p_i46088_4_, boolean p_i46088_5_)
     {
         this.animationFrames = p_i46088_1_;
         this.frameWidth = p_i46088_2_;
@@ -73,17 +70,15 @@ public class AnimationMetadataSection implements IMetadataSection
         return ((AnimationFrame)this.animationFrames.get(p_110468_1_)).getFrameIndex();
     }
 
-    public Set getFrameIndexSet()
+    public Set<Integer> getFrameIndexSet()
     {
-        HashSet hashset = Sets.newHashSet();
-        Iterator iterator = this.animationFrames.iterator();
+        Set<Integer> set = Sets.<Integer>newHashSet();
 
-        while (iterator.hasNext())
+        for (AnimationFrame animationframe : this.animationFrames)
         {
-            AnimationFrame animationframe = (AnimationFrame)iterator.next();
-            hashset.add(Integer.valueOf(animationframe.getFrameIndex()));
+            set.add(Integer.valueOf(animationframe.getFrameIndex()));
         }
 
-        return hashset;
+        return set;
     }
 }

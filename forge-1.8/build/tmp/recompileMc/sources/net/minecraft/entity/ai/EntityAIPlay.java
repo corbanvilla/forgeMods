@@ -1,6 +1,5 @@
 package net.minecraft.entity.ai;
 
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityVillager;
@@ -12,11 +11,10 @@ public class EntityAIPlay extends EntityAIBase
     private EntityLivingBase targetVillager;
     private double speed;
     private int playTime;
-    private static final String __OBFID = "CL_00001605";
 
-    public EntityAIPlay(EntityVillager p_i1646_1_, double speedIn)
+    public EntityAIPlay(EntityVillager villagerObjIn, double speedIn)
     {
-        this.villagerObj = p_i1646_1_;
+        this.villagerObj = villagerObjIn;
         this.speed = speedIn;
         this.setMutexBits(1);
     }
@@ -36,14 +34,11 @@ public class EntityAIPlay extends EntityAIBase
         }
         else
         {
-            List list = this.villagerObj.worldObj.getEntitiesWithinAABB(EntityVillager.class, this.villagerObj.getEntityBoundingBox().expand(6.0D, 3.0D, 6.0D));
+            List<EntityVillager> list = this.villagerObj.worldObj.<EntityVillager>getEntitiesWithinAABB(EntityVillager.class, this.villagerObj.getEntityBoundingBox().expand(6.0D, 3.0D, 6.0D));
             double d0 = Double.MAX_VALUE;
-            Iterator iterator = list.iterator();
 
-            while (iterator.hasNext())
+            for (EntityVillager entityvillager : list)
             {
-                EntityVillager entityvillager = (EntityVillager)iterator.next();
-
                 if (entityvillager != this.villagerObj && !entityvillager.isPlaying() && entityvillager.getGrowingAge() < 0)
                 {
                     double d1 = entityvillager.getDistanceSqToEntity(this.villagerObj);

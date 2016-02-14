@@ -5,6 +5,7 @@ import com.google.common.base.Predicates;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ChatAllowedCharacters;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
@@ -13,7 +14,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class GuiTextField extends Gui
 {
-    private final int field_175208_g;
+    private final int id;
     private final FontRenderer fontRendererInstance;
     public int xPosition;
     public int yPosition;
@@ -41,17 +42,16 @@ public class GuiTextField extends Gui
     /** True if this textbox is visible */
     private boolean visible = true;
     private GuiPageButtonList.GuiResponder field_175210_x;
-    private Predicate field_175209_y = Predicates.alwaysTrue();
-    private static final String __OBFID = "CL_00000670";
+    private Predicate<String> field_175209_y = Predicates.<String>alwaysTrue();
 
-    public GuiTextField(int p_i45542_1_, FontRenderer p_i45542_2_, int p_i45542_3_, int p_i45542_4_, int p_i45542_5_, int p_i45542_6_)
+    public GuiTextField(int componentId, FontRenderer fontrendererObj, int x, int y, int par5Width, int par6Height)
     {
-        this.field_175208_g = p_i45542_1_;
-        this.fontRendererInstance = p_i45542_2_;
-        this.xPosition = p_i45542_3_;
-        this.yPosition = p_i45542_4_;
-        this.width = p_i45542_5_;
-        this.height = p_i45542_6_;
+        this.id = componentId;
+        this.fontRendererInstance = fontrendererObj;
+        this.xPosition = x;
+        this.yPosition = y;
+        this.width = par5Width;
+        this.height = par6Height;
     }
 
     public void func_175207_a(GuiPageButtonList.GuiResponder p_175207_1_)
@@ -105,7 +105,7 @@ public class GuiTextField extends Gui
         return this.text.substring(i, j);
     }
 
-    public void func_175205_a(Predicate p_175205_1_)
+    public void func_175205_a(Predicate<String> p_175205_1_)
     {
         this.field_175209_y = p_175205_1_;
     }
@@ -115,44 +115,42 @@ public class GuiTextField extends Gui
      */
     public void writeText(String p_146191_1_)
     {
-        String s1 = "";
-        String s2 = ChatAllowedCharacters.filterAllowedCharacters(p_146191_1_);
+        String s = "";
+        String s1 = ChatAllowedCharacters.filterAllowedCharacters(p_146191_1_);
         int i = this.cursorPosition < this.selectionEnd ? this.cursorPosition : this.selectionEnd;
         int j = this.cursorPosition < this.selectionEnd ? this.selectionEnd : this.cursorPosition;
         int k = this.maxStringLength - this.text.length() - (i - j);
-        boolean flag = false;
+        int l = 0;
 
         if (this.text.length() > 0)
         {
-            s1 = s1 + this.text.substring(0, i);
+            s = s + this.text.substring(0, i);
         }
 
-        int l;
-
-        if (k < s2.length())
+        if (k < s1.length())
         {
-            s1 = s1 + s2.substring(0, k);
+            s = s + s1.substring(0, k);
             l = k;
         }
         else
         {
-            s1 = s1 + s2;
-            l = s2.length();
+            s = s + s1;
+            l = s1.length();
         }
 
         if (this.text.length() > 0 && j < this.text.length())
         {
-            s1 = s1 + this.text.substring(j);
+            s = s + this.text.substring(j);
         }
 
-        if (this.field_175209_y.apply(s1))
+        if (this.field_175209_y.apply(s))
         {
-            this.text = s1;
+            this.text = s;
             this.moveCursorBy(i - this.selectionEnd + l);
 
             if (this.field_175210_x != null)
             {
-                this.field_175210_x.func_175319_a(this.field_175208_g, this.text);
+                this.field_175210_x.func_175319_a(this.id, this.text);
             }
         }
     }
@@ -190,38 +188,41 @@ public class GuiTextField extends Gui
             else
             {
                 boolean flag = p_146175_1_ < 0;
-                int j = flag ? this.cursorPosition + p_146175_1_ : this.cursorPosition;
-                int k = flag ? this.cursorPosition : this.cursorPosition + p_146175_1_;
+                int i = flag ? this.cursorPosition + p_146175_1_ : this.cursorPosition;
+                int j = flag ? this.cursorPosition : this.cursorPosition + p_146175_1_;
                 String s = "";
 
-                if (j >= 0)
+                if (i >= 0)
                 {
-                    s = this.text.substring(0, j);
+                    s = this.text.substring(0, i);
                 }
 
-                if (k < this.text.length())
+                if (j < this.text.length())
                 {
-                    s = s + this.text.substring(k);
+                    s = s + this.text.substring(j);
                 }
 
-                this.text = s;
-
-                if (flag)
+                if (this.field_175209_y.apply(s))
                 {
-                    this.moveCursorBy(p_146175_1_);
-                }
+                    this.text = s;
 
-                if (this.field_175210_x != null)
-                {
-                    this.field_175210_x.func_175319_a(this.field_175208_g, this.text);
+                    if (flag)
+                    {
+                        this.moveCursorBy(p_146175_1_);
+                    }
+
+                    if (this.field_175210_x != null)
+                    {
+                        this.field_175210_x.func_175319_a(this.id, this.text);
+                    }
                 }
             }
         }
     }
 
-    public int func_175206_d()
+    public int getId()
     {
-        return this.field_175208_g;
+        return this.id;
     }
 
     /**
@@ -242,44 +243,44 @@ public class GuiTextField extends Gui
 
     public int func_146197_a(int p_146197_1_, int p_146197_2_, boolean p_146197_3_)
     {
-        int k = p_146197_2_;
-        boolean flag1 = p_146197_1_ < 0;
-        int l = Math.abs(p_146197_1_);
+        int i = p_146197_2_;
+        boolean flag = p_146197_1_ < 0;
+        int j = Math.abs(p_146197_1_);
 
-        for (int i1 = 0; i1 < l; ++i1)
+        for (int k = 0; k < j; ++k)
         {
-            if (flag1)
+            if (!flag)
             {
-                while (p_146197_3_ && k > 0 && this.text.charAt(k - 1) == 32)
-                {
-                    --k;
-                }
+                int l = this.text.length();
+                i = this.text.indexOf(32, i);
 
-                while (k > 0 && this.text.charAt(k - 1) != 32)
+                if (i == -1)
                 {
-                    --k;
+                    i = l;
+                }
+                else
+                {
+                    while (p_146197_3_ && i < l && this.text.charAt(i) == 32)
+                    {
+                        ++i;
+                    }
                 }
             }
             else
             {
-                int j1 = this.text.length();
-                k = this.text.indexOf(32, k);
-
-                if (k == -1)
+                while (p_146197_3_ && i > 0 && this.text.charAt(i - 1) == 32)
                 {
-                    k = j1;
+                    --i;
                 }
-                else
+
+                while (i > 0 && this.text.charAt(i - 1) != 32)
                 {
-                    while (p_146197_3_ && k < j1 && this.text.charAt(k) == 32)
-                    {
-                        ++k;
-                    }
+                    --i;
                 }
             }
         }
 
-        return k;
+        return i;
     }
 
     /**
@@ -296,8 +297,8 @@ public class GuiTextField extends Gui
     public void setCursorPosition(int p_146190_1_)
     {
         this.cursorPosition = p_146190_1_;
-        int j = this.text.length();
-        this.cursorPosition = MathHelper.clamp_int(this.cursorPosition, 0, j);
+        int i = this.text.length();
+        this.cursorPosition = MathHelper.clamp_int(this.cursorPosition, 0, i);
         this.setSelectionPos(this.cursorPosition);
     }
 
@@ -326,18 +327,18 @@ public class GuiTextField extends Gui
         {
             return false;
         }
-        else if (GuiScreen.func_175278_g(p_146201_2_))
+        else if (GuiScreen.isKeyComboCtrlA(p_146201_2_))
         {
             this.setCursorPositionEnd();
             this.setSelectionPos(0);
             return true;
         }
-        else if (GuiScreen.func_175280_f(p_146201_2_))
+        else if (GuiScreen.isKeyComboCtrlC(p_146201_2_))
         {
             GuiScreen.setClipboardString(this.getSelectedText());
             return true;
         }
-        else if (GuiScreen.func_175279_e(p_146201_2_))
+        else if (GuiScreen.isKeyComboCtrlV(p_146201_2_))
         {
             if (this.isEnabled)
             {
@@ -346,7 +347,7 @@ public class GuiTextField extends Gui
 
             return true;
         }
-        else if (GuiScreen.func_175277_d(p_146201_2_))
+        else if (GuiScreen.isKeyComboCtrlX(p_146201_2_))
         {
             GuiScreen.setClipboardString(this.getSelectedText());
 
@@ -362,6 +363,7 @@ public class GuiTextField extends Gui
             switch (p_146201_2_)
             {
                 case 14:
+
                     if (GuiScreen.isCtrlKeyDown())
                     {
                         if (this.isEnabled)
@@ -376,6 +378,7 @@ public class GuiTextField extends Gui
 
                     return true;
                 case 199:
+
                     if (GuiScreen.isShiftKeyDown())
                     {
                         this.setSelectionPos(0);
@@ -387,6 +390,7 @@ public class GuiTextField extends Gui
 
                     return true;
                 case 203:
+
                     if (GuiScreen.isShiftKeyDown())
                     {
                         if (GuiScreen.isCtrlKeyDown())
@@ -409,6 +413,7 @@ public class GuiTextField extends Gui
 
                     return true;
                 case 205:
+
                     if (GuiScreen.isShiftKeyDown())
                     {
                         if (GuiScreen.isCtrlKeyDown())
@@ -431,6 +436,7 @@ public class GuiTextField extends Gui
 
                     return true;
                 case 207:
+
                     if (GuiScreen.isShiftKeyDown())
                     {
                         this.setSelectionPos(this.text.length());
@@ -442,6 +448,7 @@ public class GuiTextField extends Gui
 
                     return true;
                 case 211:
+
                     if (GuiScreen.isCtrlKeyDown())
                     {
                         if (this.isEnabled)
@@ -456,6 +463,7 @@ public class GuiTextField extends Gui
 
                     return true;
                 default:
+
                     if (ChatAllowedCharacters.isAllowedCharacter(p_146201_1_))
                     {
                         if (this.isEnabled)
@@ -487,15 +495,15 @@ public class GuiTextField extends Gui
 
         if (this.isFocused && flag && p_146192_3_ == 0)
         {
-            int l = p_146192_1_ - this.xPosition;
+            int i = p_146192_1_ - this.xPosition;
 
             if (this.enableBackgroundDrawing)
             {
-                l -= 4;
+                i -= 4;
             }
 
             String s = this.fontRendererInstance.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.getWidth());
-            this.setCursorPosition(this.fontRendererInstance.trimStringToWidth(s, l).length() + this.lineScrollOffset);
+            this.setCursorPosition(this.fontRendererInstance.trimStringToWidth(s, i).length() + this.lineScrollOffset);
         }
     }
 
@@ -576,20 +584,18 @@ public class GuiTextField extends Gui
      */
     private void drawCursorVertical(int p_146188_1_, int p_146188_2_, int p_146188_3_, int p_146188_4_)
     {
-        int i1;
-
         if (p_146188_1_ < p_146188_3_)
         {
-            i1 = p_146188_1_;
+            int i = p_146188_1_;
             p_146188_1_ = p_146188_3_;
-            p_146188_3_ = i1;
+            p_146188_3_ = i;
         }
 
         if (p_146188_2_ < p_146188_4_)
         {
-            i1 = p_146188_2_;
+            int j = p_146188_2_;
             p_146188_2_ = p_146188_4_;
-            p_146188_4_ = i1;
+            p_146188_4_ = j;
         }
 
         if (p_146188_3_ > this.xPosition + this.width)
@@ -608,11 +614,11 @@ public class GuiTextField extends Gui
         GlStateManager.disableTexture2D();
         GlStateManager.enableColorLogic();
         GlStateManager.colorLogicOp(5387);
-        worldrenderer.startDrawingQuads();
-        worldrenderer.addVertex((double)p_146188_1_, (double)p_146188_4_, 0.0D);
-        worldrenderer.addVertex((double)p_146188_3_, (double)p_146188_4_, 0.0D);
-        worldrenderer.addVertex((double)p_146188_3_, (double)p_146188_2_, 0.0D);
-        worldrenderer.addVertex((double)p_146188_1_, (double)p_146188_2_, 0.0D);
+        worldrenderer.begin(7, DefaultVertexFormats.POSITION);
+        worldrenderer.pos((double)p_146188_1_, (double)p_146188_4_, 0.0D).endVertex();
+        worldrenderer.pos((double)p_146188_3_, (double)p_146188_4_, 0.0D).endVertex();
+        worldrenderer.pos((double)p_146188_3_, (double)p_146188_2_, 0.0D).endVertex();
+        worldrenderer.pos((double)p_146188_1_, (double)p_146188_2_, 0.0D).endVertex();
         tessellator.draw();
         GlStateManager.disableColorLogic();
         GlStateManager.enableTexture2D();
@@ -720,11 +726,11 @@ public class GuiTextField extends Gui
      */
     public void setSelectionPos(int p_146199_1_)
     {
-        int j = this.text.length();
+        int i = this.text.length();
 
-        if (p_146199_1_ > j)
+        if (p_146199_1_ > i)
         {
-            p_146199_1_ = j;
+            p_146199_1_ = i;
         }
 
         if (p_146199_1_ < 0)
@@ -736,30 +742,30 @@ public class GuiTextField extends Gui
 
         if (this.fontRendererInstance != null)
         {
-            if (this.lineScrollOffset > j)
+            if (this.lineScrollOffset > i)
             {
-                this.lineScrollOffset = j;
+                this.lineScrollOffset = i;
             }
 
-            int k = this.getWidth();
-            String s = this.fontRendererInstance.trimStringToWidth(this.text.substring(this.lineScrollOffset), k);
-            int l = s.length() + this.lineScrollOffset;
+            int j = this.getWidth();
+            String s = this.fontRendererInstance.trimStringToWidth(this.text.substring(this.lineScrollOffset), j);
+            int k = s.length() + this.lineScrollOffset;
 
             if (p_146199_1_ == this.lineScrollOffset)
             {
-                this.lineScrollOffset -= this.fontRendererInstance.trimStringToWidth(this.text, k, true).length();
+                this.lineScrollOffset -= this.fontRendererInstance.trimStringToWidth(this.text, j, true).length();
             }
 
-            if (p_146199_1_ > l)
+            if (p_146199_1_ > k)
             {
-                this.lineScrollOffset += p_146199_1_ - l;
+                this.lineScrollOffset += p_146199_1_ - k;
             }
             else if (p_146199_1_ <= this.lineScrollOffset)
             {
                 this.lineScrollOffset -= this.lineScrollOffset - p_146199_1_;
             }
 
-            this.lineScrollOffset = MathHelper.clamp_int(this.lineScrollOffset, 0, j);
+            this.lineScrollOffset = MathHelper.clamp_int(this.lineScrollOffset, 0, i);
         }
     }
 

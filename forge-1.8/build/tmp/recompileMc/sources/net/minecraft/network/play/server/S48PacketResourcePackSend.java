@@ -1,20 +1,20 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S48PacketResourcePackSend implements Packet
+public class S48PacketResourcePackSend implements Packet<INetHandlerPlayClient>
 {
     private String url;
     private String hash;
-    private static final String __OBFID = "CL_00002293";
 
-    public S48PacketResourcePackSend() {}
+    public S48PacketResourcePackSend()
+    {
+    }
 
     public S48PacketResourcePackSend(String url, String hash)
     {
@@ -45,27 +45,22 @@ public class S48PacketResourcePackSend implements Packet
         buf.writeString(this.hash);
     }
 
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
     public void processPacket(INetHandlerPlayClient handler)
     {
         handler.handleResourcePack(this);
     }
 
     @SideOnly(Side.CLIENT)
-    public String func_179783_a()
+    public String getURL()
     {
         return this.url;
     }
 
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayClient)handler);
-    }
-
     @SideOnly(Side.CLIENT)
-    public String func_179784_b()
+    public String getHash()
     {
         return this.hash;
     }

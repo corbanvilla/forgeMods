@@ -12,9 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import net.minecraft.client.Minecraft;
@@ -24,11 +22,13 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.EntityList;
 import net.minecraft.event.ClickEvent;
 import net.minecraft.event.HoverEvent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.stats.Achievement;
@@ -37,9 +37,6 @@ import net.minecraft.stats.StatList;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
-import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
-import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.StringUtils;
@@ -53,7 +50,7 @@ import tv.twitch.chat.ChatUserInfo;
 public abstract class GuiScreen extends Gui implements GuiYesNoCallback
 {
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final Set PROTOCOLS = Sets.newHashSet(new String[] {"http", "https"});
+    private static final Set<String> PROTOCOLS = Sets.newHashSet(new String[] {"http", "https"});
     private static final Splitter NEWLINE_SPLITTER = Splitter.on('\n');
     /** Reference to the Minecraft object. */
     public Minecraft mc;
@@ -63,10 +60,8 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
     public int width;
     /** The height of the screen object. */
     public int height;
-    /** A list of all the buttons in this container. */
-    protected List buttonList = Lists.newArrayList();
-    /** A list of all the labels in this container. */
-    protected List labelList = Lists.newArrayList();
+    protected List<GuiButton> buttonList = Lists.<GuiButton>newArrayList();
+    protected List<GuiLabel> labelList = Lists.<GuiLabel>newArrayList();
     public boolean allowUserInput;
     /** The FontRenderer used by GuiScreen */
     protected FontRenderer fontRendererObj;
@@ -80,28 +75,25 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
      */
     private int touchValue;
     private URI clickedLinkURI;
-    private static final String __OBFID = "CL_00000710";
 
     /**
      * Draws the screen and all the components in it. Args : mouseX, mouseY, renderPartialTicks
      */
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
-        int k;
-
-        for (k = 0; k < this.buttonList.size(); ++k)
+        for (int i = 0; i < this.buttonList.size(); ++i)
         {
-            ((GuiButton)this.buttonList.get(k)).drawButton(this.mc, mouseX, mouseY);
+            ((GuiButton)this.buttonList.get(i)).drawButton(this.mc, mouseX, mouseY);
         }
 
-        for (k = 0; k < this.labelList.size(); ++k)
+        for (int j = 0; j < this.labelList.size(); ++j)
         {
-            ((GuiLabel)this.labelList.get(k)).drawLabel(this.mc, mouseX, mouseY);
+            ((GuiLabel)this.labelList.get(j)).drawLabel(this.mc, mouseX, mouseY);
         }
     }
 
     /**
-     * Fired when a key is typed (except F11 who toggle full screen). This is the equivalent of
+     * Fired when a key is typed (except F11 which toggles full screen). This is the equivalent of
      * KeyListener.keyTyped(KeyEvent e). Args : character (character on the key), keyCode (lwjgl Keyboard key code)
      */
     protected void keyTyped(char typedChar, int keyCode) throws IOException
@@ -131,7 +123,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
                 return (String)transferable.getTransferData(DataFlavor.stringFlavor);
             }
         }
-        catch (Exception exception)
+        catch (Exception var1)
         {
             ;
         }
@@ -151,7 +143,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
                 StringSelection stringselection = new StringSelection(copyText);
                 Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringselection, (ClipboardOwner)null);
             }
-            catch (Exception exception)
+            catch (Exception var2)
             {
                 ;
             }
@@ -160,17 +152,17 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
 
     protected void renderToolTip(ItemStack stack, int x, int y)
     {
-        List list = stack.getTooltip(this.mc.thePlayer, this.mc.gameSettings.advancedItemTooltips);
+        List<String> list = stack.getTooltip(this.mc.thePlayer, this.mc.gameSettings.advancedItemTooltips);
 
-        for (int k = 0; k < list.size(); ++k)
+        for (int i = 0; i < list.size(); ++i)
         {
-            if (k == 0)
+            if (i == 0)
             {
-                list.set(k, stack.getRarity().rarityColor + (String)list.get(k));
+                list.set(i, stack.getRarity().rarityColor + (String)list.get(i));
             }
             else
             {
-                list.set(k, EnumChatFormatting.GRAY + (String)list.get(k));
+                list.set(i, EnumChatFormatting.GRAY + (String)list.get(i));
             }
         }
 
@@ -184,15 +176,18 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
      */
     protected void drawCreativeTabHoveringText(String tabName, int mouseX, int mouseY)
     {
-        this.drawHoveringText(Arrays.asList(new String[] {tabName}), mouseX, mouseY);
+        this.drawHoveringText(Arrays.<String>asList(new String[] {tabName}), mouseX, mouseY);
     }
 
-    protected void drawHoveringText(List textLines, int x, int y)
+    /**
+     * Draws a List of strings as a tooltip. Every entry is drawn on a seperate line.
+     */
+    protected void drawHoveringText(List<String> textLines, int x, int y)
     {
-        drawHoveringText(textLines, x, y, fontRendererObj);
+        drawHoveringText(textLines, x, y, fontRendererObj);   
     }
 
-    protected void drawHoveringText(List textLines, int x, int y, FontRenderer font)
+    protected void drawHoveringText(List<String> textLines, int x, int y, FontRenderer font)
     {
         if (!textLines.isEmpty())
         {
@@ -200,65 +195,63 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
             RenderHelper.disableStandardItemLighting();
             GlStateManager.disableLighting();
             GlStateManager.disableDepth();
-            int k = 0;
-            Iterator iterator = textLines.iterator();
+            int i = 0;
 
-            while (iterator.hasNext())
+            for (String s : textLines)
             {
-                String s = (String)iterator.next();
-                int l = font.getStringWidth(s);
+                int j = font.getStringWidth(s);
 
-                if (l > k)
+                if (j > i)
                 {
-                    k = l;
+                    i = j;
                 }
             }
 
-            int j2 = x + 12;
-            int k2 = y - 12;
-            int i1 = 8;
+            int l1 = x + 12;
+            int i2 = y - 12;
+            int k = 8;
 
             if (textLines.size() > 1)
             {
-                i1 += 2 + (textLines.size() - 1) * 10;
+                k += 2 + (textLines.size() - 1) * 10;
             }
 
-            if (j2 + k > this.width)
+            if (l1 + i > this.width)
             {
-                j2 -= 28 + k;
+                l1 -= 28 + i;
             }
 
-            if (k2 + i1 + 6 > this.height)
+            if (i2 + k + 6 > this.height)
             {
-                k2 = this.height - i1 - 6;
+                i2 = this.height - k - 6;
             }
 
             this.zLevel = 300.0F;
             this.itemRender.zLevel = 300.0F;
-            int j1 = -267386864;
-            this.drawGradientRect(j2 - 3, k2 - 4, j2 + k + 3, k2 - 3, j1, j1);
-            this.drawGradientRect(j2 - 3, k2 + i1 + 3, j2 + k + 3, k2 + i1 + 4, j1, j1);
-            this.drawGradientRect(j2 - 3, k2 - 3, j2 + k + 3, k2 + i1 + 3, j1, j1);
-            this.drawGradientRect(j2 - 4, k2 - 3, j2 - 3, k2 + i1 + 3, j1, j1);
-            this.drawGradientRect(j2 + k + 3, k2 - 3, j2 + k + 4, k2 + i1 + 3, j1, j1);
-            int k1 = 1347420415;
-            int l1 = (k1 & 16711422) >> 1 | k1 & -16777216;
-            this.drawGradientRect(j2 - 3, k2 - 3 + 1, j2 - 3 + 1, k2 + i1 + 3 - 1, k1, l1);
-            this.drawGradientRect(j2 + k + 2, k2 - 3 + 1, j2 + k + 3, k2 + i1 + 3 - 1, k1, l1);
-            this.drawGradientRect(j2 - 3, k2 - 3, j2 + k + 3, k2 - 3 + 1, k1, k1);
-            this.drawGradientRect(j2 - 3, k2 + i1 + 2, j2 + k + 3, k2 + i1 + 3, l1, l1);
+            int l = -267386864;
+            this.drawGradientRect(l1 - 3, i2 - 4, l1 + i + 3, i2 - 3, l, l);
+            this.drawGradientRect(l1 - 3, i2 + k + 3, l1 + i + 3, i2 + k + 4, l, l);
+            this.drawGradientRect(l1 - 3, i2 - 3, l1 + i + 3, i2 + k + 3, l, l);
+            this.drawGradientRect(l1 - 4, i2 - 3, l1 - 3, i2 + k + 3, l, l);
+            this.drawGradientRect(l1 + i + 3, i2 - 3, l1 + i + 4, i2 + k + 3, l, l);
+            int i1 = 1347420415;
+            int j1 = (i1 & 16711422) >> 1 | i1 & -16777216;
+            this.drawGradientRect(l1 - 3, i2 - 3 + 1, l1 - 3 + 1, i2 + k + 3 - 1, i1, j1);
+            this.drawGradientRect(l1 + i + 2, i2 - 3 + 1, l1 + i + 3, i2 + k + 3 - 1, i1, j1);
+            this.drawGradientRect(l1 - 3, i2 - 3, l1 + i + 3, i2 - 3 + 1, i1, i1);
+            this.drawGradientRect(l1 - 3, i2 + k + 2, l1 + i + 3, i2 + k + 3, j1, j1);
 
-            for (int i2 = 0; i2 < textLines.size(); ++i2)
+            for (int k1 = 0; k1 < textLines.size(); ++k1)
             {
-                String s1 = (String)textLines.get(i2);
-                font.drawStringWithShadow(s1, j2, k2, -1);
+                String s1 = (String)textLines.get(k1);
+                font.drawStringWithShadow(s1, (float)l1, (float)i2, -1);
 
-                if (i2 == 0)
+                if (k1 == 0)
                 {
-                    k2 += 2;
+                    i2 += 2;
                 }
 
-                k2 += 10;
+                i2 += 10;
             }
 
             this.zLevel = 0.0F;
@@ -270,7 +263,10 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
         }
     }
 
-    protected void func_175272_a(IChatComponent p_175272_1_, int p_175272_2_, int p_175272_3_)
+    /**
+     * Draws the hover event specified by the given chat component
+     */
+    protected void handleComponentHover(IChatComponent p_175272_1_, int p_175272_2_, int p_175272_3_)
     {
         if (p_175272_1_ != null && p_175272_1_.getChatStyle().getChatHoverEvent() != null)
         {
@@ -282,14 +278,14 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
 
                 try
                 {
-                    NBTTagCompound nbttagcompound = JsonToNBT.func_180713_a(hoverevent.getValue().getUnformattedText());
+                    NBTBase nbtbase = JsonToNBT.getTagFromJson(hoverevent.getValue().getUnformattedText());
 
-                    if (nbttagcompound instanceof NBTTagCompound)
+                    if (nbtbase instanceof NBTTagCompound)
                     {
-                        itemstack = ItemStack.loadItemStackFromNBT((NBTTagCompound)nbttagcompound);
+                        itemstack = ItemStack.loadItemStackFromNBT((NBTTagCompound)nbtbase);
                     }
                 }
-                catch (NBTException nbtexception1)
+                catch (NBTException var11)
                 {
                     ;
                 }
@@ -303,71 +299,66 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
                     this.drawCreativeTabHoveringText(EnumChatFormatting.RED + "Invalid Item!", p_175272_2_, p_175272_3_);
                 }
             }
-            else
+            else if (hoverevent.getAction() == HoverEvent.Action.SHOW_ENTITY)
             {
-                String s;
-
-                if (hoverevent.getAction() == HoverEvent.Action.SHOW_ENTITY)
+                if (this.mc.gameSettings.advancedItemTooltips)
                 {
-                    if (this.mc.gameSettings.advancedItemTooltips)
+                    try
                     {
-                        try
+                        NBTBase nbtbase1 = JsonToNBT.getTagFromJson(hoverevent.getValue().getUnformattedText());
+
+                        if (nbtbase1 instanceof NBTTagCompound)
                         {
-                            NBTTagCompound nbttagcompound2 = JsonToNBT.func_180713_a(hoverevent.getValue().getUnformattedText());
+                            List<String> list1 = Lists.<String>newArrayList();
+                            NBTTagCompound nbttagcompound = (NBTTagCompound)nbtbase1;
+                            list1.add(nbttagcompound.getString("name"));
 
-                            if (nbttagcompound2 instanceof NBTTagCompound)
+                            if (nbttagcompound.hasKey("type", 8))
                             {
-                                ArrayList arraylist1 = Lists.newArrayList();
-                                NBTTagCompound nbttagcompound1 = (NBTTagCompound)nbttagcompound2;
-                                arraylist1.add(nbttagcompound1.getString("name"));
-
-                                if (nbttagcompound1.hasKey("type", 8))
-                                {
-                                    s = nbttagcompound1.getString("type");
-                                    arraylist1.add("Type: " + s + " (" + EntityList.getIDFromString(s) + ")");
-                                }
-
-                                arraylist1.add(nbttagcompound1.getString("id"));
-                                this.drawHoveringText(arraylist1, p_175272_2_, p_175272_3_);
+                                String s = nbttagcompound.getString("type");
+                                list1.add("Type: " + s + " (" + EntityList.getIDFromString(s) + ")");
                             }
-                            else
-                            {
-                                this.drawCreativeTabHoveringText(EnumChatFormatting.RED + "Invalid Entity!", p_175272_2_, p_175272_3_);
-                            }
+
+                            list1.add(nbttagcompound.getString("id"));
+                            this.drawHoveringText(list1, p_175272_2_, p_175272_3_);
                         }
-                        catch (NBTException nbtexception)
+                        else
                         {
                             this.drawCreativeTabHoveringText(EnumChatFormatting.RED + "Invalid Entity!", p_175272_2_, p_175272_3_);
                         }
                     }
-                }
-                else if (hoverevent.getAction() == HoverEvent.Action.SHOW_TEXT)
-                {
-                    this.drawHoveringText(NEWLINE_SPLITTER.splitToList(hoverevent.getValue().getFormattedText()), p_175272_2_, p_175272_3_);
-                }
-                else if (hoverevent.getAction() == HoverEvent.Action.SHOW_ACHIEVEMENT)
-                {
-                    StatBase statbase = StatList.getOneShotStat(hoverevent.getValue().getUnformattedText());
-
-                    if (statbase != null)
+                    catch (NBTException var10)
                     {
-                        IChatComponent ichatcomponent1 = statbase.getStatName();
-                        ChatComponentTranslation chatcomponenttranslation = new ChatComponentTranslation("stats.tooltip.type." + (statbase.isAchievement() ? "achievement" : "statistic"), new Object[0]);
-                        chatcomponenttranslation.getChatStyle().setItalic(Boolean.valueOf(true));
-                        s = statbase instanceof Achievement ? ((Achievement)statbase).getDescription() : null;
-                        ArrayList arraylist = Lists.newArrayList(new String[] {ichatcomponent1.getFormattedText(), chatcomponenttranslation.getFormattedText()});
-
-                        if (s != null)
-                        {
-                            arraylist.addAll(this.fontRendererObj.listFormattedStringToWidth(s, 150));
-                        }
-
-                        this.drawHoveringText(arraylist, p_175272_2_, p_175272_3_);
+                        this.drawCreativeTabHoveringText(EnumChatFormatting.RED + "Invalid Entity!", p_175272_2_, p_175272_3_);
                     }
-                    else
+                }
+            }
+            else if (hoverevent.getAction() == HoverEvent.Action.SHOW_TEXT)
+            {
+                this.drawHoveringText(NEWLINE_SPLITTER.splitToList(hoverevent.getValue().getFormattedText()), p_175272_2_, p_175272_3_);
+            }
+            else if (hoverevent.getAction() == HoverEvent.Action.SHOW_ACHIEVEMENT)
+            {
+                StatBase statbase = StatList.getOneShotStat(hoverevent.getValue().getUnformattedText());
+
+                if (statbase != null)
+                {
+                    IChatComponent ichatcomponent = statbase.getStatName();
+                    IChatComponent ichatcomponent1 = new ChatComponentTranslation("stats.tooltip.type." + (statbase.isAchievement() ? "achievement" : "statistic"), new Object[0]);
+                    ichatcomponent1.getChatStyle().setItalic(Boolean.valueOf(true));
+                    String s1 = statbase instanceof Achievement ? ((Achievement)statbase).getDescription() : null;
+                    List<String> list = Lists.newArrayList(new String[] {ichatcomponent.getFormattedText(), ichatcomponent1.getFormattedText()});
+
+                    if (s1 != null)
                     {
-                        this.drawCreativeTabHoveringText(EnumChatFormatting.RED + "Invalid statistic/achievement!", p_175272_2_, p_175272_3_);
+                        list.addAll(this.fontRendererObj.listFormattedStringToWidth(s1, 150));
                     }
+
+                    this.drawHoveringText(list, p_175272_2_, p_175272_3_);
+                }
+                else
+                {
+                    this.drawCreativeTabHoveringText(EnumChatFormatting.RED + "Invalid statistic/achievement!", p_175272_2_, p_175272_3_);
                 }
             }
 
@@ -377,13 +368,15 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
 
     /**
      * Sets the text of the chat
-     *  
-     * @param newChatText The new chat text to be set
-     * @param shouldOverwrite Determines if the text currently in the chat should be overwritten or appended
      */
-    protected void setText(String newChatText, boolean shouldOverwrite) {}
+    protected void setText(String newChatText, boolean shouldOverwrite)
+    {
+    }
 
-    protected boolean func_175276_a(IChatComponent p_175276_1_)
+    /**
+     * Executes the click event specified by the given chat component
+     */
+    protected boolean handleComponentClick(IChatComponent p_175276_1_)
     {
         if (p_175276_1_ == null)
         {
@@ -402,8 +395,6 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
             }
             else if (clickevent != null)
             {
-                URI uri;
-
                 if (clickevent.getAction() == ClickEvent.Action.OPEN_URL)
                 {
                     if (!this.mc.gameSettings.chatLinks)
@@ -413,11 +404,17 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
 
                     try
                     {
-                        uri = new URI(clickevent.getValue());
+                        URI uri = new URI(clickevent.getValue());
+                        String s = uri.getScheme();
 
-                        if (!PROTOCOLS.contains(uri.getScheme().toLowerCase()))
+                        if (s == null)
                         {
-                            throw new URISyntaxException(clickevent.getValue(), "Unsupported protocol: " + uri.getScheme().toLowerCase());
+                            throw new URISyntaxException(clickevent.getValue(), "Missing protocol");
+                        }
+
+                        if (!PROTOCOLS.contains(s.toLowerCase()))
+                        {
+                            throw new URISyntaxException(clickevent.getValue(), "Unsupported protocol: " + s.toLowerCase());
                         }
 
                         if (this.mc.gameSettings.chatLinksPrompt)
@@ -427,18 +424,18 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
                         }
                         else
                         {
-                            this.func_175282_a(uri);
+                            this.openWebLink(uri);
                         }
                     }
                     catch (URISyntaxException urisyntaxexception)
                     {
-                        LOGGER.error("Can\'t open url for " + clickevent, urisyntaxexception);
+                        LOGGER.error((String)("Can\'t open url for " + clickevent), (Throwable)urisyntaxexception);
                     }
                 }
                 else if (clickevent.getAction() == ClickEvent.Action.OPEN_FILE)
                 {
-                    uri = (new File(clickevent.getValue())).toURI();
-                    this.func_175282_a(uri);
+                    URI uri1 = (new File(clickevent.getValue())).toURI();
+                    this.openWebLink(uri1);
                 }
                 else if (clickevent.getAction() == ClickEvent.Action.SUGGEST_COMMAND)
                 {
@@ -484,8 +481,8 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
         {
             this.mc.ingameGUI.getChatGUI().addToSentMessages(msg);
         }
-
         if (net.minecraftforge.client.ClientCommandHandler.instance.executeCommand(mc.thePlayer, msg) != 0) return;
+
         this.mc.thePlayer.sendChatMessage(msg);
     }
 
@@ -496,20 +493,21 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
     {
         if (mouseButton == 0)
         {
-            for (int l = 0; l < this.buttonList.size(); ++l)
+            for (int i = 0; i < this.buttonList.size(); ++i)
             {
-                GuiButton guibutton = (GuiButton)this.buttonList.get(l);
+                GuiButton guibutton = (GuiButton)this.buttonList.get(i);
 
                 if (guibutton.mousePressed(this.mc, mouseX, mouseY))
                 {
-                    ActionPerformedEvent.Pre event = new ActionPerformedEvent.Pre(this, guibutton, this.buttonList);
-                    if (MinecraftForge.EVENT_BUS.post(event))
+                    net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent.Pre event = new net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent.Pre(this, guibutton, this.buttonList);
+                    if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event))
                         break;
-                    this.selectedButton = event.button;
-                    event.button.playPressSound(this.mc.getSoundHandler());
-                    this.actionPerformed(event.button);
+                    guibutton = event.button;
+                    this.selectedButton = guibutton;
+                    guibutton.playPressSound(this.mc.getSoundHandler());
+                    this.actionPerformed(guibutton);
                     if (this.equals(this.mc.currentScreen))
-                        MinecraftForge.EVENT_BUS.post(new ActionPerformedEvent.Post(this, event.button, this.buttonList));
+                        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent.Post(this, event.button, this.buttonList));
                 }
             }
         }
@@ -531,9 +529,16 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
      * Called when a mouse button is pressed and the mouse is moved around. Parameters are : mouseX, mouseY,
      * lastButtonClicked & timeSinceMouseClick.
      */
-    protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {}
+    protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick)
+    {
+    }
 
-    protected void actionPerformed(GuiButton button) throws IOException {}
+    /**
+     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
+     */
+    protected void actionPerformed(GuiButton button) throws IOException
+    {
+    }
 
     /**
      * Causes the screen to lay out its subcomponents again. This is the equivalent of the Java call
@@ -546,18 +551,27 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
         this.fontRendererObj = mc.fontRendererObj;
         this.width = width;
         this.height = height;
-        if (!MinecraftForge.EVENT_BUS.post(new InitGuiEvent.Pre(this, this.buttonList)))
+        if (!net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent.Pre(this, this.buttonList)))
         {
-            this.buttonList.clear();
-            this.initGui();
+        this.buttonList.clear();
+        this.initGui();
         }
-        MinecraftForge.EVENT_BUS.post(new InitGuiEvent.Post(this, this.buttonList));
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent.Post(this, this.buttonList));
+    }
+
+    public void func_183500_a(int p_183500_1_, int p_183500_2_)
+    {
+        this.width = p_183500_1_;
+        this.height = p_183500_2_;
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
-    public void initGui() {}
+    public void initGui()
+    {
+    }
 
     /**
      * Delegates mouse and keyboard input.
@@ -568,9 +582,9 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
         {
             while (Mouse.next())
             {
-                if (MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.GuiScreenEvent.MouseInputEvent.Pre(this))) continue;
+                if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.GuiScreenEvent.MouseInputEvent.Pre(this))) continue;
                 this.handleMouseInput();
-                if (this.equals(this.mc.currentScreen)) MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.GuiScreenEvent.MouseInputEvent.Post(this));
+                if (this.equals(this.mc.currentScreen)) net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.GuiScreenEvent.MouseInputEvent.Post(this));
             }
         }
 
@@ -578,9 +592,9 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
         {
             while (Keyboard.next())
             {
-                if (MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.GuiScreenEvent.KeyboardInputEvent.Pre(this))) continue;
+                if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.GuiScreenEvent.KeyboardInputEvent.Pre(this))) continue;
                 this.handleKeyboardInput();
-                if (this.equals(this.mc.currentScreen)) MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.GuiScreenEvent.KeyboardInputEvent.Post(this));
+                if (this.equals(this.mc.currentScreen)) net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.GuiScreenEvent.KeyboardInputEvent.Post(this));
             }
         }
     }
@@ -638,12 +652,16 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
     /**
      * Called from the main game loop to update the screen.
      */
-    public void updateScreen() {}
+    public void updateScreen()
+    {
+    }
 
     /**
      * Called when the screen is unloaded. Used to disable keyboard repeat events
      */
-    public void onGuiClosed() {}
+    public void onGuiClosed()
+    {
+    }
 
     /**
      * Draws either a gradient over the background screen (when it exists) or a flat gradient over background.png
@@ -651,6 +669,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
     public void drawDefaultBackground()
     {
         this.drawWorldBackground(0);
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.GuiScreenEvent.BackgroundDrawnEvent(this));
     }
 
     public void drawWorldBackground(int tint)
@@ -677,12 +696,11 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
         this.mc.getTextureManager().bindTexture(optionsBackground);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         float f = 32.0F;
-        worldrenderer.startDrawingQuads();
-        worldrenderer.setColorOpaque_I(4210752);
-        worldrenderer.addVertexWithUV(0.0D, (double)this.height, 0.0D, 0.0D, (double)((float)this.height / f + (float)tint));
-        worldrenderer.addVertexWithUV((double)this.width, (double)this.height, 0.0D, (double)((float)this.width / f), (double)((float)this.height / f + (float)tint));
-        worldrenderer.addVertexWithUV((double)this.width, 0.0D, 0.0D, (double)((float)this.width / f), (double)tint);
-        worldrenderer.addVertexWithUV(0.0D, 0.0D, 0.0D, 0.0D, (double)tint);
+        worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+        worldrenderer.pos(0.0D, (double)this.height, 0.0D).tex(0.0D, (double)((float)this.height / 32.0F + (float)tint)).color(64, 64, 64, 255).endVertex();
+        worldrenderer.pos((double)this.width, (double)this.height, 0.0D).tex((double)((float)this.width / 32.0F), (double)((float)this.height / 32.0F + (float)tint)).color(64, 64, 64, 255).endVertex();
+        worldrenderer.pos((double)this.width, 0.0D, 0.0D).tex((double)((float)this.width / 32.0F), (double)tint).color(64, 64, 64, 255).endVertex();
+        worldrenderer.pos(0.0D, 0.0D, 0.0D).tex(0.0D, (double)tint).color(64, 64, 64, 255).endVertex();
         tessellator.draw();
     }
 
@@ -700,7 +718,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
         {
             if (result)
             {
-                this.func_175282_a(this.clickedLinkURI);
+                this.openWebLink(this.clickedLinkURI);
             }
 
             this.clickedLinkURI = null;
@@ -708,11 +726,11 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
         }
     }
 
-    private void func_175282_a(URI p_175282_1_)
+    private void openWebLink(URI p_175282_1_)
     {
         try
         {
-            Class oclass = Class.forName("java.awt.Desktop");
+            Class<?> oclass = Class.forName("java.awt.Desktop");
             Object object = oclass.getMethod("getDesktop", new Class[0]).invoke((Object)null, new Object[0]);
             oclass.getMethod("browse", new Class[] {URI.class}).invoke(object, new Object[] {p_175282_1_});
         }
@@ -738,32 +756,38 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
         return Keyboard.isKeyDown(42) || Keyboard.isKeyDown(54);
     }
 
-    public static boolean func_175283_s()
+    /**
+     * Returns true if either alt key is down
+     */
+    public static boolean isAltKeyDown()
     {
         return Keyboard.isKeyDown(56) || Keyboard.isKeyDown(184);
     }
 
-    public static boolean func_175277_d(int p_175277_0_)
+    public static boolean isKeyComboCtrlX(int p_175277_0_)
     {
-        return p_175277_0_ == 45 && isCtrlKeyDown();
+        return p_175277_0_ == 45 && isCtrlKeyDown() && !isShiftKeyDown() && !isAltKeyDown();
     }
 
-    public static boolean func_175279_e(int p_175279_0_)
+    public static boolean isKeyComboCtrlV(int p_175279_0_)
     {
-        return p_175279_0_ == 47 && isCtrlKeyDown();
+        return p_175279_0_ == 47 && isCtrlKeyDown() && !isShiftKeyDown() && !isAltKeyDown();
     }
 
-    public static boolean func_175280_f(int p_175280_0_)
+    public static boolean isKeyComboCtrlC(int p_175280_0_)
     {
-        return p_175280_0_ == 46 && isCtrlKeyDown();
+        return p_175280_0_ == 46 && isCtrlKeyDown() && !isShiftKeyDown() && !isAltKeyDown();
     }
 
-    public static boolean func_175278_g(int p_175278_0_)
+    public static boolean isKeyComboCtrlA(int p_175278_0_)
     {
-        return p_175278_0_ == 30 && isCtrlKeyDown();
+        return p_175278_0_ == 30 && isCtrlKeyDown() && !isShiftKeyDown() && !isAltKeyDown();
     }
 
-    public void func_175273_b(Minecraft mcIn, int p_175273_2_, int p_175273_3_)
+    /**
+     * Called when the GUI is resized in order to update the world and the resolution
+     */
+    public void onResize(Minecraft mcIn, int p_175273_2_, int p_175273_3_)
     {
         this.setWorldAndResolution(mcIn, p_175273_2_, p_175273_3_);
     }

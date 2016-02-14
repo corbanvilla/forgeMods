@@ -12,30 +12,27 @@ public abstract class AbstractTexture implements ITextureObject
     protected boolean mipmap;
     protected boolean blurLast;
     protected boolean mipmapLast;
-    private static final String __OBFID = "CL_00001047";
 
     public void setBlurMipmapDirect(boolean p_174937_1_, boolean p_174937_2_)
     {
         this.blur = p_174937_1_;
         this.mipmap = p_174937_2_;
-        boolean flag2 = true;
-        boolean flag3 = true;
-        int i;
-        short short1;
+        int i = -1;
+        int j = -1;
 
         if (p_174937_1_)
         {
             i = p_174937_2_ ? 9987 : 9729;
-            short1 = 9729;
+            j = 9729;
         }
         else
         {
             i = p_174937_2_ ? 9986 : 9728;
-            short1 = 9728;
+            j = 9728;
         }
 
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, i);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, short1);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, j);
     }
 
     public void setBlurMipmap(boolean p_174936_1_, boolean p_174936_2_)

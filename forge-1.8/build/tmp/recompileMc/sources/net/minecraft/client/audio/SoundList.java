@@ -8,13 +8,12 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class SoundList
 {
-    private final List soundList = Lists.newArrayList();
+    private final List<SoundList.SoundEntry> soundList = Lists.<SoundList.SoundEntry>newArrayList();
     /** if true it will override all the sounds from the resourcepacks loaded before */
     private boolean replaceExisting;
     private SoundCategory category;
-    private static final String __OBFID = "CL_00001121";
 
-    public List getSoundList()
+    public List<SoundList.SoundEntry> getSoundList()
     {
         return this.soundList;
     }
@@ -34,9 +33,9 @@ public class SoundList
         return this.category;
     }
 
-    public void setSoundCategory(SoundCategory p_148571_1_)
+    public void setSoundCategory(SoundCategory soundCat)
     {
-        this.category = p_148571_1_;
+        this.category = soundCat;
     }
 
     @SideOnly(Side.CLIENT)
@@ -45,16 +44,9 @@ public class SoundList
             private String name;
             private float volume = 1.0F;
             private float pitch = 1.0F;
-            private int field_148565_d = 1;
-            private SoundList.SoundEntry.Type field_148566_e;
-            private boolean streaming;
-            private static final String __OBFID = "CL_00001122";
-
-            public SoundEntry()
-            {
-                this.field_148566_e = SoundList.SoundEntry.Type.FILE;
-                this.streaming = false;
-            }
+            private int weight = 1;
+            private SoundList.SoundEntry.Type type = SoundList.SoundEntry.Type.FILE;
+            private boolean streaming = false;
 
             public String getSoundEntryName()
             {
@@ -88,22 +80,22 @@ public class SoundList
 
             public int getSoundEntryWeight()
             {
-                return this.field_148565_d;
+                return this.weight;
             }
 
-            public void setSoundEntryWeight(int p_148554_1_)
+            public void setSoundEntryWeight(int weightIn)
             {
-                this.field_148565_d = p_148554_1_;
+                this.weight = weightIn;
             }
 
             public SoundList.SoundEntry.Type getSoundEntryType()
             {
-                return this.field_148566_e;
+                return this.type;
             }
 
-            public void setSoundEntryType(SoundList.SoundEntry.Type p_148562_1_)
+            public void setSoundEntryType(SoundList.SoundEntry.Type typeIn)
             {
-                this.field_148566_e = p_148562_1_;
+                this.type = typeIn;
             }
 
             public boolean isStreaming()
@@ -111,9 +103,9 @@ public class SoundList
                 return this.streaming;
             }
 
-            public void setStreaming(boolean p_148557_1_)
+            public void setStreaming(boolean isStreaming)
             {
-                this.streaming = p_148557_1_;
+                this.streaming = isStreaming;
             }
 
             @SideOnly(Side.CLIENT)
@@ -121,9 +113,8 @@ public class SoundList
             {
                 FILE("file"),
                 SOUND_EVENT("event");
-                private final String field_148583_c;
 
-                private static final String __OBFID = "CL_00001123";
+                private final String field_148583_c;
 
                 private Type(String p_i45109_3_)
                 {
@@ -132,16 +123,11 @@ public class SoundList
 
                 public static SoundList.SoundEntry.Type getType(String p_148580_0_)
                 {
-                    SoundList.SoundEntry.Type[] atype = values();
-                    int i = atype.length;
-
-                    for (int j = 0; j < i; ++j)
+                    for (SoundList.SoundEntry.Type soundlist$soundentry$type : values())
                     {
-                        SoundList.SoundEntry.Type type = atype[j];
-
-                        if (type.field_148583_c.equals(p_148580_0_))
+                        if (soundlist$soundentry$type.field_148583_c.equals(p_148580_0_))
                         {
-                            return type;
+                            return soundlist$soundentry$type;
                         }
                     }
 

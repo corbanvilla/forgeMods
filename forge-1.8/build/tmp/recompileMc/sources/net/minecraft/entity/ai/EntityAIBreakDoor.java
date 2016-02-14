@@ -9,7 +9,6 @@ public class EntityAIBreakDoor extends EntityAIDoorInteract
 {
     private int breakingTime;
     private int previousBreakProgress = -1;
-    private static final String __OBFID = "CL_00001577";
 
     public EntityAIBreakDoor(EntityLiving entityIn)
     {
@@ -25,7 +24,7 @@ public class EntityAIBreakDoor extends EntityAIDoorInteract
         {
             return false;
         }
-        else if (!this.theEntity.worldObj.getGameRules().getGameRuleBooleanValue("mobGriefing"))
+        else if (!this.theEntity.worldObj.getGameRules().getBoolean("mobGriefing"))
         {
             return false;
         }

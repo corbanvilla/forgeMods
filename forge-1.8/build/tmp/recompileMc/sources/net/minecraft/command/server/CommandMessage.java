@@ -8,7 +8,6 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentTranslation;
@@ -17,20 +16,15 @@ import net.minecraft.util.IChatComponent;
 
 public class CommandMessage extends CommandBase
 {
-    private static final String __OBFID = "CL_00000641";
-
-    /**
-     * Gets a list of aliases for this command
-     */
-    public List getAliases()
+    public List<String> getCommandAliases()
     {
-        return Arrays.asList(new String[] {"w", "msg"});
+        return Arrays.<String>asList(new String[] {"w", "msg"});
     }
 
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
-    public String getName()
+    public String getCommandName()
     {
         return "tell";
     }
@@ -43,15 +37,23 @@ public class CommandMessage extends CommandBase
         return 0;
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.message.usage";
     }
 
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
-    public void execute(ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 2)
         {
@@ -59,9 +61,9 @@ public class CommandMessage extends CommandBase
         }
         else
         {
-            EntityPlayerMP entityplayermp = getPlayer(sender, args[0]);
+            EntityPlayer entityplayer = getPlayer(sender, args[0]);
 
-            if (entityplayermp == sender)
+            if (entityplayer == sender)
             {
                 throw new PlayerNotFoundException("commands.message.sameTarget", new Object[0]);
             }
@@ -69,16 +71,16 @@ public class CommandMessage extends CommandBase
             {
                 IChatComponent ichatcomponent = getChatComponentFromNthArg(sender, args, 1, !(sender instanceof EntityPlayer));
                 ChatComponentTranslation chatcomponenttranslation = new ChatComponentTranslation("commands.message.display.incoming", new Object[] {sender.getDisplayName(), ichatcomponent.createCopy()});
-                ChatComponentTranslation chatcomponenttranslation1 = new ChatComponentTranslation("commands.message.display.outgoing", new Object[] {entityplayermp.getDisplayName(), ichatcomponent.createCopy()});
+                ChatComponentTranslation chatcomponenttranslation1 = new ChatComponentTranslation("commands.message.display.outgoing", new Object[] {entityplayer.getDisplayName(), ichatcomponent.createCopy()});
                 chatcomponenttranslation.getChatStyle().setColor(EnumChatFormatting.GRAY).setItalic(Boolean.valueOf(true));
                 chatcomponenttranslation1.getChatStyle().setColor(EnumChatFormatting.GRAY).setItalic(Boolean.valueOf(true));
-                entityplayermp.addChatMessage(chatcomponenttranslation);
+                entityplayer.addChatMessage(chatcomponenttranslation);
                 sender.addChatMessage(chatcomponenttranslation1);
             }
         }
     }
 
-    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
         /**
          * Returns a List of strings (chosen from the given strings) which the last word in the given string array is a
@@ -89,6 +91,8 @@ public class CommandMessage extends CommandBase
 
     /**
      * Return whether the specified command parameter index is a username parameter.
+     *  
+     * @param args The arguments that were passed
      */
     public boolean isUsernameIndex(String[] args, int index)
     {

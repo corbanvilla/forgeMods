@@ -5,7 +5,6 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.exceptions.AuthenticationUnavailableException;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import java.math.BigInteger;
 import java.security.PrivateKey;
@@ -14,6 +13,7 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.crypto.SecretKey;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.login.INetHandlerLoginServer;
 import net.minecraft.network.login.client.C00PacketLoginStart;
@@ -23,15 +23,15 @@ import net.minecraft.network.login.server.S01PacketEncryptionRequest;
 import net.minecraft.network.login.server.S02PacketLoginSuccess;
 import net.minecraft.network.login.server.S03PacketEnableCompression;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.CryptManager;
 import net.minecraft.util.IChatComponent;
+import net.minecraft.util.ITickable;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class NetHandlerLoginServer implements INetHandlerLoginServer, IUpdatePlayerListBox
+public class NetHandlerLoginServer implements INetHandlerLoginServer, ITickable
 {
     private static final AtomicInteger AUTHENTICATOR_THREAD_ID = new AtomicInteger(0);
     private static final Logger logger = LogManager.getLogger();
@@ -39,31 +39,40 @@ public class NetHandlerLoginServer implements INetHandlerLoginServer, IUpdatePla
     private final byte[] verifyToken = new byte[4];
     private final MinecraftServer server;
     public final NetworkManager networkManager;
-    private NetHandlerLoginServer.LoginState currentLoginState;
+    private NetHandlerLoginServer.LoginState currentLoginState = NetHandlerLoginServer.LoginState.HELLO;
     /** How long has player been trying to login into the server. */
     private int connectionTimer;
     private GameProfile loginGameProfile;
-    private String serverId;
+    private String serverId = "";
     private SecretKey secretKey;
-    private static final String __OBFID = "CL_00001458";
+    private EntityPlayerMP field_181025_l;
 
     public NetHandlerLoginServer(MinecraftServer p_i45298_1_, NetworkManager p_i45298_2_)
     {
-        this.currentLoginState = NetHandlerLoginServer.LoginState.HELLO;
-        this.serverId = "";
         this.server = p_i45298_1_;
         this.networkManager = p_i45298_2_;
         RANDOM.nextBytes(this.verifyToken);
     }
 
     /**
-     * Updates the JList with a new model.
+     * Like the old updateEntity(), except more generic.
      */
     public void update()
     {
         if (this.currentLoginState == NetHandlerLoginServer.LoginState.READY_TO_ACCEPT)
         {
             this.tryAcceptPlayer();
+        }
+        else if (this.currentLoginState == NetHandlerLoginServer.LoginState.DELAY_ACCEPT)
+        {
+            EntityPlayerMP entityplayermp = this.server.getConfigurationManager().getPlayerByUUID(this.loginGameProfile.getId());
+
+            if (entityplayermp == null)
+            {
+                this.currentLoginState = NetHandlerLoginServer.LoginState.READY_TO_ACCEPT;
+                net.minecraftforge.fml.common.network.internal.FMLNetworkHandler.fmlServerHandshake(this.server.getConfigurationManager(), this.networkManager, this.field_181025_l);
+                this.field_181025_l = null;
+            }
         }
 
         if (this.connectionTimer++ == net.minecraftforge.fml.common.network.internal.FMLNetworkHandler.LOGIN_TIMEOUT)
@@ -83,7 +92,7 @@ public class NetHandlerLoginServer implements INetHandlerLoginServer, IUpdatePla
         }
         catch (Exception exception)
         {
-            logger.error("Error whilst disconnecting player", exception);
+            logger.error((String)"Error whilst disconnecting player", (Throwable)exception);
         }
     }
 
@@ -108,8 +117,7 @@ public class NetHandlerLoginServer implements INetHandlerLoginServer, IUpdatePla
             {
                 this.networkManager.sendPacket(new S03PacketEnableCompression(this.server.getNetworkCompressionTreshold()), new ChannelFutureListener()
                 {
-                    private static final String __OBFID = "CL_00001459";
-                    public void operationComplete(ChannelFuture p_operationComplete_1_)
+                    public void operationComplete(ChannelFuture p_operationComplete_1_) throws Exception
                     {
                         NetHandlerLoginServer.this.networkManager.setCompressionTreshold(NetHandlerLoginServer.this.server.getNetworkCompressionTreshold());
                     }
@@ -117,7 +125,17 @@ public class NetHandlerLoginServer implements INetHandlerLoginServer, IUpdatePla
             }
 
             this.networkManager.sendPacket(new S02PacketLoginSuccess(this.loginGameProfile));
-            net.minecraftforge.fml.common.network.internal.FMLNetworkHandler.fmlServerHandshake(this.server.getConfigurationManager(), this.networkManager, this.server.getConfigurationManager().createPlayerForUser(this.loginGameProfile));
+            EntityPlayerMP entityplayermp = this.server.getConfigurationManager().getPlayerByUUID(this.loginGameProfile.getId());
+
+            if (entityplayermp != null)
+            {
+                this.currentLoginState = NetHandlerLoginServer.LoginState.DELAY_ACCEPT;
+                this.field_181025_l = this.server.getConfigurationManager().createPlayerForUser(this.loginGameProfile);
+            }
+            else
+            {
+                net.minecraftforge.fml.common.network.internal.FMLNetworkHandler.fmlServerHandshake(this.server.getConfigurationManager(), this.networkManager, this.server.getConfigurationManager().createPlayerForUser(this.loginGameProfile));
+            }
         }
     }
 
@@ -131,7 +149,7 @@ public class NetHandlerLoginServer implements INetHandlerLoginServer, IUpdatePla
 
     public String getConnectionInfo()
     {
-        return this.loginGameProfile != null ? this.loginGameProfile.toString() + " (" + this.networkManager.getRemoteAddress().toString() + ")" : String.valueOf(this.networkManager.getRemoteAddress());
+        return this.loginGameProfile != null ? this.loginGameProfile.toString() + " (" + this.networkManager.getRemoteAddress().toString() + ")" : String.valueOf((Object)this.networkManager.getRemoteAddress());
     }
 
     public void processLoginStart(C00PacketLoginStart packetIn)
@@ -166,7 +184,6 @@ public class NetHandlerLoginServer implements INetHandlerLoginServer, IUpdatePla
             this.networkManager.enableEncryption(this.secretKey);
             (new Thread("User Authenticator #" + AUTHENTICATOR_THREAD_ID.incrementAndGet())
             {
-                private static final String __OBFID = "CL_00002268";
                 public void run()
                 {
                     GameProfile gameprofile = NetHandlerLoginServer.this.loginGameProfile;
@@ -193,7 +210,7 @@ public class NetHandlerLoginServer implements INetHandlerLoginServer, IUpdatePla
                             NetHandlerLoginServer.logger.error("Username \'" + NetHandlerLoginServer.this.loginGameProfile.getName() + "\' tried to join with an invalid session");
                         }
                     }
-                    catch (AuthenticationUnavailableException authenticationunavailableexception)
+                    catch (AuthenticationUnavailableException var3)
                     {
                         if (NetHandlerLoginServer.this.server.isSinglePlayer())
                         {
@@ -224,8 +241,7 @@ public class NetHandlerLoginServer implements INetHandlerLoginServer, IUpdatePla
         KEY,
         AUTHENTICATING,
         READY_TO_ACCEPT,
+        DELAY_ACCEPT,
         ACCEPTED;
-
-        private static final String __OBFID = "CL_00001463";
     }
 }

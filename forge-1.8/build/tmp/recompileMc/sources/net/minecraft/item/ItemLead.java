@@ -1,7 +1,5 @@
 package net.minecraft.item;
 
-import java.util.Iterator;
-import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
 import net.minecraft.creativetab.CreativeTabs;
@@ -15,8 +13,6 @@ import net.minecraft.world.World;
 
 public class ItemLead extends Item
 {
-    private static final String __OBFID = "CL_00000045";
-
     public ItemLead()
     {
         this.setCreativeTab(CreativeTabs.tabTools);
@@ -24,9 +20,6 @@ public class ItemLead extends Item
 
     /**
      * Called when a Block is right-clicked with this Item
-     *  
-     * @param pos The block being right-clicked
-     * @param side The side being right-clicked
      */
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
@@ -58,13 +51,9 @@ public class ItemLead extends Item
         int i = fence.getX();
         int j = fence.getY();
         int k = fence.getZ();
-        List list = worldIn.getEntitiesWithinAABB(EntityLiving.class, new AxisAlignedBB((double)i - d0, (double)j - d0, (double)k - d0, (double)i + d0, (double)j + d0, (double)k + d0));
-        Iterator iterator = list.iterator();
 
-        while (iterator.hasNext())
+        for (EntityLiving entityliving : worldIn.getEntitiesWithinAABB(EntityLiving.class, new AxisAlignedBB((double)i - d0, (double)j - d0, (double)k - d0, (double)i + d0, (double)j + d0, (double)k + d0)))
         {
-            EntityLiving entityliving = (EntityLiving)iterator.next();
-
             if (entityliving.getLeashed() && entityliving.getLeashedToEntity() == player)
             {
                 if (entityleashknot == null)

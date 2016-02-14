@@ -11,12 +11,10 @@ import net.minecraft.world.gen.structure.StructureBoundingBox;
 
 public class CommandCompare extends CommandBase
 {
-    private static final String __OBFID = "CL_00002346";
-
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
-    public String getName()
+    public String getCommandName()
     {
         return "testforblocks";
     }
@@ -29,15 +27,23 @@ public class CommandCompare extends CommandBase
         return 2;
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.compare.usage";
     }
 
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
-    public void execute(ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 9)
         {
@@ -46,9 +52,9 @@ public class CommandCompare extends CommandBase
         else
         {
             sender.setCommandStat(CommandResultStats.Type.AFFECTED_BLOCKS, 0);
-            BlockPos blockpos = func_175757_a(sender, args, 0, false);
-            BlockPos blockpos1 = func_175757_a(sender, args, 3, false);
-            BlockPos blockpos2 = func_175757_a(sender, args, 6, false);
+            BlockPos blockpos = parseBlockPos(sender, args, 0, false);
+            BlockPos blockpos1 = parseBlockPos(sender, args, 3, false);
+            BlockPos blockpos2 = parseBlockPos(sender, args, 6, false);
             StructureBoundingBox structureboundingbox = new StructureBoundingBox(blockpos, blockpos1);
             StructureBoundingBox structureboundingbox1 = new StructureBoundingBox(blockpos2, blockpos2.add(structureboundingbox.func_175896_b()));
             int i = structureboundingbox.getXSize() * structureboundingbox.getYSize() * structureboundingbox.getZSize();
@@ -72,6 +78,8 @@ public class CommandCompare extends CommandBase
 
                     i = 0;
                     BlockPos blockpos3 = new BlockPos(structureboundingbox1.minX - structureboundingbox.minX, structureboundingbox1.minY - structureboundingbox.minY, structureboundingbox1.minZ - structureboundingbox.minZ);
+                    BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+                    BlockPos.MutableBlockPos blockpos$mutableblockpos1 = new BlockPos.MutableBlockPos();
 
                     for (int j = structureboundingbox.minZ; j <= structureboundingbox.maxZ; ++j)
                     {
@@ -79,17 +87,17 @@ public class CommandCompare extends CommandBase
                         {
                             for (int l = structureboundingbox.minX; l <= structureboundingbox.maxX; ++l)
                             {
-                                BlockPos blockpos4 = new BlockPos(l, k, j);
-                                BlockPos blockpos5 = blockpos4.add(blockpos3);
+                                blockpos$mutableblockpos.set(l, k, j);
+                                blockpos$mutableblockpos1.set(l + blockpos3.getX(), k + blockpos3.getY(), j + blockpos3.getZ());
                                 boolean flag1 = false;
-                                IBlockState iblockstate = world.getBlockState(blockpos4);
+                                IBlockState iblockstate = world.getBlockState(blockpos$mutableblockpos);
 
                                 if (!flag || iblockstate.getBlock() != Blocks.air)
                                 {
-                                    if (iblockstate == world.getBlockState(blockpos5))
+                                    if (iblockstate == world.getBlockState(blockpos$mutableblockpos1))
                                     {
-                                        TileEntity tileentity = world.getTileEntity(blockpos4);
-                                        TileEntity tileentity1 = world.getTileEntity(blockpos5);
+                                        TileEntity tileentity = world.getTileEntity(blockpos$mutableblockpos);
+                                        TileEntity tileentity1 = world.getTileEntity(blockpos$mutableblockpos1);
 
                                         if (tileentity != null && tileentity1 != null)
                                         {
@@ -145,7 +153,7 @@ public class CommandCompare extends CommandBase
         }
     }
 
-    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
         return args.length > 0 && args.length <= 3 ? func_175771_a(args, 0, pos) : (args.length > 3 && args.length <= 6 ? func_175771_a(args, 3, pos) : (args.length > 6 && args.length <= 9 ? func_175771_a(args, 6, pos) : (args.length == 10 ? getListOfStringsMatchingLastWord(args, new String[] {"masked", "all"}): null)));
     }

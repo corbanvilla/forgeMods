@@ -5,12 +5,11 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import java.util.zip.Deflater;
 
-public class NettyCompressionEncoder extends MessageToByteEncoder
+public class NettyCompressionEncoder extends MessageToByteEncoder<ByteBuf>
 {
     private final byte[] buffer = new byte[8192];
     private final Deflater deflater;
     private int treshold;
-    private static final String __OBFID = "CL_00002313";
 
     public NettyCompressionEncoder(int treshold)
     {
@@ -18,20 +17,20 @@ public class NettyCompressionEncoder extends MessageToByteEncoder
         this.deflater = new Deflater();
     }
 
-    protected void compress(ChannelHandlerContext ctx, ByteBuf input, ByteBuf output)
+    protected void encode(ChannelHandlerContext p_encode_1_, ByteBuf p_encode_2_, ByteBuf p_encode_3_) throws Exception
     {
-        int i = input.readableBytes();
-        PacketBuffer packetbuffer = new PacketBuffer(output);
+        int i = p_encode_2_.readableBytes();
+        PacketBuffer packetbuffer = new PacketBuffer(p_encode_3_);
 
         if (i < this.treshold)
         {
             packetbuffer.writeVarIntToBuffer(0);
-            packetbuffer.writeBytes(input);
+            packetbuffer.writeBytes(p_encode_2_);
         }
         else
         {
             byte[] abyte = new byte[i];
-            input.readBytes(abyte);
+            p_encode_2_.readBytes(abyte);
             packetbuffer.writeVarIntToBuffer(abyte.length);
             this.deflater.setInput(abyte, 0, i);
             this.deflater.finish();
@@ -39,7 +38,7 @@ public class NettyCompressionEncoder extends MessageToByteEncoder
             while (!this.deflater.finished())
             {
                 int j = this.deflater.deflate(this.buffer);
-                packetbuffer.writeBytes(this.buffer, 0, j);
+                packetbuffer.writeBytes((byte[])this.buffer, 0, j);
             }
 
             this.deflater.reset();
@@ -49,10 +48,5 @@ public class NettyCompressionEncoder extends MessageToByteEncoder
     public void setCompressionTreshold(int treshold)
     {
         this.treshold = treshold;
-    }
-
-    protected void encode(ChannelHandlerContext p_encode_1_, Object p_encode_2_, ByteBuf p_encode_3_)
-    {
-        this.compress(p_encode_1_, (ByteBuf)p_encode_2_, p_encode_3_);
     }
 }

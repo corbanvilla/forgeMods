@@ -13,8 +13,6 @@ import net.minecraft.world.World;
 
 public class ItemBed extends Item
 {
-    private static final String __OBFID = "CL_00001771";
-
     public ItemBed()
     {
         this.setCreativeTab(CreativeTabs.tabDecorations);
@@ -22,9 +20,6 @@ public class ItemBed extends Item
 
     /**
      * Called when a Block is right-clicked with this Item
-     *  
-     * @param pos The block being right-clicked
-     * @param side The side being right-clicked
      */
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
@@ -48,23 +43,23 @@ public class ItemBed extends Item
             }
 
             int i = MathHelper.floor_double((double)(playerIn.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
-            EnumFacing enumfacing1 = EnumFacing.getHorizontal(i);
-            BlockPos blockpos1 = pos.offset(enumfacing1);
-            boolean flag1 = block.isReplaceable(worldIn, blockpos1);
-            boolean flag2 = worldIn.isAirBlock(pos) || flag;
-            boolean flag3 = worldIn.isAirBlock(blockpos1) || flag1;
+            EnumFacing enumfacing = EnumFacing.getHorizontal(i);
+            BlockPos blockpos = pos.offset(enumfacing);
 
-            if (playerIn.canPlayerEdit(pos, side, stack) && playerIn.canPlayerEdit(blockpos1, side, stack))
+            if (playerIn.canPlayerEdit(pos, side, stack) && playerIn.canPlayerEdit(blockpos, side, stack))
             {
-                if (flag2 && flag3 && World.doesBlockHaveSolidTopSurface(worldIn, pos.down()) && World.doesBlockHaveSolidTopSurface(worldIn, blockpos1.down()))
+                boolean flag1 = worldIn.getBlockState(blockpos).getBlock().isReplaceable(worldIn, blockpos);
+                boolean flag2 = flag || worldIn.isAirBlock(pos);
+                boolean flag3 = flag1 || worldIn.isAirBlock(blockpos);
+
+                if (flag2 && flag3 && World.doesBlockHaveSolidTopSurface(worldIn, pos.down()) && World.doesBlockHaveSolidTopSurface(worldIn, blockpos.down()))
                 {
-                    int j = enumfacing1.getHorizontalIndex();
-                    IBlockState iblockstate1 = Blocks.bed.getDefaultState().withProperty(BlockBed.OCCUPIED, Boolean.valueOf(false)).withProperty(BlockBed.FACING, enumfacing1).withProperty(BlockBed.PART, BlockBed.EnumPartType.FOOT);
+                    IBlockState iblockstate1 = Blocks.bed.getDefaultState().withProperty(BlockBed.OCCUPIED, Boolean.valueOf(false)).withProperty(BlockBed.FACING, enumfacing).withProperty(BlockBed.PART, BlockBed.EnumPartType.FOOT);
 
                     if (worldIn.setBlockState(pos, iblockstate1, 3))
                     {
                         IBlockState iblockstate2 = iblockstate1.withProperty(BlockBed.PART, BlockBed.EnumPartType.HEAD);
-                        worldIn.setBlockState(blockpos1, iblockstate2, 3);
+                        worldIn.setBlockState(blockpos, iblockstate2, 3);
                     }
 
                     --stack.stackSize;

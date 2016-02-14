@@ -1,6 +1,7 @@
 package net.minecraft.block;
 
 import java.util.Random;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
@@ -17,15 +18,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockHugeMushroom extends Block
 {
-    public static final PropertyEnum VARIANT = PropertyEnum.create("variant", BlockHugeMushroom.EnumType.class);
+    public static final PropertyEnum<BlockHugeMushroom.EnumType> VARIANT = PropertyEnum.<BlockHugeMushroom.EnumType>create("variant", BlockHugeMushroom.EnumType.class);
     private final Block smallBlock;
-    private static final String __OBFID = "CL_00000258";
 
-    public BlockHugeMushroom(Material materialIn, Block smallBlock)
+    public BlockHugeMushroom(Material p_i46392_1_, MapColor p_i46392_2_, Block p_i46392_3_)
     {
-        super(materialIn);
+        super(p_i46392_1_, p_i46392_2_);
         this.setDefaultState(this.blockState.getBaseState().withProperty(VARIANT, BlockHugeMushroom.EnumType.ALL_OUTSIDE));
-        this.smallBlock = smallBlock;
+        this.smallBlock = p_i46392_3_;
     }
 
     /**
@@ -37,15 +37,35 @@ public class BlockHugeMushroom extends Block
     }
 
     /**
+     * Get the MapColor for this Block and the given BlockState
+     */
+    public MapColor getMapColor(IBlockState state)
+    {
+        switch ((BlockHugeMushroom.EnumType)state.getValue(VARIANT))
+        {
+            case ALL_STEM:
+                return MapColor.clothColor;
+            case ALL_INSIDE:
+                return MapColor.sandColor;
+            case STEM:
+                return MapColor.sandColor;
+            default:
+                return super.getMapColor(state);
+        }
+    }
+
+    /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
         return Item.getItemFromBlock(this.smallBlock);
     }
 
+    /**
+     * Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the
+     * IBlockstate
+     */
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
         return this.getDefaultState();
@@ -107,11 +127,10 @@ public class BlockHugeMushroom extends Block
         ALL_INSIDE(0, "all_inside"),
         ALL_OUTSIDE(14, "all_outside"),
         ALL_STEM(15, "all_stem");
+
         private static final BlockHugeMushroom.EnumType[] META_LOOKUP = new BlockHugeMushroom.EnumType[16];
         private final int meta;
         private final String name;
-
-        private static final String __OBFID = "CL_00002105";
 
         private EnumType(int meta, String name)
         {
@@ -136,8 +155,8 @@ public class BlockHugeMushroom extends Block
                 meta = 0;
             }
 
-            BlockHugeMushroom.EnumType enumtype = META_LOOKUP[meta];
-            return enumtype == null ? META_LOOKUP[0] : enumtype;
+            BlockHugeMushroom.EnumType blockhugemushroom$enumtype = META_LOOKUP[meta];
+            return blockhugemushroom$enumtype == null ? META_LOOKUP[0] : blockhugemushroom$enumtype;
         }
 
         public String getName()
@@ -147,13 +166,9 @@ public class BlockHugeMushroom extends Block
 
         static
         {
-            BlockHugeMushroom.EnumType[] var0 = values();
-            int var1 = var0.length;
-
-            for (int var2 = 0; var2 < var1; ++var2)
+            for (BlockHugeMushroom.EnumType blockhugemushroom$enumtype : values())
             {
-                BlockHugeMushroom.EnumType var3 = var0[var2];
-                META_LOOKUP[var3.getMetadata()] = var3;
+                META_LOOKUP[blockhugemushroom$enumtype.getMetadata()] = blockhugemushroom$enumtype;
             }
         }
     }

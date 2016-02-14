@@ -27,7 +27,6 @@ public abstract class BlockLeaves extends BlockLeavesBase implements net.minecra
     protected int iconIndex;
     @SideOnly(Side.CLIENT)
     protected boolean isTransparent;
-    private static final String __OBFID = "CL_00000263";
 
     public BlockLeaves()
     {
@@ -59,26 +58,26 @@ public abstract class BlockLeaves extends BlockLeavesBase implements net.minecra
 
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
     {
-        byte b0 = 1;
-        int i = b0 + 1;
-        int j = pos.getX();
-        int k = pos.getY();
-        int l = pos.getZ();
+        int i = 1;
+        int j = i + 1;
+        int k = pos.getX();
+        int l = pos.getY();
+        int i1 = pos.getZ();
 
-        if (worldIn.isAreaLoaded(new BlockPos(j - i, k - i, l - i), new BlockPos(j + i, k + i, l + i)))
+        if (worldIn.isAreaLoaded(new BlockPos(k - j, l - j, i1 - j), new BlockPos(k + j, l + j, i1 + j)))
         {
-            for (int i1 = -b0; i1 <= b0; ++i1)
+            for (int j1 = -i; j1 <= i; ++j1)
             {
-                for (int j1 = -b0; j1 <= b0; ++j1)
+                for (int k1 = -i; k1 <= i; ++k1)
                 {
-                    for (int k1 = -b0; k1 <= b0; ++k1)
+                    for (int l1 = -i; l1 <= i; ++l1)
                     {
-                        BlockPos blockpos1 = pos.add(i1, j1, k1);
-                        IBlockState iblockstate1 = worldIn.getBlockState(blockpos1);
+                        BlockPos blockpos = pos.add(j1, k1, l1);
+                        IBlockState iblockstate = worldIn.getBlockState(blockpos);
 
-                        if (iblockstate1.getBlock().isLeaves(worldIn, blockpos1))
+                        if (iblockstate.getBlock().isLeaves(worldIn, blockpos))
                         {
-                            iblockstate1.getBlock().beginLeavesDecay(worldIn, blockpos1);
+                            iblockstate.getBlock().beginLeavesDecay(worldIn, blockpos);
                         }
                     }
                 }
@@ -92,93 +91,89 @@ public abstract class BlockLeaves extends BlockLeavesBase implements net.minecra
         {
             if (((Boolean)state.getValue(CHECK_DECAY)).booleanValue() && ((Boolean)state.getValue(DECAYABLE)).booleanValue())
             {
-                byte b0 = 4;
-                int i = b0 + 1;
-                int j = pos.getX();
-                int k = pos.getY();
-                int l = pos.getZ();
-                byte b1 = 32;
-                int i1 = b1 * b1;
-                int j1 = b1 / 2;
+                int i = 4;
+                int j = i + 1;
+                int k = pos.getX();
+                int l = pos.getY();
+                int i1 = pos.getZ();
+                int j1 = 32;
+                int k1 = j1 * j1;
+                int l1 = j1 / 2;
 
                 if (this.surroundings == null)
                 {
-                    this.surroundings = new int[b1 * b1 * b1];
+                    this.surroundings = new int[j1 * j1 * j1];
                 }
 
-                int k1;
-
-                if (worldIn.isAreaLoaded(new BlockPos(j - i, k - i, l - i), new BlockPos(j + i, k + i, l + i)))
+                if (worldIn.isAreaLoaded(new BlockPos(k - j, l - j, i1 - j), new BlockPos(k + j, l + j, i1 + j)))
                 {
-                    int l1;
-                    int i2;
+                    BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
 
-                    for (k1 = -b0; k1 <= b0; ++k1)
+                    for (int i2 = -i; i2 <= i; ++i2)
                     {
-                        for (l1 = -b0; l1 <= b0; ++l1)
+                        for (int j2 = -i; j2 <= i; ++j2)
                         {
-                            for (i2 = -b0; i2 <= b0; ++i2)
+                            for (int k2 = -i; k2 <= i; ++k2)
                             {
-                                BlockPos tmp = new BlockPos(j + k1, k + l1, l + i2);
-                                Block block = worldIn.getBlockState(tmp).getBlock();
+                                Block block = worldIn.getBlockState(blockpos$mutableblockpos.set(k + i2, l + j2, i1 + k2)).getBlock();
 
-                                if (!block.canSustainLeaves(worldIn, tmp))
+                                if (!block.canSustainLeaves(worldIn, blockpos$mutableblockpos.set(k + i2, l + j2, i1 + k2)))
                                 {
-                                    if (block.isLeaves(worldIn, tmp))
+                                    if (block.isLeaves(worldIn, blockpos$mutableblockpos.set(k + i2, l + j2, i1 + k2)))
                                     {
-                                        this.surroundings[(k1 + j1) * i1 + (l1 + j1) * b1 + i2 + j1] = -2;
+                                        this.surroundings[(i2 + l1) * k1 + (j2 + l1) * j1 + k2 + l1] = -2;
                                     }
                                     else
                                     {
-                                        this.surroundings[(k1 + j1) * i1 + (l1 + j1) * b1 + i2 + j1] = -1;
+                                        this.surroundings[(i2 + l1) * k1 + (j2 + l1) * j1 + k2 + l1] = -1;
                                     }
                                 }
                                 else
                                 {
-                                    this.surroundings[(k1 + j1) * i1 + (l1 + j1) * b1 + i2 + j1] = 0;
+                                    this.surroundings[(i2 + l1) * k1 + (j2 + l1) * j1 + k2 + l1] = 0;
                                 }
                             }
                         }
                     }
 
-                    for (k1 = 1; k1 <= 4; ++k1)
+                    for (int i3 = 1; i3 <= 4; ++i3)
                     {
-                        for (l1 = -b0; l1 <= b0; ++l1)
+                        for (int j3 = -i; j3 <= i; ++j3)
                         {
-                            for (i2 = -b0; i2 <= b0; ++i2)
+                            for (int k3 = -i; k3 <= i; ++k3)
                             {
-                                for (int j2 = -b0; j2 <= b0; ++j2)
+                                for (int l3 = -i; l3 <= i; ++l3)
                                 {
-                                    if (this.surroundings[(l1 + j1) * i1 + (i2 + j1) * b1 + j2 + j1] == k1 - 1)
+                                    if (this.surroundings[(j3 + l1) * k1 + (k3 + l1) * j1 + l3 + l1] == i3 - 1)
                                     {
-                                        if (this.surroundings[(l1 + j1 - 1) * i1 + (i2 + j1) * b1 + j2 + j1] == -2)
+                                        if (this.surroundings[(j3 + l1 - 1) * k1 + (k3 + l1) * j1 + l3 + l1] == -2)
                                         {
-                                            this.surroundings[(l1 + j1 - 1) * i1 + (i2 + j1) * b1 + j2 + j1] = k1;
+                                            this.surroundings[(j3 + l1 - 1) * k1 + (k3 + l1) * j1 + l3 + l1] = i3;
                                         }
 
-                                        if (this.surroundings[(l1 + j1 + 1) * i1 + (i2 + j1) * b1 + j2 + j1] == -2)
+                                        if (this.surroundings[(j3 + l1 + 1) * k1 + (k3 + l1) * j1 + l3 + l1] == -2)
                                         {
-                                            this.surroundings[(l1 + j1 + 1) * i1 + (i2 + j1) * b1 + j2 + j1] = k1;
+                                            this.surroundings[(j3 + l1 + 1) * k1 + (k3 + l1) * j1 + l3 + l1] = i3;
                                         }
 
-                                        if (this.surroundings[(l1 + j1) * i1 + (i2 + j1 - 1) * b1 + j2 + j1] == -2)
+                                        if (this.surroundings[(j3 + l1) * k1 + (k3 + l1 - 1) * j1 + l3 + l1] == -2)
                                         {
-                                            this.surroundings[(l1 + j1) * i1 + (i2 + j1 - 1) * b1 + j2 + j1] = k1;
+                                            this.surroundings[(j3 + l1) * k1 + (k3 + l1 - 1) * j1 + l3 + l1] = i3;
                                         }
 
-                                        if (this.surroundings[(l1 + j1) * i1 + (i2 + j1 + 1) * b1 + j2 + j1] == -2)
+                                        if (this.surroundings[(j3 + l1) * k1 + (k3 + l1 + 1) * j1 + l3 + l1] == -2)
                                         {
-                                            this.surroundings[(l1 + j1) * i1 + (i2 + j1 + 1) * b1 + j2 + j1] = k1;
+                                            this.surroundings[(j3 + l1) * k1 + (k3 + l1 + 1) * j1 + l3 + l1] = i3;
                                         }
 
-                                        if (this.surroundings[(l1 + j1) * i1 + (i2 + j1) * b1 + (j2 + j1 - 1)] == -2)
+                                        if (this.surroundings[(j3 + l1) * k1 + (k3 + l1) * j1 + (l3 + l1 - 1)] == -2)
                                         {
-                                            this.surroundings[(l1 + j1) * i1 + (i2 + j1) * b1 + (j2 + j1 - 1)] = k1;
+                                            this.surroundings[(j3 + l1) * k1 + (k3 + l1) * j1 + (l3 + l1 - 1)] = i3;
                                         }
 
-                                        if (this.surroundings[(l1 + j1) * i1 + (i2 + j1) * b1 + j2 + j1 + 1] == -2)
+                                        if (this.surroundings[(j3 + l1) * k1 + (k3 + l1) * j1 + l3 + l1 + 1] == -2)
                                         {
-                                            this.surroundings[(l1 + j1) * i1 + (i2 + j1) * b1 + j2 + j1 + 1] = k1;
+                                            this.surroundings[(j3 + l1) * k1 + (k3 + l1) * j1 + l3 + l1 + 1] = i3;
                                         }
                                     }
                                 }
@@ -187,9 +182,9 @@ public abstract class BlockLeaves extends BlockLeavesBase implements net.minecra
                     }
                 }
 
-                k1 = this.surroundings[j1 * i1 + j1 * b1 + j1];
+                int l2 = this.surroundings[l1 * k1 + l1 * j1 + l1];
 
-                if (k1 >= 0)
+                if (l2 >= 0)
                 {
                     worldIn.setBlockState(pos, state.withProperty(CHECK_DECAY, Boolean.valueOf(false)), 4);
                 }
@@ -229,8 +224,6 @@ public abstract class BlockLeaves extends BlockLeavesBase implements net.minecra
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -239,22 +232,24 @@ public abstract class BlockLeaves extends BlockLeavesBase implements net.minecra
 
     /**
      * Spawns this Block's drops into the World as EntityItems.
-     *  
-     * @param chance The chance that each Item is actually spawned (1.0 = always, 0.0 = never)
-     * @param fortune The player's fortune level
      */
     public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune)
     {
         super.dropBlockAsItemWithChance(worldIn, pos, state, chance, fortune);
     }
 
-    protected void dropApple(World worldIn, BlockPos pos, IBlockState state, int chance) {}
+    protected void dropApple(World worldIn, BlockPos pos, IBlockState state, int chance)
+    {
+    }
 
     protected int getSaplingDropChance(IBlockState state)
     {
         return 20;
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return !this.fancyGraphics;

@@ -4,8 +4,6 @@ import net.minecraft.util.ResourceLocation;
 
 public class EnchantmentWaterWalker extends Enchantment
 {
-    private static final String __OBFID = "CL_00002155";
-
     public EnchantmentWaterWalker(int p_i45762_1_, ResourceLocation p_i45762_2_, int p_i45762_3_)
     {
         super(p_i45762_1_, p_i45762_2_, p_i45762_3_, EnumEnchantmentType.ARMOR_FEET);

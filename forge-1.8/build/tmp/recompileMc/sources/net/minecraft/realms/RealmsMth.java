@@ -9,8 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 @SideOnly(Side.CLIENT)
 public class RealmsMth
 {
-    private static final String __OBFID = "CL_00001900";
-
     public static float sin(float p_sin_0_)
     {
         return MathHelper.sin(p_sin_0_);
@@ -153,7 +151,7 @@ public class RealmsMth
 
     public static int roundUp(int p_roundUp_0_, int p_roundUp_1_)
     {
-        return MathHelper.func_154354_b(p_roundUp_0_, p_roundUp_1_);
+        return MathHelper.roundUp(p_roundUp_0_, p_roundUp_1_);
     }
 
     public static double average(long[] p_average_0_)

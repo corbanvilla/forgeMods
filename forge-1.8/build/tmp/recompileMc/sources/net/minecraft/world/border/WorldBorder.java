@@ -1,7 +1,6 @@
 package net.minecraft.world.border;
 
 import com.google.common.collect.Lists;
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.AxisAlignedBB;
@@ -12,7 +11,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class WorldBorder
 {
-    private final List listeners = Lists.newArrayList();
+    private final List<IBorderListener> listeners = Lists.<IBorderListener>newArrayList();
     private double centerX = 0.0D;
     private double centerZ = 0.0D;
     private double startDiameter = 6.0E7D;
@@ -24,7 +23,6 @@ public class WorldBorder
     private double damageBuffer;
     private int warningTime;
     private int warningDistance;
-    private static final String __OBFID = "CL_00002012";
 
     public WorldBorder()
     {
@@ -58,13 +56,13 @@ public class WorldBorder
 
     public double getClosestDistance(double x, double z)
     {
-        double d2 = z - this.minZ();
-        double d3 = this.maxZ() - z;
-        double d4 = x - this.minX();
-        double d5 = this.maxX() - x;
-        double d6 = Math.min(d4, d5);
-        d6 = Math.min(d6, d2);
-        return Math.min(d6, d3);
+        double d0 = z - this.minZ();
+        double d1 = this.maxZ() - z;
+        double d2 = x - this.minX();
+        double d3 = this.maxX() - x;
+        double d4 = Math.min(d2, d3);
+        d4 = Math.min(d4, d0);
+        return Math.min(d4, d1);
     }
 
     public EnumBorderStatus getStatus()
@@ -134,11 +132,9 @@ public class WorldBorder
     {
         this.centerX = x;
         this.centerZ = z;
-        Iterator iterator = this.getListeners().iterator();
 
-        while (iterator.hasNext())
+        for (IBorderListener iborderlistener : this.getListeners())
         {
-            IBorderListener iborderlistener = (IBorderListener)iterator.next();
             iborderlistener.onCenterChanged(this, x, z);
         }
     }
@@ -176,11 +172,9 @@ public class WorldBorder
         this.endDiameter = newSize;
         this.endTime = System.currentTimeMillis();
         this.startTime = this.endTime;
-        Iterator iterator = this.getListeners().iterator();
 
-        while (iterator.hasNext())
+        for (IBorderListener iborderlistener : this.getListeners())
         {
-            IBorderListener iborderlistener = (IBorderListener)iterator.next();
             iborderlistener.onSizeChanged(this, newSize);
         }
     }
@@ -191,16 +185,14 @@ public class WorldBorder
         this.endDiameter = newSize;
         this.startTime = System.currentTimeMillis();
         this.endTime = this.startTime + time;
-        Iterator iterator = this.getListeners().iterator();
 
-        while (iterator.hasNext())
+        for (IBorderListener iborderlistener : this.getListeners())
         {
-            IBorderListener iborderlistener = (IBorderListener)iterator.next();
             iborderlistener.onTransitionStarted(this, oldSize, newSize, time);
         }
     }
 
-    protected List getListeners()
+    protected List<IBorderListener> getListeners()
     {
         return Lists.newArrayList(this.listeners);
     }
@@ -228,11 +220,9 @@ public class WorldBorder
     public void setDamageBuffer(double bufferSize)
     {
         this.damageBuffer = bufferSize;
-        Iterator iterator = this.getListeners().iterator();
 
-        while (iterator.hasNext())
+        for (IBorderListener iborderlistener : this.getListeners())
         {
-            IBorderListener iborderlistener = (IBorderListener)iterator.next();
             iborderlistener.onDamageBufferChanged(this, bufferSize);
         }
     }
@@ -245,11 +235,9 @@ public class WorldBorder
     public void setDamageAmount(double newAmount)
     {
         this.damageAmount = newAmount;
-        Iterator iterator = this.getListeners().iterator();
 
-        while (iterator.hasNext())
+        for (IBorderListener iborderlistener : this.getListeners())
         {
-            IBorderListener iborderlistener = (IBorderListener)iterator.next();
             iborderlistener.onDamageAmountChanged(this, newAmount);
         }
     }
@@ -268,11 +256,9 @@ public class WorldBorder
     public void setWarningTime(int warningTime)
     {
         this.warningTime = warningTime;
-        Iterator iterator = this.getListeners().iterator();
 
-        while (iterator.hasNext())
+        for (IBorderListener iborderlistener : this.getListeners())
         {
-            IBorderListener iborderlistener = (IBorderListener)iterator.next();
             iborderlistener.onWarningTimeChanged(this, warningTime);
         }
     }
@@ -285,11 +271,9 @@ public class WorldBorder
     public void setWarningDistance(int warningDistance)
     {
         this.warningDistance = warningDistance;
-        Iterator iterator = this.getListeners().iterator();
 
-        while (iterator.hasNext())
+        for (IBorderListener iborderlistener : this.getListeners())
         {
-            IBorderListener iborderlistener = (IBorderListener)iterator.next();
             iborderlistener.onWarningDistanceChanged(this, warningDistance);
         }
     }

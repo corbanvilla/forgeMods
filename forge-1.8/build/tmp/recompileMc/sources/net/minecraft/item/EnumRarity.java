@@ -8,6 +8,7 @@ public enum EnumRarity
     UNCOMMON(EnumChatFormatting.YELLOW, "Uncommon"),
     RARE(EnumChatFormatting.AQUA, "Rare"),
     EPIC(EnumChatFormatting.LIGHT_PURPLE, "Epic");
+
     /**
      * A decimal representation of the hex color codes of a the color assigned to this rarity type. (13 becomes d as in
      * \247d which is light purple)
@@ -15,8 +16,6 @@ public enum EnumRarity
     public final EnumChatFormatting rarityColor;
     /** Rarity name. */
     public final String rarityName;
-
-    private static final String __OBFID = "CL_00000056";
 
     private EnumRarity(EnumChatFormatting color, String name)
     {

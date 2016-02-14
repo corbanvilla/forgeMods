@@ -4,17 +4,15 @@ import java.util.List;
 import java.util.Random;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockPos;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldInfo;
 
 public class CommandWeather extends CommandBase
 {
-    private static final String __OBFID = "CL_00001185";
-
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
-    public String getName()
+    public String getCommandName()
     {
         return "weather";
     }
@@ -27,15 +25,23 @@ public class CommandWeather extends CommandBase
         return 2;
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.weather.usage";
     }
 
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
-    public void execute(ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length >= 1 && args.length <= 2)
         {
@@ -46,8 +52,8 @@ public class CommandWeather extends CommandBase
                 i = parseInt(args[1], 1, 1000000) * 20;
             }
 
-            WorldServer worldserver = MinecraftServer.getServer().worldServers[0];
-            WorldInfo worldinfo = worldserver.getWorldInfo();
+            World world = MinecraftServer.getServer().worldServers[0];
+            WorldInfo worldinfo = world.getWorldInfo();
 
             if ("clear".equalsIgnoreCase(args[0]))
             {
@@ -88,7 +94,7 @@ public class CommandWeather extends CommandBase
         }
     }
 
-    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
         return args.length == 1 ? getListOfStringsMatchingLastWord(args, new String[] {"clear", "rain", "thunder"}): null;
     }

@@ -10,11 +10,11 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.stats.StatList;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class ContainerEnchantment extends Container
 {
@@ -28,7 +28,6 @@ public class ContainerEnchantment extends Container
     /** 3-member array storing the enchantment levels of each slot */
     public int[] enchantLevels;
     public int[] field_178151_h;
-    private static final String __OBFID = "CL_00001745";
 
     @SideOnly(Side.CLIENT)
     public ContainerEnchantment(InventoryPlayer playerInv, World worldIn)
@@ -40,10 +39,8 @@ public class ContainerEnchantment extends Container
     {
         this.tableInventory = new InventoryBasic("Enchant", true, 2)
         {
-            private static final String __OBFID = "CL_00001746";
             /**
              * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended.
-             * *Isn't this more of a set than a get?*
              */
             public int getInventoryStackLimit()
             {
@@ -67,7 +64,6 @@ public class ContainerEnchantment extends Container
         this.xpSeed = playerInv.player.getXPSeed();
         this.addSlotToContainer(new Slot(this.tableInventory, 0, 15, 47)
         {
-            private static final String __OBFID = "CL_00001747";
             /**
              * Check if the stack is a valid item for this slot. Always true beside for the armor slots.
              */
@@ -86,7 +82,6 @@ public class ContainerEnchantment extends Container
         });
         this.addSlotToContainer(new Slot(this.tableInventory, 1, 35, 47)
         {
-            private static final String __OBFID = "CL_00002185";
             java.util.List<ItemStack> ores = net.minecraftforge.oredict.OreDictionary.getOres("gemLapis");
             /**
              * Check if the stack is a valid item for this slot. Always true beside for the armor slots.
@@ -98,9 +93,8 @@ public class ContainerEnchantment extends Container
                 return false;
             }
         });
-        int i;
 
-        for (i = 0; i < 3; ++i)
+        for (int i = 0; i < 3; ++i)
         {
             for (int j = 0; j < 9; ++j)
             {
@@ -108,18 +102,15 @@ public class ContainerEnchantment extends Container
             }
         }
 
-        for (i = 0; i < 9; ++i)
+        for (int k = 0; k < 9; ++k)
         {
-            this.addSlotToContainer(new Slot(playerInv, i, 8 + i * 18, 142));
+            this.addSlotToContainer(new Slot(playerInv, k, 8 + k * 18, 142));
         }
     }
 
-    /**
-     * Add the given Listener to the list of Listeners. Method name is for legacy.
-     */
-    public void addCraftingToCrafters(ICrafting listener)
+    public void onCraftGuiOpened(ICrafting listener)
     {
-        super.addCraftingToCrafters(listener);
+        super.onCraftGuiOpened(listener);
         listener.sendProgressBarUpdate(this, 0, this.enchantLevels[0]);
         listener.sendProgressBarUpdate(this, 1, this.enchantLevels[1]);
         listener.sendProgressBarUpdate(this, 2, this.enchantLevels[2]);
@@ -178,17 +169,15 @@ public class ContainerEnchantment extends Container
         if (inventoryIn == this.tableInventory)
         {
             ItemStack itemstack = inventoryIn.getStackInSlot(0);
-            int i;
 
             if (itemstack != null && itemstack.isItemEnchantable())
             {
                 if (!this.worldPointer.isRemote)
                 {
-                    i = 0;
-                    int j;
+                    int l = 0;
                     float power = 0;
 
-                    for (j = -1; j <= 1; ++j)
+                    for (int j = -1; j <= 1; ++j)
                     {
                         for (int k = -1; k <= 1; ++k)
                         {
@@ -196,7 +185,6 @@ public class ContainerEnchantment extends Container
                             {
                                 power += net.minecraftforge.common.ForgeHooks.getEnchantPower(worldPointer, position.add(k * 2, 0, j * 2));
                                 power += net.minecraftforge.common.ForgeHooks.getEnchantPower(worldPointer, position.add(k * 2, 1, j * 2));
-
                                 if (k != 0 && j != 0)
                                 {
                                     power += net.minecraftforge.common.ForgeHooks.getEnchantPower(worldPointer, position.add(k * 2, 0, j));
@@ -210,27 +198,27 @@ public class ContainerEnchantment extends Container
 
                     this.rand.setSeed((long)this.xpSeed);
 
-                    for (j = 0; j < 3; ++j)
+                    for (int i1 = 0; i1 < 3; ++i1)
                     {
-                        this.enchantLevels[j] = EnchantmentHelper.calcItemStackEnchantability(this.rand, j, (int)power, itemstack);
-                        this.field_178151_h[j] = -1;
+                        this.enchantLevels[i1] = EnchantmentHelper.calcItemStackEnchantability(this.rand, i1, (int)power, itemstack);
+                        this.field_178151_h[i1] = -1;
 
-                        if (this.enchantLevels[j] < j + 1)
+                        if (this.enchantLevels[i1] < i1 + 1)
                         {
-                            this.enchantLevels[j] = 0;
+                            this.enchantLevels[i1] = 0;
                         }
                     }
 
-                    for (j = 0; j < 3; ++j)
+                    for (int j1 = 0; j1 < 3; ++j1)
                     {
-                        if (this.enchantLevels[j] > 0)
+                        if (this.enchantLevels[j1] > 0)
                         {
-                            List list = this.func_178148_a(itemstack, j, this.enchantLevels[j]);
+                            List<EnchantmentData> list = this.func_178148_a(itemstack, j1, this.enchantLevels[j1]);
 
                             if (list != null && !list.isEmpty())
                             {
                                 EnchantmentData enchantmentdata = (EnchantmentData)list.get(this.rand.nextInt(list.size()));
-                                this.field_178151_h[j] = enchantmentdata.enchantmentobj.effectId | enchantmentdata.enchantmentLevel << 8;
+                                this.field_178151_h[j1] = enchantmentdata.enchantmentobj.effectId | enchantmentdata.enchantmentLevel << 8;
                             }
                         }
                     }
@@ -240,7 +228,7 @@ public class ContainerEnchantment extends Container
             }
             else
             {
-                for (i = 0; i < 3; ++i)
+                for (int i = 0; i < 3; ++i)
                 {
                     this.enchantLevels[i] = 0;
                     this.field_178151_h[i] = -1;
@@ -256,31 +244,31 @@ public class ContainerEnchantment extends Container
     {
         ItemStack itemstack = this.tableInventory.getStackInSlot(0);
         ItemStack itemstack1 = this.tableInventory.getStackInSlot(1);
-        int j = id + 1;
+        int i = id + 1;
 
-        if ((itemstack1 == null || itemstack1.stackSize < j) && !playerIn.capabilities.isCreativeMode)
+        if ((itemstack1 == null || itemstack1.stackSize < i) && !playerIn.capabilities.isCreativeMode)
         {
             return false;
         }
-        else if (this.enchantLevels[id] > 0 && itemstack != null && (playerIn.experienceLevel >= j && playerIn.experienceLevel >= this.enchantLevels[id] || playerIn.capabilities.isCreativeMode))
+        else if (this.enchantLevels[id] > 0 && itemstack != null && (playerIn.experienceLevel >= i && playerIn.experienceLevel >= this.enchantLevels[id] || playerIn.capabilities.isCreativeMode))
         {
             if (!this.worldPointer.isRemote)
             {
-                List list = this.func_178148_a(itemstack, id, this.enchantLevels[id]);
+                List<EnchantmentData> list = this.func_178148_a(itemstack, id, this.enchantLevels[id]);
                 boolean flag = itemstack.getItem() == Items.book;
 
                 if (list != null)
                 {
-                    playerIn.removeExperienceLevel(j);
+                    playerIn.removeExperienceLevel(i);
 
                     if (flag)
                     {
                         itemstack.setItem(Items.enchanted_book);
                     }
 
-                    for (int k = 0; k < list.size(); ++k)
+                    for (int j = 0; j < list.size(); ++j)
                     {
-                        EnchantmentData enchantmentdata = (EnchantmentData)list.get(k);
+                        EnchantmentData enchantmentdata = (EnchantmentData)list.get(j);
 
                         if (flag)
                         {
@@ -294,7 +282,7 @@ public class ContainerEnchantment extends Container
 
                     if (!playerIn.capabilities.isCreativeMode)
                     {
-                        itemstack1.stackSize -= j;
+                        itemstack1.stackSize -= i;
 
                         if (itemstack1.stackSize <= 0)
                         {
@@ -302,6 +290,7 @@ public class ContainerEnchantment extends Container
                         }
                     }
 
+                    playerIn.triggerAchievement(StatList.field_181739_W);
                     this.tableInventory.markDirty();
                     this.xpSeed = playerIn.getXPSeed();
                     this.onCraftMatrixChanged(this.tableInventory);
@@ -316,12 +305,12 @@ public class ContainerEnchantment extends Container
         }
     }
 
-    private List func_178148_a(ItemStack p_178148_1_, int p_178148_2_, int p_178148_3_)
+    private List<EnchantmentData> func_178148_a(ItemStack stack, int p_178148_2_, int p_178148_3_)
     {
         this.rand.setSeed((long)(this.xpSeed + p_178148_2_));
-        List list = EnchantmentHelper.buildEnchantmentList(this.rand, p_178148_1_, p_178148_3_);
+        List<EnchantmentData> list = EnchantmentHelper.buildEnchantmentList(this.rand, stack, p_178148_3_);
 
-        if (p_178148_1_.getItem() == Items.book && list != null && list.size() > 1)
+        if (stack.getItem() == Items.book && list != null && list.size() > 1)
         {
             list.remove(this.rand.nextInt(list.size()));
         }
@@ -347,7 +336,7 @@ public class ContainerEnchantment extends Container
         {
             for (int i = 0; i < this.tableInventory.getSizeInventory(); ++i)
             {
-                ItemStack itemstack = this.tableInventory.getStackInSlotOnClosing(i);
+                ItemStack itemstack = this.tableInventory.removeStackFromSlot(i);
 
                 if (itemstack != null)
                 {

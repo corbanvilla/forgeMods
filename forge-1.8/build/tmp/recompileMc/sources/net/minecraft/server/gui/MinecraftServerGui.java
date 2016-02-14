@@ -13,6 +13,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -38,7 +39,6 @@ public class MinecraftServerGui extends JComponent
     private static final Font serverGuiFont = new Font("Monospaced", 0, 12);
     private static final Logger LOGGER = LogManager.getLogger();
     private DedicatedServer server;
-    private static final String __OBFID = "CL_00001789";
 
     /**
      * Creates the server GUI and sets it visible for the user.
@@ -49,7 +49,7 @@ public class MinecraftServerGui extends JComponent
         {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }
-        catch (Exception exception)
+        catch (Exception var3)
         {
             ;
         }
@@ -62,7 +62,6 @@ public class MinecraftServerGui extends JComponent
         jframe.setVisible(true);
         jframe.addWindowListener(new WindowAdapter()
         {
-            private static final String __OBFID = "CL_00001791";
             public void windowClosing(WindowEvent p_windowClosing_1_)
             {
                 serverIn.initiateShutdown();
@@ -98,14 +97,14 @@ public class MinecraftServerGui extends JComponent
         }
         catch (Exception exception)
         {
-            LOGGER.error("Couldn\'t build server GUI", exception);
+            LOGGER.error((String)"Couldn\'t build server GUI", (Throwable)exception);
         }
     }
 
     /**
      * Generates new StatsComponent and returns it.
      */
-    private JComponent getStatsComponent()
+    private JComponent getStatsComponent() throws Exception
     {
         JPanel jpanel = new JPanel(new BorderLayout());
         jpanel.add(new StatsComponent(this.server), "North");
@@ -117,15 +116,15 @@ public class MinecraftServerGui extends JComponent
     /**
      * Generates new PlayerListComponent and returns it.
      */
-    private JComponent getPlayerListComponent()
+    private JComponent getPlayerListComponent() throws Exception
     {
-        PlayerListComponent playerlistcomponent = new PlayerListComponent(this.server);
-        JScrollPane jscrollpane = new JScrollPane(playerlistcomponent, 22, 30);
+        JList jlist = new PlayerListComponent(this.server);
+        JScrollPane jscrollpane = new JScrollPane(jlist, 22, 30);
         jscrollpane.setBorder(new TitledBorder(new EtchedBorder(), "Players"));
         return jscrollpane;
     }
 
-    private JComponent getLogComponent()
+    private JComponent getLogComponent() throws Exception
     {
         JPanel jpanel = new JPanel(new BorderLayout());
         final JTextArea jtextarea = new JTextArea();
@@ -135,7 +134,6 @@ public class MinecraftServerGui extends JComponent
         final JTextField jtextfield = new JTextField();
         jtextfield.addActionListener(new ActionListener()
         {
-            private static final String __OBFID = "CL_00001790";
             public void actionPerformed(ActionEvent p_actionPerformed_1_)
             {
                 String s = jtextfield.getText().trim();
@@ -150,15 +148,15 @@ public class MinecraftServerGui extends JComponent
         });
         jtextarea.addFocusListener(new FocusAdapter()
         {
-            private static final String __OBFID = "CL_00001794";
-            public void focusGained(FocusEvent p_focusGained_1_) {}
+            public void focusGained(FocusEvent p_focusGained_1_)
+            {
+            }
         });
         jpanel.add(jscrollpane, "Center");
         jpanel.add(jtextfield, "South");
         jpanel.setBorder(new TitledBorder(new EtchedBorder(), "Log and chat"));
         Thread thread = new Thread(new Runnable()
         {
-            private static final String __OBFID = "CL_00001793";
             public void run()
             {
                 String s;
@@ -185,7 +183,6 @@ public class MinecraftServerGui extends JComponent
         {
             SwingUtilities.invokeLater(new Runnable()
             {
-                private static final String __OBFID = "CL_00001792";
                 public void run()
                 {
                     MinecraftServerGui.this.func_164247_a(p_164247_1_, p_164247_2_, p_164247_3_);
@@ -207,7 +204,7 @@ public class MinecraftServerGui extends JComponent
             {
                 document.insertString(document.getLength(), p_164247_3_, (AttributeSet)null);
             }
-            catch (BadLocationException badlocationexception)
+            catch (BadLocationException var8)
             {
                 ;
             }

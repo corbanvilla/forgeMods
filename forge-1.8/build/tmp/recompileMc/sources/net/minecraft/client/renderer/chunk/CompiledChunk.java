@@ -14,16 +14,15 @@ public class CompiledChunk
 {
     public static final CompiledChunk DUMMY = new CompiledChunk()
     {
-        private static final String __OBFID = "CL_00002455";
-        protected void setLayerUsed(EnumWorldBlockLayer p_178486_1_)
+        protected void setLayerUsed(EnumWorldBlockLayer layer)
         {
             throw new UnsupportedOperationException();
         }
-        public void setLayerStarted(EnumWorldBlockLayer p_178493_1_)
+        public void setLayerStarted(EnumWorldBlockLayer layer)
         {
             throw new UnsupportedOperationException();
         }
-        public boolean isVisible(EnumFacing p_178495_1_, EnumFacing p_178495_2_)
+        public boolean isVisible(EnumFacing facing, EnumFacing facing2)
         {
             return false;
         }
@@ -31,55 +30,54 @@ public class CompiledChunk
     private final boolean[] layersUsed = new boolean[EnumWorldBlockLayer.values().length];
     private final boolean[] layersStarted = new boolean[EnumWorldBlockLayer.values().length];
     private boolean empty = true;
-    private final List tileEntities = Lists.newArrayList();
+    private final List<TileEntity> tileEntities = Lists.<TileEntity>newArrayList();
     private SetVisibility setVisibility = new SetVisibility();
     private WorldRenderer.State state;
-    private static final String __OBFID = "CL_00002456";
 
     public boolean isEmpty()
     {
         return this.empty;
     }
 
-    protected void setLayerUsed(EnumWorldBlockLayer p_178486_1_)
+    protected void setLayerUsed(EnumWorldBlockLayer layer)
     {
         this.empty = false;
-        this.layersUsed[p_178486_1_.ordinal()] = true;
+        this.layersUsed[layer.ordinal()] = true;
     }
 
-    public boolean isLayerEmpty(EnumWorldBlockLayer p_178491_1_)
+    public boolean isLayerEmpty(EnumWorldBlockLayer layer)
     {
-        return !this.layersUsed[p_178491_1_.ordinal()];
+        return !this.layersUsed[layer.ordinal()];
     }
 
-    public void setLayerStarted(EnumWorldBlockLayer p_178493_1_)
+    public void setLayerStarted(EnumWorldBlockLayer layer)
     {
-        this.layersStarted[p_178493_1_.ordinal()] = true;
+        this.layersStarted[layer.ordinal()] = true;
     }
 
-    public boolean isLayerStarted(EnumWorldBlockLayer p_178492_1_)
+    public boolean isLayerStarted(EnumWorldBlockLayer layer)
     {
-        return this.layersStarted[p_178492_1_.ordinal()];
+        return this.layersStarted[layer.ordinal()];
     }
 
-    public List getTileEntities()
+    public List<TileEntity> getTileEntities()
     {
         return this.tileEntities;
     }
 
-    public void addTileEntity(TileEntity p_178490_1_)
+    public void addTileEntity(TileEntity tileEntityIn)
     {
-        this.tileEntities.add(p_178490_1_);
+        this.tileEntities.add(tileEntityIn);
     }
 
-    public boolean isVisible(EnumFacing p_178495_1_, EnumFacing p_178495_2_)
+    public boolean isVisible(EnumFacing facing, EnumFacing facing2)
     {
-        return this.setVisibility.isVisible(p_178495_1_, p_178495_2_);
+        return this.setVisibility.isVisible(facing, facing2);
     }
 
-    public void setVisibility(SetVisibility p_178488_1_)
+    public void setVisibility(SetVisibility visibility)
     {
-        this.setVisibility = p_178488_1_;
+        this.setVisibility = visibility;
     }
 
     public WorldRenderer.State getState()
@@ -87,8 +85,8 @@ public class CompiledChunk
         return this.state;
     }
 
-    public void setState(WorldRenderer.State p_178494_1_)
+    public void setState(WorldRenderer.State stateIn)
     {
-        this.state = p_178494_1_;
+        this.state = stateIn;
     }
 }

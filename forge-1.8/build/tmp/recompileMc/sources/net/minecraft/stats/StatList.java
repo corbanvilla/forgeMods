@@ -3,10 +3,9 @@ package net.minecraft.stats;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityList;
 import net.minecraft.init.Blocks;
@@ -21,13 +20,11 @@ import net.minecraft.util.ResourceLocation;
 
 public class StatList
 {
-    /** Tracks one-off stats. */
-    protected static Map oneShotStats = Maps.newHashMap();
-    public static List allStats = Lists.newArrayList();
-    public static List generalStats = Lists.newArrayList();
-    public static List itemStats = Lists.newArrayList();
-    /** Tracks the number of times a given block or item has been mined. */
-    public static List objectMineStats = Lists.newArrayList();
+    protected static Map<String, StatBase> oneShotStats = Maps.<String, StatBase>newHashMap();
+    public static List<StatBase> allStats = Lists.<StatBase>newArrayList();
+    public static List<StatBase> generalStats = Lists.<StatBase>newArrayList();
+    public static List<StatCrafting> itemStats = Lists.<StatCrafting>newArrayList();
+    public static List<StatCrafting> objectMineStats = Lists.<StatCrafting>newArrayList();
     /** number of times you've left a game */
     public static StatBase leaveGameStat = (new StatBasic("stat.leaveGame", new ChatComponentTranslation("stat.leaveGame", new Object[0]))).initIndependentStat().registerStat();
     /** number of minutes you have played */
@@ -75,6 +72,26 @@ public class StatList
     public static StatBase treasureFishedStat = (new StatBasic("stat.treasureFished", new ChatComponentTranslation("stat.treasureFished", new Object[0]))).registerStat();
     public static StatBase timesTalkedToVillagerStat = (new StatBasic("stat.talkedToVillager", new ChatComponentTranslation("stat.talkedToVillager", new Object[0]))).registerStat();
     public static StatBase timesTradedWithVillagerStat = (new StatBasic("stat.tradedWithVillager", new ChatComponentTranslation("stat.tradedWithVillager", new Object[0]))).registerStat();
+    public static StatBase field_181724_H = (new StatBasic("stat.cakeSlicesEaten", new ChatComponentTranslation("stat.cakeSlicesEaten", new Object[0]))).registerStat();
+    public static StatBase field_181725_I = (new StatBasic("stat.cauldronFilled", new ChatComponentTranslation("stat.cauldronFilled", new Object[0]))).registerStat();
+    public static StatBase field_181726_J = (new StatBasic("stat.cauldronUsed", new ChatComponentTranslation("stat.cauldronUsed", new Object[0]))).registerStat();
+    public static StatBase field_181727_K = (new StatBasic("stat.armorCleaned", new ChatComponentTranslation("stat.armorCleaned", new Object[0]))).registerStat();
+    public static StatBase field_181728_L = (new StatBasic("stat.bannerCleaned", new ChatComponentTranslation("stat.bannerCleaned", new Object[0]))).registerStat();
+    public static StatBase field_181729_M = (new StatBasic("stat.brewingstandInteraction", new ChatComponentTranslation("stat.brewingstandInteraction", new Object[0]))).registerStat();
+    public static StatBase field_181730_N = (new StatBasic("stat.beaconInteraction", new ChatComponentTranslation("stat.beaconInteraction", new Object[0]))).registerStat();
+    public static StatBase field_181731_O = (new StatBasic("stat.dropperInspected", new ChatComponentTranslation("stat.dropperInspected", new Object[0]))).registerStat();
+    public static StatBase field_181732_P = (new StatBasic("stat.hopperInspected", new ChatComponentTranslation("stat.hopperInspected", new Object[0]))).registerStat();
+    public static StatBase field_181733_Q = (new StatBasic("stat.dispenserInspected", new ChatComponentTranslation("stat.dispenserInspected", new Object[0]))).registerStat();
+    public static StatBase field_181734_R = (new StatBasic("stat.noteblockPlayed", new ChatComponentTranslation("stat.noteblockPlayed", new Object[0]))).registerStat();
+    public static StatBase field_181735_S = (new StatBasic("stat.noteblockTuned", new ChatComponentTranslation("stat.noteblockTuned", new Object[0]))).registerStat();
+    public static StatBase field_181736_T = (new StatBasic("stat.flowerPotted", new ChatComponentTranslation("stat.flowerPotted", new Object[0]))).registerStat();
+    public static StatBase field_181737_U = (new StatBasic("stat.trappedChestTriggered", new ChatComponentTranslation("stat.trappedChestTriggered", new Object[0]))).registerStat();
+    public static StatBase field_181738_V = (new StatBasic("stat.enderchestOpened", new ChatComponentTranslation("stat.enderchestOpened", new Object[0]))).registerStat();
+    public static StatBase field_181739_W = (new StatBasic("stat.itemEnchanted", new ChatComponentTranslation("stat.itemEnchanted", new Object[0]))).registerStat();
+    public static StatBase field_181740_X = (new StatBasic("stat.recordPlayed", new ChatComponentTranslation("stat.recordPlayed", new Object[0]))).registerStat();
+    public static StatBase field_181741_Y = (new StatBasic("stat.furnaceInteraction", new ChatComponentTranslation("stat.furnaceInteraction", new Object[0]))).registerStat();
+    public static StatBase field_181742_Z = (new StatBasic("stat.craftingTableInteraction", new ChatComponentTranslation("stat.workbenchInteraction", new Object[0]))).registerStat();
+    public static StatBase field_181723_aa = (new StatBasic("stat.chestOpened", new ChatComponentTranslation("stat.chestOpened", new Object[0]))).registerStat();
     public static final StatBase[] mineBlockStatArray = new StatBase[4096];
     /** Tracks the number of items a given block or item has been crafted. */
     public static final StatBase[] objectCraftStats = new StatBase[32000];
@@ -82,9 +99,8 @@ public class StatList
     public static final StatBase[] objectUseStats = new StatBase[32000];
     /** Tracks the number of times a given block or item has been broken. */
     public static final StatBase[] objectBreakStats = new StatBase[32000];
-    private static final String __OBFID = "CL_00001480";
 
-    public static void func_151178_a()
+    public static void init()
     {
         initMiningStats();
         initStats();
@@ -100,36 +116,26 @@ public class StatList
      */
     private static void initCraftableStats()
     {
-        HashSet hashset = Sets.newHashSet();
-        Iterator iterator = CraftingManager.getInstance().getRecipeList().iterator();
+        Set<Item> set = Sets.<Item>newHashSet();
 
-        while (iterator.hasNext())
+        for (IRecipe irecipe : CraftingManager.getInstance().getRecipeList())
         {
-            IRecipe irecipe = (IRecipe)iterator.next();
-
             if (irecipe.getRecipeOutput() != null)
             {
-                hashset.add(irecipe.getRecipeOutput().getItem());
+                set.add(irecipe.getRecipeOutput().getItem());
             }
         }
 
-        iterator = FurnaceRecipes.instance().getSmeltingList().values().iterator();
-
-        while (iterator.hasNext())
+        for (ItemStack itemstack : FurnaceRecipes.instance().getSmeltingList().values())
         {
-            ItemStack itemstack = (ItemStack)iterator.next();
-            hashset.add(itemstack.getItem());
+            set.add(itemstack.getItem());
         }
 
-        iterator = hashset.iterator();
-
-        while (iterator.hasNext())
+        for (Item item : set)
         {
-            Item item = (Item)iterator.next();
-
             if (item != null)
             {
-                int i = Item.getIdFromItem(item); //TODO: Hook FML's stat change event and re-assign these
+                int i = Item.getIdFromItem(item);
                 String s = func_180204_a(item);
 
                 if (s != null)
@@ -139,21 +145,18 @@ public class StatList
             }
         }
 
-        replaceAllSimilarBlocks(objectCraftStats);
+        replaceAllSimilarBlocks(objectCraftStats, true);
     }
 
     private static void initMiningStats()
     {
-        Iterator iterator = Block.blockRegistry.iterator();
-
-        while (iterator.hasNext())
+        for (Block block : Block.blockRegistry)
         {
-            Block block = (Block)iterator.next();
-            Item item = Item.getItemFromBlock(block); //TODO: Hook FML's stat change event and re-assign these
+            Item item = Item.getItemFromBlock(block);
 
             if (item != null)
             {
-                int i = Block.getIdFromBlock(block); //TODO: Hook FML's stat change event and re-assign these
+                int i = Block.getIdFromBlock(block);
                 String s = func_180204_a(item);
 
                 if (s != null && block.getEnableStats())
@@ -164,20 +167,16 @@ public class StatList
             }
         }
 
-        replaceAllSimilarBlocks(mineBlockStatArray);
+        replaceAllSimilarBlocks(mineBlockStatArray, false);
     }
 
     private static void initStats()
     {
-        Iterator iterator = Item.itemRegistry.iterator();
-
-        while (iterator.hasNext())
+        for (Item item : Item.itemRegistry)
         {
-            Item item = (Item)iterator.next();
-
             if (item != null)
             {
-                int i = Item.getIdFromItem(item); //TODO: Hook FML's stat change event and re-assign these
+                int i = Item.getIdFromItem(item);
                 String s = func_180204_a(item);
 
                 if (s != null)
@@ -192,20 +191,16 @@ public class StatList
             }
         }
 
-        replaceAllSimilarBlocks(objectUseStats);
+        replaceAllSimilarBlocks(objectUseStats, true);
     }
 
     private static void initItemDepleteStats()
     {
-        Iterator iterator = Item.itemRegistry.iterator();
-
-        while (iterator.hasNext())
+        for (Item item : Item.itemRegistry)
         {
-            Item item = (Item)iterator.next();
-
             if (item != null)
             {
-                int i = Item.getIdFromItem(item); //TODO: Hook FML's stat change event and re-assign these
+                int i = Item.getIdFromItem(item);
                 String s = func_180204_a(item);
 
                 if (s != null && item.isDamageable())
@@ -215,7 +210,7 @@ public class StatList
             }
         }
 
-        replaceAllSimilarBlocks(objectBreakStats);
+        replaceAllSimilarBlocks(objectBreakStats, true);
     }
 
     private static String func_180204_a(Item p_180204_0_)
@@ -224,54 +219,58 @@ public class StatList
         return resourcelocation != null ? resourcelocation.toString().replace(':', '.') : null;
     }
 
-    /**
-     * Forces all dual blocks to count for each other on the stats list
-     */
-    private static void replaceAllSimilarBlocks(StatBase[] p_75924_0_)
+    private static void replaceAllSimilarBlocks(StatBase[] p_75924_0_, boolean useItemIds)
     {
-        func_151180_a(p_75924_0_, Blocks.water, Blocks.flowing_water);
-        func_151180_a(p_75924_0_, Blocks.lava, Blocks.flowing_lava);
-        func_151180_a(p_75924_0_, Blocks.lit_pumpkin, Blocks.pumpkin);
-        func_151180_a(p_75924_0_, Blocks.lit_furnace, Blocks.furnace);
-        func_151180_a(p_75924_0_, Blocks.lit_redstone_ore, Blocks.redstone_ore);
-        func_151180_a(p_75924_0_, Blocks.powered_repeater, Blocks.unpowered_repeater);
-        func_151180_a(p_75924_0_, Blocks.powered_comparator, Blocks.unpowered_comparator);
-        func_151180_a(p_75924_0_, Blocks.redstone_torch, Blocks.unlit_redstone_torch);
-        func_151180_a(p_75924_0_, Blocks.lit_redstone_lamp, Blocks.redstone_lamp);
-        func_151180_a(p_75924_0_, Blocks.double_stone_slab, Blocks.stone_slab);
-        func_151180_a(p_75924_0_, Blocks.double_wooden_slab, Blocks.wooden_slab);
-        func_151180_a(p_75924_0_, Blocks.double_stone_slab2, Blocks.stone_slab2);
-        func_151180_a(p_75924_0_, Blocks.grass, Blocks.dirt);
-        func_151180_a(p_75924_0_, Blocks.farmland, Blocks.dirt);
+        mergeStatBases(p_75924_0_, Blocks.water, Blocks.flowing_water, useItemIds);
+        mergeStatBases(p_75924_0_, Blocks.lava, Blocks.flowing_lava, useItemIds);
+        mergeStatBases(p_75924_0_, Blocks.lit_pumpkin, Blocks.pumpkin, useItemIds);
+        mergeStatBases(p_75924_0_, Blocks.lit_furnace, Blocks.furnace, useItemIds);
+        mergeStatBases(p_75924_0_, Blocks.lit_redstone_ore, Blocks.redstone_ore, useItemIds);
+        mergeStatBases(p_75924_0_, Blocks.powered_repeater, Blocks.unpowered_repeater, useItemIds);
+        mergeStatBases(p_75924_0_, Blocks.powered_comparator, Blocks.unpowered_comparator, useItemIds);
+        mergeStatBases(p_75924_0_, Blocks.redstone_torch, Blocks.unlit_redstone_torch, useItemIds);
+        mergeStatBases(p_75924_0_, Blocks.lit_redstone_lamp, Blocks.redstone_lamp, useItemIds);
+        mergeStatBases(p_75924_0_, Blocks.double_stone_slab, Blocks.stone_slab, useItemIds);
+        mergeStatBases(p_75924_0_, Blocks.double_wooden_slab, Blocks.wooden_slab, useItemIds);
+        mergeStatBases(p_75924_0_, Blocks.double_stone_slab2, Blocks.stone_slab2, useItemIds);
+        mergeStatBases(p_75924_0_, Blocks.grass, Blocks.dirt, useItemIds);
+        mergeStatBases(p_75924_0_, Blocks.farmland, Blocks.dirt, useItemIds);
     }
 
-    private static void func_151180_a(StatBase[] p_151180_0_, Block p_151180_1_, Block p_151180_2_)
+    private static void mergeStatBases(StatBase[] statBaseIn, Block p_151180_1_, Block p_151180_2_, boolean useItemIds)
     {
-        int i = Block.getIdFromBlock(p_151180_1_);
-        int j = Block.getIdFromBlock(p_151180_2_);
+        int i;
+        int j;
+        if (useItemIds) {
+            i = Item.getIdFromItem(Item.getItemFromBlock(p_151180_1_));
+            j = Item.getIdFromItem(Item.getItemFromBlock(p_151180_2_));
+        } else {
+            i = Block.getIdFromBlock(p_151180_1_);
+            j = Block.getIdFromBlock(p_151180_2_);
+        }
 
-        if (p_151180_0_[i] != null && p_151180_0_[j] == null)
+        if (statBaseIn[i] != null && statBaseIn[j] == null)
         {
-            p_151180_0_[j] = p_151180_0_[i];
+            statBaseIn[j] = statBaseIn[i];
         }
         else
         {
-            allStats.remove(p_151180_0_[i]);
-            objectMineStats.remove(p_151180_0_[i]);
-            generalStats.remove(p_151180_0_[i]);
-            p_151180_0_[i] = p_151180_0_[j];
+            allStats.remove(statBaseIn[i]);
+            objectMineStats.remove(statBaseIn[i]);
+            generalStats.remove(statBaseIn[i]);
+            statBaseIn[i] = statBaseIn[j];
         }
     }
 
-    public static StatBase getStatKillEntity(EntityList.EntityEggInfo p_151182_0_)
+    public static StatBase getStatKillEntity(EntityList.EntityEggInfo eggInfo)
     {
-        String s = EntityList.getStringFromID(p_151182_0_.spawnedID);
+        String s = EntityList.getStringFromID(eggInfo.spawnedID);
         return s == null ? null : (new StatBase("stat.killEntity." + s, new ChatComponentTranslation("stat.entityKill", new Object[] {new ChatComponentTranslation("entity." + s + ".name", new Object[0])}))).registerStat();
     }
 
-    public static StatBase getStatEntityKilledBy(EntityList.EntityEggInfo p_151176_0_)
+    public static StatBase getStatEntityKilledBy(EntityList.EntityEggInfo eggInfo)
     {
-        String s = EntityList.getStringFromID(p_151176_0_.spawnedID);
+        String s = EntityList.getStringFromID(eggInfo.spawnedID);
         return s == null ? null : (new StatBase("stat.entityKilledBy." + s, new ChatComponentTranslation("stat.entityKilledBy", new Object[] {new ChatComponentTranslation("entity." + s + ".name", new Object[0])}))).registerStat();
     }
 

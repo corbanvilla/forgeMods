@@ -3,13 +3,14 @@ package net.minecraft.client.resources;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Iterator;
+import java.io.Reader;
 import java.util.Map;
 import java.util.Map.Entry;
 import net.minecraft.util.JsonUtils;
@@ -23,56 +24,52 @@ import org.apache.logging.log4j.Logger;
 public class ResourceIndex
 {
     private static final Logger logger = LogManager.getLogger();
-    private final Map resourceMap = Maps.newHashMap();
-    private static final String __OBFID = "CL_00001831";
+    private final Map<String, File> resourceMap = Maps.<String, File>newHashMap();
 
     public ResourceIndex(File p_i1047_1_, String p_i1047_2_)
     {
         if (p_i1047_2_ != null)
         {
-            File file2 = new File(p_i1047_1_, "objects");
-            File file3 = new File(p_i1047_1_, "indexes/" + p_i1047_2_ + ".json");
+            File file1 = new File(p_i1047_1_, "objects");
+            File file2 = new File(p_i1047_1_, "indexes/" + p_i1047_2_ + ".json");
             BufferedReader bufferedreader = null;
 
             try
             {
-                bufferedreader = Files.newReader(file3, Charsets.UTF_8);
-                JsonObject jsonobject = (new JsonParser()).parse(bufferedreader).getAsJsonObject();
-                JsonObject jsonobject1 = JsonUtils.getJsonObjectFieldOrDefault(jsonobject, "objects", (JsonObject)null);
+                bufferedreader = Files.newReader(file2, Charsets.UTF_8);
+                JsonObject jsonobject = (new JsonParser()).parse((Reader)bufferedreader).getAsJsonObject();
+                JsonObject jsonobject1 = JsonUtils.getJsonObject(jsonobject, "objects", (JsonObject)null);
 
                 if (jsonobject1 != null)
                 {
-                    Iterator iterator = jsonobject1.entrySet().iterator();
-
-                    while (iterator.hasNext())
+                    for (Entry<String, JsonElement> entry : jsonobject1.entrySet())
                     {
-                        Entry entry = (Entry)iterator.next();
                         JsonObject jsonobject2 = (JsonObject)entry.getValue();
-                        String s1 = (String)entry.getKey();
-                        String[] astring = s1.split("/", 2);
-                        String s2 = astring.length == 1 ? astring[0] : astring[0] + ":" + astring[1];
-                        String s3 = JsonUtils.getJsonObjectStringFieldValue(jsonobject2, "hash");
-                        File file4 = new File(file2, s3.substring(0, 2) + "/" + s3);
-                        this.resourceMap.put(s2, file4);
+                        String s = (String)entry.getKey();
+                        String[] astring = s.split("/", 2);
+                        String s1 = astring.length == 1 ? astring[0] : astring[0] + ":" + astring[1];
+                        String s2 = JsonUtils.getString(jsonobject2, "hash");
+                        File file3 = new File(file1, s2.substring(0, 2) + "/" + s2);
+                        this.resourceMap.put(s1, file3);
                     }
                 }
             }
-            catch (JsonParseException jsonparseexception)
+            catch (JsonParseException var20)
             {
-                logger.error("Unable to parse resource index file: " + file3);
+                logger.error("Unable to parse resource index file: " + file2);
             }
-            catch (FileNotFoundException filenotfoundexception)
+            catch (FileNotFoundException var21)
             {
-                logger.error("Can\'t find the resource index file: " + file3);
+                logger.error("Can\'t find the resource index file: " + file2);
             }
             finally
             {
-                IOUtils.closeQuietly(bufferedreader);
+                IOUtils.closeQuietly((Reader)bufferedreader);
             }
         }
     }
 
-    public Map getResourceMap()
+    public Map<String, File> getResourceMap()
     {
         return this.resourceMap;
     }

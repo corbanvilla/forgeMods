@@ -1,8 +1,6 @@
 package net.minecraft.command;
 
 import com.google.common.collect.Lists;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -15,12 +13,10 @@ import net.minecraft.util.BlockPos;
 
 public class CommandTrigger extends CommandBase
 {
-    private static final String __OBFID = "CL_00002337";
-
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
-    public String getName()
+    public String getCommandName()
     {
         return "trigger";
     }
@@ -33,15 +29,23 @@ public class CommandTrigger extends CommandBase
         return 0;
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.trigger.usage";
     }
 
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
-    public void execute(ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 3)
         {
@@ -118,21 +122,18 @@ public class CommandTrigger extends CommandBase
         }
     }
 
-    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
         if (args.length == 1)
         {
             Scoreboard scoreboard = MinecraftServer.getServer().worldServerForDimension(0).getScoreboard();
-            ArrayList arraylist = Lists.newArrayList();
-            Iterator iterator = scoreboard.getScoreObjectives().iterator();
+            List<String> list = Lists.<String>newArrayList();
 
-            while (iterator.hasNext())
+            for (ScoreObjective scoreobjective : scoreboard.getScoreObjectives())
             {
-                ScoreObjective scoreobjective = (ScoreObjective)iterator.next();
-
                 if (scoreobjective.getCriteria() == IScoreObjectiveCriteria.TRIGGER)
                 {
-                    arraylist.add(scoreobjective.getName());
+                    list.add(scoreobjective.getName());
                 }
             }
 
@@ -140,7 +141,7 @@ public class CommandTrigger extends CommandBase
              * Returns a List of strings (chosen from the given strings) which the last word in the given string array
              * is a beginning-match for. (Tab completion).
              */
-            return getListOfStringsMatchingLastWord(args, (String[])arraylist.toArray(new String[arraylist.size()]));
+            return getListOfStringsMatchingLastWord(args, (String[])list.toArray(new String[list.size()]));
         }
         else
         {

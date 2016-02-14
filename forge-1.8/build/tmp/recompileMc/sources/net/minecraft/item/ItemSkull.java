@@ -24,7 +24,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemSkull extends Item
 {
     private static final String[] skullTypes = new String[] {"skeleton", "wither", "zombie", "char", "creeper"};
-    private static final String __OBFID = "CL_00000067";
 
     public ItemSkull()
     {
@@ -35,9 +34,6 @@ public class ItemSkull extends Item
 
     /**
      * Called when a Block is right-clicked with this Item
-     *  
-     * @param pos The block being right-clicked
-     * @param side The side being right-clicked
      */
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
@@ -132,11 +128,9 @@ public class ItemSkull extends Item
 
     /**
      * returns a list of items with the same ID, but different meta (eg: dye returns 16 items)
-     *  
-     * @param subItems The List of sub-items. This is a List of ItemStacks.
      */
     @SideOnly(Side.CLIENT)
-    public void getSubItems(Item itemIn, CreativeTabs tab, List subItems)
+    public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems)
     {
         for (int i = 0; i < skullTypes.length; ++i)
         {

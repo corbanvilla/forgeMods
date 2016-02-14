@@ -23,15 +23,14 @@ import net.minecraft.world.World;
 
 public class EntityChicken extends EntityAnimal
 {
-    public float field_70886_e;
+    public float wingRotation;
     public float destPos;
     public float field_70884_g;
     public float field_70888_h;
-    public float field_70889_i = 1.0F;
+    public float wingRotDelta = 1.0F;
     /** The time until the next egg is spawned. */
     public int timeUntilNextEgg;
     public boolean chickenJockey;
-    private static final String __OBFID = "CL_00001639";
 
     public EntityChicken(World worldIn)
     {
@@ -67,24 +66,24 @@ public class EntityChicken extends EntityAnimal
     public void onLivingUpdate()
     {
         super.onLivingUpdate();
-        this.field_70888_h = this.field_70886_e;
+        this.field_70888_h = this.wingRotation;
         this.field_70884_g = this.destPos;
         this.destPos = (float)((double)this.destPos + (double)(this.onGround ? -1 : 4) * 0.3D);
         this.destPos = MathHelper.clamp_float(this.destPos, 0.0F, 1.0F);
 
-        if (!this.onGround && this.field_70889_i < 1.0F)
+        if (!this.onGround && this.wingRotDelta < 1.0F)
         {
-            this.field_70889_i = 1.0F;
+            this.wingRotDelta = 1.0F;
         }
 
-        this.field_70889_i = (float)((double)this.field_70889_i * 0.9D);
+        this.wingRotDelta = (float)((double)this.wingRotDelta * 0.9D);
 
         if (!this.onGround && this.motionY < 0.0D)
         {
             this.motionY *= 0.6D;
         }
 
-        this.field_70886_e += this.field_70889_i * 2.0F;
+        this.wingRotation += this.wingRotDelta * 2.0F;
 
         if (!this.worldObj.isRemote && !this.isChild() && !this.isChickenJockey() && --this.timeUntilNextEgg <= 0)
         {
@@ -94,7 +93,9 @@ public class EntityChicken extends EntityAnimal
         }
     }
 
-    public void fall(float distance, float damageMultiplier) {}
+    public void fall(float distance, float damageMultiplier)
+    {
+    }
 
     /**
      * Returns the sound this mob makes while it's alive.
@@ -120,7 +121,7 @@ public class EntityChicken extends EntityAnimal
         return "mob.chicken.hurt";
     }
 
-    protected void playStepSound(BlockPos p_180429_1_, Block p_180429_2_)
+    protected void playStepSound(BlockPos pos, Block blockIn)
     {
         this.playSound("mob.chicken.step", 0.15F, 1.0F);
     }
@@ -135,9 +136,9 @@ public class EntityChicken extends EntityAnimal
      */
     protected void dropFewItems(boolean p_70628_1_, int p_70628_2_)
     {
-        int j = this.rand.nextInt(3) + this.rand.nextInt(1 + p_70628_2_);
+        int i = this.rand.nextInt(3) + this.rand.nextInt(1 + p_70628_2_);
 
-        for (int k = 0; k < j; ++k)
+        for (int j = 0; j < i; ++j)
         {
             this.dropItem(Items.feather, 1);
         }
@@ -231,8 +232,6 @@ public class EntityChicken extends EntityAnimal
 
     /**
      * Sets whether this chicken is a jockey or not.
-     *  
-     * @param jockey Whether this chicken is a jockey or not
      */
     public void setChickenJockey(boolean jockey)
     {

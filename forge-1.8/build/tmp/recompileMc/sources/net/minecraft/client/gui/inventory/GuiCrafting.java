@@ -14,7 +14,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class GuiCrafting extends GuiContainer
 {
     private static final ResourceLocation craftingTableGuiTextures = new ResourceLocation("textures/gui/container/crafting_table.png");
-    private static final String __OBFID = "CL_00000750";
 
     public GuiCrafting(InventoryPlayer playerInv, World worldIn)
     {
@@ -42,8 +41,8 @@ public class GuiCrafting extends GuiContainer
     {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(craftingTableGuiTextures);
-        int k = (this.width - this.xSize) / 2;
-        int l = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(k, l, 0, 0, this.xSize, this.ySize);
+        int i = (this.width - this.xSize) / 2;
+        int j = (this.height - this.ySize) / 2;
+        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
     }
 }

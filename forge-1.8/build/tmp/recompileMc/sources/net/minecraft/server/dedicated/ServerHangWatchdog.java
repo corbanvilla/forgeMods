@@ -22,7 +22,7 @@ public class ServerHangWatchdog implements Runnable
     private static final Logger LOGGER = LogManager.getLogger();
     private final DedicatedServer server;
     private final long maxTickTime;
-    private static final String __OBFID = "CL_00002634";
+    private boolean firstRun = true;
 
     public ServerHangWatchdog(DedicatedServer server)
     {
@@ -38,7 +38,7 @@ public class ServerHangWatchdog implements Runnable
             long j = MinecraftServer.getCurrentTimeMillis();
             long k = j - i;
 
-            if (k > this.maxTickTime)
+            if (k > this.maxTickTime && !this.firstRun)
             {
                 LOGGER.fatal("A single server tick took " + String.format("%.2f", new Object[] {Float.valueOf((float)k / 1000.0F)}) + " seconds (should be max " + String.format("%.2f", new Object[] {Float.valueOf(0.05F)}) + ")");
                 LOGGER.fatal("Considering it to be crashed, server will forcibly shutdown.");
@@ -46,19 +46,15 @@ public class ServerHangWatchdog implements Runnable
                 ThreadInfo[] athreadinfo = threadmxbean.dumpAllThreads(true, true);
                 StringBuilder stringbuilder = new StringBuilder();
                 Error error = new Error();
-                ThreadInfo[] athreadinfo1 = athreadinfo;
-                int l = athreadinfo.length;
 
-                for (int i1 = 0; i1 < l; ++i1)
+                for (ThreadInfo threadinfo : athreadinfo)
                 {
-                    ThreadInfo threadinfo = athreadinfo1[i1];
-
                     if (threadinfo.getThreadId() == this.server.getServerThread().getId())
                     {
                         error.setStackTrace(threadinfo.getStackTrace());
                     }
 
-                    stringbuilder.append(threadinfo);
+                    stringbuilder.append((Object)threadinfo);
                     stringbuilder.append("\n");
                 }
 
@@ -77,28 +73,29 @@ public class ServerHangWatchdog implements Runnable
                     LOGGER.error("We were unable to save this crash report to disk.");
                 }
 
-                this.func_180248_a();
+                this.scheduleHalt();
             }
+
+            this.firstRun = false;
 
             try
             {
                 Thread.sleep(i + this.maxTickTime - j);
             }
-            catch (InterruptedException interruptedexception)
+            catch (InterruptedException var15)
             {
                 ;
             }
         }
     }
 
-    private void func_180248_a()
+    private void scheduleHalt()
     {
         try
         {
             Timer timer = new Timer();
             timer.schedule(new TimerTask()
             {
-                private static final String __OBFID = "CL_00002633";
                 public void run()
                 {
                     Runtime.getRuntime().halt(1);
@@ -106,7 +103,7 @@ public class ServerHangWatchdog implements Runnable
             }, 10000L);
             System.exit(1);
         }
-        catch (Throwable throwable)
+        catch (Throwable var2)
         {
             Runtime.getRuntime().halt(1);
         }

@@ -2,7 +2,6 @@ package net.minecraft.network.play.server;
 
 import java.io.IOException;
 import net.minecraft.entity.item.EntityXPOrb;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -10,24 +9,25 @@ import net.minecraft.util.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S11PacketSpawnExperienceOrb implements Packet
+public class S11PacketSpawnExperienceOrb implements Packet<INetHandlerPlayClient>
 {
-    private int field_148992_a;
-    private int field_148990_b;
-    private int field_148991_c;
-    private int field_148988_d;
-    private int field_148989_e;
-    private static final String __OBFID = "CL_00001277";
+    private int entityID;
+    private int posX;
+    private int posY;
+    private int posZ;
+    private int xpValue;
 
-    public S11PacketSpawnExperienceOrb() {}
-
-    public S11PacketSpawnExperienceOrb(EntityXPOrb p_i45167_1_)
+    public S11PacketSpawnExperienceOrb()
     {
-        this.field_148992_a = p_i45167_1_.getEntityId();
-        this.field_148990_b = MathHelper.floor_double(p_i45167_1_.posX * 32.0D);
-        this.field_148991_c = MathHelper.floor_double(p_i45167_1_.posY * 32.0D);
-        this.field_148988_d = MathHelper.floor_double(p_i45167_1_.posZ * 32.0D);
-        this.field_148989_e = p_i45167_1_.getXpValue();
+    }
+
+    public S11PacketSpawnExperienceOrb(EntityXPOrb xpOrb)
+    {
+        this.entityID = xpOrb.getEntityId();
+        this.posX = MathHelper.floor_double(xpOrb.posX * 32.0D);
+        this.posY = MathHelper.floor_double(xpOrb.posY * 32.0D);
+        this.posZ = MathHelper.floor_double(xpOrb.posZ * 32.0D);
+        this.xpValue = xpOrb.getXpValue();
     }
 
     /**
@@ -35,11 +35,11 @@ public class S11PacketSpawnExperienceOrb implements Packet
      */
     public void readPacketData(PacketBuffer buf) throws IOException
     {
-        this.field_148992_a = buf.readVarIntFromBuffer();
-        this.field_148990_b = buf.readInt();
-        this.field_148991_c = buf.readInt();
-        this.field_148988_d = buf.readInt();
-        this.field_148989_e = buf.readShort();
+        this.entityID = buf.readVarIntFromBuffer();
+        this.posX = buf.readInt();
+        this.posY = buf.readInt();
+        this.posZ = buf.readInt();
+        this.xpValue = buf.readShort();
     }
 
     /**
@@ -47,53 +47,48 @@ public class S11PacketSpawnExperienceOrb implements Packet
      */
     public void writePacketData(PacketBuffer buf) throws IOException
     {
-        buf.writeVarIntToBuffer(this.field_148992_a);
-        buf.writeInt(this.field_148990_b);
-        buf.writeInt(this.field_148991_c);
-        buf.writeInt(this.field_148988_d);
-        buf.writeShort(this.field_148989_e);
-    }
-
-    public void func_180719_a(INetHandlerPlayClient p_180719_1_)
-    {
-        p_180719_1_.handleSpawnExperienceOrb(this);
-    }
-
-    @SideOnly(Side.CLIENT)
-    public int func_148985_c()
-    {
-        return this.field_148992_a;
+        buf.writeVarIntToBuffer(this.entityID);
+        buf.writeInt(this.posX);
+        buf.writeInt(this.posY);
+        buf.writeInt(this.posZ);
+        buf.writeShort(this.xpValue);
     }
 
     /**
      * Passes this Packet on to the NetHandler for processing.
      */
-    public void processPacket(INetHandler handler)
+    public void processPacket(INetHandlerPlayClient handler)
     {
-        this.func_180719_a((INetHandlerPlayClient)handler);
+        handler.handleSpawnExperienceOrb(this);
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_148984_d()
+    public int getEntityID()
     {
-        return this.field_148990_b;
+        return this.entityID;
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_148983_e()
+    public int getX()
     {
-        return this.field_148991_c;
+        return this.posX;
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_148982_f()
+    public int getY()
     {
-        return this.field_148988_d;
+        return this.posY;
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_148986_g()
+    public int getZ()
     {
-        return this.field_148989_e;
+        return this.posZ;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public int getXPValue()
+    {
+        return this.xpValue;
     }
 }

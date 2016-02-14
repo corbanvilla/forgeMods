@@ -6,7 +6,6 @@ public class GenLayerRiverMix extends GenLayer
 {
     private GenLayer biomePatternGeneratorChain;
     private GenLayer riverPatternGeneratorChain;
-    private static final String __OBFID = "CL_00000567";
 
     public GenLayerRiverMix(long p_i2129_1_, GenLayer p_i2129_3_, GenLayer p_i2129_4_)
     {
@@ -19,11 +18,11 @@ public class GenLayerRiverMix extends GenLayer
      * Initialize layer's local worldGenSeed based on its own baseSeed and the world's global seed (passed in as an
      * argument).
      */
-    public void initWorldGenSeed(long p_75905_1_)
+    public void initWorldGenSeed(long seed)
     {
-        this.biomePatternGeneratorChain.initWorldGenSeed(p_75905_1_);
-        this.riverPatternGeneratorChain.initWorldGenSeed(p_75905_1_);
-        super.initWorldGenSeed(p_75905_1_);
+        this.biomePatternGeneratorChain.initWorldGenSeed(seed);
+        this.riverPatternGeneratorChain.initWorldGenSeed(seed);
+        super.initWorldGenSeed(seed);
     }
 
     /**
@@ -36,33 +35,33 @@ public class GenLayerRiverMix extends GenLayer
         int[] aint1 = this.riverPatternGeneratorChain.getInts(areaX, areaY, areaWidth, areaHeight);
         int[] aint2 = IntCache.getIntCache(areaWidth * areaHeight);
 
-        for (int i1 = 0; i1 < areaWidth * areaHeight; ++i1)
+        for (int i = 0; i < areaWidth * areaHeight; ++i)
         {
-            if (aint[i1] != BiomeGenBase.ocean.biomeID && aint[i1] != BiomeGenBase.deepOcean.biomeID)
+            if (aint[i] != BiomeGenBase.ocean.biomeID && aint[i] != BiomeGenBase.deepOcean.biomeID)
             {
-                if (aint1[i1] == BiomeGenBase.river.biomeID)
+                if (aint1[i] == BiomeGenBase.river.biomeID)
                 {
-                    if (aint[i1] == BiomeGenBase.icePlains.biomeID)
+                    if (aint[i] == BiomeGenBase.icePlains.biomeID)
                     {
-                        aint2[i1] = BiomeGenBase.frozenRiver.biomeID;
+                        aint2[i] = BiomeGenBase.frozenRiver.biomeID;
                     }
-                    else if (aint[i1] != BiomeGenBase.mushroomIsland.biomeID && aint[i1] != BiomeGenBase.mushroomIslandShore.biomeID)
+                    else if (aint[i] != BiomeGenBase.mushroomIsland.biomeID && aint[i] != BiomeGenBase.mushroomIslandShore.biomeID)
                     {
-                        aint2[i1] = aint1[i1] & 255;
+                        aint2[i] = aint1[i] & 255;
                     }
                     else
                     {
-                        aint2[i1] = BiomeGenBase.mushroomIslandShore.biomeID;
+                        aint2[i] = BiomeGenBase.mushroomIslandShore.biomeID;
                     }
                 }
                 else
                 {
-                    aint2[i1] = aint[i1];
+                    aint2[i] = aint[i];
                 }
             }
             else
             {
-                aint2[i1] = aint[i1];
+                aint2[i] = aint[i];
             }
         }
 

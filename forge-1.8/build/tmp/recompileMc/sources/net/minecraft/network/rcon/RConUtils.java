@@ -9,22 +9,21 @@ public class RConUtils
 {
     /** Translation array of decimal to hex digits */
     public static final char[] hexDigits = new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-    private static final String __OBFID = "CL_00001799";
 
     /**
      * Read a null-terminated string from the given byte array
      */
     public static String getBytesAsString(byte[] p_72661_0_, int p_72661_1_, int p_72661_2_)
     {
-        int k = p_72661_2_ - 1;
-        int l;
+        int i = p_72661_2_ - 1;
+        int j;
 
-        for (l = p_72661_1_ > k ? k : p_72661_1_; 0 != p_72661_0_[l] && l < k; ++l)
+        for (j = p_72661_1_ > i ? i : p_72661_1_; 0 != p_72661_0_[j] && j < i; ++j)
         {
             ;
         }
 
-        return new String(p_72661_0_, p_72661_1_, l - p_72661_1_, Charsets.UTF_8);
+        return new String(p_72661_0_, p_72661_1_, j - p_72661_1_, Charsets.UTF_8);
     }
 
     /**

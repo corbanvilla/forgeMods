@@ -9,5 +9,5 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public interface IRenderChunkFactory
 {
-    RenderChunk makeRenderChunk(World worldIn, RenderGlobal p_178602_2_, BlockPos pos, int p_178602_4_);
+    RenderChunk makeRenderChunk(World worldIn, RenderGlobal globalRenderer, BlockPos pos, int index);
 }

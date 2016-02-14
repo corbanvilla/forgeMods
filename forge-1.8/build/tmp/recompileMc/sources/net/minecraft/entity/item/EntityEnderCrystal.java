@@ -16,7 +16,6 @@ public class EntityEnderCrystal extends Entity
     /** Used to create the rotation animation when rendering the crystal. */
     public int innerRotation;
     public int health;
-    private static final String __OBFID = "CL_00001658";
 
     public EntityEnderCrystal(World worldIn)
     {
@@ -71,12 +70,16 @@ public class EntityEnderCrystal extends Entity
     /**
      * (abstract) Protected helper method to write subclass entity data to NBT.
      */
-    protected void writeEntityToNBT(NBTTagCompound tagCompound) {}
+    protected void writeEntityToNBT(NBTTagCompound tagCompound)
+    {
+    }
 
     /**
      * (abstract) Protected helper method to read subclass entity data from NBT.
      */
-    protected void readEntityFromNBT(NBTTagCompound tagCompund) {}
+    protected void readEntityFromNBT(NBTTagCompound tagCompund)
+    {
+    }
 
     /**
      * Returns true if other Entities should be prevented from moving through this Entity.

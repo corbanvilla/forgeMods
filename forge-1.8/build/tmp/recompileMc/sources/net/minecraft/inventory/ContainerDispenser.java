@@ -6,33 +6,30 @@ import net.minecraft.item.ItemStack;
 public class ContainerDispenser extends Container
 {
     private IInventory dispenserInventory;
-    private static final String __OBFID = "CL_00001763";
 
     public ContainerDispenser(IInventory playerInventory, IInventory dispenserInventoryIn)
     {
         this.dispenserInventory = dispenserInventoryIn;
-        int i;
-        int j;
 
-        for (i = 0; i < 3; ++i)
+        for (int i = 0; i < 3; ++i)
         {
-            for (j = 0; j < 3; ++j)
+            for (int j = 0; j < 3; ++j)
             {
                 this.addSlotToContainer(new Slot(dispenserInventoryIn, j + i * 3, 62 + j * 18, 17 + i * 18));
             }
         }
 
-        for (i = 0; i < 3; ++i)
+        for (int k = 0; k < 3; ++k)
         {
-            for (j = 0; j < 9; ++j)
+            for (int i1 = 0; i1 < 9; ++i1)
             {
-                this.addSlotToContainer(new Slot(playerInventory, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
+                this.addSlotToContainer(new Slot(playerInventory, i1 + k * 9 + 9, 8 + i1 * 18, 84 + k * 18));
             }
         }
 
-        for (i = 0; i < 9; ++i)
+        for (int l = 0; l < 9; ++l)
         {
-            this.addSlotToContainer(new Slot(playerInventory, i, 8 + i * 18, 142));
+            this.addSlotToContainer(new Slot(playerInventory, l, 8 + l * 18, 142));
         }
     }
 

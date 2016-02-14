@@ -1,7 +1,6 @@
 package net.minecraft.client.gui;
 
 import java.io.IOException;
-import java.util.Iterator;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
@@ -15,10 +14,10 @@ public class GuiGameOver extends GuiScreen implements GuiYesNoCallback
     /** The integer value containing the number of ticks that have passed since the player's death */
     private int enableButtonsTimer;
     private boolean field_146346_f = false;
-    private static final String __OBFID = "CL_00000690";
 
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
     public void initGui()
     {
@@ -46,20 +45,23 @@ public class GuiGameOver extends GuiScreen implements GuiYesNoCallback
             }
         }
 
-        GuiButton guibutton;
-
-        for (Iterator iterator = this.buttonList.iterator(); iterator.hasNext(); guibutton.enabled = false)
+        for (GuiButton guibutton : this.buttonList)
         {
-            guibutton = (GuiButton)iterator.next();
+            guibutton.enabled = false;
         }
     }
 
     /**
-     * Fired when a key is typed (except F11 who toggle full screen). This is the equivalent of
+     * Fired when a key is typed (except F11 which toggles full screen). This is the equivalent of
      * KeyListener.keyTyped(KeyEvent e). Args : character (character on the key), keyCode (lwjgl Keyboard key code)
      */
-    protected void keyTyped(char typedChar, int keyCode) throws IOException {}
+    protected void keyTyped(char typedChar, int keyCode) throws IOException
+    {
+    }
 
+    /**
+     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
+     */
     protected void actionPerformed(GuiButton button) throws IOException
     {
         switch (button.id)
@@ -69,9 +71,17 @@ public class GuiGameOver extends GuiScreen implements GuiYesNoCallback
                 this.mc.displayGuiScreen((GuiScreen)null);
                 break;
             case 1:
-                GuiYesNo guiyesno = new GuiYesNo(this, I18n.format("deathScreen.quit.confirm", new Object[0]), "", I18n.format("deathScreen.titleScreen", new Object[0]), I18n.format("deathScreen.respawn", new Object[0]), 0);
-                this.mc.displayGuiScreen(guiyesno);
-                guiyesno.setButtonDelay(20);
+
+                if (this.mc.theWorld.getWorldInfo().isHardcoreModeEnabled())
+                {
+                    this.mc.displayGuiScreen(new GuiMainMenu());
+                }
+                else
+                {
+                    GuiYesNo guiyesno = new GuiYesNo(this, I18n.format("deathScreen.quit.confirm", new Object[0]), "", I18n.format("deathScreen.titleScreen", new Object[0]), I18n.format("deathScreen.respawn", new Object[0]), 0);
+                    this.mc.displayGuiScreen(guiyesno);
+                    guiyesno.setButtonDelay(20);
+                }
         }
     }
 
@@ -127,13 +137,12 @@ public class GuiGameOver extends GuiScreen implements GuiYesNoCallback
     {
         super.updateScreen();
         ++this.enableButtonsTimer;
-        GuiButton guibutton;
 
         if (this.enableButtonsTimer == 20)
         {
-            for (Iterator iterator = this.buttonList.iterator(); iterator.hasNext(); guibutton.enabled = true)
+            for (GuiButton guibutton : this.buttonList)
             {
-                guibutton = (GuiButton)iterator.next();
+                guibutton.enabled = true;
             }
         }
     }

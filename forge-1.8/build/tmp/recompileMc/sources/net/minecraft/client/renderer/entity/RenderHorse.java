@@ -6,52 +6,56 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelHorse;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.LayeredTexture;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityHorse;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderHorse extends RenderLiving
+public class RenderHorse extends RenderLiving<EntityHorse>
 {
-    private static final Map field_110852_a = Maps.newHashMap();
+    private static final Map<String, ResourceLocation> field_110852_a = Maps.<String, ResourceLocation>newHashMap();
     private static final ResourceLocation whiteHorseTextures = new ResourceLocation("textures/entity/horse/horse_white.png");
     private static final ResourceLocation muleTextures = new ResourceLocation("textures/entity/horse/mule.png");
     private static final ResourceLocation donkeyTextures = new ResourceLocation("textures/entity/horse/donkey.png");
     private static final ResourceLocation zombieHorseTextures = new ResourceLocation("textures/entity/horse/horse_zombie.png");
     private static final ResourceLocation skeletonHorseTextures = new ResourceLocation("textures/entity/horse/horse_skeleton.png");
-    private static final String __OBFID = "CL_00001000";
 
-    public RenderHorse(RenderManager p_i46170_1_, ModelHorse p_i46170_2_, float p_i46170_3_)
+    public RenderHorse(RenderManager rendermanagerIn, ModelHorse model, float shadowSizeIn)
     {
-        super(p_i46170_1_, p_i46170_2_, p_i46170_3_);
+        super(rendermanagerIn, model, shadowSizeIn);
     }
 
-    protected void func_180580_a(EntityHorse p_180580_1_, float p_180580_2_)
+    /**
+     * Allows the render to do any OpenGL state modifications necessary before the model is rendered. Args:
+     * entityLiving, partialTickTime
+     */
+    protected void preRenderCallback(EntityHorse entitylivingbaseIn, float partialTickTime)
     {
-        float f1 = 1.0F;
-        int i = p_180580_1_.getHorseType();
+        float f = 1.0F;
+        int i = entitylivingbaseIn.getHorseType();
 
         if (i == 1)
         {
-            f1 *= 0.87F;
+            f *= 0.87F;
         }
         else if (i == 2)
         {
-            f1 *= 0.92F;
+            f *= 0.92F;
         }
 
-        GlStateManager.scale(f1, f1, f1);
-        super.preRenderCallback(p_180580_1_, p_180580_2_);
+        GlStateManager.scale(f, f, f);
+        super.preRenderCallback(entitylivingbaseIn, partialTickTime);
     }
 
-    protected ResourceLocation func_180581_a(EntityHorse p_180581_1_)
+    /**
+     * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
+     */
+    protected ResourceLocation getEntityTexture(EntityHorse entity)
     {
-        if (!p_180581_1_.func_110239_cn())
+        if (!entity.func_110239_cn())
         {
-            switch (p_180581_1_.getHorseType())
+            switch (entity.getHorseType())
             {
                 case 0:
                 default:
@@ -68,15 +72,15 @@ public class RenderHorse extends RenderLiving
         }
         else
         {
-            return this.func_110848_b(p_180581_1_);
+            return this.func_110848_b(entity);
         }
     }
 
-    private ResourceLocation func_110848_b(EntityHorse p_110848_1_)
+    private ResourceLocation func_110848_b(EntityHorse horse)
     {
-        String s = p_110848_1_.getHorseTexture();
+        String s = horse.getHorseTexture();
 
-        if (!p_110848_1_.func_175507_cI())
+        if (!horse.func_175507_cI())
         {
             return null;
         }
@@ -87,28 +91,11 @@ public class RenderHorse extends RenderLiving
             if (resourcelocation == null)
             {
                 resourcelocation = new ResourceLocation(s);
-                Minecraft.getMinecraft().getTextureManager().loadTexture(resourcelocation, new LayeredTexture(p_110848_1_.getVariantTexturePaths()));
+                Minecraft.getMinecraft().getTextureManager().loadTexture(resourcelocation, new LayeredTexture(horse.getVariantTexturePaths()));
                 field_110852_a.put(s, resourcelocation);
             }
 
             return resourcelocation;
         }
-    }
-
-    /**
-     * Allows the render to do any OpenGL state modifications necessary before the model is rendered. Args:
-     * entityLiving, partialTickTime
-     */
-    protected void preRenderCallback(EntityLivingBase p_77041_1_, float p_77041_2_)
-    {
-        this.func_180580_a((EntityHorse)p_77041_1_, p_77041_2_);
-    }
-
-    /**
-     * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
-     */
-    protected ResourceLocation getEntityTexture(Entity entity)
-    {
-        return this.func_180581_a((EntityHorse)entity);
     }
 }

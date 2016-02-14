@@ -1,8 +1,8 @@
 package net.minecraft.potion;
 
 import com.google.common.collect.Maps;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.Map.Entry;
 import net.minecraft.entity.Entity;
@@ -22,8 +22,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class Potion
 {
     /** The array of potion types. */
-    public static final Potion[] potionTypes = new Potion[32];
-    private static final Map field_180150_I = Maps.newHashMap();
+    public static final Potion[] potionTypes = new Potion[256];
+    private static final Map<ResourceLocation, Potion> field_180150_I = Maps.<ResourceLocation, Potion>newHashMap();
     public static final Potion field_180151_b = null;
     public static final Potion moveSpeed = (new Potion(1, new ResourceLocation("speed"), false, 8171462)).setPotionName("potion.moveSpeed").setIconIndex(0, 0).registerPotionAttributeModifier(SharedMonsterAttributes.movementSpeed, "91AEAA56-376B-4498-935B-2F7F68070635", 0.20000000298023224D, 2);
     public static final Potion moveSlowdown = (new Potion(2, new ResourceLocation("slowness"), true, 5926017)).setPotionName("potion.moveSlowdown").setIconIndex(1, 0).registerPotionAttributeModifier(SharedMonsterAttributes.movementSpeed, "7107DE5E-7CE8-4030-940E-514C1F160890", -0.15000000596046448D, 2);
@@ -70,9 +70,8 @@ public class Potion
     public static final Potion field_180145_F = null;
     public static final Potion field_180146_G = null;
     /** The Id of a Potion object. */
-    public final int id;
-    /** Contains a Map of the AttributeModifiers registered by potions */
-    private final Map attributeModifierMap = Maps.newHashMap();
+    public int id;
+    private final Map<IAttribute, AttributeModifier> attributeModifierMap = Maps.<IAttribute, AttributeModifier>newHashMap();
     /** This field indicated if the effect is 'bad' - negative - for the entity. */
     private final boolean isBadEffect;
     /** Is the color of the liquid for this potion. */
@@ -83,12 +82,11 @@ public class Potion
     private int statusIconIndex = -1;
     private double effectiveness;
     private boolean usable;
-    private static final String __OBFID = "CL_00001528";
 
+    @Deprecated // use the Constructor without potion ID or everything will explode.
     protected Potion(int potionID, ResourceLocation location, boolean badEffect, int potionColor)
     {
-        this.id = potionID;
-        potionTypes[potionID] = this;
+        net.minecraftforge.fml.common.registry.GameData.getPotionRegistry().register(potionID, location, this);
         field_180150_I.put(location, this);
         this.isBadEffect = badEffect;
 
@@ -104,23 +102,18 @@ public class Potion
         this.liquidColor = potionColor;
     }
 
-    public static Potion getPotionFromResourceLocation(String p_180142_0_)
-    {
-        return (Potion)field_180150_I.get(new ResourceLocation(p_180142_0_));
+    protected Potion(ResourceLocation location, boolean badEffect, int potionColor) {
+        this(-1, location, badEffect, potionColor);
     }
 
-    public static String[] getPotionMapAsArray()
+    public static Potion getPotionFromResourceLocation(String location)
     {
-        String[] astring = new String[field_180150_I.size()];
-        int i = 0;
-        ResourceLocation resourcelocation;
+        return net.minecraftforge.fml.common.registry.GameData.getPotionRegistry().getObject(new ResourceLocation(location));
+    }
 
-        for (Iterator iterator = field_180150_I.keySet().iterator(); iterator.hasNext(); astring[i++] = resourcelocation.toString())
-        {
-            resourcelocation = (ResourceLocation)iterator.next();
-        }
-
-        return astring;
+    public static Set<ResourceLocation> getPotionLocations()
+    {
+        return net.minecraftforge.fml.common.registry.GameData.getPotionRegistry().getKeys();
     }
 
     /**
@@ -140,74 +133,72 @@ public class Potion
         return this.id;
     }
 
-    public void performEffect(EntityLivingBase p_76394_1_, int p_76394_2_)
+    public void performEffect(EntityLivingBase entityLivingBaseIn, int p_76394_2_)
     {
         if (this.id == regeneration.id)
         {
-            if (p_76394_1_.getHealth() < p_76394_1_.getMaxHealth())
+            if (entityLivingBaseIn.getHealth() < entityLivingBaseIn.getMaxHealth())
             {
-                p_76394_1_.heal(1.0F);
+                entityLivingBaseIn.heal(1.0F);
             }
         }
         else if (this.id == poison.id)
         {
-            if (p_76394_1_.getHealth() > 1.0F)
+            if (entityLivingBaseIn.getHealth() > 1.0F)
             {
-                p_76394_1_.attackEntityFrom(DamageSource.magic, 1.0F);
+                entityLivingBaseIn.attackEntityFrom(DamageSource.magic, 1.0F);
             }
         }
         else if (this.id == wither.id)
         {
-            p_76394_1_.attackEntityFrom(DamageSource.wither, 1.0F);
+            entityLivingBaseIn.attackEntityFrom(DamageSource.wither, 1.0F);
         }
-        else if (this.id == hunger.id && p_76394_1_ instanceof EntityPlayer)
+        else if (this.id == hunger.id && entityLivingBaseIn instanceof EntityPlayer)
         {
-            ((EntityPlayer)p_76394_1_).addExhaustion(0.025F * (float)(p_76394_2_ + 1));
+            ((EntityPlayer)entityLivingBaseIn).addExhaustion(0.025F * (float)(p_76394_2_ + 1));
         }
-        else if (this.id == saturation.id && p_76394_1_ instanceof EntityPlayer)
+        else if (this.id == saturation.id && entityLivingBaseIn instanceof EntityPlayer)
         {
-            if (!p_76394_1_.worldObj.isRemote)
+            if (!entityLivingBaseIn.worldObj.isRemote)
             {
-                ((EntityPlayer)p_76394_1_).getFoodStats().addStats(p_76394_2_ + 1, 1.0F);
+                ((EntityPlayer)entityLivingBaseIn).getFoodStats().addStats(p_76394_2_ + 1, 1.0F);
             }
         }
-        else if ((this.id != heal.id || p_76394_1_.isEntityUndead()) && (this.id != harm.id || !p_76394_1_.isEntityUndead()))
+        else if ((this.id != heal.id || entityLivingBaseIn.isEntityUndead()) && (this.id != harm.id || !entityLivingBaseIn.isEntityUndead()))
         {
-            if (this.id == harm.id && !p_76394_1_.isEntityUndead() || this.id == heal.id && p_76394_1_.isEntityUndead())
+            if (this.id == harm.id && !entityLivingBaseIn.isEntityUndead() || this.id == heal.id && entityLivingBaseIn.isEntityUndead())
             {
-                p_76394_1_.attackEntityFrom(DamageSource.magic, (float)(6 << p_76394_2_));
+                entityLivingBaseIn.attackEntityFrom(DamageSource.magic, (float)(6 << p_76394_2_));
             }
         }
         else
         {
-            p_76394_1_.heal((float)Math.max(4 << p_76394_2_, 0));
+            entityLivingBaseIn.heal((float)Math.max(4 << p_76394_2_, 0));
         }
     }
 
-    public void affectEntity(Entity p_180793_1_, Entity p_180793_2_, EntityLivingBase p_180793_3_, int p_180793_4_, double p_180793_5_)
+    public void affectEntity(Entity p_180793_1_, Entity p_180793_2_, EntityLivingBase entityLivingBaseIn, int p_180793_4_, double p_180793_5_)
     {
-        int j;
-
-        if ((this.id != heal.id || p_180793_3_.isEntityUndead()) && (this.id != harm.id || !p_180793_3_.isEntityUndead()))
+        if ((this.id != heal.id || entityLivingBaseIn.isEntityUndead()) && (this.id != harm.id || !entityLivingBaseIn.isEntityUndead()))
         {
-            if (this.id == harm.id && !p_180793_3_.isEntityUndead() || this.id == heal.id && p_180793_3_.isEntityUndead())
+            if (this.id == harm.id && !entityLivingBaseIn.isEntityUndead() || this.id == heal.id && entityLivingBaseIn.isEntityUndead())
             {
-                j = (int)(p_180793_5_ * (double)(6 << p_180793_4_) + 0.5D);
+                int j = (int)(p_180793_5_ * (double)(6 << p_180793_4_) + 0.5D);
 
                 if (p_180793_1_ == null)
                 {
-                    p_180793_3_.attackEntityFrom(DamageSource.magic, (float)j);
+                    entityLivingBaseIn.attackEntityFrom(DamageSource.magic, (float)j);
                 }
                 else
                 {
-                    p_180793_3_.attackEntityFrom(DamageSource.causeIndirectMagicDamage(p_180793_1_, p_180793_2_), (float)j);
+                    entityLivingBaseIn.attackEntityFrom(DamageSource.causeIndirectMagicDamage(p_180793_1_, p_180793_2_), (float)j);
                 }
             }
         }
         else
         {
-            j = (int)(p_180793_5_ * (double)(4 << p_180793_4_) + 0.5D);
-            p_180793_3_.heal((float)j);
+            int i = (int)(p_180793_5_ * (double)(4 << p_180793_4_) + 0.5D);
+            entityLivingBaseIn.heal((float)i);
         }
     }
 
@@ -224,22 +215,20 @@ public class Potion
      */
     public boolean isReady(int p_76397_1_, int p_76397_2_)
     {
-        int k;
-
         if (this.id == regeneration.id)
         {
-            k = 50 >> p_76397_2_;
+            int k = 50 >> p_76397_2_;
             return k > 0 ? p_76397_1_ % k == 0 : true;
         }
         else if (this.id == poison.id)
         {
-            k = 25 >> p_76397_2_;
-            return k > 0 ? p_76397_1_ % k == 0 : true;
+            int j = 25 >> p_76397_2_;
+            return j > 0 ? p_76397_1_ % j == 0 : true;
         }
         else if (this.id == wither.id)
         {
-            k = 40 >> p_76397_2_;
-            return k > 0 ? p_76397_1_ % k == 0 : true;
+            int i = 40 >> p_76397_2_;
+            return i > 0 ? p_76397_1_ % i == 0 : true;
         }
         else
         {
@@ -250,9 +239,9 @@ public class Potion
     /**
      * Set the potion name.
      */
-    public Potion setPotionName(String p_76390_1_)
+    public Potion setPotionName(String nameIn)
     {
-        this.name = p_76390_1_;
+        this.name = nameIn;
         return this;
     }
 
@@ -264,9 +253,9 @@ public class Potion
         return this.name;
     }
 
-    protected Potion setEffectiveness(double p_76404_1_)
+    protected Potion setEffectiveness(double effectivenessIn)
     {
-        this.effectiveness = p_76404_1_;
+        this.effectiveness = effectivenessIn;
         return this;
     }
 
@@ -291,22 +280,21 @@ public class Potion
     /**
      * This method returns true if the potion effect is bad - negative - for the entity.
      */
-    @SideOnly(Side.CLIENT)
     public boolean isBadEffect()
     {
         return this.isBadEffect;
     }
 
     @SideOnly(Side.CLIENT)
-    public static String getDurationString(PotionEffect p_76389_0_)
+    public static String getDurationString(PotionEffect effect)
     {
-        if (p_76389_0_.getIsPotionDurationMax())
+        if (effect.getIsPotionDurationMax())
         {
             return "**:**";
         }
         else
         {
-            int i = p_76389_0_.getDuration();
+            int i = effect.getDuration();
             return StringUtils.ticksToElapsedTime(i);
         }
     }
@@ -339,13 +327,10 @@ public class Potion
         return this;
     }
 
-    public void removeAttributesModifiersFromEntity(EntityLivingBase p_111187_1_, BaseAttributeMap p_111187_2_, int p_111187_3_)
+    public void removeAttributesModifiersFromEntity(EntityLivingBase entityLivingBaseIn, BaseAttributeMap p_111187_2_, int amplifier)
     {
-        Iterator iterator = this.attributeModifierMap.entrySet().iterator();
-
-        while (iterator.hasNext())
+        for (Entry<IAttribute, AttributeModifier> entry : this.attributeModifierMap.entrySet())
         {
-            Entry entry = (Entry)iterator.next();
             IAttributeInstance iattributeinstance = p_111187_2_.getAttributeInstance((IAttribute)entry.getKey());
 
             if (iattributeinstance != null)
@@ -356,35 +341,39 @@ public class Potion
     }
 
     @SideOnly(Side.CLIENT)
-    public Map getAttributeModifierMap()
+    public Map<IAttribute, AttributeModifier> getAttributeModifierMap()
     {
         return this.attributeModifierMap;
     }
 
-    public void applyAttributesModifiersToEntity(EntityLivingBase p_111185_1_, BaseAttributeMap p_111185_2_, int p_111185_3_)
+    public void applyAttributesModifiersToEntity(EntityLivingBase entityLivingBaseIn, BaseAttributeMap p_111185_2_, int amplifier)
     {
-        Iterator iterator = this.attributeModifierMap.entrySet().iterator();
-
-        while (iterator.hasNext())
+        for (Entry<IAttribute, AttributeModifier> entry : this.attributeModifierMap.entrySet())
         {
-            Entry entry = (Entry)iterator.next();
             IAttributeInstance iattributeinstance = p_111185_2_.getAttributeInstance((IAttribute)entry.getKey());
 
             if (iattributeinstance != null)
             {
                 AttributeModifier attributemodifier = (AttributeModifier)entry.getValue();
                 iattributeinstance.removeModifier(attributemodifier);
-                iattributeinstance.applyModifier(new AttributeModifier(attributemodifier.getID(), this.getName() + " " + p_111185_3_, this.getAttributeModifierAmount(p_111185_3_, attributemodifier), attributemodifier.getOperation()));
+                iattributeinstance.applyModifier(new AttributeModifier(attributemodifier.getID(), this.getName() + " " + amplifier, this.getAttributeModifierAmount(amplifier, attributemodifier), attributemodifier.getOperation()));
             }
         }
     }
 
-    public double getAttributeModifierAmount(int p_111183_1_, AttributeModifier p_111183_2_)
+    public double getAttributeModifierAmount(int p_111183_1_, AttributeModifier modifier)
     {
-        return p_111183_2_.getAmount() * (double)(p_111183_1_ + 1);
+        return modifier.getAmount() * (double)(p_111183_1_ + 1);
     }
 
     /* ======================================== FORGE START =====================================*/
+
+    /**
+     * If the Potion effect should be displayed in the players inventory
+     * @param effect the active PotionEffect
+     * @return true to display it (default), false to hide it.
+     */
+    public boolean shouldRender(PotionEffect effect) { return true; }
 
     /**
      * If the standard PotionEffect text (name and duration) should be drawn when this potion is active.

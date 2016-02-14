@@ -1,9 +1,7 @@
 package net.minecraftforge.common.util;
 
-
 import java.io.Serializable;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -20,7 +18,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry.UniqueIdentifier;
  * Unlike Block, which only one object can exist per coordinate, BlockSnapshot
  * can exist multiple times for any given Block.
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial", "deprecation"})
 public class BlockSnapshot implements Serializable
 {
     private static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("forge.debugBlockSnapshot", "false"));
@@ -60,7 +58,7 @@ public class BlockSnapshot implements Serializable
     {
         this.world = world;
         this.dimId = world.provider.getDimensionId();
-        this.pos = pos;
+        this.pos = pos.getImmutable();
         this.replacedBlock = state;
         this.blockIdentifier = GameRegistry.findUniqueIdentifierFor(state.getBlock());
         this.meta = state.getBlock().getMetaFromState(state);
@@ -84,7 +82,7 @@ public class BlockSnapshot implements Serializable
     public BlockSnapshot(int dimension, BlockPos pos, String modid, String blockName, int meta, int flag, NBTTagCompound nbt)
     {
         this.dimId = dimension;
-        this.pos = pos;
+        this.pos = pos.getImmutable();
         this.flag = flag;
         this.blockIdentifier = new UniqueIdentifier(modid + ":" + blockName);
         this.meta = meta;

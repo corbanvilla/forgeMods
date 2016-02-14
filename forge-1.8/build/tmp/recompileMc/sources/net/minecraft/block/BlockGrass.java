@@ -21,7 +21,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BlockGrass extends Block implements IGrowable
 {
     public static final PropertyBool SNOWY = PropertyBool.create("snowy");
-    private static final String __OBFID = "CL_00000251";
 
     protected BlockGrass()
     {
@@ -73,13 +72,13 @@ public class BlockGrass extends Block implements IGrowable
                 {
                     for (int i = 0; i < 4; ++i)
                     {
-                        BlockPos blockpos1 = pos.add(rand.nextInt(3) - 1, rand.nextInt(5) - 3, rand.nextInt(3) - 1);
-                        Block block = worldIn.getBlockState(blockpos1.up()).getBlock();
-                        IBlockState iblockstate1 = worldIn.getBlockState(blockpos1);
+                        BlockPos blockpos = pos.add(rand.nextInt(3) - 1, rand.nextInt(5) - 3, rand.nextInt(3) - 1);
+                        Block block = worldIn.getBlockState(blockpos.up()).getBlock();
+                        IBlockState iblockstate = worldIn.getBlockState(blockpos);
 
-                        if (iblockstate1.getBlock() == Blocks.dirt && iblockstate1.getValue(BlockDirt.VARIANT) == BlockDirt.DirtType.DIRT && worldIn.getLightFromNeighbors(blockpos1.up()) >= 4 && block.getLightOpacity(worldIn, blockpos1.up()) <= 2)
+                        if (iblockstate.getBlock() == Blocks.dirt && iblockstate.getValue(BlockDirt.VARIANT) == BlockDirt.DirtType.DIRT && worldIn.getLightFromNeighbors(blockpos.up()) >= 4 && block.getLightOpacity(worldIn, blockpos.up()) <= 2)
                         {
-                            worldIn.setBlockState(blockpos1, Blocks.grass.getDefaultState());
+                            worldIn.setBlockState(blockpos, Blocks.grass.getDefaultState());
                         }
                     }
                 }
@@ -89,8 +88,6 @@ public class BlockGrass extends Block implements IGrowable
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -112,45 +109,52 @@ public class BlockGrass extends Block implements IGrowable
 
     public void grow(World worldIn, Random rand, BlockPos pos, IBlockState state)
     {
-        BlockPos blockpos1 = pos.up();
-        int i = 0;
+        BlockPos blockpos = pos.up();
 
-        while (i < 128)
+        for (int i = 0; i < 128; ++i)
         {
-            BlockPos blockpos2 = blockpos1;
+            BlockPos blockpos1 = blockpos;
             int j = 0;
 
             while (true)
             {
-                if (j < i / 16)
+                if (j >= i / 16)
                 {
-                    blockpos2 = blockpos2.add(rand.nextInt(3) - 1, (rand.nextInt(3) - 1) * rand.nextInt(3) / 2, rand.nextInt(3) - 1);
-
-                    if (worldIn.getBlockState(blockpos2.down()).getBlock() == Blocks.grass && !worldIn.getBlockState(blockpos2).getBlock().isNormalCube())
+                    if (worldIn.isAirBlock(blockpos1))
                     {
-                        ++j;
-                        continue;
-                    }
-                }
-                else if (worldIn.isAirBlock(blockpos2))
-                {
-                    if (rand.nextInt(8) == 0)
-                    {
-                        worldIn.getBiomeGenForCoords(blockpos2).plantFlower(worldIn, rand, blockpos2);
-                    }
-                    else
-                    {
-                        IBlockState iblockstate2 = Blocks.tallgrass.getDefaultState().withProperty(BlockTallGrass.TYPE, BlockTallGrass.EnumType.GRASS);
-
-                        if (Blocks.tallgrass.canBlockStay(worldIn, blockpos2, iblockstate2))
+                        if (rand.nextInt(8) == 0)
                         {
-                            worldIn.setBlockState(blockpos2, iblockstate2, 3);
+                            BlockFlower.EnumFlowerType blockflower$enumflowertype = worldIn.getBiomeGenForCoords(blockpos1).pickRandomFlower(rand, blockpos1);
+                            BlockFlower blockflower = blockflower$enumflowertype.getBlockType().getBlock();
+                            IBlockState iblockstate = blockflower.getDefaultState().withProperty(blockflower.getTypeProperty(), blockflower$enumflowertype);
+
+                            if (blockflower.canBlockStay(worldIn, blockpos1, iblockstate))
+                            {
+                                worldIn.setBlockState(blockpos1, iblockstate, 3);
+                            }
+                        }
+                        else
+                        {
+                            IBlockState iblockstate1 = Blocks.tallgrass.getDefaultState().withProperty(BlockTallGrass.TYPE, BlockTallGrass.EnumType.GRASS);
+
+                            if (Blocks.tallgrass.canBlockStay(worldIn, blockpos1, iblockstate1))
+                            {
+                                worldIn.setBlockState(blockpos1, iblockstate1, 3);
+                            }
                         }
                     }
+
+                    break;
                 }
 
-                ++i;
-                break;
+                blockpos1 = blockpos1.add(rand.nextInt(3) - 1, (rand.nextInt(3) - 1) * rand.nextInt(3) / 2, rand.nextInt(3) - 1);
+
+                if (worldIn.getBlockState(blockpos1.down()).getBlock() != Blocks.grass || worldIn.getBlockState(blockpos1).getBlock().isNormalCube())
+                {
+                    break;
+                }
+
+                ++j;
             }
         }
     }

@@ -20,8 +20,6 @@ import net.minecraft.util.ReportedException;
 
 public class CompressedStreamTools
 {
-    private static final String __OBFID = "CL_00001226";
-
     /**
      * Load the gzipped compound from the inputstream.
      */
@@ -32,7 +30,7 @@ public class CompressedStreamTools
 
         try
         {
-            nbttagcompound = func_152456_a(datainputstream, NBTSizeTracker.INFINITE);
+            nbttagcompound = read(datainputstream, NBTSizeTracker.INFINITE);
         }
         finally
         {
@@ -61,14 +59,14 @@ public class CompressedStreamTools
 
     public static void safeWrite(NBTTagCompound p_74793_0_, File p_74793_1_) throws IOException
     {
-        File file2 = new File(p_74793_1_.getAbsolutePath() + "_tmp");
+        File file1 = new File(p_74793_1_.getAbsolutePath() + "_tmp");
 
-        if (file2.exists())
+        if (file1.exists())
         {
-            file2.delete();
+            file1.delete();
         }
 
-        write(p_74793_0_, file2);
+        write(p_74793_0_, file1);
 
         if (p_74793_1_.exists())
         {
@@ -81,7 +79,7 @@ public class CompressedStreamTools
         }
         else
         {
-            file2.renameTo(p_74793_1_);
+            file1.renameTo(p_74793_1_);
         }
     }
 
@@ -90,10 +88,16 @@ public class CompressedStreamTools
      */
     public static NBTTagCompound read(DataInputStream inputStream) throws IOException
     {
-        return func_152456_a(inputStream, NBTSizeTracker.INFINITE);
+        /**
+         * Reads the given DataInput, constructs, and returns an NBTTagCompound with the data from the DataInput
+         */
+        return read(inputStream, NBTSizeTracker.INFINITE);
     }
 
-    public static NBTTagCompound func_152456_a(DataInput p_152456_0_, NBTSizeTracker p_152456_1_) throws IOException
+    /**
+     * Reads the given DataInput, constructs, and returns an NBTTagCompound with the data from the DataInput
+     */
+    public static NBTTagCompound read(DataInput p_152456_0_, NBTSizeTracker p_152456_1_) throws IOException
     {
         NBTBase nbtbase = func_152455_a(p_152456_0_, 0, p_152456_1_);
 
@@ -181,7 +185,7 @@ public class CompressedStreamTools
 
             try
             {
-                nbttagcompound = func_152456_a(datainputstream, NBTSizeTracker.INFINITE);
+                nbttagcompound = read(datainputstream, NBTSizeTracker.INFINITE);
             }
             finally
             {

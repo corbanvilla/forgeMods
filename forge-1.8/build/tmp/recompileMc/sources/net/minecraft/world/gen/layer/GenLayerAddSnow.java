@@ -2,8 +2,6 @@ package net.minecraft.world.gen.layer;
 
 public class GenLayerAddSnow extends GenLayer
 {
-    private static final String __OBFID = "CL_00000553";
-
     public GenLayerAddSnow(long p_i2121_1_, GenLayer p_i2121_3_)
     {
         super(p_i2121_1_);
@@ -16,43 +14,42 @@ public class GenLayerAddSnow extends GenLayer
      */
     public int[] getInts(int areaX, int areaY, int areaWidth, int areaHeight)
     {
-        int i1 = areaX - 1;
-        int j1 = areaY - 1;
-        int k1 = areaWidth + 2;
-        int l1 = areaHeight + 2;
-        int[] aint = this.parent.getInts(i1, j1, k1, l1);
+        int i = areaX - 1;
+        int j = areaY - 1;
+        int k = areaWidth + 2;
+        int l = areaHeight + 2;
+        int[] aint = this.parent.getInts(i, j, k, l);
         int[] aint1 = IntCache.getIntCache(areaWidth * areaHeight);
 
-        for (int i2 = 0; i2 < areaHeight; ++i2)
+        for (int i1 = 0; i1 < areaHeight; ++i1)
         {
-            for (int j2 = 0; j2 < areaWidth; ++j2)
+            for (int j1 = 0; j1 < areaWidth; ++j1)
             {
-                int k2 = aint[j2 + 1 + (i2 + 1) * k1];
-                this.initChunkSeed((long)(j2 + areaX), (long)(i2 + areaY));
+                int k1 = aint[j1 + 1 + (i1 + 1) * k];
+                this.initChunkSeed((long)(j1 + areaX), (long)(i1 + areaY));
 
-                if (k2 == 0)
+                if (k1 == 0)
                 {
-                    aint1[j2 + i2 * areaWidth] = 0;
+                    aint1[j1 + i1 * areaWidth] = 0;
                 }
                 else
                 {
-                    int l2 = this.nextInt(6);
-                    byte b0;
+                    int l1 = this.nextInt(6);
 
-                    if (l2 == 0)
+                    if (l1 == 0)
                     {
-                        b0 = 4;
+                        l1 = 4;
                     }
-                    else if (l2 <= 1)
+                    else if (l1 <= 1)
                     {
-                        b0 = 3;
+                        l1 = 3;
                     }
                     else
                     {
-                        b0 = 1;
+                        l1 = 1;
                     }
 
-                    aint1[j2 + i2 * areaWidth] = b0;
+                    aint1[j1 + i1 * areaWidth] = l1;
                 }
             }
         }

@@ -1,27 +1,23 @@
 package net.minecraft.scoreboard;
 
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
 
 public class ScoreHealthCriteria extends ScoreDummyCriteria
 {
-    private static final String __OBFID = "CL_00000623";
-
     public ScoreHealthCriteria(String name)
     {
         super(name);
     }
 
-    public int func_96635_a(List p_96635_1_)
+    public int func_96635_a(List<EntityPlayer> p_96635_1_)
     {
         float f = 0.0F;
-        EntityPlayer entityplayer;
 
-        for (Iterator iterator = p_96635_1_.iterator(); iterator.hasNext(); f += entityplayer.getHealth() + entityplayer.getAbsorptionAmount())
+        for (EntityPlayer entityplayer : p_96635_1_)
         {
-            entityplayer = (EntityPlayer)iterator.next();
+            f += entityplayer.getHealth() + entityplayer.getAbsorptionAmount();
         }
 
         if (p_96635_1_.size() > 0)

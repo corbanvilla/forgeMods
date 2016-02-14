@@ -2,8 +2,6 @@ package net.minecraft.world.gen.layer;
 
 public class GenLayerSmooth extends GenLayer
 {
-    private static final String __OBFID = "CL_00000569";
-
     public GenLayerSmooth(long p_i2131_1_, GenLayer p_i2131_3_)
     {
         super(p_i2131_1_);
@@ -16,50 +14,50 @@ public class GenLayerSmooth extends GenLayer
      */
     public int[] getInts(int areaX, int areaY, int areaWidth, int areaHeight)
     {
-        int i1 = areaX - 1;
-        int j1 = areaY - 1;
-        int k1 = areaWidth + 2;
-        int l1 = areaHeight + 2;
-        int[] aint = this.parent.getInts(i1, j1, k1, l1);
+        int i = areaX - 1;
+        int j = areaY - 1;
+        int k = areaWidth + 2;
+        int l = areaHeight + 2;
+        int[] aint = this.parent.getInts(i, j, k, l);
         int[] aint1 = IntCache.getIntCache(areaWidth * areaHeight);
 
-        for (int i2 = 0; i2 < areaHeight; ++i2)
+        for (int i1 = 0; i1 < areaHeight; ++i1)
         {
-            for (int j2 = 0; j2 < areaWidth; ++j2)
+            for (int j1 = 0; j1 < areaWidth; ++j1)
             {
-                int k2 = aint[j2 + 0 + (i2 + 1) * k1];
-                int l2 = aint[j2 + 2 + (i2 + 1) * k1];
-                int i3 = aint[j2 + 1 + (i2 + 0) * k1];
-                int j3 = aint[j2 + 1 + (i2 + 2) * k1];
-                int k3 = aint[j2 + 1 + (i2 + 1) * k1];
+                int k1 = aint[j1 + 0 + (i1 + 1) * k];
+                int l1 = aint[j1 + 2 + (i1 + 1) * k];
+                int i2 = aint[j1 + 1 + (i1 + 0) * k];
+                int j2 = aint[j1 + 1 + (i1 + 2) * k];
+                int k2 = aint[j1 + 1 + (i1 + 1) * k];
 
-                if (k2 == l2 && i3 == j3)
+                if (k1 == l1 && i2 == j2)
                 {
-                    this.initChunkSeed((long)(j2 + areaX), (long)(i2 + areaY));
+                    this.initChunkSeed((long)(j1 + areaX), (long)(i1 + areaY));
 
                     if (this.nextInt(2) == 0)
                     {
-                        k3 = k2;
+                        k2 = k1;
                     }
                     else
                     {
-                        k3 = i3;
+                        k2 = i2;
                     }
                 }
                 else
                 {
-                    if (k2 == l2)
+                    if (k1 == l1)
                     {
-                        k3 = k2;
+                        k2 = k1;
                     }
 
-                    if (i3 == j3)
+                    if (i2 == j2)
                     {
-                        k3 = i3;
+                        k2 = i2;
                     }
                 }
 
-                aint1[j2 + i2 * areaWidth] = k3;
+                aint1[j1 + i1 * areaWidth] = k2;
             }
         }
 

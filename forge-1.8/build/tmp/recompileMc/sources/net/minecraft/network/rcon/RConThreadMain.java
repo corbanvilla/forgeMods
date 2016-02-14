@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
 import java.util.Iterator;
 import java.util.Map;
@@ -25,9 +26,7 @@ public class RConThreadMain extends RConThreadBase
     private ServerSocket serverSocket;
     /** The RCon password */
     private String rconPassword;
-    /** A map of client addresses to their running Threads */
-    private Map clientThreads;
-    private static final String __OBFID = "CL_00001805";
+    private Map<SocketAddress, RConThreadClient> clientThreads;
 
     public RConThreadMain(IServer p_i1538_1_)
     {
@@ -62,7 +61,7 @@ public class RConThreadMain extends RConThreadBase
 
     private void initClientThreadList()
     {
-        this.clientThreads = Maps.newHashMap();
+        this.clientThreads = Maps.<SocketAddress, RConThreadClient>newHashMap();
     }
 
     /**
@@ -70,11 +69,11 @@ public class RConThreadMain extends RConThreadBase
      */
     private void cleanClientThreadsMap()
     {
-        Iterator iterator = this.clientThreads.entrySet().iterator();
+        Iterator<Entry<SocketAddress, RConThreadClient>> iterator = this.clientThreads.entrySet().iterator();
 
         while (iterator.hasNext())
         {
-            Entry entry = (Entry)iterator.next();
+            Entry<SocketAddress, RConThreadClient> entry = (Entry)iterator.next();
 
             if (!((RConThreadClient)entry.getValue()).isRunning())
             {
@@ -100,7 +99,7 @@ public class RConThreadMain extends RConThreadBase
                     this.clientThreads.put(socket.getRemoteSocketAddress(), rconthreadclient);
                     this.cleanClientThreadsMap();
                 }
-                catch (SocketTimeoutException sockettimeoutexception)
+                catch (SocketTimeoutException var7)
                 {
                     this.cleanClientThreadsMap();
                 }

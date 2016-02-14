@@ -17,32 +17,31 @@ public class InventoryLargeChest implements ILockableContainer
     private ILockableContainer upperChest;
     /** Inventory object corresponding to double chest lower part */
     private ILockableContainer lowerChest;
-    private static final String __OBFID = "CL_00001507";
 
-    public InventoryLargeChest(String p_i45905_1_, ILockableContainer p_i45905_2_, ILockableContainer p_i45905_3_)
+    public InventoryLargeChest(String nameIn, ILockableContainer upperChestIn, ILockableContainer lowerChestIn)
     {
-        this.name = p_i45905_1_;
+        this.name = nameIn;
 
-        if (p_i45905_2_ == null)
+        if (upperChestIn == null)
         {
-            p_i45905_2_ = p_i45905_3_;
+            upperChestIn = lowerChestIn;
         }
 
-        if (p_i45905_3_ == null)
+        if (lowerChestIn == null)
         {
-            p_i45905_3_ = p_i45905_2_;
+            lowerChestIn = upperChestIn;
         }
 
-        this.upperChest = p_i45905_2_;
-        this.lowerChest = p_i45905_3_;
+        this.upperChest = upperChestIn;
+        this.lowerChest = lowerChestIn;
 
-        if (p_i45905_2_.isLocked())
+        if (upperChestIn.isLocked())
         {
-            p_i45905_3_.setLockCode(p_i45905_2_.getLockCode());
+            lowerChestIn.setLockCode(upperChestIn.getLockCode());
         }
-        else if (p_i45905_3_.isLocked())
+        else if (lowerChestIn.isLocked())
         {
-            p_i45905_2_.setLockCode(p_i45905_3_.getLockCode());
+            upperChestIn.setLockCode(lowerChestIn.getLockCode());
         }
     }
 
@@ -63,7 +62,7 @@ public class InventoryLargeChest implements ILockableContainer
     }
 
     /**
-     * Gets the name of this command sender (usually username, but possibly "Rcon")
+     * Get the name of this object. For players this returns their username
      */
     public String getName()
     {
@@ -78,13 +77,16 @@ public class InventoryLargeChest implements ILockableContainer
         return this.upperChest.hasCustomName() || this.lowerChest.hasCustomName();
     }
 
+    /**
+     * Get the formatted ChatComponent that will be used for the sender's username in chat
+     */
     public IChatComponent getDisplayName()
     {
         return (IChatComponent)(this.hasCustomName() ? new ChatComponentText(this.getName()) : new ChatComponentTranslation(this.getName(), new Object[0]));
     }
 
     /**
-     * Returns the stack in slot i
+     * Returns the stack in the given slot.
      */
     public ItemStack getStackInSlot(int index)
     {
@@ -92,8 +94,7 @@ public class InventoryLargeChest implements ILockableContainer
     }
 
     /**
-     * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a
-     * new stack.
+     * Removes up to a specified number of items from an inventory slot and returns them in a new stack.
      */
     public ItemStack decrStackSize(int index, int count)
     {
@@ -101,12 +102,11 @@ public class InventoryLargeChest implements ILockableContainer
     }
 
     /**
-     * When some containers are closed they call this on each slot, then drop whatever it returns as an EntityItem -
-     * like when you close a workbench GUI.
+     * Removes a stack from the given slot and returns it.
      */
-    public ItemStack getStackInSlotOnClosing(int index)
+    public ItemStack removeStackFromSlot(int index)
     {
-        return index >= this.upperChest.getSizeInventory() ? this.lowerChest.getStackInSlotOnClosing(index - this.upperChest.getSizeInventory()) : this.upperChest.getStackInSlotOnClosing(index);
+        return index >= this.upperChest.getSizeInventory() ? this.lowerChest.removeStackFromSlot(index - this.upperChest.getSizeInventory()) : this.upperChest.removeStackFromSlot(index);
     }
 
     /**
@@ -125,8 +125,7 @@ public class InventoryLargeChest implements ILockableContainer
     }
 
     /**
-     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended. *Isn't
-     * this more of a set than a get?*
+     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended.
      */
     public int getInventoryStackLimit()
     {
@@ -176,7 +175,9 @@ public class InventoryLargeChest implements ILockableContainer
         return 0;
     }
 
-    public void setField(int id, int value) {}
+    public void setField(int id, int value)
+    {
+    }
 
     public int getFieldCount()
     {

@@ -8,7 +8,6 @@ public class NBTTagString extends NBTBase
 {
     /** The string value for the tag (cannot be empty). */
     private String data;
-    private static final String __OBFID = "CL_00001228";
 
     public NBTTagString()
     {
@@ -35,6 +34,7 @@ public class NBTTagString extends NBTBase
 
     void read(DataInput input, int depth, NBTSizeTracker sizeTracker) throws IOException
     {
+        sizeTracker.read(288L);
         this.data = input.readUTF();
         NBTSizeTracker.readUTF(sizeTracker, data); // Forge: Correctly read String length including header.
     }

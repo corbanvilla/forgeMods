@@ -9,9 +9,10 @@ public class NBTTagDouble extends NBTBase.NBTPrimitive
 {
     /** The double value for the tag. */
     private double data;
-    private static final String __OBFID = "CL_00001218";
 
-    NBTTagDouble() {}
+    NBTTagDouble()
+    {
+    }
 
     public NBTTagDouble(double data)
     {
@@ -28,7 +29,7 @@ public class NBTTagDouble extends NBTBase.NBTPrimitive
 
     void read(DataInput input, int depth, NBTSizeTracker sizeTracker) throws IOException
     {
-        sizeTracker.read(64L);
+        sizeTracker.read(128L);
         this.data = input.readDouble();
     }
 

@@ -17,32 +17,23 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public abstract class TileEntity
+public abstract class TileEntity implements net.minecraftforge.common.capabilities.ICapabilitySerializable<NBTTagCompound>
 {
     private static final Logger logger = LogManager.getLogger();
-    /** A HashMap storing string names of classes mapping to the actual java.lang.Class type. */
-    private static Map nameToClassMap = Maps.newHashMap();
-    /** A HashMap storing the classes and mapping to the string names (reverse of nameToClassMap). */
-    private static Map classToNameMap = Maps.newHashMap();
+    private static Map < String, Class <? extends TileEntity >> nameToClassMap = Maps. < String, Class <? extends TileEntity >> newHashMap();
+    private static Map < Class <? extends TileEntity > , String > classToNameMap = Maps. < Class <? extends TileEntity > , String > newHashMap();
     /** the instance of the world the tile entity is in. */
     protected World worldObj;
-    protected BlockPos pos;
+    protected BlockPos pos = BlockPos.ORIGIN;
     protected boolean tileEntityInvalid;
-    private int blockMetadata;
+    private int blockMetadata = -1;
     /** the Block type that this TileEntity is contained within */
     protected Block blockType;
-    private static final String __OBFID = "CL_00000340";
-
-    public TileEntity()
-    {
-        this.pos = BlockPos.ORIGIN;
-        this.blockMetadata = -1;
-    }
 
     /**
      * Adds a new two-way mapping between the class and its string name in both hashmaps.
      */
-    public static void addMapping(Class cl, String id)
+    public static void addMapping(Class <? extends TileEntity > cl, String id)
     {
         if (nameToClassMap.containsKey(id))
         {
@@ -83,6 +74,7 @@ public abstract class TileEntity
     {
         this.pos = new BlockPos(compound.getInteger("x"), compound.getInteger("y"), compound.getInteger("z"));
         if (compound.hasKey("ForgeData")) this.customTileData = compound.getCompoundTag("ForgeData");
+        if (this.capabilities != null && compound.hasKey("ForgeCaps")) this.capabilities.deserializeNBT(compound.getCompoundTag("ForgeCaps"));
     }
 
     public void writeToNBT(NBTTagCompound compound)
@@ -100,6 +92,7 @@ public abstract class TileEntity
             compound.setInteger("y", this.pos.getY());
             compound.setInteger("z", this.pos.getZ());
             if (this.customTileData != null) compound.setTag("ForgeData", this.customTileData);
+            if (this.capabilities != null) compound.setTag("ForgeCaps", this.capabilities.serializeNBT());
         }
     }
 
@@ -110,7 +103,7 @@ public abstract class TileEntity
     {
         TileEntity tileentity = null;
 
-        Class oclass = null;
+        Class <? extends TileEntity > oclass = null;
         try
         {
             oclass = (Class)nameToClassMap.get(nbt.getString("id"));
@@ -182,10 +175,10 @@ public abstract class TileEntity
      */
     public double getDistanceSq(double x, double y, double z)
     {
-        double d3 = (double)this.pos.getX() + 0.5D - x;
-        double d4 = (double)this.pos.getY() + 0.5D - y;
-        double d5 = (double)this.pos.getZ() + 0.5D - z;
-        return d3 * d3 + d4 * d4 + d5 * d5;
+        double d0 = (double)this.pos.getX() + 0.5D - x;
+        double d1 = (double)this.pos.getY() + 0.5D - y;
+        double d2 = (double)this.pos.getZ() + 0.5D - z;
+        return d0 * d0 + d1 * d1 + d2 * d2;
     }
 
     @SideOnly(Side.CLIENT)
@@ -255,10 +248,9 @@ public abstract class TileEntity
 
     public void addInfoToCrashReport(CrashReportCategory reportCategory)
     {
-        reportCategory.addCrashSectionCallable("Name", new Callable()
+        reportCategory.addCrashSectionCallable("Name", new Callable<String>()
         {
-            private static final String __OBFID = "CL_00000341";
-            public String call()
+            public String call() throws Exception
             {
                 return (String)TileEntity.classToNameMap.get(TileEntity.this.getClass()) + " // " + TileEntity.this.getClass().getCanonicalName();
             }
@@ -267,10 +259,9 @@ public abstract class TileEntity
         if (this.worldObj != null)
         {
             CrashReportCategory.addBlockInfo(reportCategory, this.pos, this.getBlockType(), this.getBlockMetadata());
-            reportCategory.addCrashSectionCallable("Actual block type", new Callable()
+            reportCategory.addCrashSectionCallable("Actual block type", new Callable<String>()
             {
-                private static final String __OBFID = "CL_00000343";
-                public String call()
+                public String call() throws Exception
                 {
                     int i = Block.getIdFromBlock(TileEntity.this.worldObj.getBlockState(TileEntity.this.pos).getBlock());
 
@@ -278,16 +269,15 @@ public abstract class TileEntity
                     {
                         return String.format("ID #%d (%s // %s)", new Object[] {Integer.valueOf(i), Block.getBlockById(i).getUnlocalizedName(), Block.getBlockById(i).getClass().getCanonicalName()});
                     }
-                    catch (Throwable throwable)
+                    catch (Throwable var3)
                     {
                         return "ID #" + i;
                     }
                 }
             });
-            reportCategory.addCrashSectionCallable("Actual block data value", new Callable()
+            reportCategory.addCrashSectionCallable("Actual block data value", new Callable<String>()
             {
-                private static final String __OBFID = "CL_00000344";
-                public String call()
+                public String call() throws Exception
                 {
                     IBlockState iblockstate = TileEntity.this.worldObj.getBlockState(TileEntity.this.pos);
                     int i = iblockstate.getBlock().getMetaFromState(iblockstate);
@@ -309,6 +299,11 @@ public abstract class TileEntity
     public void setPos(BlockPos posIn)
     {
         this.pos = posIn;
+    }
+
+    public boolean func_183000_F()
+    {
+        return false;
     }
 
     static
@@ -359,18 +354,18 @@ public abstract class TileEntity
 
     private boolean isVanilla = getClass().getName().startsWith("net.minecraft.");
     /**
-     * Called from Chunk.setBlockIDWithMetadata, determines if this tile entity should be re-created when the ID, or Metadata changes.
+     * Called from Chunk.setBlockIDWithMetadata and Chunk.fillChunk, determines if this tile entity should be re-created when the ID, or Metadata changes.
      * Use with caution as this will leave straggler TileEntities, or create conflicts with other TileEntities if not used properly.
      *
      * @param world Current world
      * @param pos Tile's world position
-     * @param oldID The old ID of the block
-     * @param newID The new ID of the block (May be the same)
-     * @return True to remove the old tile entity, false to keep it in tact {and create a new one if the new values specify to}
+     * @param oldState The old ID of the block
+     * @param newState The new ID of the block (May be the same)
+     * @return true forcing the invalidation of the existing TE, false not to invalidate the existing TE
      */
     public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate)
     {
-        return !isVanilla || (oldState.getBlock() != newSate.getBlock());
+        return isVanilla ? (oldState.getBlock() != newSate.getBlock()) : oldState != newSate;
     }
 
     public boolean shouldRenderInPass(int pass)
@@ -465,5 +460,53 @@ public abstract class TileEntity
         return this instanceof TileEntityCommandBlock ||
                this instanceof TileEntityMobSpawner ||
                this instanceof TileEntitySign;
+    }
+
+
+    /**
+     * Called from the Chunk when this is first added to the world. Override instead of adding
+     * if (firstTick) stuff in update. Happens after validate and after it has been placed into the Chunk tileEntity
+     * map.
+     */
+    public void onLoad()
+    {
+        // NOOP
+    }
+
+    /**
+     * If the TileEntitySpecialRenderer associated with this TileEntity can be batched in with another renderers, and won't access the GL state.
+     * If TileEntity returns true, then TESR should have the same functionality as (and probably extend) the FastTESR class.
+     */
+    public boolean hasFastRenderer()
+    {
+        return false;
+    }
+
+    private net.minecraftforge.common.capabilities.CapabilityDispatcher capabilities;
+    public TileEntity()
+    {
+        capabilities = net.minecraftforge.event.ForgeEventFactory.gatherCapabilities(this);
+    }
+
+    public boolean hasCapability(net.minecraftforge.common.capabilities.Capability<?> capability, net.minecraft.util.EnumFacing facing)
+    {
+        return capabilities == null ? false : capabilities.hasCapability(capability, facing);
+    }
+
+    public <T> T getCapability(net.minecraftforge.common.capabilities.Capability<T> capability, net.minecraft.util.EnumFacing facing)
+    {
+        return capabilities == null ? null : capabilities.getCapability(capability, facing);
+    }
+
+    public void deserializeNBT(NBTTagCompound nbt)
+    {
+        this.readFromNBT(nbt);
+    }
+
+    public NBTTagCompound serializeNBT()
+    {
+        NBTTagCompound ret = new NBTTagCompound();
+        this.writeToNBT(ret);
+        return ret;
     }
 }

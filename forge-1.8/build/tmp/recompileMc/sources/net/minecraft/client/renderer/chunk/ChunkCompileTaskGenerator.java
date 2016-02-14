@@ -1,7 +1,6 @@
 package net.minecraft.client.renderer.chunk;
 
 import com.google.common.collect.Lists;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import net.minecraft.client.renderer.RegionRenderCacheBuilder;
@@ -13,19 +12,17 @@ public class ChunkCompileTaskGenerator
 {
     private final RenderChunk renderChunk;
     private final ReentrantLock lock = new ReentrantLock();
-    private final List listFinishRunnables = Lists.newArrayList();
+    private final List<Runnable> listFinishRunnables = Lists.<Runnable>newArrayList();
     private final ChunkCompileTaskGenerator.Type type;
     private RegionRenderCacheBuilder regionRenderCacheBuilder;
     private CompiledChunk compiledChunk;
-    private ChunkCompileTaskGenerator.Status status;
+    private ChunkCompileTaskGenerator.Status status = ChunkCompileTaskGenerator.Status.PENDING;
     private boolean finished;
-    private static final String __OBFID = "CL_00002466";
 
-    public ChunkCompileTaskGenerator(RenderChunk p_i46208_1_, ChunkCompileTaskGenerator.Type p_i46208_2_)
+    public ChunkCompileTaskGenerator(RenderChunk renderChunkIn, ChunkCompileTaskGenerator.Type typeIn)
     {
-        this.status = ChunkCompileTaskGenerator.Status.PENDING;
-        this.renderChunk = p_i46208_1_;
-        this.type = p_i46208_2_;
+        this.renderChunk = renderChunkIn;
+        this.type = typeIn;
     }
 
     public ChunkCompileTaskGenerator.Status getStatus()
@@ -43,9 +40,9 @@ public class ChunkCompileTaskGenerator
         return this.compiledChunk;
     }
 
-    public void setCompiledChunk(CompiledChunk p_178543_1_)
+    public void setCompiledChunk(CompiledChunk compiledChunkIn)
     {
-        this.compiledChunk = p_178543_1_;
+        this.compiledChunk = compiledChunkIn;
     }
 
     public RegionRenderCacheBuilder getRegionRenderCacheBuilder()
@@ -53,18 +50,18 @@ public class ChunkCompileTaskGenerator
         return this.regionRenderCacheBuilder;
     }
 
-    public void setRegionRenderCacheBuilder(RegionRenderCacheBuilder p_178541_1_)
+    public void setRegionRenderCacheBuilder(RegionRenderCacheBuilder regionRenderCacheBuilderIn)
     {
-        this.regionRenderCacheBuilder = p_178541_1_;
+        this.regionRenderCacheBuilder = regionRenderCacheBuilderIn;
     }
 
-    public void setStatus(ChunkCompileTaskGenerator.Status p_178535_1_)
+    public void setStatus(ChunkCompileTaskGenerator.Status statusIn)
     {
         this.lock.lock();
 
         try
         {
-            this.status = p_178535_1_;
+            this.status = statusIn;
         }
         finally
         {
@@ -78,13 +75,16 @@ public class ChunkCompileTaskGenerator
 
         try
         {
+            if (this.type == ChunkCompileTaskGenerator.Type.REBUILD_CHUNK && this.status != ChunkCompileTaskGenerator.Status.DONE)
+            {
+                this.renderChunk.setNeedsUpdate(true);
+            }
+
             this.finished = true;
             this.status = ChunkCompileTaskGenerator.Status.DONE;
-            Iterator iterator = this.listFinishRunnables.iterator();
 
-            while (iterator.hasNext())
+            for (Runnable runnable : this.listFinishRunnables)
             {
-                Runnable runnable = (Runnable)iterator.next();
                 runnable.run();
             }
         }
@@ -135,8 +135,6 @@ public class ChunkCompileTaskGenerator
         COMPILING,
         UPLOADING,
         DONE;
-
-        private static final String __OBFID = "CL_00002465";
     }
 
     @SideOnly(Side.CLIENT)
@@ -144,7 +142,5 @@ public class ChunkCompileTaskGenerator
     {
         REBUILD_CHUNK,
         RESORT_TRANSPARENCY;
-
-        private static final String __OBFID = "CL_00002464";
     }
 }

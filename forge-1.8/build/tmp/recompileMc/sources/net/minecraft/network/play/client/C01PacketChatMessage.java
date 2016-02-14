@@ -1,17 +1,17 @@
 package net.minecraft.network.play.client;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
 
-public class C01PacketChatMessage implements Packet
+public class C01PacketChatMessage implements Packet<INetHandlerPlayServer>
 {
     private String message;
-    private static final String __OBFID = "CL_00001347";
 
-    public C01PacketChatMessage() {}
+    public C01PacketChatMessage()
+    {
+    }
 
     public C01PacketChatMessage(String messageIn)
     {
@@ -39,6 +39,9 @@ public class C01PacketChatMessage implements Packet
         buf.writeString(this.message);
     }
 
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
     public void processPacket(INetHandlerPlayServer handler)
     {
         handler.processChatMessage(this);
@@ -47,13 +50,5 @@ public class C01PacketChatMessage implements Packet
     public String getMessage()
     {
         return this.message;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayServer)handler);
     }
 }

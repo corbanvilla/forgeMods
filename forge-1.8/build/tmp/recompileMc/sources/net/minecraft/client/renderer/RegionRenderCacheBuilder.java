@@ -8,7 +8,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class RegionRenderCacheBuilder
 {
     private final WorldRenderer[] worldRenderers = new WorldRenderer[EnumWorldBlockLayer.values().length];
-    private static final String __OBFID = "CL_00002564";
 
     public RegionRenderCacheBuilder()
     {
@@ -18,13 +17,13 @@ public class RegionRenderCacheBuilder
         this.worldRenderers[EnumWorldBlockLayer.TRANSLUCENT.ordinal()] = new WorldRenderer(262144);
     }
 
-    public WorldRenderer getWorldRendererByLayer(EnumWorldBlockLayer p_179038_1_)
+    public WorldRenderer getWorldRendererByLayer(EnumWorldBlockLayer layer)
     {
-        return this.worldRenderers[p_179038_1_.ordinal()];
+        return this.worldRenderers[layer.ordinal()];
     }
 
-    public WorldRenderer getWorldRendererByLayerId(int p_179039_1_)
+    public WorldRenderer getWorldRendererByLayerId(int id)
     {
-        return this.worldRenderers[p_179039_1_];
+        return this.worldRenderers[id];
     }
 }

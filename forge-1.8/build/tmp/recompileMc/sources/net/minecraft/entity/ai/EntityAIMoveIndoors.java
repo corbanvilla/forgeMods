@@ -12,11 +12,10 @@ public class EntityAIMoveIndoors extends EntityAIBase
     private VillageDoorInfo doorInfo;
     private int insidePosX = -1;
     private int insidePosZ = -1;
-    private static final String __OBFID = "CL_00001596";
 
-    public EntityAIMoveIndoors(EntityCreature p_i1637_1_)
+    public EntityAIMoveIndoors(EntityCreature entityObjIn)
     {
-        this.entityObj = p_i1637_1_;
+        this.entityObj = entityObjIn;
         this.setMutexBits(1);
     }
 
@@ -47,7 +46,7 @@ public class EntityAIMoveIndoors extends EntityAIBase
                 }
                 else
                 {
-                    this.doorInfo = village.func_179863_c(blockpos);
+                    this.doorInfo = village.getDoorInfo(blockpos);
                     return this.doorInfo != null;
                 }
             }

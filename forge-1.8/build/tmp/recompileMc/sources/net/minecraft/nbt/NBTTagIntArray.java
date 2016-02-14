@@ -9,9 +9,10 @@ public class NBTTagIntArray extends NBTBase
 {
     /** The array of saved integers */
     private int[] intArray;
-    private static final String __OBFID = "CL_00001221";
 
-    NBTTagIntArray() {}
+    NBTTagIntArray()
+    {
+    }
 
     public NBTTagIntArray(int[] p_i45132_1_)
     {
@@ -33,14 +34,14 @@ public class NBTTagIntArray extends NBTBase
 
     void read(DataInput input, int depth, NBTSizeTracker sizeTracker) throws IOException
     {
-        sizeTracker.read(32); //Forge: Count the length as well
-        int j = input.readInt();
-        sizeTracker.read((long)(32 * j));
-        this.intArray = new int[j];
+        sizeTracker.read(192L);
+        int i = input.readInt();
+        sizeTracker.read((long)(32 * i));
+        this.intArray = new int[i];
 
-        for (int k = 0; k < j; ++k)
+        for (int j = 0; j < i; ++j)
         {
-            this.intArray[k] = input.readInt();
+            this.intArray[j] = input.readInt();
         }
     }
 
@@ -55,13 +56,10 @@ public class NBTTagIntArray extends NBTBase
     public String toString()
     {
         String s = "[";
-        int[] aint = this.intArray;
-        int i = aint.length;
 
-        for (int j = 0; j < i; ++j)
+        for (int i : this.intArray)
         {
-            int k = aint[j];
-            s = s + k + ",";
+            s = s + i + ",";
         }
 
         return s + "]";

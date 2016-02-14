@@ -1,8 +1,6 @@
 package net.minecraft.command;
 
 import com.google.common.collect.Lists;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -17,12 +15,10 @@ import net.minecraft.world.World;
 
 public class CommandFill extends CommandBase
 {
-    private static final String __OBFID = "CL_00002342";
-
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
-    public String getName()
+    public String getCommandName()
     {
         return "fill";
     }
@@ -35,15 +31,23 @@ public class CommandFill extends CommandBase
         return 2;
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.fill.usage";
     }
 
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
-    public void execute(ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 7)
         {
@@ -52,8 +56,8 @@ public class CommandFill extends CommandBase
         else
         {
             sender.setCommandStat(CommandResultStats.Type.AFFECTED_BLOCKS, 0);
-            BlockPos blockpos = func_175757_a(sender, args, 0, false);
-            BlockPos blockpos1 = func_175757_a(sender, args, 3, false);
+            BlockPos blockpos = parseBlockPos(sender, args, 0, false);
+            BlockPos blockpos1 = parseBlockPos(sender, args, 3, false);
             Block block = CommandBase.getBlockByText(sender, args[6]);
             int i = 0;
 
@@ -95,7 +99,7 @@ public class CommandFill extends CommandBase
 
                     try
                     {
-                        nbttagcompound = JsonToNBT.func_180713_a(s);
+                        nbttagcompound = JsonToNBT.getTagFromJson(s);
                         flag = true;
                     }
                     catch (NBTException nbtexception)
@@ -104,7 +108,7 @@ public class CommandFill extends CommandBase
                     }
                 }
 
-                ArrayList arraylist = Lists.newArrayList();
+                List<BlockPos> list = Lists.<BlockPos>newArrayList();
                 j = 0;
 
                 for (int i1 = blockpos2.getZ(); i1 <= blockpos3.getZ(); ++i1)
@@ -114,7 +118,6 @@ public class CommandFill extends CommandBase
                         for (int k1 = blockpos2.getX(); k1 <= blockpos3.getX(); ++k1)
                         {
                             BlockPos blockpos4 = new BlockPos(k1, j1, i1);
-                            IBlockState iblockstate;
 
                             if (args.length >= 9)
                             {
@@ -146,7 +149,7 @@ public class CommandFill extends CommandBase
                                         if (args.length > 10)
                                         {
                                             int l1 = CommandBase.parseInt(args[10]);
-                                            iblockstate = world.getBlockState(blockpos4);
+                                            IBlockState iblockstate = world.getBlockState(blockpos4);
 
                                             if (iblockstate.getBlock().getMetaFromState(iblockstate) != l1)
                                             {
@@ -160,7 +163,7 @@ public class CommandFill extends CommandBase
                                     if (args[8].equals("hollow"))
                                     {
                                         world.setBlockState(blockpos4, Blocks.air.getDefaultState(), 2);
-                                        arraylist.add(blockpos4);
+                                        list.add(blockpos4);
                                     }
 
                                     continue;
@@ -179,11 +182,11 @@ public class CommandFill extends CommandBase
                                 world.setBlockState(blockpos4, Blocks.barrier.getDefaultState(), block == Blocks.barrier ? 2 : 4);
                             }
 
-                            iblockstate = block.getStateFromMeta(i);
+                            IBlockState iblockstate1 = block.getStateFromMeta(i);
 
-                            if (world.setBlockState(blockpos4, iblockstate, 2))
+                            if (world.setBlockState(blockpos4, iblockstate1, 2))
                             {
-                                arraylist.add(blockpos4);
+                                list.add(blockpos4);
                                 ++j;
 
                                 if (flag)
@@ -203,11 +206,8 @@ public class CommandFill extends CommandBase
                     }
                 }
 
-                Iterator iterator = arraylist.iterator();
-
-                while (iterator.hasNext())
+                for (BlockPos blockpos5 : list)
                 {
-                    BlockPos blockpos5 = (BlockPos)iterator.next();
                     Block block2 = world.getBlockState(blockpos5).getBlock();
                     world.notifyNeighborsRespectDebug(blockpos5, block2);
                 }
@@ -229,8 +229,8 @@ public class CommandFill extends CommandBase
         }
     }
 
-    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
-        return args.length > 0 && args.length <= 3 ? func_175771_a(args, 0, pos) : (args.length > 3 && args.length <= 6 ? func_175771_a(args, 3, pos) : (args.length == 7 ? func_175762_a(args, Block.blockRegistry.getKeys()) : (args.length == 9 ? getListOfStringsMatchingLastWord(args, new String[] {"replace", "destroy", "keep", "hollow", "outline"}): null)));
+        return args.length > 0 && args.length <= 3 ? func_175771_a(args, 0, pos) : (args.length > 3 && args.length <= 6 ? func_175771_a(args, 3, pos) : (args.length == 7 ? getListOfStringsMatchingLastWord(args, Block.blockRegistry.getKeys()) : (args.length == 9 ? getListOfStringsMatchingLastWord(args, new String[] {"replace", "destroy", "keep", "hollow", "outline"}): (args.length == 10 && "replace".equals(args[8]) ? getListOfStringsMatchingLastWord(args, Block.blockRegistry.getKeys()) : null))));
     }
 }

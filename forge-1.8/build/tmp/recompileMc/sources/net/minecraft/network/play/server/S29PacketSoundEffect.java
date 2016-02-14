@@ -1,7 +1,6 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -10,28 +9,29 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.Validate;
 
-public class S29PacketSoundEffect implements Packet
+public class S29PacketSoundEffect implements Packet<INetHandlerPlayClient>
 {
-    private String field_149219_a;
-    private int field_149217_b;
-    private int field_149218_c = Integer.MAX_VALUE;
-    private int field_149215_d;
-    private float field_149216_e;
-    private int field_149214_f;
-    private static final String __OBFID = "CL_00001309";
+    private String soundName;
+    private int posX;
+    private int posY = Integer.MAX_VALUE;
+    private int posZ;
+    private float soundVolume;
+    private int soundPitch;
 
-    public S29PacketSoundEffect() {}
-
-    public S29PacketSoundEffect(String p_i45200_1_, double p_i45200_2_, double p_i45200_4_, double p_i45200_6_, float p_i45200_8_, float p_i45200_9_)
+    public S29PacketSoundEffect()
     {
-        Validate.notNull(p_i45200_1_, "name", new Object[0]);
-        this.field_149219_a = p_i45200_1_;
-        this.field_149217_b = (int)(p_i45200_2_ * 8.0D);
-        this.field_149218_c = (int)(p_i45200_4_ * 8.0D);
-        this.field_149215_d = (int)(p_i45200_6_ * 8.0D);
-        this.field_149216_e = p_i45200_8_;
-        this.field_149214_f = (int)(p_i45200_9_ * 63.0F);
-        p_i45200_9_ = MathHelper.clamp_float(p_i45200_9_, 0.0F, 255.0F);
+    }
+
+    public S29PacketSoundEffect(String soundNameIn, double soundX, double soundY, double soundZ, float volume, float pitch)
+    {
+        Validate.notNull(soundNameIn, "name", new Object[0]);
+        this.soundName = soundNameIn;
+        this.posX = (int)(soundX * 8.0D);
+        this.posY = (int)(soundY * 8.0D);
+        this.posZ = (int)(soundZ * 8.0D);
+        this.soundVolume = volume;
+        this.soundPitch = (int)(pitch * 63.0F);
+        pitch = MathHelper.clamp_float(pitch, 0.0F, 255.0F);
     }
 
     /**
@@ -39,12 +39,12 @@ public class S29PacketSoundEffect implements Packet
      */
     public void readPacketData(PacketBuffer buf) throws IOException
     {
-        this.field_149219_a = buf.readStringFromBuffer(256);
-        this.field_149217_b = buf.readInt();
-        this.field_149218_c = buf.readInt();
-        this.field_149215_d = buf.readInt();
-        this.field_149216_e = buf.readFloat();
-        this.field_149214_f = buf.readUnsignedByte();
+        this.soundName = buf.readStringFromBuffer(256);
+        this.posX = buf.readInt();
+        this.posY = buf.readInt();
+        this.posZ = buf.readInt();
+        this.soundVolume = buf.readFloat();
+        this.soundPitch = buf.readUnsignedByte();
     }
 
     /**
@@ -52,18 +52,18 @@ public class S29PacketSoundEffect implements Packet
      */
     public void writePacketData(PacketBuffer buf) throws IOException
     {
-        buf.writeString(this.field_149219_a);
-        buf.writeInt(this.field_149217_b);
-        buf.writeInt(this.field_149218_c);
-        buf.writeInt(this.field_149215_d);
-        buf.writeFloat(this.field_149216_e);
-        buf.writeByte(this.field_149214_f);
+        buf.writeString(this.soundName);
+        buf.writeInt(this.posX);
+        buf.writeInt(this.posY);
+        buf.writeInt(this.posZ);
+        buf.writeFloat(this.soundVolume);
+        buf.writeByte(this.soundPitch);
     }
 
     @SideOnly(Side.CLIENT)
-    public String func_149212_c()
+    public String getSoundName()
     {
-        return this.field_149219_a;
+        return this.soundName;
     }
 
     /**
@@ -74,41 +74,33 @@ public class S29PacketSoundEffect implements Packet
         handler.handleSoundEffect(this);
     }
 
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
+    @SideOnly(Side.CLIENT)
+    public double getX()
     {
-        this.processPacket((INetHandlerPlayClient)handler);
+        return (double)((float)this.posX / 8.0F);
     }
 
     @SideOnly(Side.CLIENT)
-    public double func_149207_d()
+    public double getY()
     {
-        return (double)((float)this.field_149217_b / 8.0F);
+        return (double)((float)this.posY / 8.0F);
     }
 
     @SideOnly(Side.CLIENT)
-    public double func_149211_e()
+    public double getZ()
     {
-        return (double)((float)this.field_149218_c / 8.0F);
+        return (double)((float)this.posZ / 8.0F);
     }
 
     @SideOnly(Side.CLIENT)
-    public double func_149210_f()
+    public float getVolume()
     {
-        return (double)((float)this.field_149215_d / 8.0F);
+        return this.soundVolume;
     }
 
     @SideOnly(Side.CLIENT)
-    public float func_149208_g()
+    public float getPitch()
     {
-        return this.field_149216_e;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public float func_149209_h()
-    {
-        return (float)this.field_149214_f / 63.0F;
+        return (float)this.soundPitch / 63.0F;
     }
 }

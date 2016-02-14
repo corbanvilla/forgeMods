@@ -8,7 +8,6 @@ public class ItemColored extends ItemBlock
 {
     private final Block coloredBlock;
     private String[] subtypeNames;
-    private static final String __OBFID = "CL_00000003";
 
     public ItemColored(Block block, boolean hasSubtypes)
     {

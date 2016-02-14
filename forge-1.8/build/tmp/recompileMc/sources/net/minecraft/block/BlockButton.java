@@ -18,14 +18,12 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import static net.minecraft.util.EnumFacing.*;
 
 public abstract class BlockButton extends Block
 {
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
     public static final PropertyBool POWERED = PropertyBool.create("powered");
     private final boolean wooden;
-    private static final String __OBFID = "CL_00000209";
 
     protected BlockButton(boolean wooden)
     {
@@ -49,6 +47,9 @@ public abstract class BlockButton extends Block
         return this.wooden ? 30 : 20;
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -64,19 +65,14 @@ public abstract class BlockButton extends Block
      */
     public boolean canPlaceBlockOnSide(World worldIn, BlockPos pos, EnumFacing side)
     {
-        return worldIn.isSideSolid(pos.offset(side.getOpposite()), side, true);
+        return func_181088_a(worldIn, pos, side.getOpposite());
     }
 
     public boolean canPlaceBlockAt(World worldIn, BlockPos pos)
     {
-        EnumFacing[] aenumfacing = EnumFacing.values();
-        int i = aenumfacing.length;
-
-        for (int j = 0; j < i; ++j)
+        for (EnumFacing enumfacing : EnumFacing.values())
         {
-            EnumFacing enumfacing = aenumfacing[j];
-
-            if (worldIn.isSideSolid(pos.offset(enumfacing), enumfacing.getOpposite(), true))
+            if (func_181088_a(worldIn, pos, enumfacing))
             {
                 return true;
             }
@@ -85,9 +81,18 @@ public abstract class BlockButton extends Block
         return false;
     }
 
+    protected static boolean func_181088_a(World p_181088_0_, BlockPos p_181088_1_, EnumFacing p_181088_2_)
+    {
+        return p_181088_2_ == EnumFacing.DOWN && World.doesBlockHaveSolidTopSurface(p_181088_0_, p_181088_1_.down()) ? true : p_181088_0_.isSideSolid(p_181088_1_.offset(p_181088_2_), p_181088_2_.getOpposite());
+    }
+
+    /**
+     * Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the
+     * IBlockstate
+     */
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
-        return worldIn.isSideSolid(pos.offset(facing.getOpposite()), facing, true) ? this.getDefaultState().withProperty(FACING, facing).withProperty(POWERED, Boolean.valueOf(false)) : this.getDefaultState().withProperty(FACING, EnumFacing.DOWN).withProperty(POWERED, Boolean.valueOf(false));
+        return func_181088_a(worldIn, pos, facing.getOpposite()) ? this.getDefaultState().withProperty(FACING, facing).withProperty(POWERED, Boolean.valueOf(false)) : this.getDefaultState().withProperty(FACING, EnumFacing.DOWN).withProperty(POWERED, Boolean.valueOf(false));
     }
 
     /**
@@ -95,29 +100,24 @@ public abstract class BlockButton extends Block
      */
     public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
     {
-        if (this.checkForDrop(worldIn, pos, state))
+        if (this.checkForDrop(worldIn, pos, state) && !func_181088_a(worldIn, pos, ((EnumFacing)state.getValue(FACING)).getOpposite()))
         {
-            EnumFacing enumfacing = (EnumFacing)state.getValue(FACING);
-
-            if (!worldIn.isSideSolid(pos.offset(enumfacing.getOpposite()), enumfacing, true))
-            {
-                this.dropBlockAsItem(worldIn, pos, state, 0);
-                worldIn.setBlockToAir(pos);
-            }
+            this.dropBlockAsItem(worldIn, pos, state, 0);
+            worldIn.setBlockToAir(pos);
         }
     }
 
     private boolean checkForDrop(World worldIn, BlockPos pos, IBlockState state)
     {
-        if (!this.canPlaceBlockAt(worldIn, pos))
+        if (this.canPlaceBlockAt(worldIn, pos))
+        {
+            return true;
+        }
+        else
         {
             this.dropBlockAsItem(worldIn, pos, state, 0);
             worldIn.setBlockToAir(pos);
             return false;
-        }
-        else
-        {
-            return true;
         }
     }
 
@@ -136,24 +136,24 @@ public abstract class BlockButton extends Block
         float f3 = 0.125F;
         float f4 = 0.1875F;
 
-        switch (BlockButton.SwitchEnumFacing.FACING_LOOKUP[enumfacing.ordinal()])
+        switch (enumfacing)
         {
-            case 1:
+            case EAST:
                 this.setBlockBounds(0.0F, 0.375F, 0.3125F, f2, 0.625F, 0.6875F);
                 break;
-            case 2:
+            case WEST:
                 this.setBlockBounds(1.0F - f2, 0.375F, 0.3125F, 1.0F, 0.625F, 0.6875F);
                 break;
-            case 3:
+            case SOUTH:
                 this.setBlockBounds(0.3125F, 0.375F, 0.0F, 0.6875F, 0.625F, f2);
                 break;
-            case 4:
+            case NORTH:
                 this.setBlockBounds(0.3125F, 0.375F, 1.0F - f2, 0.6875F, 0.625F, 1.0F);
                 break;
-            case 5:
+            case UP:
                 this.setBlockBounds(0.3125F, 0.0F, 0.375F, 0.6875F, 0.0F + f2, 0.625F);
                 break;
-            case 6:
+            case DOWN:
                 this.setBlockBounds(0.3125F, 1.0F - f2, 0.375F, 0.6875F, 1.0F, 0.625F);
         }
     }
@@ -185,12 +185,12 @@ public abstract class BlockButton extends Block
         super.breakBlock(worldIn, pos, state);
     }
 
-    public int isProvidingWeakPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
+    public int getWeakPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
     {
         return ((Boolean)state.getValue(POWERED)).booleanValue() ? 15 : 0;
     }
 
-    public int isProvidingStrongPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
+    public int getStrongPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
     {
         return !((Boolean)state.getValue(POWERED)).booleanValue() ? 0 : (state.getValue(FACING) == side ? 15 : 0);
     }
@@ -206,7 +206,9 @@ public abstract class BlockButton extends Block
     /**
      * Called randomly when setTickRandomly is set to true (used by e.g. crops to grow, etc.)
      */
-    public void randomTick(World worldIn, BlockPos pos, IBlockState state, Random random) {}
+    public void randomTick(World worldIn, BlockPos pos, IBlockState state, Random random)
+    {
+    }
 
     public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
@@ -260,7 +262,7 @@ public abstract class BlockButton extends Block
     private void checkForArrows(World worldIn, BlockPos pos, IBlockState state)
     {
         this.updateBlockBounds(state);
-        List list = worldIn.getEntitiesWithinAABB(EntityArrow.class, new AxisAlignedBB((double)pos.getX() + this.minX, (double)pos.getY() + this.minY, (double)pos.getZ() + this.minZ, (double)pos.getX() + this.maxX, (double)pos.getY() + this.maxY, (double)pos.getZ() + this.maxZ));
+        List <? extends Entity > list = worldIn.<Entity>getEntitiesWithinAABB(EntityArrow.class, new AxisAlignedBB((double)pos.getX() + this.minX, (double)pos.getY() + this.minY, (double)pos.getZ() + this.minZ, (double)pos.getX() + this.maxX, (double)pos.getY() + this.maxY, (double)pos.getZ() + this.maxZ));
         boolean flag = !list.isEmpty();
         boolean flag1 = ((Boolean)state.getValue(POWERED)).booleanValue();
 
@@ -331,25 +333,25 @@ public abstract class BlockButton extends Block
     {
         int i;
 
-        switch (BlockButton.SwitchEnumFacing.FACING_LOOKUP[((EnumFacing)state.getValue(FACING)).ordinal()])
+        switch ((EnumFacing)state.getValue(FACING))
         {
-            case 1:
+            case EAST:
                 i = 1;
                 break;
-            case 2:
+            case WEST:
                 i = 2;
                 break;
-            case 3:
+            case SOUTH:
                 i = 3;
                 break;
-            case 4:
+            case NORTH:
                 i = 4;
                 break;
-            case 5:
+            case UP:
             default:
                 i = 5;
                 break;
-            case 6:
+            case DOWN:
                 i = 0;
         }
 
@@ -365,67 +367,4 @@ public abstract class BlockButton extends Block
     {
         return new BlockState(this, new IProperty[] {FACING, POWERED});
     }
-
-    static final class SwitchEnumFacing
-        {
-            static final int[] FACING_LOOKUP = new int[EnumFacing.values().length];
-            private static final String __OBFID = "CL_00002131";
-
-            static
-            {
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.EAST.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var6)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.WEST.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var5)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.SOUTH.ordinal()] = 3;
-                }
-                catch (NoSuchFieldError var4)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.NORTH.ordinal()] = 4;
-                }
-                catch (NoSuchFieldError var3)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.UP.ordinal()] = 5;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.DOWN.ordinal()] = 6;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
-            }
-        }
 }

@@ -10,7 +10,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BlockLeavesBase extends Block
 {
     protected boolean fancyGraphics;
-    private static final String __OBFID = "CL_00000326";
 
     protected BlockLeavesBase(Material materialIn, boolean fancyGraphics)
     {
@@ -18,6 +17,9 @@ public class BlockLeavesBase extends Block
         this.fancyGraphics = fancyGraphics;
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;

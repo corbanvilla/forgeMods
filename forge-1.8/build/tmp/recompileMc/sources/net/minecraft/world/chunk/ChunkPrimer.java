@@ -7,18 +7,12 @@ import net.minecraft.init.Blocks;
 public class ChunkPrimer
 {
     private final short[] data = new short[65536];
-    private final IBlockState defaultState;
-    private static final String __OBFID = "CL_00002007";
-
-    public ChunkPrimer()
-    {
-        this.defaultState = Blocks.air.getDefaultState();
-    }
+    private final IBlockState defaultState = Blocks.air.getDefaultState();
 
     public IBlockState getBlockState(int x, int y, int z)
     {
-        int l = x << 12 | z << 8 | y;
-        return this.getBlockState(l);
+        int i = x << 12 | z << 8 | y;
+        return this.getBlockState(i);
     }
 
     public IBlockState getBlockState(int index)
@@ -36,8 +30,8 @@ public class ChunkPrimer
 
     public void setBlockState(int x, int y, int z, IBlockState state)
     {
-        int l = x << 12 | z << 8 | y;
-        this.setBlockState(l, state);
+        int i = x << 12 | z << 8 | y;
+        this.setBlockState(i, state);
     }
 
     public void setBlockState(int index, IBlockState state)

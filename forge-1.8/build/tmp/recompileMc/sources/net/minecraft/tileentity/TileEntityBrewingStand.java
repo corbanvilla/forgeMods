@@ -15,11 +15,12 @@ import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.potion.PotionHelper;
-import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
 
-public class TileEntityBrewingStand extends TileEntityLockable implements IUpdatePlayerListBox, ISidedInventory
+public class TileEntityBrewingStand extends TileEntityLockable implements ITickable, ISidedInventory
 {
     /** an array of the input slot indices */
     private static final int[] inputSlots = new int[] {3};
@@ -33,10 +34,9 @@ public class TileEntityBrewingStand extends TileEntityLockable implements IUpdat
     /** used to check if the current ingredient has been removed from the brewing stand during brewing */
     private Item ingredientID;
     private String customName;
-    private static final String __OBFID = "CL_00000345";
 
     /**
-     * Gets the name of this command sender (usually username, but possibly "Rcon")
+     * Get the name of this object. For players this returns their username
      */
     public String getName()
     {
@@ -51,9 +51,9 @@ public class TileEntityBrewingStand extends TileEntityLockable implements IUpdat
         return this.customName != null && this.customName.length() > 0;
     }
 
-    public void func_145937_a(String p_145937_1_)
+    public void setName(String name)
     {
-        this.customName = p_145937_1_;
+        this.customName = name;
     }
 
     /**
@@ -65,7 +65,7 @@ public class TileEntityBrewingStand extends TileEntityLockable implements IUpdat
     }
 
     /**
-     * Updates the JList with a new model.
+     * Like the old updateEntity(), except more generic.
      */
     public void update()
     {
@@ -138,7 +138,7 @@ public class TileEntityBrewingStand extends TileEntityLockable implements IUpdat
                     if (this.brewingItemStacks[i] != null && this.brewingItemStacks[i].getItem() instanceof ItemPotion)
                     {
                         int j = this.brewingItemStacks[i].getMetadata();
-                        int k = this.func_145936_c(j, itemstack);
+                        int k = this.getPotionResult(j, itemstack);
 
                         if (!ItemPotion.isSplash(j) && ItemPotion.isSplash(k))
                         {
@@ -146,8 +146,8 @@ public class TileEntityBrewingStand extends TileEntityLockable implements IUpdat
                             break;
                         }
 
-                        List list = Items.potionitem.getEffects(j);
-                        List list1 = Items.potionitem.getEffects(k);
+                        List<PotionEffect> list = Items.potionitem.getEffects(j);
+                        List<PotionEffect> list1 = Items.potionitem.getEffects(k);
 
                         if ((j <= 0 || list != list1) && (list == null || !list.equals(list1) && list1 != null) && j != k)
                         {
@@ -180,18 +180,18 @@ public class TileEntityBrewingStand extends TileEntityLockable implements IUpdat
                 if (this.brewingItemStacks[i] != null && this.brewingItemStacks[i].getItem() instanceof ItemPotion)
                 {
                     int j = this.brewingItemStacks[i].getMetadata();
-                    int k = this.func_145936_c(j, itemstack);
-                    List list = Items.potionitem.getEffects(j);
-                    List list1 = Items.potionitem.getEffects(k);
+                    int k = this.getPotionResult(j, itemstack);
+                    List<PotionEffect> list = Items.potionitem.getEffects(j);
+                    List<PotionEffect> list1 = Items.potionitem.getEffects(k);
 
-                    if ((j <= 0 || list != list1) && (list == null || !list.equals(list1) && list1 != null))
+                    if (j > 0 && list == list1 || list != null && (list.equals(list1) || list1 == null))
                     {
-                        if (j != k)
+                        if (!ItemPotion.isSplash(j) && ItemPotion.isSplash(k))
                         {
                             this.brewingItemStacks[i].setItemDamage(k);
                         }
                     }
-                    else if (!ItemPotion.isSplash(j) && ItemPotion.isSplash(k))
+                    else if (j != k)
                     {
                         this.brewingItemStacks[i].setItemDamage(k);
                     }
@@ -216,9 +216,12 @@ public class TileEntityBrewingStand extends TileEntityLockable implements IUpdat
         }
     }
 
-    private int func_145936_c(int p_145936_1_, ItemStack p_145936_2_)
+    /**
+     * The result of brewing a potion of the specified damage value with an ingredient itemstack.
+     */
+    private int getPotionResult(int meta, ItemStack stack)
     {
-        return p_145936_2_ == null ? p_145936_1_ : (p_145936_2_.getItem().isPotionIngredient(p_145936_2_) ? PotionHelper.applyIngredient(p_145936_1_, p_145936_2_.getItem().getPotionEffect(p_145936_2_)) : p_145936_1_);
+        return stack == null ? meta : (stack.getItem().isPotionIngredient(stack) ? PotionHelper.applyIngredient(meta, stack.getItem().getPotionEffect(stack)) : meta);
     }
 
     public void readFromNBT(NBTTagCompound compound)
@@ -229,12 +232,12 @@ public class TileEntityBrewingStand extends TileEntityLockable implements IUpdat
 
         for (int i = 0; i < nbttaglist.tagCount(); ++i)
         {
-            NBTTagCompound nbttagcompound1 = nbttaglist.getCompoundTagAt(i);
-            byte b0 = nbttagcompound1.getByte("Slot");
+            NBTTagCompound nbttagcompound = nbttaglist.getCompoundTagAt(i);
+            int j = nbttagcompound.getByte("Slot");
 
-            if (b0 >= 0 && b0 < this.brewingItemStacks.length)
+            if (j >= 0 && j < this.brewingItemStacks.length)
             {
-                this.brewingItemStacks[b0] = ItemStack.loadItemStackFromNBT(nbttagcompound1);
+                this.brewingItemStacks[j] = ItemStack.loadItemStackFromNBT(nbttagcompound);
             }
         }
 
@@ -256,10 +259,10 @@ public class TileEntityBrewingStand extends TileEntityLockable implements IUpdat
         {
             if (this.brewingItemStacks[i] != null)
             {
-                NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-                nbttagcompound1.setByte("Slot", (byte)i);
-                this.brewingItemStacks[i].writeToNBT(nbttagcompound1);
-                nbttaglist.appendTag(nbttagcompound1);
+                NBTTagCompound nbttagcompound = new NBTTagCompound();
+                nbttagcompound.setByte("Slot", (byte)i);
+                this.brewingItemStacks[i].writeToNBT(nbttagcompound);
+                nbttaglist.appendTag(nbttagcompound);
             }
         }
 
@@ -272,7 +275,7 @@ public class TileEntityBrewingStand extends TileEntityLockable implements IUpdat
     }
 
     /**
-     * Returns the stack in slot i
+     * Returns the stack in the given slot.
      */
     public ItemStack getStackInSlot(int index)
     {
@@ -280,8 +283,7 @@ public class TileEntityBrewingStand extends TileEntityLockable implements IUpdat
     }
 
     /**
-     * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a
-     * new stack.
+     * Removes up to a specified number of items from an inventory slot and returns them in a new stack.
      */
     public ItemStack decrStackSize(int index, int count)
     {
@@ -298,10 +300,9 @@ public class TileEntityBrewingStand extends TileEntityLockable implements IUpdat
     }
 
     /**
-     * When some containers are closed they call this on each slot, then drop whatever it returns as an EntityItem -
-     * like when you close a workbench GUI.
+     * Removes a stack from the given slot and returns it.
      */
-    public ItemStack getStackInSlotOnClosing(int index)
+    public ItemStack removeStackFromSlot(int index)
     {
         if (index >= 0 && index < this.brewingItemStacks.length)
         {
@@ -327,8 +328,7 @@ public class TileEntityBrewingStand extends TileEntityLockable implements IUpdat
     }
 
     /**
-     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended. *Isn't
-     * this more of a set than a get?*
+     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended.
      */
     public int getInventoryStackLimit()
     {
@@ -343,9 +343,13 @@ public class TileEntityBrewingStand extends TileEntityLockable implements IUpdat
         return this.worldObj.getTileEntity(this.pos) != this ? false : player.getDistanceSq((double)this.pos.getX() + 0.5D, (double)this.pos.getY() + 0.5D, (double)this.pos.getZ() + 0.5D) <= 64.0D;
     }
 
-    public void openInventory(EntityPlayer player) {}
+    public void openInventory(EntityPlayer player)
+    {
+    }
 
-    public void closeInventory(EntityPlayer player) {}
+    public void closeInventory(EntityPlayer player)
+    {
+    }
 
     /**
      * Returns true if automation is allowed to insert the given stack (ignoring stack size) into the given slot.
@@ -437,5 +441,19 @@ public class TileEntityBrewingStand extends TileEntityLockable implements IUpdat
         {
             this.brewingItemStacks[i] = null;
         }
+    }
+
+    net.minecraftforge.items.IItemHandler handlerInput = new net.minecraftforge.items.wrapper.SidedInvWrapper(this, net.minecraft.util.EnumFacing.UP);
+    net.minecraftforge.items.IItemHandler handlerOutput = new net.minecraftforge.items.wrapper.SidedInvWrapper(this, net.minecraft.util.EnumFacing.DOWN);
+
+    @Override
+    public <T> T getCapability(net.minecraftforge.common.capabilities.Capability<T> capability, net.minecraft.util.EnumFacing facing)
+    {
+        if (facing != null && capability == net.minecraftforge.items.CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+            if (facing == EnumFacing.UP)
+                return (T) handlerInput;
+            else
+                return (T) handlerOutput;
+        return super.getCapability(capability, facing);
     }
 }

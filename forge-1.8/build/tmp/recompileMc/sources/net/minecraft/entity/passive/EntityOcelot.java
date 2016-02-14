@@ -33,16 +33,15 @@ import net.minecraft.world.World;
 
 public class EntityOcelot extends EntityTameable
 {
-    private EntityAIAvoidEntity field_175545_bm;
+    private EntityAIAvoidEntity<EntityPlayer> avoidEntity;
     /** The tempt AI task for this mob, used to prevent taming while it is fleeing. */
     private EntityAITempt aiTempt;
-    private static final String __OBFID = "CL_00001646";
 
     public EntityOcelot(World worldIn)
     {
         super(worldIn);
         this.setSize(0.6F, 0.7F);
-        ((PathNavigateGround)this.getNavigator()).func_179690_a(true);
+        ((PathNavigateGround)this.getNavigator()).setAvoidsWater(true);
         this.tasks.addTask(1, new EntityAISwimming(this));
         this.tasks.addTask(2, this.aiSit);
         this.tasks.addTask(3, this.aiTempt = new EntityAITempt(this, 0.6D, Items.fish, true));
@@ -106,7 +105,9 @@ public class EntityOcelot extends EntityTameable
         this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.30000001192092896D);
     }
 
-    public void fall(float distance, float damageMultiplier) {}
+    public void fall(float distance, float damageMultiplier)
+    {
+    }
 
     /**
      * (abstract) Protected helper method to write subclass entity data to NBT.
@@ -163,9 +164,9 @@ public class EntityOcelot extends EntityTameable
         return Items.leather;
     }
 
-    public boolean attackEntityAsMob(Entity p_70652_1_)
+    public boolean attackEntityAsMob(Entity entityIn)
     {
-        return p_70652_1_.attackEntityFrom(DamageSource.causeMobDamage(this), 3.0F);
+        return entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), 3.0F);
     }
 
     /**
@@ -187,7 +188,9 @@ public class EntityOcelot extends EntityTameable
     /**
      * Drop 0-2 items of this living's type
      */
-    protected void dropFewItems(boolean p_70628_1_, int p_70628_2_) {}
+    protected void dropFewItems(boolean p_70628_1_, int p_70628_2_)
+    {
+    }
 
     /**
      * Called when a player interacts with a mob. e.g. gets milk from a cow, gets into the saddle on a pig.
@@ -239,7 +242,7 @@ public class EntityOcelot extends EntityTameable
         return super.interact(player);
     }
 
-    public EntityOcelot func_180493_b(EntityAgeable p_180493_1_)
+    public EntityOcelot createChild(EntityAgeable ageable)
     {
         EntityOcelot entityocelot = new EntityOcelot(this.worldObj);
 
@@ -305,15 +308,15 @@ public class EntityOcelot extends EntityTameable
     }
 
     /**
-     * Whether or not the current entity is in lava
+     * Checks that the entity is not colliding with any blocks / liquids
      */
-    public boolean handleLavaMovement()
+    public boolean isNotColliding()
     {
         if (this.worldObj.checkNoEntityCollision(this.getEntityBoundingBox(), this) && this.worldObj.getCollidingBoundingBoxes(this, this.getEntityBoundingBox()).isEmpty() && !this.worldObj.isAnyLiquid(this.getEntityBoundingBox()))
         {
             BlockPos blockpos = new BlockPos(this.posX, this.getEntityBoundingBox().minY, this.posZ);
 
-            if (blockpos.getY() < 63)
+            if (blockpos.getY() < this.worldObj.getSeaLevel())
             {
                 return false;
             }
@@ -330,7 +333,7 @@ public class EntityOcelot extends EntityTameable
     }
 
     /**
-     * Gets the name of this command sender (usually username, but possibly "Rcon")
+     * Get the name of this object. For players this returns their username
      */
     public String getName()
     {
@@ -344,33 +347,26 @@ public class EntityOcelot extends EntityTameable
 
     protected void setupTamedAI()
     {
-        if (this.field_175545_bm == null)
+        if (this.avoidEntity == null)
         {
-            this.field_175545_bm = new EntityAIAvoidEntity(this, new Predicate()
-            {
-                private static final String __OBFID = "CL_00002243";
-                public boolean func_179874_a(Entity p_179874_1_)
-                {
-                    return p_179874_1_ instanceof EntityPlayer;
-                }
-                public boolean apply(Object p_apply_1_)
-                {
-                    return this.func_179874_a((Entity)p_apply_1_);
-                }
-            }, 16.0F, 0.8D, 1.33D);
+            this.avoidEntity = new EntityAIAvoidEntity(this, EntityPlayer.class, 16.0F, 0.8D, 1.33D);
         }
 
-        this.tasks.removeTask(this.field_175545_bm);
+        this.tasks.removeTask(this.avoidEntity);
 
         if (!this.isTamed())
         {
-            this.tasks.addTask(4, this.field_175545_bm);
+            this.tasks.addTask(4, this.avoidEntity);
         }
     }
 
-    public IEntityLivingData func_180482_a(DifficultyInstance p_180482_1_, IEntityLivingData p_180482_2_)
+    /**
+     * Called only once on an entity when first time spawned, via egg, mob spawner, natural spawning etc, but not called
+     * when entity is reloaded from nbt. Mainly used for initializing attributes and inventory
+     */
+    public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, IEntityLivingData livingdata)
     {
-        p_180482_2_ = super.func_180482_a(p_180482_1_, p_180482_2_);
+        livingdata = super.onInitialSpawn(difficulty, livingdata);
 
         if (this.worldObj.rand.nextInt(7) == 0)
         {
@@ -383,11 +379,6 @@ public class EntityOcelot extends EntityTameable
             }
         }
 
-        return p_180482_2_;
-    }
-
-    public EntityAgeable createChild(EntityAgeable ageable)
-    {
-        return this.func_180493_b(ageable);
+        return livingdata;
     }
 }

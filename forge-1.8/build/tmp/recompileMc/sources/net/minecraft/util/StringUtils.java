@@ -7,7 +7,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class StringUtils
 {
     private static final Pattern patternControlCode = Pattern.compile("(?i)\\u00A7[0-9A-FK-OR]");
-    private static final String __OBFID = "CL_00001501";
 
     /**
      * Returns the time elapsed for the given number of ticks, in "mm:ss" format.
@@ -15,16 +14,16 @@ public class StringUtils
     @SideOnly(Side.CLIENT)
     public static String ticksToElapsedTime(int ticks)
     {
-        int j = ticks / 20;
-        int k = j / 60;
-        j %= 60;
-        return j < 10 ? k + ":0" + j : k + ":" + j;
+        int i = ticks / 20;
+        int j = i / 60;
+        i = i % 60;
+        return i < 10 ? j + ":0" + i : j + ":" + i;
     }
 
     @SideOnly(Side.CLIENT)
-    public static String stripControlCodes(String p_76338_0_)
+    public static String stripControlCodes(String text)
     {
-        return patternControlCode.matcher(p_76338_0_).replaceAll("");
+        return patternControlCode.matcher(text).replaceAll("");
     }
 
     /**

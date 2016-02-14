@@ -1,6 +1,5 @@
 package net.minecraft.inventory;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
@@ -18,7 +17,6 @@ public class Slot
     public int xDisplayPosition;
     /** display position of the inventory slot on the screen y axis */
     public int yDisplayPosition;
-    private static final String __OBFID = "CL_00001762";
 
     public Slot(IInventory inventoryIn, int index, int xPosition, int yPosition)
     {
@@ -51,12 +49,16 @@ public class Slot
      * the itemStack passed in is the output - ie, iron ingots, and pickaxes, not ore and wood. Typically increases an
      * internal count then calls onCrafting(item).
      */
-    protected void onCrafting(ItemStack stack, int amount) {}
+    protected void onCrafting(ItemStack stack, int amount)
+    {
+    }
 
     /**
      * the itemStack passed in is the output - ie, iron ingots, and pickaxes, not ore and wood.
      */
-    protected void onCrafting(ItemStack stack) {}
+    protected void onCrafting(ItemStack stack)
+    {
+    }
 
     public void onPickupFromSlot(EntityPlayer playerIn, ItemStack stack)
     {
@@ -136,7 +138,7 @@ public class Slot
     /**
      * returns true if the slot exists in the given inventory and location
      */
-    public boolean isSlotInInventory(IInventory inv, int slotIn)
+    public boolean isHere(IInventory inv, int slotIn)
     {
         return inv == this.inventory && slotIn == this.slotIndex;
     }
@@ -165,7 +167,7 @@ public class Slot
     protected Object backgroundMap;
     /**
      * Gets the path of the texture file to use for the background image of this slot when drawing the GUI.
-     * @return String: The texture file that will be used in GuiContainer.drawSlotInventory for the slot background.
+     * @return The resource location for the background image
      */
     @SideOnly(Side.CLIENT)
     public net.minecraft.util.ResourceLocation getBackgroundLocation()
@@ -175,7 +177,7 @@ public class Slot
 
     /**
      * Sets the texture file to use for the background image of the slot when it's empty.
-     * @param textureFilename String: Path of texture file to use, or null to use "/gui/items.png"
+     * @param texture the resourcelocation for the texture
      */
     @SideOnly(Side.CLIENT)
     public void setBackgroundLocation(net.minecraft.util.ResourceLocation texture)
@@ -185,8 +187,7 @@ public class Slot
 
     /**
      * Sets which icon index to use as the background image of the slot when it's empty.
-     * Getter is func_178171_c
-     * @param icon The icon to use, null for none
+     * @param name The icon to use, null for none
      */
     public void setBackgroundName(String name)
     {
@@ -203,7 +204,7 @@ public class Slot
     @SideOnly(Side.CLIENT)
     protected net.minecraft.client.renderer.texture.TextureMap getBackgroundMap()
     {
-        if (backgroundMap == null) backgroundMap = Minecraft.getMinecraft().getTextureMapBlocks();
+        if (backgroundMap == null) backgroundMap = net.minecraft.client.Minecraft.getMinecraft().getTextureMapBlocks();
         return (net.minecraft.client.renderer.texture.TextureMap)backgroundMap;
     }
 

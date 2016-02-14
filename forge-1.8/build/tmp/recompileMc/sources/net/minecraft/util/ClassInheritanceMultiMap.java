@@ -1,134 +1,148 @@
 package net.minecraft.util;
 
-import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.util.AbstractSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import org.apache.commons.lang3.ClassUtils;
-import org.apache.commons.lang3.ClassUtils.Interfaces;
 
-public class ClassInheritanceMultiMap extends AbstractSet
+public class ClassInheritanceMultiMap<T> extends AbstractSet<T>
 {
-    private final Multimap field_180218_a = HashMultimap.create();
-    private final Set field_180216_b = Sets.newIdentityHashSet();
-    private final Class field_180217_c;
-    private static final String __OBFID = "CL_00002266";
+    private static final Set < Class<? >> field_181158_a = Sets. < Class<? >> newHashSet();
+    private final Map < Class<?>, List<T >> map = Maps. < Class<?>, List<T >> newHashMap();
+    private final Set < Class<? >> knownKeys = Sets. < Class<? >> newIdentityHashSet();
+    private final Class<T> baseClass;
+    private final List<T> field_181745_e = Lists.<T>newArrayList();
 
-    public ClassInheritanceMultiMap(Class p_i45909_1_)
+    public ClassInheritanceMultiMap(Class<T> baseClassIn)
     {
-        this.field_180217_c = p_i45909_1_;
-        this.field_180216_b.add(p_i45909_1_);
+        this.baseClass = baseClassIn;
+        this.knownKeys.add(baseClassIn);
+        this.map.put(baseClassIn, this.field_181745_e);
+
+        for (Class<?> oclass : field_181158_a)
+        {
+            this.createLookup(oclass);
+        }
     }
 
-    public void func_180213_a(Class p_180213_1_)
+    protected void createLookup(Class<?> clazz)
     {
-        Iterator iterator = this.field_180218_a.get(this.func_180212_a(p_180213_1_, false)).iterator();
+        field_181158_a.add(clazz);
 
-        while (iterator.hasNext())
+        for (T t : this.field_181745_e)
         {
-            Object object = iterator.next();
-
-            if (p_180213_1_.isAssignableFrom(object.getClass()))
+            if (clazz.isAssignableFrom(t.getClass()))
             {
-                this.field_180218_a.put(p_180213_1_, object);
+                this.func_181743_a(t, clazz);
             }
         }
 
-        this.field_180216_b.add(p_180213_1_);
+        this.knownKeys.add(clazz);
     }
 
-    protected Class func_180212_a(Class p_180212_1_, boolean p_180212_2_)
+    protected Class<?> func_181157_b(Class<?> p_181157_1_)
     {
-        Iterator iterator = ClassUtils.hierarchy(p_180212_1_, Interfaces.INCLUDE).iterator();
-        Class oclass1;
-
-        do
+        if (this.baseClass.isAssignableFrom(p_181157_1_))
         {
-            if (!iterator.hasNext())
+            if (!this.knownKeys.contains(p_181157_1_))
             {
-                throw new IllegalArgumentException("Don\'t know how to search for " + p_180212_1_);
+                this.createLookup(p_181157_1_);
             }
 
-            oclass1 = (Class)iterator.next();
+            return p_181157_1_;
         }
-        while (!this.field_180216_b.contains(oclass1));
-
-        if (oclass1 == this.field_180217_c && p_180212_2_)
+        else
         {
-            this.func_180213_a(p_180212_1_);
+            throw new IllegalArgumentException("Don\'t know how to search for " + p_181157_1_);
         }
-
-        return oclass1;
     }
 
-    public boolean add(Object p_add_1_)
+    public boolean add(T p_add_1_)
     {
-        Iterator iterator = this.field_180216_b.iterator();
-
-        while (iterator.hasNext())
+        for (Class<?> oclass : this.knownKeys)
         {
-            Class oclass = (Class)iterator.next();
-
             if (oclass.isAssignableFrom(p_add_1_.getClass()))
             {
-                this.field_180218_a.put(oclass, p_add_1_);
+                this.func_181743_a(p_add_1_, oclass);
             }
         }
 
         return true;
     }
 
+    private void func_181743_a(T p_181743_1_, Class<?> p_181743_2_)
+    {
+        List<T> list = (List)this.map.get(p_181743_2_);
+
+        if (list == null)
+        {
+            this.map.put(p_181743_2_, Lists.newArrayList(p_181743_1_));
+        }
+        else
+        {
+            list.add(p_181743_1_);
+        }
+    }
+
     public boolean remove(Object p_remove_1_)
     {
-        Object object1 = p_remove_1_;
+        T t = (T)p_remove_1_;
         boolean flag = false;
-        Iterator iterator = this.field_180216_b.iterator();
 
-        while (iterator.hasNext())
+        for (Class<?> oclass : this.knownKeys)
         {
-            Class oclass = (Class)iterator.next();
-
-            if (oclass.isAssignableFrom(object1.getClass()))
+            if (oclass.isAssignableFrom(t.getClass()))
             {
-                flag |= this.field_180218_a.remove(oclass, object1);
+                List<T> list = (List)this.map.get(oclass);
+
+                if (list != null && list.remove(t))
+                {
+                    flag = true;
+                }
             }
         }
 
         return flag;
     }
 
-    public Iterable func_180215_b(final Class p_180215_1_)
+    public boolean contains(Object p_contains_1_)
     {
-        return new Iterable()
+        return Iterators.contains(this.getByClass(p_contains_1_.getClass()).iterator(), p_contains_1_);
+    }
+
+    public <S> Iterable<S> getByClass(final Class<S> clazz)
+    {
+        return new Iterable<S>()
         {
-            private static final String __OBFID = "CL_00002265";
-            public Iterator iterator()
+            public Iterator<S> iterator()
             {
-                Iterator iterator = ClassInheritanceMultiMap.this.field_180218_a.get(ClassInheritanceMultiMap.this.func_180212_a(p_180215_1_, true)).iterator();
-                return Iterators.filter(iterator, p_180215_1_);
+                List<T> list = (List)ClassInheritanceMultiMap.this.map.get(ClassInheritanceMultiMap.this.func_181157_b(clazz));
+
+                if (list == null)
+                {
+                    return Iterators.<S>emptyIterator();
+                }
+                else
+                {
+                    Iterator<T> iterator = list.iterator();
+                    return Iterators.filter(iterator, clazz);
+                }
             }
         };
     }
 
-    public Iterator iterator()
+    public Iterator<T> iterator()
     {
-        final Iterator iterator = this.field_180218_a.get(this.field_180217_c).iterator();
-        return new AbstractIterator()
-        {
-            private static final String __OBFID = "CL_00002264";
-            protected Object computeNext()
-            {
-                return !iterator.hasNext() ? this.endOfData() : iterator.next();
-            }
-        };
+        return this.field_181745_e.isEmpty() ? Iterators.<T>emptyIterator() : Iterators.unmodifiableIterator(this.field_181745_e.iterator());
     }
 
     public int size()
     {
-        return this.field_180218_a.get(this.field_180217_c).size();
+        return this.field_181745_e.size();
     }
 }

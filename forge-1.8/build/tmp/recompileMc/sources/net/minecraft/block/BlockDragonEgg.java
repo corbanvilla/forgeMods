@@ -1,6 +1,7 @@
 package net.minecraft.block;
 
 import java.util.Random;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityFallingBlock;
@@ -16,11 +17,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockDragonEgg extends Block
 {
-    private static final String __OBFID = "CL_00000232";
-
     public BlockDragonEgg()
     {
-        super(Material.dragonEgg);
+        super(Material.dragonEgg, MapColor.blackColor);
         this.setBlockBounds(0.0625F, 0.0F, 0.0625F, 0.9375F, 1.0F, 0.9375F);
     }
 
@@ -46,25 +45,25 @@ public class BlockDragonEgg extends Block
     {
         if (BlockFalling.canFallInto(worldIn, pos.down()) && pos.getY() >= 0)
         {
-            byte b0 = 32;
+            int i = 32;
 
-            if (!BlockFalling.fallInstantly && worldIn.isAreaLoaded(pos.add(-b0, -b0, -b0), pos.add(b0, b0, b0)))
+            if (!BlockFalling.fallInstantly && worldIn.isAreaLoaded(pos.add(-i, -i, -i), pos.add(i, i, i)))
             {
                 worldIn.spawnEntityInWorld(new EntityFallingBlock(worldIn, (double)((float)pos.getX() + 0.5F), (double)pos.getY(), (double)((float)pos.getZ() + 0.5F), this.getDefaultState()));
             }
             else
             {
                 worldIn.setBlockToAir(pos);
-                BlockPos blockpos1;
+                BlockPos blockpos;
 
-                for (blockpos1 = pos; BlockFalling.canFallInto(worldIn, blockpos1) && blockpos1.getY() > 0; blockpos1 = blockpos1.down())
+                for (blockpos = pos; BlockFalling.canFallInto(worldIn, blockpos) && blockpos.getY() > 0; blockpos = blockpos.down())
                 {
                     ;
                 }
 
-                if (blockpos1.getY() > 0)
+                if (blockpos.getY() > 0)
                 {
-                    worldIn.setBlockState(blockpos1, this.getDefaultState(), 2);
+                    worldIn.setBlockState(blockpos, this.getDefaultState(), 2);
                 }
             }
         }
@@ -89,9 +88,9 @@ public class BlockDragonEgg extends Block
         {
             for (int i = 0; i < 1000; ++i)
             {
-                BlockPos blockpos1 = pos.add(worldIn.rand.nextInt(16) - worldIn.rand.nextInt(16), worldIn.rand.nextInt(8) - worldIn.rand.nextInt(8), worldIn.rand.nextInt(16) - worldIn.rand.nextInt(16));
+                BlockPos blockpos = pos.add(worldIn.rand.nextInt(16) - worldIn.rand.nextInt(16), worldIn.rand.nextInt(8) - worldIn.rand.nextInt(8), worldIn.rand.nextInt(16) - worldIn.rand.nextInt(16));
 
-                if (worldIn.getBlockState(blockpos1).getBlock().blockMaterial == Material.air)
+                if (worldIn.getBlockState(blockpos).getBlock().blockMaterial == Material.air)
                 {
                     if (worldIn.isRemote)
                     {
@@ -101,15 +100,15 @@ public class BlockDragonEgg extends Block
                             float f = (worldIn.rand.nextFloat() - 0.5F) * 0.2F;
                             float f1 = (worldIn.rand.nextFloat() - 0.5F) * 0.2F;
                             float f2 = (worldIn.rand.nextFloat() - 0.5F) * 0.2F;
-                            double d1 = (double)blockpos1.getX() + (double)(pos.getX() - blockpos1.getX()) * d0 + (worldIn.rand.nextDouble() - 0.5D) * 1.0D + 0.5D;
-                            double d2 = (double)blockpos1.getY() + (double)(pos.getY() - blockpos1.getY()) * d0 + worldIn.rand.nextDouble() * 1.0D - 0.5D;
-                            double d3 = (double)blockpos1.getZ() + (double)(pos.getZ() - blockpos1.getZ()) * d0 + (worldIn.rand.nextDouble() - 0.5D) * 1.0D + 0.5D;
+                            double d1 = (double)blockpos.getX() + (double)(pos.getX() - blockpos.getX()) * d0 + (worldIn.rand.nextDouble() - 0.5D) * 1.0D + 0.5D;
+                            double d2 = (double)blockpos.getY() + (double)(pos.getY() - blockpos.getY()) * d0 + worldIn.rand.nextDouble() * 1.0D - 0.5D;
+                            double d3 = (double)blockpos.getZ() + (double)(pos.getZ() - blockpos.getZ()) * d0 + (worldIn.rand.nextDouble() - 0.5D) * 1.0D + 0.5D;
                             worldIn.spawnParticle(EnumParticleTypes.PORTAL, d1, d2, d3, (double)f, (double)f1, (double)f2, new int[0]);
                         }
                     }
                     else
                     {
-                        worldIn.setBlockState(blockpos1, iblockstate, 2);
+                        worldIn.setBlockState(blockpos, iblockstate, 2);
                         worldIn.setBlockToAir(pos);
                     }
 
@@ -127,6 +126,9 @@ public class BlockDragonEgg extends Block
         return 5;
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;

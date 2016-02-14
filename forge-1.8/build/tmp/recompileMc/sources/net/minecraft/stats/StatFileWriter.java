@@ -10,30 +10,29 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class StatFileWriter
 {
-    protected final Map statsData = Maps.newConcurrentMap();
-    private static final String __OBFID = "CL_00001481";
+    protected final Map<StatBase, TupleIntJsonSerializable> statsData = Maps.<StatBase, TupleIntJsonSerializable>newConcurrentMap();
 
     /**
      * Returns true if the achievement has been unlocked.
      */
-    public boolean hasAchievementUnlocked(Achievement p_77443_1_)
+    public boolean hasAchievementUnlocked(Achievement achievementIn)
     {
-        return this.readStat(p_77443_1_) > 0;
+        return this.readStat(achievementIn) > 0;
     }
 
     /**
      * Returns true if the parent has been unlocked, or there is no parent
      */
-    public boolean canUnlockAchievement(Achievement p_77442_1_)
+    public boolean canUnlockAchievement(Achievement achievementIn)
     {
-        return p_77442_1_.parentAchievement == null || this.hasAchievementUnlocked(p_77442_1_.parentAchievement);
+        return achievementIn.parentAchievement == null || this.hasAchievementUnlocked(achievementIn.parentAchievement);
     }
 
-    public void func_150871_b(EntityPlayer p_150871_1_, StatBase p_150871_2_, int p_150871_3_)
+    public void increaseStat(EntityPlayer player, StatBase stat, int amount)
     {
-        if (!p_150871_2_.isAchievement() || this.canUnlockAchievement((Achievement)p_150871_2_))
+        if (!stat.isAchievement() || this.canUnlockAchievement((Achievement)stat))
         {
-            this.func_150873_a(p_150871_1_, p_150871_2_, this.readStat(p_150871_2_) + p_150871_3_);
+            this.unlockAchievement(player, stat, this.readStat(stat) + amount);
         }
     }
 
@@ -48,23 +47,26 @@ public class StatFileWriter
         {
             int i = 0;
 
-            for (Achievement achievement1 = p_150874_1_.parentAchievement; achievement1 != null && !this.hasAchievementUnlocked(achievement1); ++i)
+            for (Achievement achievement = p_150874_1_.parentAchievement; achievement != null && !this.hasAchievementUnlocked(achievement); ++i)
             {
-                achievement1 = achievement1.parentAchievement;
+                achievement = achievement.parentAchievement;
             }
 
             return i;
         }
     }
 
-    public void func_150873_a(EntityPlayer p_150873_1_, StatBase p_150873_2_, int p_150873_3_)
+    /**
+     * Triggers the logging of an achievement and attempts to announce to server
+     */
+    public void unlockAchievement(EntityPlayer playerIn, StatBase statIn, int p_150873_3_)
     {
-        TupleIntJsonSerializable tupleintjsonserializable = (TupleIntJsonSerializable)this.statsData.get(p_150873_2_);
+        TupleIntJsonSerializable tupleintjsonserializable = (TupleIntJsonSerializable)this.statsData.get(statIn);
 
         if (tupleintjsonserializable == null)
         {
             tupleintjsonserializable = new TupleIntJsonSerializable();
-            this.statsData.put(p_150873_2_, tupleintjsonserializable);
+            this.statsData.put(statIn, tupleintjsonserializable);
         }
 
         tupleintjsonserializable.setIntegerValue(p_150873_3_);
@@ -72,8 +74,6 @@ public class StatFileWriter
 
     /**
      * Reads the given stat and returns its value as an int.
-     *  
-     * @param stat The StatBase object to lookup
      */
     public int readStat(StatBase stat)
     {
@@ -81,13 +81,13 @@ public class StatFileWriter
         return tupleintjsonserializable == null ? 0 : tupleintjsonserializable.getIntegerValue();
     }
 
-    public IJsonSerializable func_150870_b(StatBase p_150870_1_)
+    public <T extends IJsonSerializable> T func_150870_b(StatBase p_150870_1_)
     {
         TupleIntJsonSerializable tupleintjsonserializable = (TupleIntJsonSerializable)this.statsData.get(p_150870_1_);
-        return tupleintjsonserializable != null ? tupleintjsonserializable.getJsonSerializableValue() : null;
+        return (T)(tupleintjsonserializable != null ? tupleintjsonserializable.getJsonSerializableValue() : null);
     }
 
-    public IJsonSerializable func_150872_a(StatBase p_150872_1_, IJsonSerializable p_150872_2_)
+    public <T extends IJsonSerializable> T func_150872_a(StatBase p_150872_1_, T p_150872_2_)
     {
         TupleIntJsonSerializable tupleintjsonserializable = (TupleIntJsonSerializable)this.statsData.get(p_150872_1_);
 
@@ -98,6 +98,6 @@ public class StatFileWriter
         }
 
         tupleintjsonserializable.setJsonSerializableValue(p_150872_2_);
-        return p_150872_2_;
+        return (T)p_150872_2_;
     }
 }

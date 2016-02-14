@@ -13,7 +13,6 @@ public class DerivedWorldInfo extends WorldInfo
 {
     /** Instance of WorldInfo. */
     private final WorldInfo theWorldInfo;
-    private static final String __OBFID = "CL_00000584";
 
     public DerivedWorldInfo(WorldInfo p_i2145_1_)
     {
@@ -164,55 +163,79 @@ public class DerivedWorldInfo extends WorldInfo
      * Set the x spawn position to the passed in value
      */
     @SideOnly(Side.CLIENT)
-    public void setSpawnX(int x) {}
+    public void setSpawnX(int x)
+    {
+    }
 
     /**
      * Sets the y spawn position
      */
     @SideOnly(Side.CLIENT)
-    public void setSpawnY(int y) {}
+    public void setSpawnY(int y)
+    {
+    }
 
-    public void incrementTotalWorldTime(long time) {}
+    public void setWorldTotalTime(long time)
+    {
+    }
 
     /**
      * Set the z spawn position to the passed in value
      */
     @SideOnly(Side.CLIENT)
-    public void setSpawnZ(int z) {}
+    public void setSpawnZ(int z)
+    {
+    }
 
     /**
      * Set current world time
      */
-    public void setWorldTime(long time) {}
+    public void setWorldTime(long time)
+    {
+    }
 
-    public void setSpawn(BlockPos spawnPoint) {}
+    public void setSpawn(BlockPos spawnPoint)
+    {
+    }
 
-    public void setWorldName(String worldName) {}
+    public void setWorldName(String worldName)
+    {
+    }
 
     /**
      * Sets the save version of the world
      */
-    public void setSaveVersion(int version) {}
+    public void setSaveVersion(int version)
+    {
+    }
 
     /**
      * Sets whether it is thundering or not.
      */
-    public void setThundering(boolean thunderingIn) {}
+    public void setThundering(boolean thunderingIn)
+    {
+    }
 
     /**
      * Defines the number of ticks until next thunderbolt.
      */
-    public void setThunderTime(int time) {}
+    public void setThunderTime(int time)
+    {
+    }
 
     /**
      * Sets whether it is raining or not.
      */
-    public void setRaining(boolean isRaining) {}
+    public void setRaining(boolean isRaining)
+    {
+    }
 
     /**
      * Sets the number of ticks until rain.
      */
-    public void setRainTime(int time) {}
+    public void setRainTime(int time)
+    {
+    }
 
     /**
      * Get whether the map features (e.g. strongholds) generation is enabled or disabled.
@@ -235,7 +258,9 @@ public class DerivedWorldInfo extends WorldInfo
         return this.theWorldInfo.getTerrainType();
     }
 
-    public void setTerrainType(WorldType type) {}
+    public void setTerrainType(WorldType type)
+    {
+    }
 
     /**
      * Returns true if commands are allowed on this World.
@@ -245,7 +270,9 @@ public class DerivedWorldInfo extends WorldInfo
         return this.theWorldInfo.areCommandsAllowed();
     }
 
-    public void setAllowCommands(boolean allow) {}
+    public void setAllowCommands(boolean allow)
+    {
+    }
 
     /**
      * Returns true if the World is initialized.
@@ -258,7 +285,9 @@ public class DerivedWorldInfo extends WorldInfo
     /**
      * Sets the initialization status of the World.
      */
-    public void setServerInitialized(boolean initializedIn) {}
+    public void setServerInitialized(boolean initializedIn)
+    {
+    }
 
     /**
      * Gets the GameRules class Instance.
@@ -273,12 +302,16 @@ public class DerivedWorldInfo extends WorldInfo
         return this.theWorldInfo.getDifficulty();
     }
 
-    public void setDifficulty(EnumDifficulty newDifficulty) {}
+    public void setDifficulty(EnumDifficulty newDifficulty)
+    {
+    }
 
     public boolean isDifficultyLocked()
     {
         return this.theWorldInfo.isDifficultyLocked();
     }
 
-    public void setDifficultyLocked(boolean locked) {}
+    public void setDifficultyLocked(boolean locked)
+    {
+    }
 }

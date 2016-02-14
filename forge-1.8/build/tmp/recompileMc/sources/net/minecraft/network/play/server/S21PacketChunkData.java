@@ -2,9 +2,7 @@ package net.minecraft.network.play.server;
 
 import com.google.common.collect.Lists;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import net.minecraft.network.INetHandler;
+import java.util.List;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -13,22 +11,23 @@ import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S21PacketChunkData implements Packet
+public class S21PacketChunkData implements Packet<INetHandlerPlayClient>
 {
     private int chunkX;
     private int chunkZ;
-    private S21PacketChunkData.Extracted field_179758_c;
+    private S21PacketChunkData.Extracted extractedData;
     private boolean field_149279_g;
-    private static final String __OBFID = "CL_00001304";
 
-    public S21PacketChunkData() {}
-
-    public S21PacketChunkData(Chunk p_i45196_1_, boolean p_i45196_2_, int p_i45196_3_)
+    public S21PacketChunkData()
     {
-        this.chunkX = p_i45196_1_.xPosition;
-        this.chunkZ = p_i45196_1_.zPosition;
+    }
+
+    public S21PacketChunkData(Chunk chunkIn, boolean p_i45196_2_, int p_i45196_3_)
+    {
+        this.chunkX = chunkIn.xPosition;
+        this.chunkZ = chunkIn.zPosition;
         this.field_149279_g = p_i45196_2_;
-        this.field_179758_c = func_179756_a(p_i45196_1_, p_i45196_2_, !p_i45196_1_.getWorld().provider.getHasNoSky(), p_i45196_3_);
+        this.extractedData = func_179756_a(chunkIn, p_i45196_2_, !chunkIn.getWorld().provider.getHasNoSky(), p_i45196_3_);
     }
 
     /**
@@ -39,9 +38,9 @@ public class S21PacketChunkData implements Packet
         this.chunkX = buf.readInt();
         this.chunkZ = buf.readInt();
         this.field_149279_g = buf.readBoolean();
-        this.field_179758_c = new S21PacketChunkData.Extracted();
-        this.field_179758_c.dataSize = buf.readShort();
-        this.field_179758_c.data = buf.readByteArray();
+        this.extractedData = new S21PacketChunkData.Extracted();
+        this.extractedData.dataSize = buf.readShort();
+        this.extractedData.data = buf.readByteArray();
     }
 
     /**
@@ -52,8 +51,8 @@ public class S21PacketChunkData implements Packet
         buf.writeInt(this.chunkX);
         buf.writeInt(this.chunkZ);
         buf.writeBoolean(this.field_149279_g);
-        buf.writeShort((short)(this.field_179758_c.dataSize & 65535));
-        buf.writeByteArray(this.field_179758_c.data);
+        buf.writeShort((short)(this.extractedData.dataSize & 65535));
+        buf.writeByteArray(this.extractedData.data);
     }
 
     /**
@@ -67,75 +66,68 @@ public class S21PacketChunkData implements Packet
     @SideOnly(Side.CLIENT)
     public byte[] func_149272_d()
     {
-        return this.field_179758_c.data;
+        return this.extractedData.data;
     }
 
     protected static int func_180737_a(int p_180737_0_, boolean p_180737_1_, boolean p_180737_2_)
     {
-        int j = p_180737_0_ * 2 * 16 * 16 * 16;
-        int k = p_180737_0_ * 16 * 16 * 16 / 2;
-        int l = p_180737_1_ ? p_180737_0_ * 16 * 16 * 16 / 2 : 0;
-        int i1 = p_180737_2_ ? 256 : 0;
-        return j + k + l + i1;
+        int i = p_180737_0_ * 2 * 16 * 16 * 16;
+        int j = p_180737_0_ * 16 * 16 * 16 / 2;
+        int k = p_180737_1_ ? p_180737_0_ * 16 * 16 * 16 / 2 : 0;
+        int l = p_180737_2_ ? 256 : 0;
+        return i + j + k + l;
     }
 
     public static S21PacketChunkData.Extracted func_179756_a(Chunk p_179756_0_, boolean p_179756_1_, boolean p_179756_2_, int p_179756_3_)
     {
         ExtendedBlockStorage[] aextendedblockstorage = p_179756_0_.getBlockStorageArray();
-        S21PacketChunkData.Extracted extracted = new S21PacketChunkData.Extracted();
-        ArrayList arraylist = Lists.newArrayList();
-        int j;
+        S21PacketChunkData.Extracted s21packetchunkdata$extracted = new S21PacketChunkData.Extracted();
+        List<ExtendedBlockStorage> list = Lists.<ExtendedBlockStorage>newArrayList();
 
-        for (j = 0; j < aextendedblockstorage.length; ++j)
+        for (int i = 0; i < aextendedblockstorage.length; ++i)
         {
-            ExtendedBlockStorage extendedblockstorage = aextendedblockstorage[j];
+            ExtendedBlockStorage extendedblockstorage = aextendedblockstorage[i];
 
-            if (extendedblockstorage != null && (!p_179756_1_ || !extendedblockstorage.isEmpty()) && (p_179756_3_ & 1 << j) != 0)
+            if (extendedblockstorage != null && (!p_179756_1_ || !extendedblockstorage.isEmpty()) && (p_179756_3_ & 1 << i) != 0)
             {
-                extracted.dataSize |= 1 << j;
-                arraylist.add(extendedblockstorage);
+                s21packetchunkdata$extracted.dataSize |= 1 << i;
+                list.add(extendedblockstorage);
             }
         }
 
-        extracted.data = new byte[func_180737_a(Integer.bitCount(extracted.dataSize), p_179756_2_, p_179756_1_)];
-        j = 0;
-        Iterator iterator = arraylist.iterator();
-        ExtendedBlockStorage extendedblockstorage1;
+        s21packetchunkdata$extracted.data = new byte[func_180737_a(Integer.bitCount(s21packetchunkdata$extracted.dataSize), p_179756_2_, p_179756_1_)];
+        int j = 0;
 
-        while (iterator.hasNext())
+        for (ExtendedBlockStorage extendedblockstorage1 : list)
         {
-            extendedblockstorage1 = (ExtendedBlockStorage)iterator.next();
             char[] achar = extendedblockstorage1.getData();
-            char[] achar1 = achar;
-            int k = achar.length;
 
-            for (int l = 0; l < k; ++l)
+            for (char c0 : achar)
             {
-                char c0 = achar1[l];
-                extracted.data[j++] = (byte)(c0 & 255);
-                extracted.data[j++] = (byte)(c0 >> 8 & 255);
+                s21packetchunkdata$extracted.data[j++] = (byte)(c0 & 255);
+                s21packetchunkdata$extracted.data[j++] = (byte)(c0 >> 8 & 255);
             }
         }
 
-        for (iterator = arraylist.iterator(); iterator.hasNext(); j = func_179757_a(extendedblockstorage1.getBlocklightArray().getData(), extracted.data, j))
+        for (ExtendedBlockStorage extendedblockstorage2 : list)
         {
-            extendedblockstorage1 = (ExtendedBlockStorage)iterator.next();
+            j = func_179757_a(extendedblockstorage2.getBlocklightArray().getData(), s21packetchunkdata$extracted.data, j);
         }
 
         if (p_179756_2_)
         {
-            for (iterator = arraylist.iterator(); iterator.hasNext(); j = func_179757_a(extendedblockstorage1.getSkylightArray().getData(), extracted.data, j))
+            for (ExtendedBlockStorage extendedblockstorage3 : list)
             {
-                extendedblockstorage1 = (ExtendedBlockStorage)iterator.next();
+                j = func_179757_a(extendedblockstorage3.getSkylightArray().getData(), s21packetchunkdata$extracted.data, j);
             }
         }
 
         if (p_179756_1_)
         {
-            func_179757_a(p_179756_0_.getBiomeArray(), extracted.data, j);
+            func_179757_a(p_179756_0_.getBiomeArray(), s21packetchunkdata$extracted.data, j);
         }
 
-        return extracted;
+        return s21packetchunkdata$extracted;
     }
 
     private static int func_179757_a(byte[] p_179757_0_, byte[] p_179757_1_, int p_179757_2_)
@@ -144,30 +136,22 @@ public class S21PacketChunkData implements Packet
         return p_179757_2_ + p_179757_0_.length;
     }
 
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayClient)handler);
-    }
-
     @SideOnly(Side.CLIENT)
-    public int func_149273_e()
+    public int getChunkX()
     {
         return this.chunkX;
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_149271_f()
+    public int getChunkZ()
     {
         return this.chunkZ;
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_149276_g()
+    public int getExtractedSize()
     {
-        return this.field_179758_c.dataSize;
+        return this.extractedData.dataSize;
     }
 
     @SideOnly(Side.CLIENT)
@@ -180,6 +164,5 @@ public class S21PacketChunkData implements Packet
         {
             public byte[] data;
             public int dataSize;
-            private static final String __OBFID = "CL_00001305";
         }
 }

@@ -14,8 +14,6 @@ import net.minecraft.world.World;
 
 public class ItemSign extends Item
 {
-    private static final String __OBFID = "CL_00000064";
-
     public ItemSign()
     {
         this.maxStackSize = 16;
@@ -24,9 +22,6 @@ public class ItemSign extends Item
 
     /**
      * Called when a Block is right-clicked with this Item
-     *  
-     * @param pos The block being right-clicked
-     * @param side The side being right-clicked
      */
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
@@ -69,7 +64,7 @@ public class ItemSign extends Item
                 --stack.stackSize;
                 TileEntity tileentity = worldIn.getTileEntity(pos);
 
-                if (tileentity instanceof TileEntitySign && !ItemBlock.setTileEntityNBT(worldIn, pos, stack, playerIn))
+                if (tileentity instanceof TileEntitySign && !ItemBlock.setTileEntityNBT(worldIn, playerIn, pos, stack))
                 {
                     playerIn.openEditSign((TileEntitySign)tileentity);
                 }

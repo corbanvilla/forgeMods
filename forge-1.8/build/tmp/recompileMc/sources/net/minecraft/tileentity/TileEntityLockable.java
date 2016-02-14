@@ -10,13 +10,7 @@ import net.minecraft.world.LockCode;
 
 public abstract class TileEntityLockable extends TileEntity implements IInteractionObject, ILockableContainer
 {
-    private LockCode code;
-    private static final String __OBFID = "CL_00002040";
-
-    public TileEntityLockable()
-    {
-        this.code = LockCode.EMPTY_CODE;
-    }
+    private LockCode code = LockCode.EMPTY_CODE;
 
     public void readFromNBT(NBTTagCompound compound)
     {
@@ -49,8 +43,32 @@ public abstract class TileEntityLockable extends TileEntity implements IInteract
         this.code = code;
     }
 
+    /**
+     * Get the formatted ChatComponent that will be used for the sender's username in chat
+     */
     public IChatComponent getDisplayName()
     {
         return (IChatComponent)(this.hasCustomName() ? new ChatComponentText(this.getName()) : new ChatComponentTranslation(this.getName(), new Object[0]));
+    }
+
+    private net.minecraftforge.items.IItemHandler itemHandler;
+
+    protected net.minecraftforge.items.IItemHandler createUnSidedHandler()
+    {
+        return new net.minecraftforge.items.wrapper.InvWrapper(this);
+    }
+
+    @Override
+    public <T> T getCapability(net.minecraftforge.common.capabilities.Capability<T> capability, net.minecraft.util.EnumFacing facing)
+    {
+        if (capability == net.minecraftforge.items.CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+            return (T) (itemHandler == null ? (itemHandler = createUnSidedHandler()) : itemHandler);
+        return super.getCapability(capability, facing);
+    }
+
+    @Override
+    public boolean hasCapability(net.minecraftforge.common.capabilities.Capability<?> capability, net.minecraft.util.EnumFacing facing)
+    {
+        return capability == net.minecraftforge.items.CapabilityItemHandler.ITEM_HANDLER_CAPABILITY || super.hasCapability(capability, facing);
     }
 }

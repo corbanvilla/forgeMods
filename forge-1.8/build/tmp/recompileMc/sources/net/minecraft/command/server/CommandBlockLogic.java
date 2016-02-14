@@ -33,7 +33,6 @@ public abstract class CommandBlockLogic implements ICommandSender
     /** The custom name of the command block. (defaults to "@") */
     private String customName = "@";
     private final CommandResultStats resultStats = new CommandResultStats();
-    private static final String __OBFID = "CL_00000128";
 
     /**
      * returns the successCount int.
@@ -66,7 +65,7 @@ public abstract class CommandBlockLogic implements ICommandSender
             tagCompound.setString("LastOutput", IChatComponent.Serializer.componentToJson(this.lastOutput));
         }
 
-        this.resultStats.func_179670_b(tagCompound);
+        this.resultStats.writeStatsToNBT(tagCompound);
     }
 
     /**
@@ -92,16 +91,13 @@ public abstract class CommandBlockLogic implements ICommandSender
             this.lastOutput = IChatComponent.Serializer.jsonToComponent(nbt.getString("LastOutput"));
         }
 
-        this.resultStats.func_179668_a(nbt);
+        this.resultStats.readStatsFromNBT(nbt);
     }
 
     /**
-     * Returns true if the CommandSender may execute the given command
-     *  
-     * @param permLevel The permission level required to execute the command
-     * @param commandName The name of the command
+     * Returns {@code true} if the CommandSender is allowed to execute the command, {@code false} if not
      */
-    public boolean canUseCommand(int permLevel, String commandName)
+    public boolean canCommandSenderUseCommand(int permLevel, String commandName)
     {
         return permLevel <= 2;
     }
@@ -116,9 +112,9 @@ public abstract class CommandBlockLogic implements ICommandSender
     }
 
     /**
-     * Returns the customName of the command block.
+     * Returns the command of the command block.
      */
-    public String getCustomName()
+    public String getCommand()
     {
         return this.commandStored;
     }
@@ -132,7 +128,7 @@ public abstract class CommandBlockLogic implements ICommandSender
 
         MinecraftServer minecraftserver = MinecraftServer.getServer();
 
-        if (minecraftserver != null && minecraftserver.func_175578_N() && minecraftserver.isCommandBlockEnabled())
+        if (minecraftserver != null && minecraftserver.isAnvilFileSet() && minecraftserver.isCommandBlockEnabled())
         {
             ICommandManager icommandmanager = minecraftserver.getCommandManager();
 
@@ -145,18 +141,16 @@ public abstract class CommandBlockLogic implements ICommandSender
             {
                 CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Executing command block");
                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Command to be executed");
-                crashreportcategory.addCrashSectionCallable("Command", new Callable()
+                crashreportcategory.addCrashSectionCallable("Command", new Callable<String>()
                 {
-                    private static final String __OBFID = "CL_00002154";
-                    public String call()
+                    public String call() throws Exception
                     {
-                        return CommandBlockLogic.this.getCustomName();
+                        return CommandBlockLogic.this.getCommand();
                     }
                 });
-                crashreportcategory.addCrashSectionCallable("Name", new Callable()
+                crashreportcategory.addCrashSectionCallable("Name", new Callable<String>()
                 {
-                    private static final String __OBFID = "CL_00002153";
-                    public String call()
+                    public String call() throws Exception
                     {
                         return CommandBlockLogic.this.getName();
                     }
@@ -171,13 +165,16 @@ public abstract class CommandBlockLogic implements ICommandSender
     }
 
     /**
-     * Gets the name of this command sender (usually username, but possibly "Rcon")
+     * Get the name of this object. For players this returns their username
      */
     public String getName()
     {
         return this.customName;
     }
 
+    /**
+     * Get the formatted ChatComponent that will be used for the sender's username in chat
+     */
     public IChatComponent getDisplayName()
     {
         return new ChatComponentText(this.getName());
@@ -189,17 +186,14 @@ public abstract class CommandBlockLogic implements ICommandSender
     }
 
     /**
-     * Notifies this sender of some sort of information.  This is for messages intended to display to the user.  Used
-     * for typical output (like "you asked for whether or not this game rule is set, so here's your answer"), warnings
-     * (like "I fetched this block for you by ID, but I'd like you to know that every time you do this, I die a little
-     * inside"), and errors (like "it's not called iron_pixacke, silly").
+     * Send a chat message to the CommandSender
      */
-    public void addChatMessage(IChatComponent message)
+    public void addChatMessage(IChatComponent component)
     {
         if (this.trackOutput && this.getEntityWorld() != null && !this.getEntityWorld().isRemote)
         {
-            this.lastOutput = (new ChatComponentText("[" + timestampFormat.format(new Date()) + "] ")).appendSibling(message);
-            this.func_145756_e();
+            this.lastOutput = (new ChatComponentText("[" + timestampFormat.format(new Date()) + "] ")).appendSibling(component);
+            this.updateCommand();
         }
     }
 
@@ -209,7 +203,7 @@ public abstract class CommandBlockLogic implements ICommandSender
     public boolean sendCommandFeedback()
     {
         MinecraftServer minecraftserver = MinecraftServer.getServer();
-        return minecraftserver == null || !minecraftserver.func_175578_N() || minecraftserver.worldServers[0].getGameRules().getGameRuleBooleanValue("commandBlockOutput");
+        return minecraftserver == null || !minecraftserver.isAnvilFileSet() || minecraftserver.worldServers[0].getGameRules().getBoolean("commandBlockOutput");
     }
 
     public void setCommandStat(CommandResultStats.Type type, int amount)
@@ -217,7 +211,7 @@ public abstract class CommandBlockLogic implements ICommandSender
         this.resultStats.func_179672_a(this, type, amount);
     }
 
-    public abstract void func_145756_e();
+    public abstract void updateCommand();
 
     @SideOnly(Side.CLIENT)
     public abstract int func_145751_f();
@@ -240,17 +234,17 @@ public abstract class CommandBlockLogic implements ICommandSender
         return this.trackOutput;
     }
 
-    public boolean func_175574_a(EntityPlayer p_175574_1_)
+    public boolean tryOpenEditCommandBlock(EntityPlayer playerIn)
     {
-        if (!p_175574_1_.capabilities.isCreativeMode)
+        if (!playerIn.capabilities.isCreativeMode)
         {
             return false;
         }
         else
         {
-            if (p_175574_1_.getEntityWorld().isRemote)
+            if (playerIn.getEntityWorld().isRemote)
             {
-                p_175574_1_.openEditCommandBlock(this);
+                playerIn.openEditCommandBlock(this);
             }
 
             return true;

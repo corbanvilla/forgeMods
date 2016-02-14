@@ -1,7 +1,6 @@
 package net.minecraft.entity;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.UUID;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.BaseAttributeMap;
@@ -16,12 +15,11 @@ import org.apache.logging.log4j.Logger;
 public class SharedMonsterAttributes
 {
     private static final Logger logger = LogManager.getLogger();
-    public static final IAttribute maxHealth = (new RangedAttribute((IAttribute)null, "generic.maxHealth", 20.0D, 0.0D, Double.MAX_VALUE)).setDescription("Max Health").setShouldWatch(true);
+    public static final IAttribute maxHealth = (new RangedAttribute((IAttribute)null, "generic.maxHealth", 20.0D, 0.0D, 1024.0D)).setDescription("Max Health").setShouldWatch(true);
     public static final IAttribute followRange = (new RangedAttribute((IAttribute)null, "generic.followRange", 32.0D, 0.0D, 2048.0D)).setDescription("Follow Range");
     public static final IAttribute knockbackResistance = (new RangedAttribute((IAttribute)null, "generic.knockbackResistance", 0.0D, 0.0D, 1.0D)).setDescription("Knockback Resistance");
-    public static final IAttribute movementSpeed = (new RangedAttribute((IAttribute)null, "generic.movementSpeed", 0.699999988079071D, 0.0D, Double.MAX_VALUE)).setDescription("Movement Speed").setShouldWatch(true);
-    public static final IAttribute attackDamage = new RangedAttribute((IAttribute)null, "generic.attackDamage", 2.0D, 0.0D, Double.MAX_VALUE);
-    private static final String __OBFID = "CL_00001695";
+    public static final IAttribute movementSpeed = (new RangedAttribute((IAttribute)null, "generic.movementSpeed", 0.699999988079071D, 0.0D, 1024.0D)).setDescription("Movement Speed").setShouldWatch(true);
+    public static final IAttribute attackDamage = new RangedAttribute((IAttribute)null, "generic.attackDamage", 2.0D, 0.0D, 2048.0D);
 
     /**
      * Creates an NBTTagList from a BaseAttributeMap, including all its AttributeInstances
@@ -29,11 +27,9 @@ public class SharedMonsterAttributes
     public static NBTTagList writeBaseAttributeMapToNBT(BaseAttributeMap p_111257_0_)
     {
         NBTTagList nbttaglist = new NBTTagList();
-        Iterator iterator = p_111257_0_.getAllAttributes().iterator();
 
-        while (iterator.hasNext())
+        for (IAttributeInstance iattributeinstance : p_111257_0_.getAllAttributes())
         {
-            IAttributeInstance iattributeinstance = (IAttributeInstance)iterator.next();
             nbttaglist.appendTag(writeAttributeInstanceToNBT(iattributeinstance));
         }
 
@@ -49,17 +45,14 @@ public class SharedMonsterAttributes
         IAttribute iattribute = p_111261_0_.getAttribute();
         nbttagcompound.setString("Name", iattribute.getAttributeUnlocalizedName());
         nbttagcompound.setDouble("Base", p_111261_0_.getBaseValue());
-        Collection collection = p_111261_0_.func_111122_c();
+        Collection<AttributeModifier> collection = p_111261_0_.func_111122_c();
 
         if (collection != null && !collection.isEmpty())
         {
             NBTTagList nbttaglist = new NBTTagList();
-            Iterator iterator = collection.iterator();
 
-            while (iterator.hasNext())
+            for (AttributeModifier attributemodifier : collection)
             {
-                AttributeModifier attributemodifier = (AttributeModifier)iterator.next();
-
                 if (attributemodifier.isSaved())
                 {
                     nbttaglist.appendTag(writeAttributeModifierToNBT(attributemodifier));

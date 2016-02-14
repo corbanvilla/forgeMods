@@ -10,13 +10,12 @@ public class EntityAIRestrictOpenDoor extends EntityAIBase
 {
     private EntityCreature entityObj;
     private VillageDoorInfo frontDoor;
-    private static final String __OBFID = "CL_00001610";
 
-    public EntityAIRestrictOpenDoor(EntityCreature p_i1651_1_)
+    public EntityAIRestrictOpenDoor(EntityCreature creatureIn)
     {
-        this.entityObj = p_i1651_1_;
+        this.entityObj = creatureIn;
 
-        if (!(p_i1651_1_.getNavigator() instanceof PathNavigateGround))
+        if (!(creatureIn.getNavigator() instanceof PathNavigateGround))
         {
             throw new IllegalArgumentException("Unsupported mob type for RestrictOpenDoorGoal");
         }
@@ -53,7 +52,7 @@ public class EntityAIRestrictOpenDoor extends EntityAIBase
      */
     public boolean continueExecuting()
     {
-        return this.entityObj.worldObj.isDaytime() ? false : !this.frontDoor.func_179851_i() && this.frontDoor.func_179850_c(new BlockPos(this.entityObj));
+        return this.entityObj.worldObj.isDaytime() ? false : !this.frontDoor.getIsDetachedFromVillageFlag() && this.frontDoor.func_179850_c(new BlockPos(this.entityObj));
     }
 
     /**
@@ -61,8 +60,8 @@ public class EntityAIRestrictOpenDoor extends EntityAIBase
      */
     public void startExecuting()
     {
-        ((PathNavigateGround)this.entityObj.getNavigator()).func_179688_b(false);
-        ((PathNavigateGround)this.entityObj.getNavigator()).func_179691_c(false);
+        ((PathNavigateGround)this.entityObj.getNavigator()).setBreakDoors(false);
+        ((PathNavigateGround)this.entityObj.getNavigator()).setEnterDoors(false);
     }
 
     /**
@@ -70,8 +69,8 @@ public class EntityAIRestrictOpenDoor extends EntityAIBase
      */
     public void resetTask()
     {
-        ((PathNavigateGround)this.entityObj.getNavigator()).func_179688_b(true);
-        ((PathNavigateGround)this.entityObj.getNavigator()).func_179691_c(true);
+        ((PathNavigateGround)this.entityObj.getNavigator()).setBreakDoors(true);
+        ((PathNavigateGround)this.entityObj.getNavigator()).setEnterDoors(true);
         this.frontDoor = null;
     }
 

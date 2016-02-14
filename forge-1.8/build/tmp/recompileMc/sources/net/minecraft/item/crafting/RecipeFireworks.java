@@ -1,7 +1,7 @@
 package net.minecraft.item.crafting;
 
 import com.google.common.collect.Lists;
-import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemDye;
@@ -13,12 +13,11 @@ import net.minecraft.world.World;
 public class RecipeFireworks implements IRecipe
 {
     private ItemStack field_92102_a;
-    private static final String __OBFID = "CL_00000083";
 
     /**
      * Used to check if a recipe matches current crafting inventory
      */
-    public boolean matches(InventoryCrafting p_77569_1_, World worldIn)
+    public boolean matches(InventoryCrafting inv, World worldIn)
     {
         this.field_92102_a = null;
         int i = 0;
@@ -28,9 +27,9 @@ public class RecipeFireworks implements IRecipe
         int i1 = 0;
         int j1 = 0;
 
-        for (int k1 = 0; k1 < p_77569_1_.getSizeInventory(); ++k1)
+        for (int k1 = 0; k1 < inv.getSizeInventory(); ++k1)
         {
-            ItemStack itemstack = p_77569_1_.getStackInSlot(k1);
+            ItemStack itemstack = inv.getStackInSlot(k1);
 
             if (itemstack != null)
             {
@@ -82,26 +81,23 @@ public class RecipeFireworks implements IRecipe
             }
         }
 
-        i1 += k + j1;
+        i1 = i1 + k + j1;
 
         if (j <= 3 && i <= 1)
         {
-            NBTTagCompound nbttagcompound;
-            NBTTagCompound nbttagcompound1;
-
             if (j >= 1 && i == 1 && i1 == 0)
             {
                 this.field_92102_a = new ItemStack(Items.fireworks);
 
-                nbttagcompound = new NBTTagCompound();
+                NBTTagCompound nbttagcompound1 = new NBTTagCompound();
                 if (l > 0)
                 {
-                    nbttagcompound1 = new NBTTagCompound();
+                    NBTTagCompound nbttagcompound3 = new NBTTagCompound();
                     NBTTagList nbttaglist = new NBTTagList();
 
-                    for (int k2 = 0; k2 < p_77569_1_.getSizeInventory(); ++k2)
+                    for (int k2 = 0; k2 < inv.getSizeInventory(); ++k2)
                     {
-                        ItemStack itemstack3 = p_77569_1_.getStackInSlot(k2);
+                        ItemStack itemstack3 = inv.getStackInSlot(k2);
 
                         if (itemstack3 != null && itemstack3.getItem() == Items.firework_charge && itemstack3.hasTagCompound() && itemstack3.getTagCompound().hasKey("Explosion", 10))
                         {
@@ -109,39 +105,39 @@ public class RecipeFireworks implements IRecipe
                         }
                     }
 
-                    nbttagcompound1.setTag("Explosions", nbttaglist);
-                    nbttagcompound1.setByte("Flight", (byte)j);
-                    nbttagcompound.setTag("Fireworks", nbttagcompound1);
+                    nbttagcompound3.setTag("Explosions", nbttaglist);
+                    nbttagcompound3.setByte("Flight", (byte)j);
+                    nbttagcompound1.setTag("Fireworks", nbttagcompound3);
                 }
-                this.field_92102_a.setTagCompound(nbttagcompound); //Forge BugFix: NPE Protection
 
+                this.field_92102_a.setTagCompound(nbttagcompound1); //Forge BugFix: NPE Protection
                 return true;
             }
             else if (j == 1 && i == 0 && l == 0 && k > 0 && j1 <= 1)
             {
                 this.field_92102_a = new ItemStack(Items.firework_charge);
-                nbttagcompound = new NBTTagCompound();
-                nbttagcompound1 = new NBTTagCompound();
+                NBTTagCompound nbttagcompound = new NBTTagCompound();
+                NBTTagCompound nbttagcompound2 = new NBTTagCompound();
                 byte b0 = 0;
-                ArrayList arraylist = Lists.newArrayList();
+                List<Integer> list = Lists.<Integer>newArrayList();
 
-                for (int l1 = 0; l1 < p_77569_1_.getSizeInventory(); ++l1)
+                for (int l1 = 0; l1 < inv.getSizeInventory(); ++l1)
                 {
-                    ItemStack itemstack2 = p_77569_1_.getStackInSlot(l1);
+                    ItemStack itemstack2 = inv.getStackInSlot(l1);
 
                     if (itemstack2 != null)
                     {
                         if (itemstack2.getItem() == Items.dye)
                         {
-                            arraylist.add(Integer.valueOf(ItemDye.dyeColors[itemstack2.getMetadata() & 15]));
+                            list.add(Integer.valueOf(ItemDye.dyeColors[itemstack2.getMetadata() & 15]));
                         }
                         else if (itemstack2.getItem() == Items.glowstone_dust)
                         {
-                            nbttagcompound1.setBoolean("Flicker", true);
+                            nbttagcompound2.setBoolean("Flicker", true);
                         }
                         else if (itemstack2.getItem() == Items.diamond)
                         {
-                            nbttagcompound1.setBoolean("Trail", true);
+                            nbttagcompound2.setBoolean("Trail", true);
                         }
                         else if (itemstack2.getItem() == Items.fire_charge)
                         {
@@ -162,32 +158,32 @@ public class RecipeFireworks implements IRecipe
                     }
                 }
 
-                int[] aint1 = new int[arraylist.size()];
+                int[] aint1 = new int[list.size()];
 
                 for (int l2 = 0; l2 < aint1.length; ++l2)
                 {
-                    aint1[l2] = ((Integer)arraylist.get(l2)).intValue();
+                    aint1[l2] = ((Integer)list.get(l2)).intValue();
                 }
 
-                nbttagcompound1.setIntArray("Colors", aint1);
-                nbttagcompound1.setByte("Type", b0);
-                nbttagcompound.setTag("Explosion", nbttagcompound1);
+                nbttagcompound2.setIntArray("Colors", aint1);
+                nbttagcompound2.setByte("Type", b0);
+                nbttagcompound.setTag("Explosion", nbttagcompound2);
                 this.field_92102_a.setTagCompound(nbttagcompound);
                 return true;
             }
             else if (j == 0 && i == 0 && l == 1 && k > 0 && k == i1)
             {
-                ArrayList arraylist1 = Lists.newArrayList();
+                List<Integer> list1 = Lists.<Integer>newArrayList();
 
-                for (int i2 = 0; i2 < p_77569_1_.getSizeInventory(); ++i2)
+                for (int i2 = 0; i2 < inv.getSizeInventory(); ++i2)
                 {
-                    ItemStack itemstack1 = p_77569_1_.getStackInSlot(i2);
+                    ItemStack itemstack1 = inv.getStackInSlot(i2);
 
                     if (itemstack1 != null)
                     {
                         if (itemstack1.getItem() == Items.dye)
                         {
-                            arraylist1.add(Integer.valueOf(ItemDye.dyeColors[itemstack1.getMetadata() & 15]));
+                            list1.add(Integer.valueOf(ItemDye.dyeColors[itemstack1.getMetadata() & 15]));
                         }
                         else if (itemstack1.getItem() == Items.firework_charge)
                         {
@@ -197,24 +193,24 @@ public class RecipeFireworks implements IRecipe
                     }
                 }
 
-                int[] aint = new int[arraylist1.size()];
+                int[] aint = new int[list1.size()];
 
                 for (int j2 = 0; j2 < aint.length; ++j2)
                 {
-                    aint[j2] = ((Integer)arraylist1.get(j2)).intValue();
+                    aint[j2] = ((Integer)list1.get(j2)).intValue();
                 }
 
                 if (this.field_92102_a != null && this.field_92102_a.hasTagCompound())
                 {
-                    NBTTagCompound nbttagcompound2 = this.field_92102_a.getTagCompound().getCompoundTag("Explosion");
+                    NBTTagCompound nbttagcompound4 = this.field_92102_a.getTagCompound().getCompoundTag("Explosion");
 
-                    if (nbttagcompound2 == null)
+                    if (nbttagcompound4 == null)
                     {
                         return false;
                     }
                     else
                     {
-                        nbttagcompound2.setIntArray("FadeColors", aint);
+                        nbttagcompound4.setIntArray("FadeColors", aint);
                         return true;
                     }
                 }
@@ -237,7 +233,7 @@ public class RecipeFireworks implements IRecipe
     /**
      * Returns an Item that is the result of this recipe
      */
-    public ItemStack getCraftingResult(InventoryCrafting p_77572_1_)
+    public ItemStack getCraftingResult(InventoryCrafting inv)
     {
         return this.field_92102_a.copy();
     }
@@ -255,13 +251,13 @@ public class RecipeFireworks implements IRecipe
         return this.field_92102_a;
     }
 
-    public ItemStack[] getRemainingItems(InventoryCrafting p_179532_1_)
+    public ItemStack[] getRemainingItems(InventoryCrafting inv)
     {
-        ItemStack[] aitemstack = new ItemStack[p_179532_1_.getSizeInventory()];
+        ItemStack[] aitemstack = new ItemStack[inv.getSizeInventory()];
 
         for (int i = 0; i < aitemstack.length; ++i)
         {
-            ItemStack itemstack = p_179532_1_.getStackInSlot(i);
+            ItemStack itemstack = inv.getStackInSlot(i);
             aitemstack[i] = net.minecraftforge.common.ForgeHooks.getContainerItem(itemstack);
         }
 

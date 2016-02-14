@@ -4,7 +4,6 @@ public class ChatAllowedCharacters
 {
     /** Array of the special characters that are allowed in any text drawing of Minecraft. */
     public static final char[] allowedCharactersArray = new char[] {'/', '\n', '\r', '\t', '\u0000', '\f', '`', '?', '*', '\\', '<', '>', '|', '\"', ':'};
-    private static final String __OBFID = "CL_00001606";
 
     public static boolean isAllowedCharacter(char character)
     {
@@ -17,13 +16,9 @@ public class ChatAllowedCharacters
     public static String filterAllowedCharacters(String input)
     {
         StringBuilder stringbuilder = new StringBuilder();
-        char[] achar = input.toCharArray();
-        int i = achar.length;
 
-        for (int j = 0; j < i; ++j)
+        for (char c0 : input.toCharArray())
         {
-            char c0 = achar[j];
-
             if (isAllowedCharacter(c0))
             {
                 stringbuilder.append(c0);

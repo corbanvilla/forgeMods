@@ -11,12 +11,11 @@ public class EntityAIMoveTowardsRestriction extends EntityAIBase
     private double movePosY;
     private double movePosZ;
     private double movementSpeed;
-    private static final String __OBFID = "CL_00001598";
 
-    public EntityAIMoveTowardsRestriction(EntityCreature p_i2347_1_, double p_i2347_2_)
+    public EntityAIMoveTowardsRestriction(EntityCreature creatureIn, double speedIn)
     {
-        this.theEntity = p_i2347_1_;
-        this.movementSpeed = p_i2347_2_;
+        this.theEntity = creatureIn;
+        this.movementSpeed = speedIn;
         this.setMutexBits(1);
     }
 
@@ -31,7 +30,7 @@ public class EntityAIMoveTowardsRestriction extends EntityAIBase
         }
         else
         {
-            BlockPos blockpos = this.theEntity.func_180486_cf();
+            BlockPos blockpos = this.theEntity.getHomePosition();
             Vec3 vec3 = RandomPositionGenerator.findRandomTargetBlockTowards(this.theEntity, 16, 7, new Vec3((double)blockpos.getX(), (double)blockpos.getY(), (double)blockpos.getZ()));
 
             if (vec3 == null)

@@ -7,8 +7,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemCoal extends Item
 {
-    private static final String __OBFID = "CL_00000002";
-
     public ItemCoal()
     {
         this.setHasSubtypes(true);
@@ -27,11 +25,9 @@ public class ItemCoal extends Item
 
     /**
      * returns a list of items with the same ID, but different meta (eg: dye returns 16 items)
-     *  
-     * @param subItems The List of sub-items. This is a List of ItemStacks.
      */
     @SideOnly(Side.CLIENT)
-    public void getSubItems(Item itemIn, CreativeTabs tab, List subItems)
+    public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems)
     {
         subItems.add(new ItemStack(itemIn, 1, 0));
         subItems.add(new ItemStack(itemIn, 1, 1));

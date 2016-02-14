@@ -2,21 +2,21 @@ package net.minecraft.network.play.client;
 
 import java.io.IOException;
 import net.minecraft.entity.Entity;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class C0BPacketEntityAction implements Packet
+public class C0BPacketEntityAction implements Packet<INetHandlerPlayServer>
 {
     private int entityID;
     private C0BPacketEntityAction.Action action;
     private int auxData;
-    private static final String __OBFID = "CL_00001366";
 
-    public C0BPacketEntityAction() {}
+    public C0BPacketEntityAction()
+    {
+    }
 
     @SideOnly(Side.CLIENT)
     public C0BPacketEntityAction(Entity entity, C0BPacketEntityAction.Action action)
@@ -52,6 +52,9 @@ public class C0BPacketEntityAction implements Packet
         buf.writeVarIntToBuffer(this.auxData);
     }
 
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
     public void processPacket(INetHandlerPlayServer handler)
     {
         handler.processEntityAction(this);
@@ -67,14 +70,6 @@ public class C0BPacketEntityAction implements Packet
         return this.auxData;
     }
 
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayServer)handler);
-    }
-
     public static enum Action
     {
         START_SNEAKING,
@@ -84,7 +79,5 @@ public class C0BPacketEntityAction implements Packet
         STOP_SPRINTING,
         RIDING_JUMP,
         OPEN_INVENTORY;
-
-        private static final String __OBFID = "CL_00002283";
     }
 }

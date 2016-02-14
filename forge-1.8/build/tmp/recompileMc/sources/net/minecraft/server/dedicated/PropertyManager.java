@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Properties;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -18,7 +20,6 @@ public class PropertyManager
     private final Properties serverProperties = new Properties();
     /** The server properties file. */
     private final File serverPropertiesFile;
-    private static final String __OBFID = "CL_00001782";
 
     public PropertyManager(File propertiesFile)
     {
@@ -31,11 +32,11 @@ public class PropertyManager
             try
             {
                 fileinputstream = new FileInputStream(propertiesFile);
-                this.serverProperties.load(fileinputstream);
+                this.serverProperties.load((InputStream)fileinputstream);
             }
             catch (Exception exception)
             {
-                LOGGER.warn("Failed to load " + propertiesFile, exception);
+                LOGGER.warn((String)("Failed to load " + propertiesFile), (Throwable)exception);
                 this.generateNewProperties();
             }
             finally
@@ -46,7 +47,7 @@ public class PropertyManager
                     {
                         fileinputstream.close();
                     }
-                    catch (IOException ioexception)
+                    catch (IOException var11)
                     {
                         ;
                     }
@@ -79,11 +80,11 @@ public class PropertyManager
         try
         {
             fileoutputstream = new FileOutputStream(this.serverPropertiesFile);
-            this.serverProperties.store(fileoutputstream, "Minecraft server properties");
+            this.serverProperties.store((OutputStream)fileoutputstream, "Minecraft server properties");
         }
         catch (Exception exception)
         {
-            LOGGER.warn("Failed to save " + this.serverPropertiesFile, exception);
+            LOGGER.warn((String)("Failed to save " + this.serverPropertiesFile), (Throwable)exception);
             this.generateNewProperties();
         }
         finally
@@ -94,7 +95,7 @@ public class PropertyManager
                 {
                     fileoutputstream.close();
                 }
-                catch (IOException ioexception)
+                catch (IOException var10)
                 {
                     ;
                 }
@@ -134,7 +135,7 @@ public class PropertyManager
         {
             return Integer.parseInt(this.getStringProperty(key, "" + defaultValue));
         }
-        catch (Exception exception)
+        catch (Exception var4)
         {
             this.serverProperties.setProperty(key, "" + defaultValue);
             this.saveProperties();
@@ -148,7 +149,7 @@ public class PropertyManager
         {
             return Long.parseLong(this.getStringProperty(key, "" + defaultValue));
         }
-        catch (Exception exception)
+        catch (Exception var5)
         {
             this.serverProperties.setProperty(key, "" + defaultValue);
             this.saveProperties();
@@ -165,7 +166,7 @@ public class PropertyManager
         {
             return Boolean.parseBoolean(this.getStringProperty(key, "" + defaultValue));
         }
-        catch (Exception exception)
+        catch (Exception var4)
         {
             this.serverProperties.setProperty(key, "" + defaultValue);
             this.saveProperties();

@@ -40,20 +40,18 @@ public class RConThreadQuery extends RConThreadBase
     private byte[] buffer = new byte[1460];
     /** Storage for incoming DatagramPackets */
     private DatagramPacket incomingPacket;
-    private Map field_72644_p;
+    private Map<SocketAddress, String> field_72644_p;
     /** The hostname of this query server */
     private String queryHostname;
     /** The hostname of the running server */
     private String serverHostname;
-    /** A map of SocketAddress objects to RConThreadQueryAuth objects */
-    private Map queryClients;
+    private Map<SocketAddress, RConThreadQuery.Auth> queryClients;
     /** The time that this RConThreadQuery was constructed, from (new Date()).getTime() */
     private long time;
     /** The RConQuery output stream */
     private RConOutputStream output;
     /** The time of the last query response sent */
     private long lastQueryResponseTime;
-    private static final String __OBFID = "CL_00001802";
 
     public RConThreadQuery(IServer p_i1536_1_)
     {
@@ -95,9 +93,9 @@ public class RConThreadQuery extends RConThreadBase
             p_i1536_1_.saveProperties();
         }
 
-        this.field_72644_p = Maps.newHashMap();
+        this.field_72644_p = Maps.<SocketAddress, String>newHashMap();
         this.output = new RConOutputStream(1460);
-        this.queryClients = Maps.newHashMap();
+        this.queryClients = Maps.<SocketAddress, RConThreadQuery.Auth>newHashMap();
         this.time = (new Date()).getTime();
     }
 
@@ -126,6 +124,7 @@ public class RConThreadQuery extends RConThreadBase
             switch (abyte[2])
             {
                 case 0:
+
                     if (!this.verifyClientAuth(requestPacket).booleanValue())
                     {
                         this.logDebug("Invalid challenge [" + socketaddress + "]");
@@ -151,11 +150,12 @@ public class RConThreadQuery extends RConThreadBase
                         this.sendResponsePacket(rconoutputstream.toByteArray(), requestPacket);
                         this.logDebug("Status [" + socketaddress + "]");
                     }
+
+                default:
+                    return true;
                 case 9:
                     this.sendAuthChallenge(requestPacket);
                     this.logDebug("Challenge [" + socketaddress + "]");
-                    return true;
-                default:
                     return true;
             }
         }
@@ -217,12 +217,9 @@ public class RConThreadQuery extends RConThreadBase
             this.output.writeString("player_");
             this.output.writeInt(0);
             String[] astring = this.server.getAllUsernames();
-            String[] astring1 = astring;
-            int j = astring.length;
 
-            for (int k = 0; k < j; ++k)
+            for (String s : astring)
             {
-                String s = astring1[k];
                 this.output.writeString(s);
             }
 
@@ -262,9 +259,9 @@ public class RConThreadQuery extends RConThreadBase
      */
     private void sendAuthChallenge(DatagramPacket requestPacket) throws IOException
     {
-        RConThreadQuery.Auth auth = new RConThreadQuery.Auth(requestPacket);
-        this.queryClients.put(requestPacket.getSocketAddress(), auth);
-        this.sendResponsePacket(auth.getChallengeValue(), requestPacket);
+        RConThreadQuery.Auth rconthreadquery$auth = new RConThreadQuery.Auth(requestPacket);
+        this.queryClients.put(requestPacket.getSocketAddress(), rconthreadquery$auth);
+        this.sendResponsePacket(rconthreadquery$auth.getChallengeValue(), requestPacket);
     }
 
     /**
@@ -279,11 +276,11 @@ public class RConThreadQuery extends RConThreadBase
             if (i >= this.lastAuthCheckTime + 30000L)
             {
                 this.lastAuthCheckTime = i;
-                Iterator iterator = this.queryClients.entrySet().iterator();
+                Iterator<Entry<SocketAddress, RConThreadQuery.Auth>> iterator = this.queryClients.entrySet().iterator();
 
                 while (iterator.hasNext())
                 {
-                    Entry entry = (Entry)iterator.next();
+                    Entry<SocketAddress, RConThreadQuery.Auth> entry = (Entry)iterator.next();
 
                     if (((RConThreadQuery.Auth)entry.getValue()).hasExpired(i).booleanValue())
                     {
@@ -310,11 +307,11 @@ public class RConThreadQuery extends RConThreadBase
                     this.cleanQueryClientsMap();
                     this.parseIncomingPacket(this.incomingPacket);
                 }
-                catch (SocketTimeoutException sockettimeoutexception)
+                catch (SocketTimeoutException var7)
                 {
                     this.cleanQueryClientsMap();
                 }
-                catch (PortUnreachableException portunreachableexception)
+                catch (PortUnreachableException var8)
                 {
                     ;
                 }
@@ -409,7 +406,6 @@ public class RConThreadQuery extends RConThreadBase
         private byte[] challengeValue;
         /** The request ID stored as a String */
         private String requestIdAsString;
-        private static final String __OBFID = "CL_00001803";
 
         public Auth(DatagramPacket requestPacket)
         {

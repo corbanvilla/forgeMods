@@ -1,8 +1,6 @@
 package net.minecraft.realms;
 
 import com.google.common.collect.Lists;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.client.AnvilConverterException;
 import net.minecraft.util.IProgressUpdate;
@@ -15,11 +13,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class RealmsAnvilLevelStorageSource
 {
     private ISaveFormat levelStorageSource;
-    private static final String __OBFID = "CL_00001856";
 
-    public RealmsAnvilLevelStorageSource(ISaveFormat p_i1106_1_)
+    public RealmsAnvilLevelStorageSource(ISaveFormat levelStorageSourceIn)
     {
-        this.levelStorageSource = p_i1106_1_;
+        this.levelStorageSource = levelStorageSourceIn;
     }
 
     public String getName()
@@ -67,17 +64,15 @@ public class RealmsAnvilLevelStorageSource
         this.levelStorageSource.flushCache();
     }
 
-    public List getLevelList() throws AnvilConverterException
+    public List<RealmsLevelSummary> getLevelList() throws AnvilConverterException
     {
-        ArrayList arraylist = Lists.newArrayList();
-        Iterator iterator = this.levelStorageSource.getSaveList().iterator();
+        List<RealmsLevelSummary> list = Lists.<RealmsLevelSummary>newArrayList();
 
-        while (iterator.hasNext())
+        for (SaveFormatComparator saveformatcomparator : this.levelStorageSource.getSaveList())
         {
-            SaveFormatComparator saveformatcomparator = (SaveFormatComparator)iterator.next();
-            arraylist.add(new RealmsLevelSummary(saveformatcomparator));
+            list.add(new RealmsLevelSummary(saveformatcomparator));
         }
 
-        return arraylist;
+        return list;
     }
 }

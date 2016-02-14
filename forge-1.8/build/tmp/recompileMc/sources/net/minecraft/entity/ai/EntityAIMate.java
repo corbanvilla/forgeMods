@@ -1,6 +1,5 @@
 package net.minecraft.entity.ai;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import net.minecraft.entity.EntityAgeable;
@@ -22,13 +21,12 @@ public class EntityAIMate extends EntityAIBase
     int spawnBabyDelay;
     /** The speed the creature moves at during mating behavior. */
     double moveSpeed;
-    private static final String __OBFID = "CL_00001578";
 
-    public EntityAIMate(EntityAnimal p_i1619_1_, double p_i1619_2_)
+    public EntityAIMate(EntityAnimal animal, double speedIn)
     {
-        this.theAnimal = p_i1619_1_;
-        this.theWorld = p_i1619_1_.worldObj;
-        this.moveSpeed = p_i1619_2_;
+        this.theAnimal = animal;
+        this.theWorld = animal.worldObj;
+        this.moveSpeed = speedIn;
         this.setMutexBits(3);
     }
 
@@ -87,15 +85,12 @@ public class EntityAIMate extends EntityAIBase
     private EntityAnimal getNearbyMate()
     {
         float f = 8.0F;
-        List list = this.theWorld.getEntitiesWithinAABB(this.theAnimal.getClass(), this.theAnimal.getEntityBoundingBox().expand((double)f, (double)f, (double)f));
+        List<EntityAnimal> list = this.theWorld.<EntityAnimal>getEntitiesWithinAABB(this.theAnimal.getClass(), this.theAnimal.getEntityBoundingBox().expand((double)f, (double)f, (double)f));
         double d0 = Double.MAX_VALUE;
         EntityAnimal entityanimal = null;
-        Iterator iterator = list.iterator();
 
-        while (iterator.hasNext())
+        for (EntityAnimal entityanimal1 : list)
         {
-            EntityAnimal entityanimal1 = (EntityAnimal)iterator.next();
-
             if (this.theAnimal.canMateWith(entityanimal1) && this.theAnimal.getDistanceSqToEntity(entityanimal1) < d0)
             {
                 entityanimal = entityanimal1;
@@ -115,11 +110,11 @@ public class EntityAIMate extends EntityAIBase
 
         if (entityageable != null)
         {
-            EntityPlayer entityplayer = this.theAnimal.func_146083_cb();
+            EntityPlayer entityplayer = this.theAnimal.getPlayerInLove();
 
-            if (entityplayer == null && this.targetMate.func_146083_cb() != null)
+            if (entityplayer == null && this.targetMate.getPlayerInLove() != null)
             {
-                entityplayer = this.targetMate.func_146083_cb();
+                entityplayer = this.targetMate.getPlayerInLove();
             }
 
             if (entityplayer != null)
@@ -146,10 +141,13 @@ public class EntityAIMate extends EntityAIBase
                 double d0 = random.nextGaussian() * 0.02D;
                 double d1 = random.nextGaussian() * 0.02D;
                 double d2 = random.nextGaussian() * 0.02D;
-                this.theWorld.spawnParticle(EnumParticleTypes.HEART, this.theAnimal.posX + (double)(random.nextFloat() * this.theAnimal.width * 2.0F) - (double)this.theAnimal.width, this.theAnimal.posY + 0.5D + (double)(random.nextFloat() * this.theAnimal.height), this.theAnimal.posZ + (double)(random.nextFloat() * this.theAnimal.width * 2.0F) - (double)this.theAnimal.width, d0, d1, d2, new int[0]);
+                double d3 = random.nextDouble() * (double)this.theAnimal.width * 2.0D - (double)this.theAnimal.width;
+                double d4 = 0.5D + random.nextDouble() * (double)this.theAnimal.height;
+                double d5 = random.nextDouble() * (double)this.theAnimal.width * 2.0D - (double)this.theAnimal.width;
+                this.theWorld.spawnParticle(EnumParticleTypes.HEART, this.theAnimal.posX + d3, this.theAnimal.posY + d4, this.theAnimal.posZ + d5, d0, d1, d2, new int[0]);
             }
 
-            if (this.theWorld.getGameRules().getGameRuleBooleanValue("doMobLoot"))
+            if (this.theWorld.getGameRules().getBoolean("doMobLoot"))
             {
                 this.theWorld.spawnEntityInWorld(new EntityXPOrb(this.theWorld, this.theAnimal.posX, this.theAnimal.posY, this.theAnimal.posZ, random.nextInt(7) + 1));
             }

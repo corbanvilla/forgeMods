@@ -11,7 +11,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class GrassColorReloadListener implements IResourceManagerReloadListener
 {
     private static final ResourceLocation LOC_GRASS_PNG = new ResourceLocation("textures/colormap/grass.png");
-    private static final String __OBFID = "CL_00001078";
 
     public void onResourceManagerReload(IResourceManager resourceManager)
     {
@@ -19,7 +18,7 @@ public class GrassColorReloadListener implements IResourceManagerReloadListener
         {
             ColorizerGrass.setGrassBiomeColorizer(TextureUtil.readImageData(resourceManager, LOC_GRASS_PNG));
         }
-        catch (IOException ioexception)
+        catch (IOException var3)
         {
             ;
         }

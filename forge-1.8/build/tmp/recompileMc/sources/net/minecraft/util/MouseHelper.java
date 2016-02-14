@@ -12,7 +12,6 @@ public class MouseHelper
     public int deltaX;
     /** Mouse delta Y this frame */
     public int deltaY;
-    private static final String __OBFID = "CL_00000648";
 
     /**
      * Grabs the mouse cursor it doesn't move and isn't seen.

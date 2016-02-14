@@ -15,8 +15,6 @@ import net.minecraft.world.World;
 
 public class ItemEnderEye extends Item
 {
-    private static final String __OBFID = "CL_00000026";
-
     public ItemEnderEye()
     {
         this.setCreativeTab(CreativeTabs.tabMisc);
@@ -24,9 +22,6 @@ public class ItemEnderEye extends Item
 
     /**
      * Called when a Block is right-clicked with this Item
-     *  
-     * @param pos The block being right-clicked
-     * @param side The side being right-clicked
      */
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
@@ -55,17 +50,17 @@ public class ItemEnderEye extends Item
                     worldIn.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d0, d1, d2, d3, d4, d5, new int[0]);
                 }
 
-                EnumFacing enumfacing1 = (EnumFacing)iblockstate.getValue(BlockEndPortalFrame.FACING);
+                EnumFacing enumfacing = (EnumFacing)iblockstate.getValue(BlockEndPortalFrame.FACING);
                 int l = 0;
                 int j = 0;
                 boolean flag1 = false;
                 boolean flag = true;
-                EnumFacing enumfacing2 = enumfacing1.rotateY();
+                EnumFacing enumfacing1 = enumfacing.rotateY();
 
                 for (int k = -2; k <= 2; ++k)
                 {
-                    BlockPos blockpos2 = pos.offset(enumfacing2, k);
-                    IBlockState iblockstate1 = worldIn.getBlockState(blockpos2);
+                    BlockPos blockpos1 = pos.offset(enumfacing1, k);
+                    IBlockState iblockstate1 = worldIn.getBlockState(blockpos1);
 
                     if (iblockstate1.getBlock() == Blocks.end_portal_frame)
                     {
@@ -87,13 +82,12 @@ public class ItemEnderEye extends Item
 
                 if (flag && j == l + 2)
                 {
-                    BlockPos blockpos1 = pos.offset(enumfacing1, 4);
-                    int i1;
+                    BlockPos blockpos = pos.offset(enumfacing, 4);
 
-                    for (i1 = l; i1 <= j; ++i1)
+                    for (int i1 = l; i1 <= j; ++i1)
                     {
-                        BlockPos blockpos3 = blockpos1.offset(enumfacing2, i1);
-                        IBlockState iblockstate3 = worldIn.getBlockState(blockpos3);
+                        BlockPos blockpos2 = blockpos.offset(enumfacing1, i1);
+                        IBlockState iblockstate3 = worldIn.getBlockState(blockpos2);
 
                         if (iblockstate3.getBlock() != Blocks.end_portal_frame || !((Boolean)iblockstate3.getValue(BlockEndPortalFrame.EYE)).booleanValue())
                         {
@@ -102,17 +96,14 @@ public class ItemEnderEye extends Item
                         }
                     }
 
-                    int j1;
-                    BlockPos blockpos4;
-
-                    for (i1 = l - 1; i1 <= j + 1; i1 += 4)
+                    for (int j1 = l - 1; j1 <= j + 1; j1 += 4)
                     {
-                        blockpos1 = pos.offset(enumfacing2, i1);
+                        blockpos = pos.offset(enumfacing1, j1);
 
-                        for (j1 = 1; j1 <= 3; ++j1)
+                        for (int l1 = 1; l1 <= 3; ++l1)
                         {
-                            blockpos4 = blockpos1.offset(enumfacing1, j1);
-                            IBlockState iblockstate2 = worldIn.getBlockState(blockpos4);
+                            BlockPos blockpos3 = blockpos.offset(enumfacing, l1);
+                            IBlockState iblockstate2 = worldIn.getBlockState(blockpos3);
 
                             if (iblockstate2.getBlock() != Blocks.end_portal_frame || !((Boolean)iblockstate2.getValue(BlockEndPortalFrame.EYE)).booleanValue())
                             {
@@ -124,13 +115,13 @@ public class ItemEnderEye extends Item
 
                     if (flag)
                     {
-                        for (i1 = l; i1 <= j; ++i1)
+                        for (int k1 = l; k1 <= j; ++k1)
                         {
-                            blockpos1 = pos.offset(enumfacing2, i1);
+                            blockpos = pos.offset(enumfacing1, k1);
 
-                            for (j1 = 1; j1 <= 3; ++j1)
+                            for (int i2 = 1; i2 <= 3; ++i2)
                             {
-                                blockpos4 = blockpos1.offset(enumfacing1, j1);
+                                BlockPos blockpos4 = blockpos.offset(enumfacing, i2);
                                 worldIn.setBlockState(blockpos4, Blocks.end_portal.getDefaultState(), 2);
                             }
                         }

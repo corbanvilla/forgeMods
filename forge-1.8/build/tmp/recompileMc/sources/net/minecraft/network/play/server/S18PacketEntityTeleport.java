@@ -2,7 +2,6 @@ package net.minecraft.network.play.server;
 
 import java.io.IOException;
 import net.minecraft.entity.Entity;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -10,39 +9,40 @@ import net.minecraft.util.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S18PacketEntityTeleport implements Packet
+public class S18PacketEntityTeleport implements Packet<INetHandlerPlayClient>
 {
-    private int field_149458_a;
-    private int field_149456_b;
-    private int field_149457_c;
-    private int field_149454_d;
-    private byte field_149455_e;
-    private byte field_149453_f;
-    private boolean field_179698_g;
-    private static final String __OBFID = "CL_00001340";
+    private int entityId;
+    private int posX;
+    private int posY;
+    private int posZ;
+    private byte yaw;
+    private byte pitch;
+    private boolean onGround;
 
-    public S18PacketEntityTeleport() {}
-
-    public S18PacketEntityTeleport(Entity p_i45233_1_)
+    public S18PacketEntityTeleport()
     {
-        this.field_149458_a = p_i45233_1_.getEntityId();
-        this.field_149456_b = MathHelper.floor_double(p_i45233_1_.posX * 32.0D);
-        this.field_149457_c = MathHelper.floor_double(p_i45233_1_.posY * 32.0D);
-        this.field_149454_d = MathHelper.floor_double(p_i45233_1_.posZ * 32.0D);
-        this.field_149455_e = (byte)((int)(p_i45233_1_.rotationYaw * 256.0F / 360.0F));
-        this.field_149453_f = (byte)((int)(p_i45233_1_.rotationPitch * 256.0F / 360.0F));
-        this.field_179698_g = p_i45233_1_.onGround;
     }
 
-    public S18PacketEntityTeleport(int p_i45949_1_, int p_i45949_2_, int p_i45949_3_, int p_i45949_4_, byte p_i45949_5_, byte p_i45949_6_, boolean p_i45949_7_)
+    public S18PacketEntityTeleport(Entity entityIn)
     {
-        this.field_149458_a = p_i45949_1_;
-        this.field_149456_b = p_i45949_2_;
-        this.field_149457_c = p_i45949_3_;
-        this.field_149454_d = p_i45949_4_;
-        this.field_149455_e = p_i45949_5_;
-        this.field_149453_f = p_i45949_6_;
-        this.field_179698_g = p_i45949_7_;
+        this.entityId = entityIn.getEntityId();
+        this.posX = MathHelper.floor_double(entityIn.posX * 32.0D);
+        this.posY = MathHelper.floor_double(entityIn.posY * 32.0D);
+        this.posZ = MathHelper.floor_double(entityIn.posZ * 32.0D);
+        this.yaw = (byte)((int)(entityIn.rotationYaw * 256.0F / 360.0F));
+        this.pitch = (byte)((int)(entityIn.rotationPitch * 256.0F / 360.0F));
+        this.onGround = entityIn.onGround;
+    }
+
+    public S18PacketEntityTeleport(int entityIdIn, int posXIn, int posYIn, int posZIn, byte yawIn, byte pitchIn, boolean onGroundIn)
+    {
+        this.entityId = entityIdIn;
+        this.posX = posXIn;
+        this.posY = posYIn;
+        this.posZ = posZIn;
+        this.yaw = yawIn;
+        this.pitch = pitchIn;
+        this.onGround = onGroundIn;
     }
 
     /**
@@ -50,13 +50,13 @@ public class S18PacketEntityTeleport implements Packet
      */
     public void readPacketData(PacketBuffer buf) throws IOException
     {
-        this.field_149458_a = buf.readVarIntFromBuffer();
-        this.field_149456_b = buf.readInt();
-        this.field_149457_c = buf.readInt();
-        this.field_149454_d = buf.readInt();
-        this.field_149455_e = buf.readByte();
-        this.field_149453_f = buf.readByte();
-        this.field_179698_g = buf.readBoolean();
+        this.entityId = buf.readVarIntFromBuffer();
+        this.posX = buf.readInt();
+        this.posY = buf.readInt();
+        this.posZ = buf.readInt();
+        this.yaw = buf.readByte();
+        this.pitch = buf.readByte();
+        this.onGround = buf.readBoolean();
     }
 
     /**
@@ -64,13 +64,13 @@ public class S18PacketEntityTeleport implements Packet
      */
     public void writePacketData(PacketBuffer buf) throws IOException
     {
-        buf.writeVarIntToBuffer(this.field_149458_a);
-        buf.writeInt(this.field_149456_b);
-        buf.writeInt(this.field_149457_c);
-        buf.writeInt(this.field_149454_d);
-        buf.writeByte(this.field_149455_e);
-        buf.writeByte(this.field_149453_f);
-        buf.writeBoolean(this.field_179698_g);
+        buf.writeVarIntToBuffer(this.entityId);
+        buf.writeInt(this.posX);
+        buf.writeInt(this.posY);
+        buf.writeInt(this.posZ);
+        buf.writeByte(this.yaw);
+        buf.writeByte(this.pitch);
+        buf.writeBoolean(this.onGround);
     }
 
     /**
@@ -82,52 +82,44 @@ public class S18PacketEntityTeleport implements Packet
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_149451_c()
+    public int getEntityId()
     {
-        return this.field_149458_a;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayClient)handler);
+        return this.entityId;
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_149449_d()
+    public int getX()
     {
-        return this.field_149456_b;
+        return this.posX;
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_149448_e()
+    public int getY()
     {
-        return this.field_149457_c;
+        return this.posY;
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_149446_f()
+    public int getZ()
     {
-        return this.field_149454_d;
+        return this.posZ;
     }
 
     @SideOnly(Side.CLIENT)
-    public byte func_149450_g()
+    public byte getYaw()
     {
-        return this.field_149455_e;
+        return this.yaw;
     }
 
     @SideOnly(Side.CLIENT)
-    public byte func_149447_h()
+    public byte getPitch()
     {
-        return this.field_149453_f;
+        return this.pitch;
     }
 
     @SideOnly(Side.CLIENT)
-    public boolean func_179697_g()
+    public boolean getOnGround()
     {
-        return this.field_179698_g;
+        return this.onGround;
     }
 }

@@ -2,7 +2,6 @@ package net.minecraft.world.gen;
 
 import com.google.common.base.Objects;
 import java.util.Random;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockSand;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -14,8 +13,6 @@ import net.minecraft.world.chunk.ChunkPrimer;
 
 public class MapGenCaves extends MapGenBase
 {
-    private static final String __OBFID = "CL_00000393";
-
     protected void func_180703_a(long p_180703_1_, int p_180703_3_, int p_180703_4_, ChunkPrimer p_180703_5_, double p_180703_6_, double p_180703_8_, double p_180703_10_)
     {
         this.func_180702_a(p_180703_1_, p_180703_3_, p_180703_4_, p_180703_5_, p_180703_6_, p_180703_8_, p_180703_10_, 1.0F + this.rand.nextFloat() * 6.0F, 0.0F, 0.0F, -1, -1, 0.5D);
@@ -23,16 +20,16 @@ public class MapGenCaves extends MapGenBase
 
     protected void func_180702_a(long p_180702_1_, int p_180702_3_, int p_180702_4_, ChunkPrimer p_180702_5_, double p_180702_6_, double p_180702_8_, double p_180702_10_, float p_180702_12_, float p_180702_13_, float p_180702_14_, int p_180702_15_, int p_180702_16_, double p_180702_17_)
     {
-        double d4 = (double)(p_180702_3_ * 16 + 8);
-        double d5 = (double)(p_180702_4_ * 16 + 8);
-        float f3 = 0.0F;
-        float f4 = 0.0F;
+        double d0 = (double)(p_180702_3_ * 16 + 8);
+        double d1 = (double)(p_180702_4_ * 16 + 8);
+        float f = 0.0F;
+        float f1 = 0.0F;
         Random random = new Random(p_180702_1_);
 
         if (p_180702_16_ <= 0)
         {
-            int j1 = this.range * 16 - 16;
-            p_180702_16_ = j1 - random.nextInt(j1 / 4);
+            int i = this.range * 16 - 16;
+            p_180702_16_ = i - random.nextInt(i / 4);
         }
 
         boolean flag2 = false;
@@ -43,35 +40,35 @@ public class MapGenCaves extends MapGenBase
             flag2 = true;
         }
 
-        int k1 = random.nextInt(p_180702_16_ / 2) + p_180702_16_ / 4;
+        int j = random.nextInt(p_180702_16_ / 2) + p_180702_16_ / 4;
 
         for (boolean flag = random.nextInt(6) == 0; p_180702_15_ < p_180702_16_; ++p_180702_15_)
         {
-            double d6 = 1.5D + (double)(MathHelper.sin((float)p_180702_15_ * (float)Math.PI / (float)p_180702_16_) * p_180702_12_ * 1.0F);
-            double d7 = d6 * p_180702_17_;
-            float f5 = MathHelper.cos(p_180702_14_);
-            float f6 = MathHelper.sin(p_180702_14_);
-            p_180702_6_ += (double)(MathHelper.cos(p_180702_13_) * f5);
-            p_180702_8_ += (double)f6;
-            p_180702_10_ += (double)(MathHelper.sin(p_180702_13_) * f5);
+            double d2 = 1.5D + (double)(MathHelper.sin((float)p_180702_15_ * (float)Math.PI / (float)p_180702_16_) * p_180702_12_ * 1.0F);
+            double d3 = d2 * p_180702_17_;
+            float f2 = MathHelper.cos(p_180702_14_);
+            float f3 = MathHelper.sin(p_180702_14_);
+            p_180702_6_ += (double)(MathHelper.cos(p_180702_13_) * f2);
+            p_180702_8_ += (double)f3;
+            p_180702_10_ += (double)(MathHelper.sin(p_180702_13_) * f2);
 
             if (flag)
             {
-                p_180702_14_ *= 0.92F;
+                p_180702_14_ = p_180702_14_ * 0.92F;
             }
             else
             {
-                p_180702_14_ *= 0.7F;
+                p_180702_14_ = p_180702_14_ * 0.7F;
             }
 
-            p_180702_14_ += f4 * 0.1F;
-            p_180702_13_ += f3 * 0.1F;
-            f4 *= 0.9F;
-            f3 *= 0.75F;
-            f4 += (random.nextFloat() - random.nextFloat()) * random.nextFloat() * 2.0F;
-            f3 += (random.nextFloat() - random.nextFloat()) * random.nextFloat() * 4.0F;
+            p_180702_14_ = p_180702_14_ + f1 * 0.1F;
+            p_180702_13_ += f * 0.1F;
+            f1 = f1 * 0.9F;
+            f = f * 0.75F;
+            f1 = f1 + (random.nextFloat() - random.nextFloat()) * random.nextFloat() * 2.0F;
+            f = f + (random.nextFloat() - random.nextFloat()) * random.nextFloat() * 4.0F;
 
-            if (!flag2 && p_180702_15_ == k1 && p_180702_12_ > 1.0F && p_180702_16_ > 0)
+            if (!flag2 && p_180702_15_ == j && p_180702_12_ > 1.0F && p_180702_16_ > 0)
             {
                 this.func_180702_a(random.nextLong(), p_180702_3_, p_180702_4_, p_180702_5_, p_180702_6_, p_180702_8_, p_180702_10_, random.nextFloat() * 0.5F + 0.5F, p_180702_13_ - ((float)Math.PI / 2F), p_180702_14_ / 3.0F, p_180702_15_, p_180702_16_, 1.0D);
                 this.func_180702_a(random.nextLong(), p_180702_3_, p_180702_4_, p_180702_5_, p_180702_6_, p_180702_8_, p_180702_10_, random.nextFloat() * 0.5F + 0.5F, p_180702_13_ + ((float)Math.PI / 2F), p_180702_14_ / 3.0F, p_180702_15_, p_180702_16_, 1.0D);
@@ -80,76 +77,75 @@ public class MapGenCaves extends MapGenBase
 
             if (flag2 || random.nextInt(4) != 0)
             {
-                double d8 = p_180702_6_ - d4;
-                double d9 = p_180702_10_ - d5;
-                double d10 = (double)(p_180702_16_ - p_180702_15_);
-                double d11 = (double)(p_180702_12_ + 2.0F + 16.0F);
+                double d4 = p_180702_6_ - d0;
+                double d5 = p_180702_10_ - d1;
+                double d6 = (double)(p_180702_16_ - p_180702_15_);
+                double d7 = (double)(p_180702_12_ + 2.0F + 16.0F);
 
-                if (d8 * d8 + d9 * d9 - d10 * d10 > d11 * d11)
+                if (d4 * d4 + d5 * d5 - d6 * d6 > d7 * d7)
                 {
                     return;
                 }
 
-                if (p_180702_6_ >= d4 - 16.0D - d6 * 2.0D && p_180702_10_ >= d5 - 16.0D - d6 * 2.0D && p_180702_6_ <= d4 + 16.0D + d6 * 2.0D && p_180702_10_ <= d5 + 16.0D + d6 * 2.0D)
+                if (p_180702_6_ >= d0 - 16.0D - d2 * 2.0D && p_180702_10_ >= d1 - 16.0D - d2 * 2.0D && p_180702_6_ <= d0 + 16.0D + d2 * 2.0D && p_180702_10_ <= d1 + 16.0D + d2 * 2.0D)
                 {
-                    int k3 = MathHelper.floor_double(p_180702_6_ - d6) - p_180702_3_ * 16 - 1;
-                    int l1 = MathHelper.floor_double(p_180702_6_ + d6) - p_180702_3_ * 16 + 1;
-                    int l3 = MathHelper.floor_double(p_180702_8_ - d7) - 1;
-                    int i2 = MathHelper.floor_double(p_180702_8_ + d7) + 1;
-                    int i4 = MathHelper.floor_double(p_180702_10_ - d6) - p_180702_4_ * 16 - 1;
-                    int j2 = MathHelper.floor_double(p_180702_10_ + d6) - p_180702_4_ * 16 + 1;
+                    int k2 = MathHelper.floor_double(p_180702_6_ - d2) - p_180702_3_ * 16 - 1;
+                    int k = MathHelper.floor_double(p_180702_6_ + d2) - p_180702_3_ * 16 + 1;
+                    int l2 = MathHelper.floor_double(p_180702_8_ - d3) - 1;
+                    int l = MathHelper.floor_double(p_180702_8_ + d3) + 1;
+                    int i3 = MathHelper.floor_double(p_180702_10_ - d2) - p_180702_4_ * 16 - 1;
+                    int i1 = MathHelper.floor_double(p_180702_10_ + d2) - p_180702_4_ * 16 + 1;
 
-                    if (k3 < 0)
+                    if (k2 < 0)
                     {
-                        k3 = 0;
+                        k2 = 0;
                     }
 
-                    if (l1 > 16)
+                    if (k > 16)
                     {
-                        l1 = 16;
+                        k = 16;
                     }
 
-                    if (l3 < 1)
+                    if (l2 < 1)
                     {
-                        l3 = 1;
+                        l2 = 1;
                     }
 
-                    if (i2 > 248)
+                    if (l > 248)
                     {
-                        i2 = 248;
+                        l = 248;
                     }
 
-                    if (i4 < 0)
+                    if (i3 < 0)
                     {
-                        i4 = 0;
+                        i3 = 0;
                     }
 
-                    if (j2 > 16)
+                    if (i1 > 16)
                     {
-                        j2 = 16;
+                        i1 = 16;
                     }
 
                     boolean flag3 = false;
-                    int k2;
 
-                    for (k2 = k3; !flag3 && k2 < l1; ++k2)
+                    for (int j1 = k2; !flag3 && j1 < k; ++j1)
                     {
-                        for (int l2 = i4; !flag3 && l2 < j2; ++l2)
+                        for (int k1 = i3; !flag3 && k1 < i1; ++k1)
                         {
-                            for (int i3 = i2 + 1; !flag3 && i3 >= l3 - 1; --i3)
+                            for (int l1 = l + 1; !flag3 && l1 >= l2 - 1; --l1)
                             {
-                                if (i3 >= 0 && i3 < 256)
+                                if (l1 >= 0 && l1 < 256)
                                 {
-                                    IBlockState iblockstate = p_180702_5_.getBlockState(k2, i3, l2);
+                                    IBlockState iblockstate = p_180702_5_.getBlockState(j1, l1, k1);
 
-                                    if (isOceanBlock(p_180702_5_, k2, i3, l2, p_180702_3_, p_180702_4_))
+                                    if (isOceanBlock(p_180702_5_, j1, l1, k1, p_180702_3_, p_180702_4_))
                                     {
                                         flag3 = true;
                                     }
 
-                                    if (i3 != l3 - 1 && k2 != k3 && k2 != l1 - 1 && l2 != i4 && l2 != j2 - 1)
+                                    if (l1 != l2 - 1 && j1 != k2 && j1 != k - 1 && k1 != i3 && k1 != i1 - 1)
                                     {
-                                        i3 = l3;
+                                        l1 = l2;
                                     }
                                 }
                             }
@@ -158,31 +154,34 @@ public class MapGenCaves extends MapGenBase
 
                     if (!flag3)
                     {
-                        for (k2 = k3; k2 < l1; ++k2)
-                        {
-                            double d14 = ((double)(k2 + p_180702_3_ * 16) + 0.5D - p_180702_6_) / d6;
+                        BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
 
-                            for (int j4 = i4; j4 < j2; ++j4)
+                        for (int j3 = k2; j3 < k; ++j3)
+                        {
+                            double d10 = ((double)(j3 + p_180702_3_ * 16) + 0.5D - p_180702_6_) / d2;
+
+                            for (int i2 = i3; i2 < i1; ++i2)
                             {
-                                double d12 = ((double)(j4 + p_180702_4_ * 16) + 0.5D - p_180702_10_) / d6;
+                                double d8 = ((double)(i2 + p_180702_4_ * 16) + 0.5D - p_180702_10_) / d2;
                                 boolean flag1 = false;
 
-                                if (d14 * d14 + d12 * d12 < 1.0D)
+                                if (d10 * d10 + d8 * d8 < 1.0D)
                                 {
-                                    for (int j3 = i2; j3 > l3; --j3)
+                                    for (int j2 = l; j2 > l2; --j2)
                                     {
-                                        double d13 = ((double)(j3 - 1) + 0.5D - p_180702_8_) / d7;
+                                        double d9 = ((double)(j2 - 1) + 0.5D - p_180702_8_) / d3;
 
-                                        if (d13 > -0.7D && d14 * d14 + d13 * d13 + d12 * d12 < 1.0D)
+                                        if (d9 > -0.7D && d10 * d10 + d9 * d9 + d8 * d8 < 1.0D)
                                         {
-                                            IBlockState iblockstate1 = p_180702_5_.getBlockState(k2, j3, j4);
-                                            IBlockState iblockstate2 = (IBlockState)Objects.firstNonNull(p_180702_5_.getBlockState(k2, j3 + 1, j4), Blocks.air.getDefaultState());
+                                            IBlockState iblockstate1 = p_180702_5_.getBlockState(j3, j2, i2);
+                                            IBlockState iblockstate2 = (IBlockState)Objects.firstNonNull(p_180702_5_.getBlockState(j3, j2 + 1, i2), Blocks.air.getDefaultState());
 
-                                            if (isTopBlock(p_180702_5_, k2, j3, j4, p_180702_3_, p_180702_4_))
+                                            if (isTopBlock(p_180702_5_, j3, j2, i2, p_180702_3_, p_180702_4_))
                                             {
                                                 flag1 = true;
                                             }
-                                            digBlock(p_180702_5_, k2, j3, j4, p_180702_3_, p_180702_4_, flag1, iblockstate1, iblockstate2);
+
+                                            digBlock(p_180702_5_, j3, j2, i2, p_180702_3_, p_180702_4_, flag1, iblockstate1, iblockstate2);
                                         }
                                     }
                                 }
@@ -204,29 +203,32 @@ public class MapGenCaves extends MapGenBase
         return p_175793_1_.getBlock() == Blocks.stone ? true : (p_175793_1_.getBlock() == Blocks.dirt ? true : (p_175793_1_.getBlock() == Blocks.grass ? true : (p_175793_1_.getBlock() == Blocks.hardened_clay ? true : (p_175793_1_.getBlock() == Blocks.stained_hardened_clay ? true : (p_175793_1_.getBlock() == Blocks.sandstone ? true : (p_175793_1_.getBlock() == Blocks.red_sandstone ? true : (p_175793_1_.getBlock() == Blocks.mycelium ? true : (p_175793_1_.getBlock() == Blocks.snow_layer ? true : (p_175793_1_.getBlock() == Blocks.sand || p_175793_1_.getBlock() == Blocks.gravel) && p_175793_2_.getBlock().getMaterial() != Material.water))))))));
     }
 
-    protected void func_180701_a(World worldIn, int p_180701_2_, int p_180701_3_, int p_180701_4_, int p_180701_5_, ChunkPrimer p_180701_6_)
+    /**
+     * Recursively called by generate()
+     */
+    protected void recursiveGenerate(World worldIn, int chunkX, int chunkZ, int p_180701_4_, int p_180701_5_, ChunkPrimer chunkPrimerIn)
     {
-        int i1 = this.rand.nextInt(this.rand.nextInt(this.rand.nextInt(15) + 1) + 1);
+        int i = this.rand.nextInt(this.rand.nextInt(this.rand.nextInt(15) + 1) + 1);
 
         if (this.rand.nextInt(7) != 0)
         {
-            i1 = 0;
+            i = 0;
         }
 
-        for (int j1 = 0; j1 < i1; ++j1)
+        for (int j = 0; j < i; ++j)
         {
-            double d0 = (double)(p_180701_2_ * 16 + this.rand.nextInt(16));
+            double d0 = (double)(chunkX * 16 + this.rand.nextInt(16));
             double d1 = (double)this.rand.nextInt(this.rand.nextInt(120) + 8);
-            double d2 = (double)(p_180701_3_ * 16 + this.rand.nextInt(16));
-            int k1 = 1;
+            double d2 = (double)(chunkZ * 16 + this.rand.nextInt(16));
+            int k = 1;
 
             if (this.rand.nextInt(4) == 0)
             {
-                this.func_180703_a(this.rand.nextLong(), p_180701_4_, p_180701_5_, p_180701_6_, d0, d1, d2);
-                k1 += this.rand.nextInt(4);
+                this.func_180703_a(this.rand.nextLong(), p_180701_4_, p_180701_5_, chunkPrimerIn, d0, d1, d2);
+                k += this.rand.nextInt(4);
             }
 
-            for (int l1 = 0; l1 < k1; ++l1)
+            for (int l = 0; l < k; ++l)
             {
                 float f = this.rand.nextFloat() * (float)Math.PI * 2.0F;
                 float f1 = (this.rand.nextFloat() - 0.5F) * 2.0F / 8.0F;
@@ -237,7 +239,7 @@ public class MapGenCaves extends MapGenBase
                     f2 *= this.rand.nextFloat() * this.rand.nextFloat() * 3.0F + 1.0F;
                 }
 
-                this.func_180702_a(this.rand.nextLong(), p_180701_4_, p_180701_5_, p_180701_6_, d0, d1, d2, f2, f, f1, 0, 0, 1.0D);
+                this.func_180702_a(this.rand.nextLong(), p_180701_4_, p_180701_5_, chunkPrimerIn, d0, d1, d2, f2, f, f1, 0, 0, 1.0D);
             }
         }
     }

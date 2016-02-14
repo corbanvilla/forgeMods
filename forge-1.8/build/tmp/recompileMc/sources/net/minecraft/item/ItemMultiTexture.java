@@ -6,10 +6,9 @@ import net.minecraft.block.Block;
 public class ItemMultiTexture extends ItemBlock
 {
     protected final Block theBlock;
-    protected final Function nameFunction;
-    private static final String __OBFID = "CL_00000051";
+    protected final Function<ItemStack, String> nameFunction;
 
-    public ItemMultiTexture(Block block, Block block2, Function nameFunction)
+    public ItemMultiTexture(Block block, Block block2, Function<ItemStack, String> nameFunction)
     {
         super(block);
         this.theBlock = block2;
@@ -20,12 +19,11 @@ public class ItemMultiTexture extends ItemBlock
 
     public ItemMultiTexture(Block block, Block block2, final String[] namesByMeta)
     {
-        this(block, block2, new Function()
+        this(block, block2, new Function<ItemStack, String>()
         {
-            private static final String __OBFID = "CL_00002161";
-            public String apply(ItemStack stack)
+            public String apply(ItemStack p_apply_1_)
             {
-                int i = stack.getMetadata();
+                int i = p_apply_1_.getMetadata();
 
                 if (i < 0 || i >= namesByMeta.length)
                 {
@@ -33,10 +31,6 @@ public class ItemMultiTexture extends ItemBlock
                 }
 
                 return namesByMeta[i];
-            }
-            public Object apply(Object p_apply_1_)
-            {
-                return this.apply((ItemStack)p_apply_1_);
             }
         });
     }

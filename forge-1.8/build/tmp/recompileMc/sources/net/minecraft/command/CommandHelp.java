@@ -15,12 +15,10 @@ import net.minecraft.util.MathHelper;
 
 public class CommandHelp extends CommandBase
 {
-    private static final String __OBFID = "CL_00000529";
-
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
-    public String getName()
+    public String getCommandName()
     {
         return "help";
     }
@@ -33,37 +31,41 @@ public class CommandHelp extends CommandBase
         return 0;
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.help.usage";
     }
 
-    /**
-     * Gets a list of aliases for this command
-     */
-    public List getAliases()
+    public List<String> getCommandAliases()
     {
-        return Arrays.asList(new String[] {"?"});
+        return Arrays.<String>asList(new String[] {"?"});
     }
 
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
-    public void execute(ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
-        List list = this.getSortedPossibleCommands(sender);
-        boolean flag = true;
-        int i = (list.size() - 1) / 7;
-        boolean flag1 = false;
-        int k;
+        List<ICommand> list = this.getSortedPossibleCommands(sender);
+        int i = 7;
+        int j = (list.size() - 1) / 7;
+        int k = 0;
 
         try
         {
-            k = args.length == 0 ? 0 : parseInt(args[0], 1, i + 1) - 1;
+            k = args.length == 0 ? 0 : parseInt(args[0], 1, j + 1) - 1;
         }
         catch (NumberInvalidException numberinvalidexception)
         {
-            Map map = this.getCommands();
+            Map<String, ICommand> map = this.getCommands();
             ICommand icommand = (ICommand)map.get(args[0]);
 
             if (icommand != null)
@@ -79,16 +81,16 @@ public class CommandHelp extends CommandBase
             throw new CommandNotFoundException();
         }
 
-        int j = Math.min((k + 1) * 7, list.size());
-        ChatComponentTranslation chatcomponenttranslation1 = new ChatComponentTranslation("commands.help.header", new Object[] {Integer.valueOf(k + 1), Integer.valueOf(i + 1)});
+        int l = Math.min((k + 1) * 7, list.size());
+        ChatComponentTranslation chatcomponenttranslation1 = new ChatComponentTranslation("commands.help.header", new Object[] {Integer.valueOf(k + 1), Integer.valueOf(j + 1)});
         chatcomponenttranslation1.getChatStyle().setColor(EnumChatFormatting.DARK_GREEN);
         sender.addChatMessage(chatcomponenttranslation1);
 
-        for (int l = k * 7; l < j; ++l)
+        for (int i1 = k * 7; i1 < l; ++i1)
         {
-            ICommand icommand1 = (ICommand)list.get(l);
+            ICommand icommand1 = (ICommand)list.get(i1);
             ChatComponentTranslation chatcomponenttranslation = new ChatComponentTranslation(icommand1.getCommandUsage(sender), new Object[0]);
-            chatcomponenttranslation.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + icommand1.getName() + " "));
+            chatcomponenttranslation.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + icommand1.getCommandName() + " "));
             sender.addChatMessage(chatcomponenttranslation);
         }
 
@@ -100,26 +102,23 @@ public class CommandHelp extends CommandBase
         }
     }
 
-    /**
-     * Returns a sorted list of all possible commands for the given ICommandSender.
-     */
-    protected List getSortedPossibleCommands(ICommandSender p_71534_1_)
+    protected List<ICommand> getSortedPossibleCommands(ICommandSender p_71534_1_)
     {
-        List list = MinecraftServer.getServer().getCommandManager().getPossibleCommands(p_71534_1_);
+        List<ICommand> list = MinecraftServer.getServer().getCommandManager().getPossibleCommands(p_71534_1_);
         Collections.sort(list);
         return list;
     }
 
-    protected Map getCommands()
+    protected Map<String, ICommand> getCommands()
     {
         return MinecraftServer.getServer().getCommandManager().getCommands();
     }
 
-    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
         if (args.length == 1)
         {
-            Set set = this.getCommands().keySet();
+            Set<String> set = this.getCommands().keySet();
             /**
              * Returns a List of strings (chosen from the given strings) which the last word in the given string array
              * is a beginning-match for. (Tab completion).

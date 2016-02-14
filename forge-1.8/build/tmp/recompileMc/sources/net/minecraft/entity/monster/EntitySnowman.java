@@ -23,13 +23,11 @@ import net.minecraft.world.World;
 
 public class EntitySnowman extends EntityGolem implements IRangedAttackMob
 {
-    private static final String __OBFID = "CL_00001650";
-
     public EntitySnowman(World worldIn)
     {
         super(worldIn);
         this.setSize(0.7F, 1.9F);
-        ((PathNavigateGround)this.getNavigator()).func_179690_a(true);
+        ((PathNavigateGround)this.getNavigator()).setAvoidsWater(true);
         this.tasks.addTask(1, new EntityAIArrowAttack(this, 1.25D, 20, 10.0F));
         this.tasks.addTask(2, new EntityAIWander(this, 1.0D));
         this.tasks.addTask(3, new EntityAIWatchClosest(this, EntityPlayer.class, 6.0F));
@@ -73,10 +71,11 @@ public class EntitySnowman extends EntityGolem implements IRangedAttackMob
                 i = MathHelper.floor_double(this.posX + (double)((float)(l % 2 * 2 - 1) * 0.25F));
                 j = MathHelper.floor_double(this.posY);
                 k = MathHelper.floor_double(this.posZ + (double)((float)(l / 2 % 2 * 2 - 1) * 0.25F));
+                BlockPos blockpos = new BlockPos(i, j, k);
 
-                if (this.worldObj.getBlockState(new BlockPos(i, j, k)).getBlock().getMaterial() == Material.air && this.worldObj.getBiomeGenForCoords(new BlockPos(i, 0, k)).getFloatTemperature(new BlockPos(i, j, k)) < 0.8F && Blocks.snow_layer.canPlaceBlockAt(this.worldObj, new BlockPos(i, j, k)))
+                if (this.worldObj.getBlockState(blockpos).getBlock().getMaterial() == Material.air && this.worldObj.getBiomeGenForCoords(new BlockPos(i, 0, k)).getFloatTemperature(blockpos) < 0.8F && Blocks.snow_layer.canPlaceBlockAt(this.worldObj, blockpos))
                 {
-                    this.worldObj.setBlockState(new BlockPos(i, j, k), Blocks.snow_layer.getDefaultState());
+                    this.worldObj.setBlockState(blockpos, Blocks.snow_layer.getDefaultState());
                 }
             }
         }
@@ -92,9 +91,9 @@ public class EntitySnowman extends EntityGolem implements IRangedAttackMob
      */
     protected void dropFewItems(boolean p_70628_1_, int p_70628_2_)
     {
-        int j = this.rand.nextInt(16);
+        int i = this.rand.nextInt(16);
 
-        for (int k = 0; k < j; ++k)
+        for (int j = 0; j < i; ++j)
         {
             this.dropItem(Items.snowball, 1);
         }
@@ -110,8 +109,8 @@ public class EntitySnowman extends EntityGolem implements IRangedAttackMob
         double d1 = p_82196_1_.posX - this.posX;
         double d2 = d0 - entitysnowball.posY;
         double d3 = p_82196_1_.posZ - this.posZ;
-        float f1 = MathHelper.sqrt_double(d1 * d1 + d3 * d3) * 0.2F;
-        entitysnowball.setThrowableHeading(d1, d2 + (double)f1, d3, 1.6F, 12.0F);
+        float f = MathHelper.sqrt_double(d1 * d1 + d3 * d3) * 0.2F;
+        entitysnowball.setThrowableHeading(d1, d2 + (double)f, d3, 1.6F, 12.0F);
         this.playSound("random.bow", 1.0F, 1.0F / (this.getRNG().nextFloat() * 0.4F + 0.8F));
         this.worldObj.spawnEntityInWorld(entitysnowball);
     }

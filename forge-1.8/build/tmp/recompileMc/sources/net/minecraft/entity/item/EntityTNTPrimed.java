@@ -11,7 +11,6 @@ public class EntityTNTPrimed extends Entity
     /** How long the fuse is */
     public int fuse;
     private EntityLivingBase tntPlacedBy;
-    private static final String __OBFID = "CL_00001681";
 
     public EntityTNTPrimed(World worldIn)
     {
@@ -35,7 +34,9 @@ public class EntityTNTPrimed extends Entity
         this.tntPlacedBy = p_i1730_8_;
     }
 
-    protected void entityInit() {}
+    protected void entityInit()
+    {
+    }
 
     /**
      * returns if this entity triggers Block.onEntityWalking on the blocks they walk on. used for spiders and wolves to
@@ -94,7 +95,7 @@ public class EntityTNTPrimed extends Entity
     private void explode()
     {
         float f = 4.0F;
-        this.worldObj.createExplosion(this, this.posX, this.posY + (double)(this.height / 2.0F), this.posZ, f, true);
+        this.worldObj.createExplosion(this, this.posX, this.posY + (double)(this.height / 16.0F), this.posZ, f, true);
     }
 
     /**

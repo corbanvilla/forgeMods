@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.GameSettings;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.ARBFramebufferObject;
@@ -21,11 +22,14 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GLContext;
+import oshi.SystemInfo;
+import oshi.hardware.Processor;
 
 @SideOnly(Side.CLIENT)
 public class OpenGlHelper
 {
     public static boolean nvidia;
+    public static boolean ati;
     public static int GL_FRAMEBUFFER;
     public static int GL_RENDERBUFFER;
     public static int GL_COLOR_ATTACHMENT0;
@@ -80,11 +84,12 @@ public class OpenGlHelper
     public static boolean openGL21;
     public static boolean shadersSupported;
     private static String logText = "";
+    private static String cpu;
     public static boolean vboSupported;
+    public static boolean vboSupportedAti;
     private static boolean arbVbo;
     public static int GL_ARRAY_BUFFER;
     public static int GL_STATIC_DRAW;
-    private static final String __OBFID = "CL_00001179";
 
     /* Stores the last values sent into setLightmapTextureCoords */
     public static float lastBrightnessX = 0.0f;
@@ -256,7 +261,8 @@ public class OpenGlHelper
         }
 
         shadersSupported = framebufferSupported && shadersAvailable;
-        nvidia = GL11.glGetString(GL11.GL_VENDOR).toLowerCase().contains("nvidia");
+        String s = GL11.glGetString(GL11.GL_VENDOR).toLowerCase();
+        nvidia = s.contains("nvidia");
         arbVbo = !contextcapabilities.OpenGL15 && contextcapabilities.GL_ARB_vertex_buffer_object;
         vboSupported = contextcapabilities.OpenGL15 || arbVbo;
         logText = logText + "VBOs are " + (vboSupported ? "" : "not ") + "available because ";
@@ -276,6 +282,30 @@ public class OpenGlHelper
                 GL_ARRAY_BUFFER = 34962;
             }
         }
+
+        ati = s.contains("ati");
+
+        if (ati)
+        {
+            if (vboSupported)
+            {
+                vboSupportedAti = true;
+            }
+            else
+            {
+                GameSettings.Options.RENDER_DISTANCE.setValueMax(16.0F);
+            }
+        }
+
+        try
+        {
+            Processor[] aprocessor = (new SystemInfo()).getHardware().getProcessors();
+            cpu = String.format("%dx %s", new Object[] {Integer.valueOf(aprocessor.length), aprocessor[0]}).replaceAll("\\s+", " ");
+        }
+        catch (Throwable var3)
+        {
+            ;
+        }
     }
 
     public static boolean areShadersSupported()
@@ -288,20 +318,20 @@ public class OpenGlHelper
         return logText;
     }
 
-    public static int glGetProgrami(int p_153175_0_, int p_153175_1_)
+    public static int glGetProgrami(int program, int pname)
     {
-        return arbShaders ? ARBShaderObjects.glGetObjectParameteriARB(p_153175_0_, p_153175_1_) : GL20.glGetProgrami(p_153175_0_, p_153175_1_);
+        return arbShaders ? ARBShaderObjects.glGetObjectParameteriARB(program, pname) : GL20.glGetProgrami(program, pname);
     }
 
-    public static void glAttachShader(int p_153178_0_, int p_153178_1_)
+    public static void glAttachShader(int program, int shaderIn)
     {
         if (arbShaders)
         {
-            ARBShaderObjects.glAttachObjectARB(p_153178_0_, p_153178_1_);
+            ARBShaderObjects.glAttachObjectARB(program, shaderIn);
         }
         else
         {
-            GL20.glAttachShader(p_153178_0_, p_153178_1_);
+            GL20.glAttachShader(program, shaderIn);
         }
     }
 
@@ -320,59 +350,59 @@ public class OpenGlHelper
     /**
      * creates a shader with the given mode and returns the GL id. params: mode
      */
-    public static int glCreateShader(int p_153195_0_)
+    public static int glCreateShader(int type)
     {
-        return arbShaders ? ARBShaderObjects.glCreateShaderObjectARB(p_153195_0_) : GL20.glCreateShader(p_153195_0_);
+        return arbShaders ? ARBShaderObjects.glCreateShaderObjectARB(type) : GL20.glCreateShader(type);
     }
 
-    public static void glShaderSource(int p_153169_0_, ByteBuffer p_153169_1_)
+    public static void glShaderSource(int shaderIn, ByteBuffer string)
     {
         if (arbShaders)
         {
-            ARBShaderObjects.glShaderSourceARB(p_153169_0_, p_153169_1_);
+            ARBShaderObjects.glShaderSourceARB(shaderIn, string);
         }
         else
         {
-            GL20.glShaderSource(p_153169_0_, p_153169_1_);
+            GL20.glShaderSource(shaderIn, string);
         }
     }
 
-    public static void glCompileShader(int p_153170_0_)
+    public static void glCompileShader(int shaderIn)
     {
         if (arbShaders)
         {
-            ARBShaderObjects.glCompileShaderARB(p_153170_0_);
+            ARBShaderObjects.glCompileShaderARB(shaderIn);
         }
         else
         {
-            GL20.glCompileShader(p_153170_0_);
+            GL20.glCompileShader(shaderIn);
         }
     }
 
-    public static int glGetShaderi(int p_153157_0_, int p_153157_1_)
+    public static int glGetShaderi(int shaderIn, int pname)
     {
-        return arbShaders ? ARBShaderObjects.glGetObjectParameteriARB(p_153157_0_, p_153157_1_) : GL20.glGetShaderi(p_153157_0_, p_153157_1_);
+        return arbShaders ? ARBShaderObjects.glGetObjectParameteriARB(shaderIn, pname) : GL20.glGetShaderi(shaderIn, pname);
     }
 
-    public static String glGetShaderInfoLog(int p_153158_0_, int p_153158_1_)
+    public static String glGetShaderInfoLog(int shaderIn, int maxLength)
     {
-        return arbShaders ? ARBShaderObjects.glGetInfoLogARB(p_153158_0_, p_153158_1_) : GL20.glGetShaderInfoLog(p_153158_0_, p_153158_1_);
+        return arbShaders ? ARBShaderObjects.glGetInfoLogARB(shaderIn, maxLength) : GL20.glGetShaderInfoLog(shaderIn, maxLength);
     }
 
-    public static String glGetProgramInfoLog(int p_153166_0_, int p_153166_1_)
+    public static String glGetProgramInfoLog(int program, int maxLength)
     {
-        return arbShaders ? ARBShaderObjects.glGetInfoLogARB(p_153166_0_, p_153166_1_) : GL20.glGetProgramInfoLog(p_153166_0_, p_153166_1_);
+        return arbShaders ? ARBShaderObjects.glGetInfoLogARB(program, maxLength) : GL20.glGetProgramInfoLog(program, maxLength);
     }
 
-    public static void glUseProgram(int p_153161_0_)
+    public static void glUseProgram(int program)
     {
         if (arbShaders)
         {
-            ARBShaderObjects.glUseProgramObjectARB(p_153161_0_);
+            ARBShaderObjects.glUseProgramObjectARB(program);
         }
         else
         {
-            GL20.glUseProgram(p_153161_0_);
+            GL20.glUseProgram(program);
         }
     }
 
@@ -381,176 +411,176 @@ public class OpenGlHelper
         return arbShaders ? ARBShaderObjects.glCreateProgramObjectARB() : GL20.glCreateProgram();
     }
 
-    public static void glDeleteProgram(int p_153187_0_)
+    public static void glDeleteProgram(int program)
     {
         if (arbShaders)
         {
-            ARBShaderObjects.glDeleteObjectARB(p_153187_0_);
+            ARBShaderObjects.glDeleteObjectARB(program);
         }
         else
         {
-            GL20.glDeleteProgram(p_153187_0_);
+            GL20.glDeleteProgram(program);
         }
     }
 
-    public static void glLinkProgram(int p_153179_0_)
+    public static void glLinkProgram(int program)
     {
         if (arbShaders)
         {
-            ARBShaderObjects.glLinkProgramARB(p_153179_0_);
+            ARBShaderObjects.glLinkProgramARB(program);
         }
         else
         {
-            GL20.glLinkProgram(p_153179_0_);
+            GL20.glLinkProgram(program);
         }
     }
 
-    public static int glGetUniformLocation(int p_153194_0_, CharSequence p_153194_1_)
+    public static int glGetUniformLocation(int programObj, CharSequence name)
     {
-        return arbShaders ? ARBShaderObjects.glGetUniformLocationARB(p_153194_0_, p_153194_1_) : GL20.glGetUniformLocation(p_153194_0_, p_153194_1_);
+        return arbShaders ? ARBShaderObjects.glGetUniformLocationARB(programObj, name) : GL20.glGetUniformLocation(programObj, name);
     }
 
-    public static void glUniform1(int p_153181_0_, IntBuffer p_153181_1_)
-    {
-        if (arbShaders)
-        {
-            ARBShaderObjects.glUniform1ARB(p_153181_0_, p_153181_1_);
-        }
-        else
-        {
-            GL20.glUniform1(p_153181_0_, p_153181_1_);
-        }
-    }
-
-    public static void glUniform1i(int p_153163_0_, int p_153163_1_)
+    public static void glUniform1(int location, IntBuffer values)
     {
         if (arbShaders)
         {
-            ARBShaderObjects.glUniform1iARB(p_153163_0_, p_153163_1_);
+            ARBShaderObjects.glUniform1ARB(location, values);
         }
         else
         {
-            GL20.glUniform1i(p_153163_0_, p_153163_1_);
+            GL20.glUniform1(location, values);
         }
     }
 
-    public static void glUniform1(int p_153168_0_, FloatBuffer p_153168_1_)
+    public static void glUniform1i(int location, int v0)
     {
         if (arbShaders)
         {
-            ARBShaderObjects.glUniform1ARB(p_153168_0_, p_153168_1_);
+            ARBShaderObjects.glUniform1iARB(location, v0);
         }
         else
         {
-            GL20.glUniform1(p_153168_0_, p_153168_1_);
+            GL20.glUniform1i(location, v0);
         }
     }
 
-    public static void glUniform2(int p_153182_0_, IntBuffer p_153182_1_)
+    public static void glUniform1(int location, FloatBuffer values)
     {
         if (arbShaders)
         {
-            ARBShaderObjects.glUniform2ARB(p_153182_0_, p_153182_1_);
+            ARBShaderObjects.glUniform1ARB(location, values);
         }
         else
         {
-            GL20.glUniform2(p_153182_0_, p_153182_1_);
+            GL20.glUniform1(location, values);
         }
     }
 
-    public static void glUniform2(int p_153177_0_, FloatBuffer p_153177_1_)
+    public static void glUniform2(int location, IntBuffer values)
     {
         if (arbShaders)
         {
-            ARBShaderObjects.glUniform2ARB(p_153177_0_, p_153177_1_);
+            ARBShaderObjects.glUniform2ARB(location, values);
         }
         else
         {
-            GL20.glUniform2(p_153177_0_, p_153177_1_);
+            GL20.glUniform2(location, values);
         }
     }
 
-    public static void glUniform3(int p_153192_0_, IntBuffer p_153192_1_)
+    public static void glUniform2(int location, FloatBuffer values)
     {
         if (arbShaders)
         {
-            ARBShaderObjects.glUniform3ARB(p_153192_0_, p_153192_1_);
+            ARBShaderObjects.glUniform2ARB(location, values);
         }
         else
         {
-            GL20.glUniform3(p_153192_0_, p_153192_1_);
+            GL20.glUniform2(location, values);
         }
     }
 
-    public static void glUniform3(int p_153191_0_, FloatBuffer p_153191_1_)
+    public static void glUniform3(int location, IntBuffer values)
     {
         if (arbShaders)
         {
-            ARBShaderObjects.glUniform3ARB(p_153191_0_, p_153191_1_);
+            ARBShaderObjects.glUniform3ARB(location, values);
         }
         else
         {
-            GL20.glUniform3(p_153191_0_, p_153191_1_);
+            GL20.glUniform3(location, values);
         }
     }
 
-    public static void glUniform4(int p_153162_0_, IntBuffer p_153162_1_)
+    public static void glUniform3(int location, FloatBuffer values)
     {
         if (arbShaders)
         {
-            ARBShaderObjects.glUniform4ARB(p_153162_0_, p_153162_1_);
+            ARBShaderObjects.glUniform3ARB(location, values);
         }
         else
         {
-            GL20.glUniform4(p_153162_0_, p_153162_1_);
+            GL20.glUniform3(location, values);
         }
     }
 
-    public static void glUniform4(int p_153159_0_, FloatBuffer p_153159_1_)
+    public static void glUniform4(int location, IntBuffer values)
     {
         if (arbShaders)
         {
-            ARBShaderObjects.glUniform4ARB(p_153159_0_, p_153159_1_);
+            ARBShaderObjects.glUniform4ARB(location, values);
         }
         else
         {
-            GL20.glUniform4(p_153159_0_, p_153159_1_);
+            GL20.glUniform4(location, values);
         }
     }
 
-    public static void glUniformMatrix2(int p_153173_0_, boolean p_153173_1_, FloatBuffer p_153173_2_)
+    public static void glUniform4(int location, FloatBuffer values)
     {
         if (arbShaders)
         {
-            ARBShaderObjects.glUniformMatrix2ARB(p_153173_0_, p_153173_1_, p_153173_2_);
+            ARBShaderObjects.glUniform4ARB(location, values);
         }
         else
         {
-            GL20.glUniformMatrix2(p_153173_0_, p_153173_1_, p_153173_2_);
+            GL20.glUniform4(location, values);
         }
     }
 
-    public static void glUniformMatrix3(int p_153189_0_, boolean p_153189_1_, FloatBuffer p_153189_2_)
+    public static void glUniformMatrix2(int location, boolean transpose, FloatBuffer matrices)
     {
         if (arbShaders)
         {
-            ARBShaderObjects.glUniformMatrix3ARB(p_153189_0_, p_153189_1_, p_153189_2_);
+            ARBShaderObjects.glUniformMatrix2ARB(location, transpose, matrices);
         }
         else
         {
-            GL20.glUniformMatrix3(p_153189_0_, p_153189_1_, p_153189_2_);
+            GL20.glUniformMatrix2(location, transpose, matrices);
         }
     }
 
-    public static void glUniformMatrix4(int p_153160_0_, boolean p_153160_1_, FloatBuffer p_153160_2_)
+    public static void glUniformMatrix3(int location, boolean transpose, FloatBuffer matrices)
     {
         if (arbShaders)
         {
-            ARBShaderObjects.glUniformMatrix4ARB(p_153160_0_, p_153160_1_, p_153160_2_);
+            ARBShaderObjects.glUniformMatrix3ARB(location, transpose, matrices);
         }
         else
         {
-            GL20.glUniformMatrix4(p_153160_0_, p_153160_1_, p_153160_2_);
+            GL20.glUniformMatrix3(location, transpose, matrices);
+        }
+    }
+
+    public static void glUniformMatrix4(int location, boolean transpose, FloatBuffer matrices)
+    {
+        if (arbShaders)
+        {
+            ARBShaderObjects.glUniformMatrix4ARB(location, transpose, matrices);
+        }
+        else
+        {
+            GL20.glUniformMatrix4(location, transpose, matrices);
         }
     }
 
@@ -564,39 +594,39 @@ public class OpenGlHelper
         return arbVbo ? ARBVertexBufferObject.glGenBuffersARB() : GL15.glGenBuffers();
     }
 
-    public static void glBindBuffer(int p_176072_0_, int p_176072_1_)
+    public static void glBindBuffer(int target, int buffer)
     {
         if (arbVbo)
         {
-            ARBVertexBufferObject.glBindBufferARB(p_176072_0_, p_176072_1_);
+            ARBVertexBufferObject.glBindBufferARB(target, buffer);
         }
         else
         {
-            GL15.glBindBuffer(p_176072_0_, p_176072_1_);
+            GL15.glBindBuffer(target, buffer);
         }
     }
 
-    public static void glBufferData(int p_176071_0_, ByteBuffer p_176071_1_, int p_176071_2_)
+    public static void glBufferData(int target, ByteBuffer data, int usage)
     {
         if (arbVbo)
         {
-            ARBVertexBufferObject.glBufferDataARB(p_176071_0_, p_176071_1_, p_176071_2_);
+            ARBVertexBufferObject.glBufferDataARB(target, data, usage);
         }
         else
         {
-            GL15.glBufferData(p_176071_0_, p_176071_1_, p_176071_2_);
+            GL15.glBufferData(target, data, usage);
         }
     }
 
-    public static void glDeleteBuffers(int p_176074_0_)
+    public static void glDeleteBuffers(int buffer)
     {
         if (arbVbo)
         {
-            ARBVertexBufferObject.glDeleteBuffersARB(p_176074_0_);
+            ARBVertexBufferObject.glDeleteBuffersARB(buffer);
         }
         else
         {
-            GL15.glDeleteBuffers(p_176074_0_);
+            GL15.glDeleteBuffers(buffer);
         }
     }
 
@@ -605,74 +635,74 @@ public class OpenGlHelper
         return vboSupported && Minecraft.getMinecraft().gameSettings.useVbo;
     }
 
-    public static void glBindFramebuffer(int p_153171_0_, int p_153171_1_)
+    public static void glBindFramebuffer(int target, int framebufferIn)
     {
         if (framebufferSupported)
         {
             switch (framebufferType)
             {
                 case 0:
-                    GL30.glBindFramebuffer(p_153171_0_, p_153171_1_);
+                    GL30.glBindFramebuffer(target, framebufferIn);
                     break;
                 case 1:
-                    ARBFramebufferObject.glBindFramebuffer(p_153171_0_, p_153171_1_);
+                    ARBFramebufferObject.glBindFramebuffer(target, framebufferIn);
                     break;
                 case 2:
-                    EXTFramebufferObject.glBindFramebufferEXT(p_153171_0_, p_153171_1_);
+                    EXTFramebufferObject.glBindFramebufferEXT(target, framebufferIn);
             }
         }
     }
 
-    public static void glBindRenderbuffer(int p_153176_0_, int p_153176_1_)
+    public static void glBindRenderbuffer(int target, int renderbuffer)
     {
         if (framebufferSupported)
         {
             switch (framebufferType)
             {
                 case 0:
-                    GL30.glBindRenderbuffer(p_153176_0_, p_153176_1_);
+                    GL30.glBindRenderbuffer(target, renderbuffer);
                     break;
                 case 1:
-                    ARBFramebufferObject.glBindRenderbuffer(p_153176_0_, p_153176_1_);
+                    ARBFramebufferObject.glBindRenderbuffer(target, renderbuffer);
                     break;
                 case 2:
-                    EXTFramebufferObject.glBindRenderbufferEXT(p_153176_0_, p_153176_1_);
+                    EXTFramebufferObject.glBindRenderbufferEXT(target, renderbuffer);
             }
         }
     }
 
-    public static void glDeleteRenderbuffers(int p_153184_0_)
+    public static void glDeleteRenderbuffers(int renderbuffer)
     {
         if (framebufferSupported)
         {
             switch (framebufferType)
             {
                 case 0:
-                    GL30.glDeleteRenderbuffers(p_153184_0_);
+                    GL30.glDeleteRenderbuffers(renderbuffer);
                     break;
                 case 1:
-                    ARBFramebufferObject.glDeleteRenderbuffers(p_153184_0_);
+                    ARBFramebufferObject.glDeleteRenderbuffers(renderbuffer);
                     break;
                 case 2:
-                    EXTFramebufferObject.glDeleteRenderbuffersEXT(p_153184_0_);
+                    EXTFramebufferObject.glDeleteRenderbuffersEXT(renderbuffer);
             }
         }
     }
 
-    public static void glDeleteFramebuffers(int p_153174_0_)
+    public static void glDeleteFramebuffers(int framebufferIn)
     {
         if (framebufferSupported)
         {
             switch (framebufferType)
             {
                 case 0:
-                    GL30.glDeleteFramebuffers(p_153174_0_);
+                    GL30.glDeleteFramebuffers(framebufferIn);
                     break;
                 case 1:
-                    ARBFramebufferObject.glDeleteFramebuffers(p_153174_0_);
+                    ARBFramebufferObject.glDeleteFramebuffers(framebufferIn);
                     break;
                 case 2:
-                    EXTFramebufferObject.glDeleteFramebuffersEXT(p_153174_0_);
+                    EXTFramebufferObject.glDeleteFramebuffersEXT(framebufferIn);
             }
         }
     }
@@ -724,43 +754,43 @@ public class OpenGlHelper
         }
     }
 
-    public static void glRenderbufferStorage(int p_153186_0_, int p_153186_1_, int p_153186_2_, int p_153186_3_)
+    public static void glRenderbufferStorage(int target, int internalFormat, int width, int height)
     {
         if (framebufferSupported)
         {
             switch (framebufferType)
             {
                 case 0:
-                    GL30.glRenderbufferStorage(p_153186_0_, p_153186_1_, p_153186_2_, p_153186_3_);
+                    GL30.glRenderbufferStorage(target, internalFormat, width, height);
                     break;
                 case 1:
-                    ARBFramebufferObject.glRenderbufferStorage(p_153186_0_, p_153186_1_, p_153186_2_, p_153186_3_);
+                    ARBFramebufferObject.glRenderbufferStorage(target, internalFormat, width, height);
                     break;
                 case 2:
-                    EXTFramebufferObject.glRenderbufferStorageEXT(p_153186_0_, p_153186_1_, p_153186_2_, p_153186_3_);
+                    EXTFramebufferObject.glRenderbufferStorageEXT(target, internalFormat, width, height);
             }
         }
     }
 
-    public static void glFramebufferRenderbuffer(int p_153190_0_, int p_153190_1_, int p_153190_2_, int p_153190_3_)
+    public static void glFramebufferRenderbuffer(int target, int attachment, int renderBufferTarget, int renderBuffer)
     {
         if (framebufferSupported)
         {
             switch (framebufferType)
             {
                 case 0:
-                    GL30.glFramebufferRenderbuffer(p_153190_0_, p_153190_1_, p_153190_2_, p_153190_3_);
+                    GL30.glFramebufferRenderbuffer(target, attachment, renderBufferTarget, renderBuffer);
                     break;
                 case 1:
-                    ARBFramebufferObject.glFramebufferRenderbuffer(p_153190_0_, p_153190_1_, p_153190_2_, p_153190_3_);
+                    ARBFramebufferObject.glFramebufferRenderbuffer(target, attachment, renderBufferTarget, renderBuffer);
                     break;
                 case 2:
-                    EXTFramebufferObject.glFramebufferRenderbufferEXT(p_153190_0_, p_153190_1_, p_153190_2_, p_153190_3_);
+                    EXTFramebufferObject.glFramebufferRenderbufferEXT(target, attachment, renderBufferTarget, renderBuffer);
             }
         }
     }
 
-    public static int glCheckFramebufferStatus(int p_153167_0_)
+    public static int glCheckFramebufferStatus(int target)
     {
         if (!framebufferSupported)
         {
@@ -771,31 +801,31 @@ public class OpenGlHelper
             switch (framebufferType)
             {
                 case 0:
-                    return GL30.glCheckFramebufferStatus(p_153167_0_);
+                    return GL30.glCheckFramebufferStatus(target);
                 case 1:
-                    return ARBFramebufferObject.glCheckFramebufferStatus(p_153167_0_);
+                    return ARBFramebufferObject.glCheckFramebufferStatus(target);
                 case 2:
-                    return EXTFramebufferObject.glCheckFramebufferStatusEXT(p_153167_0_);
+                    return EXTFramebufferObject.glCheckFramebufferStatusEXT(target);
                 default:
                     return -1;
             }
         }
     }
 
-    public static void glFramebufferTexture2D(int p_153188_0_, int p_153188_1_, int p_153188_2_, int p_153188_3_, int p_153188_4_)
+    public static void glFramebufferTexture2D(int target, int attachment, int textarget, int texture, int level)
     {
         if (framebufferSupported)
         {
             switch (framebufferType)
             {
                 case 0:
-                    GL30.glFramebufferTexture2D(p_153188_0_, p_153188_1_, p_153188_2_, p_153188_3_, p_153188_4_);
+                    GL30.glFramebufferTexture2D(target, attachment, textarget, texture, level);
                     break;
                 case 1:
-                    ARBFramebufferObject.glFramebufferTexture2D(p_153188_0_, p_153188_1_, p_153188_2_, p_153188_3_, p_153188_4_);
+                    ARBFramebufferObject.glFramebufferTexture2D(target, attachment, textarget, texture, level);
                     break;
                 case 2:
-                    EXTFramebufferObject.glFramebufferTexture2DEXT(p_153188_0_, p_153188_1_, p_153188_2_, p_153188_3_, p_153188_4_);
+                    EXTFramebufferObject.glFramebufferTexture2DEXT(target, attachment, textarget, texture, level);
             }
         }
     }
@@ -803,75 +833,80 @@ public class OpenGlHelper
     /**
      * Sets the current lightmap texture to the specified OpenGL constant
      */
-    public static void setActiveTexture(int p_77473_0_)
+    public static void setActiveTexture(int texture)
     {
         if (arbMultitexture)
         {
-            ARBMultitexture.glActiveTextureARB(p_77473_0_);
+            ARBMultitexture.glActiveTextureARB(texture);
         }
         else
         {
-            GL13.glActiveTexture(p_77473_0_);
+            GL13.glActiveTexture(texture);
         }
     }
 
     /**
      * Sets the current lightmap texture to the specified OpenGL constant
      */
-    public static void setClientActiveTexture(int p_77472_0_)
+    public static void setClientActiveTexture(int texture)
     {
         if (arbMultitexture)
         {
-            ARBMultitexture.glClientActiveTextureARB(p_77472_0_);
+            ARBMultitexture.glClientActiveTextureARB(texture);
         }
         else
         {
-            GL13.glClientActiveTexture(p_77472_0_);
+            GL13.glClientActiveTexture(texture);
         }
     }
 
     /**
      * Sets the current coordinates of the given lightmap texture
      */
-    public static void setLightmapTextureCoords(int p_77475_0_, float p_77475_1_, float p_77475_2_)
+    public static void setLightmapTextureCoords(int target, float p_77475_1_, float p_77475_2_)
     {
         if (arbMultitexture)
         {
-            ARBMultitexture.glMultiTexCoord2fARB(p_77475_0_, p_77475_1_, p_77475_2_);
+            ARBMultitexture.glMultiTexCoord2fARB(target, p_77475_1_, p_77475_2_);
         }
         else
         {
-            GL13.glMultiTexCoord2f(p_77475_0_, p_77475_1_, p_77475_2_);
+            GL13.glMultiTexCoord2f(target, p_77475_1_, p_77475_2_);
         }
 
-        if (p_77475_0_ == lightmapTexUnit)
+        if (target == lightmapTexUnit)
         {
             lastBrightnessX = p_77475_1_;
             lastBrightnessY = p_77475_2_;
         }
     }
 
-    public static void glBlendFunc(int p_148821_0_, int p_148821_1_, int p_148821_2_, int p_148821_3_)
+    public static void glBlendFunc(int sFactorRGB, int dFactorRGB, int sfactorAlpha, int dfactorAlpha)
     {
         if (openGL14)
         {
             if (extBlendFuncSeparate)
             {
-                EXTBlendFuncSeparate.glBlendFuncSeparateEXT(p_148821_0_, p_148821_1_, p_148821_2_, p_148821_3_);
+                EXTBlendFuncSeparate.glBlendFuncSeparateEXT(sFactorRGB, dFactorRGB, sfactorAlpha, dfactorAlpha);
             }
             else
             {
-                GL14.glBlendFuncSeparate(p_148821_0_, p_148821_1_, p_148821_2_, p_148821_3_);
+                GL14.glBlendFuncSeparate(sFactorRGB, dFactorRGB, sfactorAlpha, dfactorAlpha);
             }
         }
         else
         {
-            GL11.glBlendFunc(p_148821_0_, p_148821_1_);
+            GL11.glBlendFunc(sFactorRGB, dFactorRGB);
         }
     }
 
     public static boolean isFramebufferEnabled()
     {
         return framebufferSupported && Minecraft.getMinecraft().gameSettings.fboEnable;
+    }
+
+    public static String getCpu()
+    {
+        return cpu == null ? "<unknown>" : cpu;
     }
 }

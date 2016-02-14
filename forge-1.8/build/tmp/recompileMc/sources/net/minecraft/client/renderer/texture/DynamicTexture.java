@@ -14,7 +14,6 @@ public class DynamicTexture extends AbstractTexture
     private final int width;
     /** height of this icon in pixels */
     private final int height;
-    private static final String __OBFID = "CL_00001048";
 
     public DynamicTexture(BufferedImage bufferedImage)
     {
@@ -31,7 +30,9 @@ public class DynamicTexture extends AbstractTexture
         TextureUtil.allocateTexture(this.getGlTextureId(), textureWidth, textureHeight);
     }
 
-    public void loadTexture(IResourceManager resourceManager) throws IOException {}
+    public void loadTexture(IResourceManager resourceManager) throws IOException
+    {
+    }
 
     public void updateDynamicTexture()
     {

@@ -11,7 +11,6 @@ public class ModelWitch extends ModelVillager
     public boolean field_82900_g;
     private ModelRenderer field_82901_h = (new ModelRenderer(this)).setTextureSize(64, 128);
     private ModelRenderer witchHat;
-    private static final String __OBFID = "CL_00000866";
 
     public ModelWitch(float p_i46361_1_)
     {
@@ -48,14 +47,14 @@ public class ModelWitch extends ModelVillager
      * and legs, where par1 represents the time(so that arms and legs swing back and forth) and par2 represents how
      * "far" arms and legs can swing at most.
      */
-    public void setRotationAngles(float p_78087_1_, float p_78087_2_, float p_78087_3_, float p_78087_4_, float p_78087_5_, float p_78087_6_, Entity p_78087_7_)
+    public void setRotationAngles(float p_78087_1_, float p_78087_2_, float p_78087_3_, float p_78087_4_, float p_78087_5_, float p_78087_6_, Entity entityIn)
     {
-        super.setRotationAngles(p_78087_1_, p_78087_2_, p_78087_3_, p_78087_4_, p_78087_5_, p_78087_6_, p_78087_7_);
+        super.setRotationAngles(p_78087_1_, p_78087_2_, p_78087_3_, p_78087_4_, p_78087_5_, p_78087_6_, entityIn);
         this.villagerNose.offsetX = this.villagerNose.offsetY = this.villagerNose.offsetZ = 0.0F;
-        float f6 = 0.01F * (float)(p_78087_7_.getEntityId() % 10);
-        this.villagerNose.rotateAngleX = MathHelper.sin((float)p_78087_7_.ticksExisted * f6) * 4.5F * (float)Math.PI / 180.0F;
+        float f = 0.01F * (float)(entityIn.getEntityId() % 10);
+        this.villagerNose.rotateAngleX = MathHelper.sin((float)entityIn.ticksExisted * f) * 4.5F * (float)Math.PI / 180.0F;
         this.villagerNose.rotateAngleY = 0.0F;
-        this.villagerNose.rotateAngleZ = MathHelper.cos((float)p_78087_7_.ticksExisted * f6) * 2.5F * (float)Math.PI / 180.0F;
+        this.villagerNose.rotateAngleZ = MathHelper.cos((float)entityIn.ticksExisted * f) * 2.5F * (float)Math.PI / 180.0F;
 
         if (this.field_82900_g)
         {

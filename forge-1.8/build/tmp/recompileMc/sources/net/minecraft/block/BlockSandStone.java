@@ -1,6 +1,7 @@
 package net.minecraft.block;
 
 import java.util.List;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
@@ -15,8 +16,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockSandStone extends Block
 {
-    public static final PropertyEnum TYPE = PropertyEnum.create("type", BlockSandStone.EnumType.class);
-    private static final String __OBFID = "CL_00000304";
+    public static final PropertyEnum<BlockSandStone.EnumType> TYPE = PropertyEnum.<BlockSandStone.EnumType>create("type", BlockSandStone.EnumType.class);
 
     public BlockSandStone()
     {
@@ -26,7 +26,8 @@ public class BlockSandStone extends Block
     }
 
     /**
-     * Get the damage value that this Block should drop
+     * Gets the metadata of the item this Block can drop. This method is called when the block gets destroyed. It
+     * returns the metadata of the dropped item based on the old metadata of the block.
      */
     public int damageDropped(IBlockState state)
     {
@@ -37,16 +38,20 @@ public class BlockSandStone extends Block
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
     {
-        BlockSandStone.EnumType[] aenumtype = BlockSandStone.EnumType.values();
-        int i = aenumtype.length;
-
-        for (int j = 0; j < i; ++j)
+        for (BlockSandStone.EnumType blocksandstone$enumtype : BlockSandStone.EnumType.values())
         {
-            BlockSandStone.EnumType enumtype = aenumtype[j];
-            list.add(new ItemStack(itemIn, 1, enumtype.getMetadata()));
+            list.add(new ItemStack(itemIn, 1, blocksandstone$enumtype.getMetadata()));
         }
+    }
+
+    /**
+     * Get the MapColor for this Block and the given BlockState
+     */
+    public MapColor getMapColor(IBlockState state)
+    {
+        return MapColor.sandColor;
     }
 
     /**
@@ -75,12 +80,11 @@ public class BlockSandStone extends Block
         DEFAULT(0, "sandstone", "default"),
         CHISELED(1, "chiseled_sandstone", "chiseled"),
         SMOOTH(2, "smooth_sandstone", "smooth");
+
         private static final BlockSandStone.EnumType[] META_LOOKUP = new BlockSandStone.EnumType[values().length];
         private final int metadata;
         private final String name;
         private final String unlocalizedName;
-
-        private static final String __OBFID = "CL_00002068";
 
         private EnumType(int meta, String name, String unlocalizedName)
         {
@@ -124,13 +128,9 @@ public class BlockSandStone extends Block
 
         static
         {
-            BlockSandStone.EnumType[] var0 = values();
-            int var1 = var0.length;
-
-            for (int var2 = 0; var2 < var1; ++var2)
+            for (BlockSandStone.EnumType blocksandstone$enumtype : values())
             {
-                BlockSandStone.EnumType var3 = var0[var2];
-                META_LOOKUP[var3.getMetadata()] = var3;
+                META_LOOKUP[blocksandstone$enumtype.getMetadata()] = blocksandstone$enumtype;
             }
         }
     }

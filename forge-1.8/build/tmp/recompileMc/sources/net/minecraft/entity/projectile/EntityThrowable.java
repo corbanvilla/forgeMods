@@ -1,6 +1,7 @@
 package net.minecraft.entity.projectile;
 
 import java.util.List;
+import java.util.UUID;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -16,6 +17,7 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -32,7 +34,6 @@ public abstract class EntityThrowable extends Entity implements IProjectile
     private String throwerName;
     private int ticksInGround;
     private int ticksInAir;
-    private static final String __OBFID = "CL_00001723";
 
     public EntityThrowable(World worldIn)
     {
@@ -40,7 +41,9 @@ public abstract class EntityThrowable extends Entity implements IProjectile
         this.setSize(0.25F, 0.25F);
     }
 
-    protected void entityInit() {}
+    protected void entityInit()
+    {
+    }
 
     /**
      * Checks if the entity is in range to render by using the past in distance and comparing it to its average edge
@@ -49,9 +52,15 @@ public abstract class EntityThrowable extends Entity implements IProjectile
     @SideOnly(Side.CLIENT)
     public boolean isInRangeToRenderDist(double distance)
     {
-        double d1 = this.getEntityBoundingBox().getAverageEdgeLength() * 4.0D;
-        d1 *= 64.0D;
-        return distance < d1 * d1;
+        double d0 = this.getEntityBoundingBox().getAverageEdgeLength() * 4.0D;
+
+        if (Double.isNaN(d0))
+        {
+            d0 = 4.0D;
+        }
+
+        d0 = d0 * 64.0D;
+        return distance < d0 * d0;
     }
 
     public EntityThrowable(World worldIn, EntityLivingBase throwerIn)
@@ -71,12 +80,12 @@ public abstract class EntityThrowable extends Entity implements IProjectile
         this.setThrowableHeading(this.motionX, this.motionY, this.motionZ, this.getVelocity(), 1.0F);
     }
 
-    public EntityThrowable(World worldIn, double x, double y, double p_i1778_6_)
+    public EntityThrowable(World worldIn, double x, double y, double z)
     {
         super(worldIn);
         this.ticksInGround = 0;
         this.setSize(0.25F, 0.25F);
-        this.setPosition(x, y, p_i1778_6_);
+        this.setPosition(x, y, z);
     }
 
     protected float getVelocity()
@@ -91,27 +100,25 @@ public abstract class EntityThrowable extends Entity implements IProjectile
 
     /**
      * Similar to setArrowHeading, it's point the throwable entity to a x, y, z direction.
-     *  
-     * @param inaccuracy Higher means more error.
      */
     public void setThrowableHeading(double x, double y, double z, float velocity, float inaccuracy)
     {
-        float f2 = MathHelper.sqrt_double(x * x + y * y + z * z);
-        x /= (double)f2;
-        y /= (double)f2;
-        z /= (double)f2;
-        x += this.rand.nextGaussian() * 0.007499999832361937D * (double)inaccuracy;
-        y += this.rand.nextGaussian() * 0.007499999832361937D * (double)inaccuracy;
-        z += this.rand.nextGaussian() * 0.007499999832361937D * (double)inaccuracy;
-        x *= (double)velocity;
-        y *= (double)velocity;
-        z *= (double)velocity;
+        float f = MathHelper.sqrt_double(x * x + y * y + z * z);
+        x = x / (double)f;
+        y = y / (double)f;
+        z = z / (double)f;
+        x = x + this.rand.nextGaussian() * 0.007499999832361937D * (double)inaccuracy;
+        y = y + this.rand.nextGaussian() * 0.007499999832361937D * (double)inaccuracy;
+        z = z + this.rand.nextGaussian() * 0.007499999832361937D * (double)inaccuracy;
+        x = x * (double)velocity;
+        y = y * (double)velocity;
+        z = z * (double)velocity;
         this.motionX = x;
         this.motionY = y;
         this.motionZ = z;
-        float f3 = MathHelper.sqrt_double(x * x + z * z);
-        this.prevRotationYaw = this.rotationYaw = (float)(Math.atan2(x, z) * 180.0D / Math.PI);
-        this.prevRotationPitch = this.rotationPitch = (float)(Math.atan2(y, (double)f3) * 180.0D / Math.PI);
+        float f1 = MathHelper.sqrt_double(x * x + z * z);
+        this.prevRotationYaw = this.rotationYaw = (float)(MathHelper.atan2(x, z) * 180.0D / Math.PI);
+        this.prevRotationPitch = this.rotationPitch = (float)(MathHelper.atan2(y, (double)f1) * 180.0D / Math.PI);
         this.ticksInGround = 0;
     }
 
@@ -128,8 +135,8 @@ public abstract class EntityThrowable extends Entity implements IProjectile
         if (this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F)
         {
             float f = MathHelper.sqrt_double(x * x + z * z);
-            this.prevRotationYaw = this.rotationYaw = (float)(Math.atan2(x, z) * 180.0D / Math.PI);
-            this.prevRotationPitch = this.rotationPitch = (float)(Math.atan2(y, (double)f) * 180.0D / Math.PI);
+            this.prevRotationYaw = this.rotationYaw = (float)(MathHelper.atan2(x, z) * 180.0D / Math.PI);
+            this.prevRotationPitch = this.rotationPitch = (float)(MathHelper.atan2(y, (double)f) * 180.0D / Math.PI);
         }
     }
 
@@ -188,7 +195,7 @@ public abstract class EntityThrowable extends Entity implements IProjectile
         if (!this.worldObj.isRemote)
         {
             Entity entity = null;
-            List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
+            List<Entity> list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
             double d0 = 0.0D;
             EntityLivingBase entitylivingbase = this.getThrower();
 
@@ -204,7 +211,7 @@ public abstract class EntityThrowable extends Entity implements IProjectile
 
                     if (movingobjectposition1 != null)
                     {
-                        double d1 = vec3.distanceTo(movingobjectposition1.hitVec);
+                        double d1 = vec3.squareDistanceTo(movingobjectposition1.hitVec);
 
                         if (d1 < d0 || d0 == 0.0D)
                         {
@@ -225,7 +232,7 @@ public abstract class EntityThrowable extends Entity implements IProjectile
         {
             if (movingobjectposition.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && this.worldObj.getBlockState(movingobjectposition.getBlockPos()).getBlock() == Blocks.portal)
             {
-                this.setInPortal();
+                this.setPortal(movingobjectposition.getBlockPos());
             }
             else
             {
@@ -237,9 +244,9 @@ public abstract class EntityThrowable extends Entity implements IProjectile
         this.posY += this.motionY;
         this.posZ += this.motionZ;
         float f1 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
-        this.rotationYaw = (float)(Math.atan2(this.motionX, this.motionZ) * 180.0D / Math.PI);
+        this.rotationYaw = (float)(MathHelper.atan2(this.motionX, this.motionZ) * 180.0D / Math.PI);
 
-        for (this.rotationPitch = (float)(Math.atan2(this.motionY, (double)f1) * 180.0D / Math.PI); this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F)
+        for (this.rotationPitch = (float)(MathHelper.atan2(this.motionY, (double)f1) * 180.0D / Math.PI); this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F)
         {
             ;
         }
@@ -336,12 +343,15 @@ public abstract class EntityThrowable extends Entity implements IProjectile
 
         this.throwableShake = tagCompund.getByte("shake") & 255;
         this.inGround = tagCompund.getByte("inGround") == 1;
+        this.thrower = null;
         this.throwerName = tagCompund.getString("ownerName");
 
         if (this.throwerName != null && this.throwerName.length() == 0)
         {
             this.throwerName = null;
         }
+
+        this.thrower = this.getThrower();
     }
 
     public EntityLivingBase getThrower()
@@ -349,6 +359,23 @@ public abstract class EntityThrowable extends Entity implements IProjectile
         if (this.thrower == null && this.throwerName != null && this.throwerName.length() > 0)
         {
             this.thrower = this.worldObj.getPlayerEntityByName(this.throwerName);
+
+            if (this.thrower == null && this.worldObj instanceof WorldServer)
+            {
+                try
+                {
+                    Entity entity = ((WorldServer)this.worldObj).getEntityFromUuid(UUID.fromString(this.throwerName));
+
+                    if (entity instanceof EntityLivingBase)
+                    {
+                        this.thrower = (EntityLivingBase)entity;
+                    }
+                }
+                catch (Throwable var2)
+                {
+                    this.thrower = null;
+                }
+            }
         }
 
         return this.thrower;

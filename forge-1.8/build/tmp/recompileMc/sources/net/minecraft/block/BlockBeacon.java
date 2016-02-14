@@ -1,5 +1,6 @@
 package net.minecraft.block;
 
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -7,6 +8,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityBeacon;
 import net.minecraft.util.BlockPos;
@@ -21,11 +23,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockBeacon extends BlockContainer
 {
-    private static final String __OBFID = "CL_00000197";
-
     public BlockBeacon()
     {
-        super(Material.glass);
+        super(Material.glass, MapColor.diamondColor);
         this.setHardness(3.0F);
         this.setCreativeTab(CreativeTabs.tabMisc);
     }
@@ -51,12 +51,16 @@ public class BlockBeacon extends BlockContainer
             if (tileentity instanceof TileEntityBeacon)
             {
                 playerIn.displayGUIChest((TileEntityBeacon)tileentity);
+                playerIn.triggerAchievement(StatList.field_181730_N);
             }
 
             return true;
         }
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -68,13 +72,16 @@ public class BlockBeacon extends BlockContainer
     }
 
     /**
-     * The type of render function that is called for this block
+     * The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render
      */
     public int getRenderType()
     {
         return 3;
     }
 
+    /**
+     * Called by ItemBlocks after a block is set in the world, to allow post-place logic
+     */
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
     {
         super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
@@ -85,7 +92,7 @@ public class BlockBeacon extends BlockContainer
 
             if (tileentity instanceof TileEntityBeacon)
             {
-                ((TileEntityBeacon)tileentity).func_145999_a(stack.getDisplayName());
+                ((TileEntityBeacon)tileentity).setName(stack.getDisplayName());
             }
         }
     }
@@ -99,7 +106,7 @@ public class BlockBeacon extends BlockContainer
 
         if (tileentity instanceof TileEntityBeacon)
         {
-            ((TileEntityBeacon)tileentity).func_174908_m();
+            ((TileEntityBeacon)tileentity).updateBeacon();
             worldIn.addBlockEvent(pos, this, 1, 0);
         }
     }
@@ -114,7 +121,6 @@ public class BlockBeacon extends BlockContainer
     {
         HttpUtil.field_180193_a.submit(new Runnable()
         {
-            private static final String __OBFID = "CL_00002136";
             public void run()
             {
                 Chunk chunk = worldIn.getChunkFromBlockCoords(glassPos);
@@ -134,14 +140,13 @@ public class BlockBeacon extends BlockContainer
                     {
                         ((WorldServer)worldIn).addScheduledTask(new Runnable()
                         {
-                            private static final String __OBFID = "CL_00002135";
                             public void run()
                             {
                                 TileEntity tileentity = worldIn.getTileEntity(blockpos);
 
                                 if (tileentity instanceof TileEntityBeacon)
                                 {
-                                    ((TileEntityBeacon)tileentity).func_174908_m();
+                                    ((TileEntityBeacon)tileentity).updateBeacon();
                                     worldIn.addBlockEvent(blockpos, Blocks.beacon, 1, 0);
                                 }
                             }

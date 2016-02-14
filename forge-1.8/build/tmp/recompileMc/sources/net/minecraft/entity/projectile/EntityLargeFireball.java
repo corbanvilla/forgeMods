@@ -12,7 +12,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class EntityLargeFireball extends EntityFireball
 {
     public int explosionPower = 1;
-    private static final String __OBFID = "CL_00001719";
 
     public EntityLargeFireball(World worldIn)
     {
@@ -20,14 +19,14 @@ public class EntityLargeFireball extends EntityFireball
     }
 
     @SideOnly(Side.CLIENT)
-    public EntityLargeFireball(World worldIn, double p_i1768_2_, double p_i1768_4_, double p_i1768_6_, double p_i1768_8_, double p_i1768_10_, double p_i1768_12_)
+    public EntityLargeFireball(World worldIn, double x, double y, double z, double accelX, double accelY, double accelZ)
     {
-        super(worldIn, p_i1768_2_, p_i1768_4_, p_i1768_6_, p_i1768_8_, p_i1768_10_, p_i1768_12_);
+        super(worldIn, x, y, z, accelX, accelY, accelZ);
     }
 
-    public EntityLargeFireball(World worldIn, EntityLivingBase p_i1769_2_, double p_i1769_3_, double p_i1769_5_, double p_i1769_7_)
+    public EntityLargeFireball(World worldIn, EntityLivingBase shooter, double accelX, double accelY, double accelZ)
     {
-        super(worldIn, p_i1769_2_, p_i1769_3_, p_i1769_5_, p_i1769_7_);
+        super(worldIn, shooter, accelX, accelY, accelZ);
     }
 
     /**
@@ -40,10 +39,10 @@ public class EntityLargeFireball extends EntityFireball
             if (movingObject.entityHit != null)
             {
                 movingObject.entityHit.attackEntityFrom(DamageSource.causeFireballDamage(this, this.shootingEntity), 6.0F);
-                this.func_174815_a(this.shootingEntity, movingObject.entityHit);
+                this.applyEnchantments(this.shootingEntity, movingObject.entityHit);
             }
 
-            boolean flag = this.worldObj.getGameRules().getGameRuleBooleanValue("mobGriefing");
+            boolean flag = this.worldObj.getGameRules().getBoolean("mobGriefing");
             this.worldObj.newExplosion((Entity)null, this.posX, this.posY, this.posZ, (float)this.explosionPower, flag, flag);
             this.setDead();
         }

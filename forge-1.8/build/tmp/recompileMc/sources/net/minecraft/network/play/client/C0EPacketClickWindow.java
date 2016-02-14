@@ -2,14 +2,13 @@ package net.minecraft.network.play.client;
 
 import java.io.IOException;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class C0EPacketClickWindow implements Packet
+public class C0EPacketClickWindow implements Packet<INetHandlerPlayServer>
 {
     /** The id of the window which was clicked. 0 for player inventory. */
     private int windowId;
@@ -23,9 +22,10 @@ public class C0EPacketClickWindow implements Packet
     private ItemStack clickedItem;
     /** Inventory operation mode */
     private int mode;
-    private static final String __OBFID = "CL_00001353";
 
-    public C0EPacketClickWindow() {}
+    public C0EPacketClickWindow()
+    {
+    }
 
     @SideOnly(Side.CLIENT)
     public C0EPacketClickWindow(int windowId, int slotId, int usedButton, int mode, ItemStack clickedItem, short actionNumber)
@@ -100,13 +100,5 @@ public class C0EPacketClickWindow implements Packet
     public int getMode()
     {
         return this.mode;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayServer)handler);
     }
 }

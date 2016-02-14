@@ -13,7 +13,6 @@ public class VillageDoorInfo
     private int lastActivityTimestamp;
     private boolean isDetachedFromVillageFlag;
     private int doorOpeningRestrictionCounter;
-    private static final String __OBFID = "CL_00001630";
 
     public VillageDoorInfo(BlockPos p_i45871_1_, int p_i45871_2_, int p_i45871_3_, int p_i45871_4_)
     {
@@ -103,12 +102,12 @@ public class VillageDoorInfo
         this.lastActivityTimestamp = p_179849_1_;
     }
 
-    public boolean func_179851_i()
+    public boolean getIsDetachedFromVillageFlag()
     {
         return this.isDetachedFromVillageFlag;
     }
 
-    public void func_179853_a(boolean p_179853_1_)
+    public void setIsDetachedFromVillageFlag(boolean p_179853_1_)
     {
         this.isDetachedFromVillageFlag = p_179853_1_;
     }

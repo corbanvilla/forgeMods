@@ -1,14 +1,13 @@
 package net.minecraft.network.play.client;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class C0CPacketInput implements Packet
+public class C0CPacketInput implements Packet<INetHandlerPlayServer>
 {
     /** Positive for left strafe, negative for right */
     private float strafeSpeed;
@@ -16,9 +15,10 @@ public class C0CPacketInput implements Packet
     private float forwardSpeed;
     private boolean jumping;
     private boolean sneaking;
-    private static final String __OBFID = "CL_00001367";
 
-    public C0CPacketInput() {}
+    public C0CPacketInput()
+    {
+    }
 
     @SideOnly(Side.CLIENT)
     public C0CPacketInput(float strafeSpeed, float forwardSpeed, boolean jumping, boolean sneaking)
@@ -63,6 +63,9 @@ public class C0CPacketInput implements Packet
         buf.writeByte(b0);
     }
 
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
     public void processPacket(INetHandlerPlayServer handler)
     {
         handler.processInput(this);
@@ -86,13 +89,5 @@ public class C0CPacketInput implements Packet
     public boolean isSneaking()
     {
         return this.sneaking;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayServer)handler);
     }
 }

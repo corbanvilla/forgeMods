@@ -12,7 +12,6 @@ import net.minecraft.world.World;
 public class ItemBow extends Item
 {
     public static final String[] bowPullIconNameArray = new String[] {"pulling_0", "pulling_1", "pulling_2"};
-    private static final String __OBFID = "CL_00001777";
 
     public ItemBow()
     {
@@ -23,21 +22,18 @@ public class ItemBow extends Item
 
     /**
      * Called when the player stops using an Item (stops holding the right mouse button).
-     *  
-     * @param timeLeft The amount of ticks left before the using would have been complete
      */
     public void onPlayerStoppedUsing(ItemStack stack, World worldIn, EntityPlayer playerIn, int timeLeft)
     {
-        int j = this.getMaxItemUseDuration(stack) - timeLeft;
-        net.minecraftforge.event.entity.player.ArrowLooseEvent event = new net.minecraftforge.event.entity.player.ArrowLooseEvent(playerIn, stack, j);
-        if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event)) return;
-        j = event.charge;
-
         boolean flag = playerIn.capabilities.isCreativeMode || EnchantmentHelper.getEnchantmentLevel(Enchantment.infinity.effectId, stack) > 0;
 
         if (flag || playerIn.inventory.hasItem(Items.arrow))
         {
-            float f = (float)j / 20.0F;
+            int i = this.getMaxItemUseDuration(stack) - timeLeft;
+            net.minecraftforge.event.entity.player.ArrowLooseEvent event = new net.minecraftforge.event.entity.player.ArrowLooseEvent(playerIn, stack, i);
+            if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event)) return;
+            i = event.charge;
+            float f = (float)i / 20.0F;
             f = (f * f + f * 2.0F) / 3.0F;
 
             if ((double)f < 0.1D)
@@ -57,18 +53,18 @@ public class ItemBow extends Item
                 entityarrow.setIsCritical(true);
             }
 
-            int k = EnchantmentHelper.getEnchantmentLevel(Enchantment.power.effectId, stack);
+            int j = EnchantmentHelper.getEnchantmentLevel(Enchantment.power.effectId, stack);
+
+            if (j > 0)
+            {
+                entityarrow.setDamage(entityarrow.getDamage() + (double)j * 0.5D + 0.5D);
+            }
+
+            int k = EnchantmentHelper.getEnchantmentLevel(Enchantment.punch.effectId, stack);
 
             if (k > 0)
             {
-                entityarrow.setDamage(entityarrow.getDamage() + (double)k * 0.5D + 0.5D);
-            }
-
-            int l = EnchantmentHelper.getEnchantmentLevel(Enchantment.punch.effectId, stack);
-
-            if (l > 0)
-            {
-                entityarrow.setKnockbackStrength(l);
+                entityarrow.setKnockbackStrength(k);
             }
 
             if (EnchantmentHelper.getEnchantmentLevel(Enchantment.flame.effectId, stack) > 0)

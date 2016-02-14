@@ -3,7 +3,6 @@ package net.minecraft.network.play.server;
 import java.io.IOException;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.EntityLightningBolt;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -11,27 +10,28 @@ import net.minecraft.util.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S2CPacketSpawnGlobalEntity implements Packet
+public class S2CPacketSpawnGlobalEntity implements Packet<INetHandlerPlayClient>
 {
-    private int field_149059_a;
-    private int field_149057_b;
-    private int field_149058_c;
-    private int field_149055_d;
-    private int field_149056_e;
-    private static final String __OBFID = "CL_00001278";
+    private int entityId;
+    private int x;
+    private int y;
+    private int z;
+    private int type;
 
-    public S2CPacketSpawnGlobalEntity() {}
-
-    public S2CPacketSpawnGlobalEntity(Entity p_i45191_1_)
+    public S2CPacketSpawnGlobalEntity()
     {
-        this.field_149059_a = p_i45191_1_.getEntityId();
-        this.field_149057_b = MathHelper.floor_double(p_i45191_1_.posX * 32.0D);
-        this.field_149058_c = MathHelper.floor_double(p_i45191_1_.posY * 32.0D);
-        this.field_149055_d = MathHelper.floor_double(p_i45191_1_.posZ * 32.0D);
+    }
 
-        if (p_i45191_1_ instanceof EntityLightningBolt)
+    public S2CPacketSpawnGlobalEntity(Entity entityIn)
+    {
+        this.entityId = entityIn.getEntityId();
+        this.x = MathHelper.floor_double(entityIn.posX * 32.0D);
+        this.y = MathHelper.floor_double(entityIn.posY * 32.0D);
+        this.z = MathHelper.floor_double(entityIn.posZ * 32.0D);
+
+        if (entityIn instanceof EntityLightningBolt)
         {
-            this.field_149056_e = 1;
+            this.type = 1;
         }
     }
 
@@ -40,11 +40,11 @@ public class S2CPacketSpawnGlobalEntity implements Packet
      */
     public void readPacketData(PacketBuffer buf) throws IOException
     {
-        this.field_149059_a = buf.readVarIntFromBuffer();
-        this.field_149056_e = buf.readByte();
-        this.field_149057_b = buf.readInt();
-        this.field_149058_c = buf.readInt();
-        this.field_149055_d = buf.readInt();
+        this.entityId = buf.readVarIntFromBuffer();
+        this.type = buf.readByte();
+        this.x = buf.readInt();
+        this.y = buf.readInt();
+        this.z = buf.readInt();
     }
 
     /**
@@ -52,53 +52,48 @@ public class S2CPacketSpawnGlobalEntity implements Packet
      */
     public void writePacketData(PacketBuffer buf) throws IOException
     {
-        buf.writeVarIntToBuffer(this.field_149059_a);
-        buf.writeByte(this.field_149056_e);
-        buf.writeInt(this.field_149057_b);
-        buf.writeInt(this.field_149058_c);
-        buf.writeInt(this.field_149055_d);
-    }
-
-    public void func_180720_a(INetHandlerPlayClient p_180720_1_)
-    {
-        p_180720_1_.handleSpawnGlobalEntity(this);
-    }
-
-    @SideOnly(Side.CLIENT)
-    public int func_149052_c()
-    {
-        return this.field_149059_a;
+        buf.writeVarIntToBuffer(this.entityId);
+        buf.writeByte(this.type);
+        buf.writeInt(this.x);
+        buf.writeInt(this.y);
+        buf.writeInt(this.z);
     }
 
     /**
      * Passes this Packet on to the NetHandler for processing.
      */
-    public void processPacket(INetHandler handler)
+    public void processPacket(INetHandlerPlayClient handler)
     {
-        this.func_180720_a((INetHandlerPlayClient)handler);
+        handler.handleSpawnGlobalEntity(this);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public int func_149052_c()
+    {
+        return this.entityId;
     }
 
     @SideOnly(Side.CLIENT)
     public int func_149051_d()
     {
-        return this.field_149057_b;
+        return this.x;
     }
 
     @SideOnly(Side.CLIENT)
     public int func_149050_e()
     {
-        return this.field_149058_c;
+        return this.y;
     }
 
     @SideOnly(Side.CLIENT)
     public int func_149049_f()
     {
-        return this.field_149055_d;
+        return this.z;
     }
 
     @SideOnly(Side.CLIENT)
     public int func_149053_g()
     {
-        return this.field_149056_e;
+        return this.type;
     }
 }

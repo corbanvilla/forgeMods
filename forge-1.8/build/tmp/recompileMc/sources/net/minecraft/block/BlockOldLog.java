@@ -2,6 +2,7 @@ package net.minecraft.block;
 
 import com.google.common.base.Predicate;
 import java.util.List;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockState;
@@ -14,19 +15,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockOldLog extends BlockLog
 {
-    public static final PropertyEnum VARIANT = PropertyEnum.create("variant", BlockPlanks.EnumType.class, new Predicate()
+    public static final PropertyEnum<BlockPlanks.EnumType> VARIANT = PropertyEnum.<BlockPlanks.EnumType>create("variant", BlockPlanks.EnumType.class, new Predicate<BlockPlanks.EnumType>()
     {
-        private static final String __OBFID = "CL_00002084";
-        public boolean apply(BlockPlanks.EnumType type)
+        public boolean apply(BlockPlanks.EnumType p_apply_1_)
         {
-            return type.getMetadata() < 4;
-        }
-        public boolean apply(Object p_apply_1_)
-        {
-            return this.apply((BlockPlanks.EnumType)p_apply_1_);
+            return p_apply_1_.getMetadata() < 4;
         }
     });
-    private static final String __OBFID = "CL_00000281";
 
     public BlockOldLog()
     {
@@ -34,10 +29,42 @@ public class BlockOldLog extends BlockLog
     }
 
     /**
+     * Get the MapColor for this Block and the given BlockState
+     */
+    public MapColor getMapColor(IBlockState state)
+    {
+        BlockPlanks.EnumType blockplanks$enumtype = (BlockPlanks.EnumType)state.getValue(VARIANT);
+
+        switch ((BlockLog.EnumAxis)state.getValue(LOG_AXIS))
+        {
+            case X:
+            case Z:
+            case NONE:
+            default:
+
+                switch (blockplanks$enumtype)
+                {
+                    case OAK:
+                    default:
+                        return BlockPlanks.EnumType.SPRUCE.func_181070_c();
+                    case SPRUCE:
+                        return BlockPlanks.EnumType.DARK_OAK.func_181070_c();
+                    case BIRCH:
+                        return MapColor.quartzColor;
+                    case JUNGLE:
+                        return BlockPlanks.EnumType.SPRUCE.func_181070_c();
+                }
+
+            case Y:
+                return blockplanks$enumtype.func_181070_c();
+        }
+    }
+
+    /**
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
     {
         list.add(new ItemStack(itemIn, 1, BlockPlanks.EnumType.OAK.getMetadata()));
         list.add(new ItemStack(itemIn, 1, BlockPlanks.EnumType.SPRUCE.getMetadata()));
@@ -73,20 +100,21 @@ public class BlockOldLog extends BlockLog
     /**
      * Convert the BlockState into the correct metadata value
      */
+    @SuppressWarnings("incomplete-switch")
     public int getMetaFromState(IBlockState state)
     {
-        byte b0 = 0;
-        int i = b0 | ((BlockPlanks.EnumType)state.getValue(VARIANT)).getMetadata();
+        int i = 0;
+        i = i | ((BlockPlanks.EnumType)state.getValue(VARIANT)).getMetadata();
 
-        switch (BlockOldLog.SwitchEnumAxis.AXIS_LOOKUP[((BlockLog.EnumAxis)state.getValue(LOG_AXIS)).ordinal()])
+        switch ((BlockLog.EnumAxis)state.getValue(LOG_AXIS))
         {
-            case 1:
+            case X:
                 i |= 4;
                 break;
-            case 2:
+            case Z:
                 i |= 8;
                 break;
-            case 3:
+            case NONE:
                 i |= 12;
         }
 
@@ -104,46 +132,11 @@ public class BlockOldLog extends BlockLog
     }
 
     /**
-     * Get the damage value that this Block should drop
+     * Gets the metadata of the item this Block can drop. This method is called when the block gets destroyed. It
+     * returns the metadata of the dropped item based on the old metadata of the block.
      */
     public int damageDropped(IBlockState state)
     {
         return ((BlockPlanks.EnumType)state.getValue(VARIANT)).getMetadata();
     }
-
-    static final class SwitchEnumAxis
-        {
-            static final int[] AXIS_LOOKUP = new int[BlockLog.EnumAxis.values().length];
-            private static final String __OBFID = "CL_00002083";
-
-            static
-            {
-                try
-                {
-                    AXIS_LOOKUP[BlockLog.EnumAxis.X.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var3)
-                {
-                    ;
-                }
-
-                try
-                {
-                    AXIS_LOOKUP[BlockLog.EnumAxis.Z.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
-
-                try
-                {
-                    AXIS_LOOKUP[BlockLog.EnumAxis.NONE.ordinal()] = 3;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
-            }
-        }
 }

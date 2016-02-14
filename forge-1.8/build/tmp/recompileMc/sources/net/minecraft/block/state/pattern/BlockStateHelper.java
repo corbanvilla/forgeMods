@@ -2,7 +2,6 @@ package net.minecraft.block.state.pattern;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import net.minecraft.block.Block;
@@ -10,11 +9,10 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 
-public class BlockStateHelper implements Predicate
+public class BlockStateHelper implements Predicate<IBlockState>
 {
     private final BlockState blockstate;
-    private final Map propertyPredicates = Maps.newHashMap();
-    private static final String __OBFID = "CL_00002019";
+    private final Map<IProperty, Predicate> propertyPredicates = Maps.<IProperty, Predicate>newHashMap();
 
     private BlockStateHelper(BlockState blockStateIn)
     {
@@ -26,27 +24,21 @@ public class BlockStateHelper implements Predicate
         return new BlockStateHelper(blockIn.getBlockState());
     }
 
-    public boolean matchesState(IBlockState testState)
+    public boolean apply(IBlockState p_apply_1_)
     {
-        if (testState != null && testState.getBlock().equals(this.blockstate.getBlock()))
+        if (p_apply_1_ != null && p_apply_1_.getBlock().equals(this.blockstate.getBlock()))
         {
-            Iterator iterator = this.propertyPredicates.entrySet().iterator();
-            Entry entry;
-            Comparable comparable;
-
-            do
+            for (Entry<IProperty, Predicate> entry : this.propertyPredicates.entrySet())
             {
-                if (!iterator.hasNext())
+                Object object = p_apply_1_.getValue((IProperty)entry.getKey());
+
+                if (!((Predicate)entry.getValue()).apply(object))
                 {
-                    return true;
+                    return false;
                 }
-
-                entry = (Entry)iterator.next();
-                comparable = testState.getValue((IProperty)entry.getKey());
             }
-            while (((Predicate)entry.getValue()).apply(comparable));
 
-            return false;
+            return true;
         }
         else
         {
@@ -54,7 +46,7 @@ public class BlockStateHelper implements Predicate
         }
     }
 
-    public BlockStateHelper where(IProperty property, Predicate is)
+    public <V extends Comparable<V>> BlockStateHelper where(IProperty<V> property, Predicate <? extends V > is)
     {
         if (!this.blockstate.getProperties().contains(property))
         {
@@ -65,10 +57,5 @@ public class BlockStateHelper implements Predicate
             this.propertyPredicates.put(property, is);
             return this;
         }
-    }
-
-    public boolean apply(Object p_apply_1_)
-    {
-        return this.matchesState((IBlockState)p_apply_1_);
     }
 }

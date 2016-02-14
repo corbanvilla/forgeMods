@@ -4,8 +4,6 @@ import net.minecraft.block.Block;
 
 public class ItemPiston extends ItemBlock
 {
-    private static final String __OBFID = "CL_00000054";
-
     public ItemPiston(Block block)
     {
         super(block);

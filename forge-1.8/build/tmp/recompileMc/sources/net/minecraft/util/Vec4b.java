@@ -6,7 +6,6 @@ public class Vec4b
     private byte field_176115_b;
     private byte field_176116_c;
     private byte field_176114_d;
-    private static final String __OBFID = "CL_00001964";
 
     public Vec4b(byte p_i45555_1_, byte p_i45555_2_, byte p_i45555_3_, byte p_i45555_4_)
     {
@@ -63,8 +62,8 @@ public class Vec4b
 
     public int hashCode()
     {
-        byte b0 = this.field_176117_a;
-        int i = 31 * b0 + this.field_176115_b;
+        int i = this.field_176117_a;
+        i = 31 * i + this.field_176115_b;
         i = 31 * i + this.field_176116_c;
         i = 31 * i + this.field_176114_d;
         return i;

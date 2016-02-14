@@ -13,8 +13,7 @@ public class Metadata
     private static final Gson field_152811_a = new Gson();
     private final String name;
     private String description;
-    private Map payload;
-    private static final String __OBFID = "CL_00001823";
+    private Map<String, String> payload;
 
     public Metadata(String p_i46345_1_, String p_i46345_2_)
     {
@@ -41,7 +40,7 @@ public class Metadata
     {
         if (this.payload == null)
         {
-            this.payload = Maps.newHashMap();
+            this.payload = Maps.<String, String>newHashMap();
         }
 
         if (this.payload.size() > 50)
@@ -72,7 +71,7 @@ public class Metadata
 
     public String func_152806_b()
     {
-        return this.payload != null && !this.payload.isEmpty() ? field_152811_a.toJson(this.payload) : null;
+        return this.payload != null && !this.payload.isEmpty() ? field_152811_a.toJson((Object)this.payload) : null;
     }
 
     public String func_152810_c()

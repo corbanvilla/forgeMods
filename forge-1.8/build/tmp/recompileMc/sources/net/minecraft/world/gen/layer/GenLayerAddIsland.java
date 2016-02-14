@@ -2,8 +2,6 @@ package net.minecraft.world.gen.layer;
 
 public class GenLayerAddIsland extends GenLayer
 {
-    private static final String __OBFID = "CL_00000551";
-
     public GenLayerAddIsland(long p_i2119_1_, GenLayer p_i2119_3_)
     {
         super(p_i2119_1_);
@@ -16,83 +14,86 @@ public class GenLayerAddIsland extends GenLayer
      */
     public int[] getInts(int areaX, int areaY, int areaWidth, int areaHeight)
     {
-        int i1 = areaX - 1;
-        int j1 = areaY - 1;
-        int k1 = areaWidth + 2;
-        int l1 = areaHeight + 2;
-        int[] aint = this.parent.getInts(i1, j1, k1, l1);
+        int i = areaX - 1;
+        int j = areaY - 1;
+        int k = areaWidth + 2;
+        int l = areaHeight + 2;
+        int[] aint = this.parent.getInts(i, j, k, l);
         int[] aint1 = IntCache.getIntCache(areaWidth * areaHeight);
 
-        for (int i2 = 0; i2 < areaHeight; ++i2)
+        for (int i1 = 0; i1 < areaHeight; ++i1)
         {
-            for (int j2 = 0; j2 < areaWidth; ++j2)
+            for (int j1 = 0; j1 < areaWidth; ++j1)
             {
-                int k2 = aint[j2 + 0 + (i2 + 0) * k1];
-                int l2 = aint[j2 + 2 + (i2 + 0) * k1];
-                int i3 = aint[j2 + 0 + (i2 + 2) * k1];
-                int j3 = aint[j2 + 2 + (i2 + 2) * k1];
-                int k3 = aint[j2 + 1 + (i2 + 1) * k1];
-                this.initChunkSeed((long)(j2 + areaX), (long)(i2 + areaY));
+                int k1 = aint[j1 + 0 + (i1 + 0) * k];
+                int l1 = aint[j1 + 2 + (i1 + 0) * k];
+                int i2 = aint[j1 + 0 + (i1 + 2) * k];
+                int j2 = aint[j1 + 2 + (i1 + 2) * k];
+                int k2 = aint[j1 + 1 + (i1 + 1) * k];
+                this.initChunkSeed((long)(j1 + areaX), (long)(i1 + areaY));
 
-                if (k3 == 0 && (k2 != 0 || l2 != 0 || i3 != 0 || j3 != 0))
+                if (k2 != 0 || k1 == 0 && l1 == 0 && i2 == 0 && j2 == 0)
                 {
-                    int l3 = 1;
-                    int i4 = 1;
-
-                    if (k2 != 0 && this.nextInt(l3++) == 0)
+                    if (k2 > 0 && (k1 == 0 || l1 == 0 || i2 == 0 || j2 == 0))
                     {
-                        i4 = k2;
-                    }
-
-                    if (l2 != 0 && this.nextInt(l3++) == 0)
-                    {
-                        i4 = l2;
-                    }
-
-                    if (i3 != 0 && this.nextInt(l3++) == 0)
-                    {
-                        i4 = i3;
-                    }
-
-                    if (j3 != 0 && this.nextInt(l3++) == 0)
-                    {
-                        i4 = j3;
-                    }
-
-                    if (this.nextInt(3) == 0)
-                    {
-                        aint1[j2 + i2 * areaWidth] = i4;
-                    }
-                    else if (i4 == 4)
-                    {
-                        aint1[j2 + i2 * areaWidth] = 4;
-                    }
-                    else
-                    {
-                        aint1[j2 + i2 * areaWidth] = 0;
-                    }
-                }
-                else if (k3 > 0 && (k2 == 0 || l2 == 0 || i3 == 0 || j3 == 0))
-                {
-                    if (this.nextInt(5) == 0)
-                    {
-                        if (k3 == 4)
+                        if (this.nextInt(5) == 0)
                         {
-                            aint1[j2 + i2 * areaWidth] = 4;
+                            if (k2 == 4)
+                            {
+                                aint1[j1 + i1 * areaWidth] = 4;
+                            }
+                            else
+                            {
+                                aint1[j1 + i1 * areaWidth] = 0;
+                            }
                         }
                         else
                         {
-                            aint1[j2 + i2 * areaWidth] = 0;
+                            aint1[j1 + i1 * areaWidth] = k2;
                         }
                     }
                     else
                     {
-                        aint1[j2 + i2 * areaWidth] = k3;
+                        aint1[j1 + i1 * areaWidth] = k2;
                     }
                 }
                 else
                 {
-                    aint1[j2 + i2 * areaWidth] = k3;
+                    int l2 = 1;
+                    int i3 = 1;
+
+                    if (k1 != 0 && this.nextInt(l2++) == 0)
+                    {
+                        i3 = k1;
+                    }
+
+                    if (l1 != 0 && this.nextInt(l2++) == 0)
+                    {
+                        i3 = l1;
+                    }
+
+                    if (i2 != 0 && this.nextInt(l2++) == 0)
+                    {
+                        i3 = i2;
+                    }
+
+                    if (j2 != 0 && this.nextInt(l2++) == 0)
+                    {
+                        i3 = j2;
+                    }
+
+                    if (this.nextInt(3) == 0)
+                    {
+                        aint1[j1 + i1 * areaWidth] = i3;
+                    }
+                    else if (i3 == 4)
+                    {
+                        aint1[j1 + i1 * areaWidth] = 4;
+                    }
+                    else
+                    {
+                        aint1[j1 + i1 * areaWidth] = 0;
+                    }
                 }
             }
         }

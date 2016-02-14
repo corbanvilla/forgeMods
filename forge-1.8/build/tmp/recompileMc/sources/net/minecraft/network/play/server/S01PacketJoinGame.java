@@ -1,7 +1,6 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -11,7 +10,7 @@ import net.minecraft.world.WorldType;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S01PacketJoinGame implements Packet
+public class S01PacketJoinGame implements Packet<INetHandlerPlayClient>
 {
     private int entityId;
     private boolean hardcoreMode;
@@ -21,20 +20,21 @@ public class S01PacketJoinGame implements Packet
     private int maxPlayers;
     private WorldType worldType;
     private boolean reducedDebugInfo;
-    private static final String __OBFID = "CL_00001310";
 
-    public S01PacketJoinGame() {}
-
-    public S01PacketJoinGame(int p_i45976_1_, WorldSettings.GameType p_i45976_2_, boolean p_i45976_3_, int p_i45976_4_, EnumDifficulty p_i45976_5_, int p_i45976_6_, WorldType p_i45976_7_, boolean p_i45976_8_)
+    public S01PacketJoinGame()
     {
-        this.entityId = p_i45976_1_;
-        this.dimension = p_i45976_4_;
-        this.difficulty = p_i45976_5_;
-        this.gameType = p_i45976_2_;
-        this.maxPlayers = p_i45976_6_;
-        this.hardcoreMode = p_i45976_3_;
-        this.worldType = p_i45976_7_;
-        this.reducedDebugInfo = p_i45976_8_;
+    }
+
+    public S01PacketJoinGame(int entityIdIn, WorldSettings.GameType gameTypeIn, boolean hardcoreModeIn, int dimensionIn, EnumDifficulty difficultyIn, int maxPlayersIn, WorldType worldTypeIn, boolean reducedDebugInfoIn)
+    {
+        this.entityId = entityIdIn;
+        this.dimension = dimensionIn;
+        this.difficulty = difficultyIn;
+        this.gameType = gameTypeIn;
+        this.maxPlayers = maxPlayersIn;
+        this.hardcoreMode = hardcoreModeIn;
+        this.worldType = worldTypeIn;
+        this.reducedDebugInfo = reducedDebugInfoIn;
     }
 
     /**
@@ -43,9 +43,9 @@ public class S01PacketJoinGame implements Packet
     public void readPacketData(PacketBuffer buf) throws IOException
     {
         this.entityId = buf.readInt();
-        short short1 = buf.readUnsignedByte();
-        this.hardcoreMode = (short1 & 8) == 8;
-        int i = short1 & -9;
+        int i = buf.readUnsignedByte();
+        this.hardcoreMode = (i & 8) == 8;
+        i = i & -9;
         this.gameType = WorldSettings.GameType.getByID(i);
         this.dimension = buf.readByte();
         this.difficulty = EnumDifficulty.getDifficultyEnum(buf.readUnsignedByte());
@@ -93,14 +93,6 @@ public class S01PacketJoinGame implements Packet
     public int getEntityId()
     {
         return this.entityId;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayClient)handler);
     }
 
     @SideOnly(Side.CLIENT)

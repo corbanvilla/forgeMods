@@ -31,18 +31,17 @@ public abstract class EntityAITarget extends EntityAIBase
      * see the target
      */
     private int targetUnseenTicks;
-    private static final String __OBFID = "CL_00001626";
 
-    public EntityAITarget(EntityCreature p_i1669_1_, boolean p_i1669_2_)
+    public EntityAITarget(EntityCreature creature, boolean checkSight)
     {
-        this(p_i1669_1_, p_i1669_2_, false);
+        this(creature, checkSight, false);
     }
 
-    public EntityAITarget(EntityCreature p_i1670_1_, boolean p_i1670_2_, boolean p_i1670_3_)
+    public EntityAITarget(EntityCreature creature, boolean checkSight, boolean onlyNearby)
     {
-        this.taskOwner = p_i1670_1_;
-        this.shouldCheckSight = p_i1670_2_;
-        this.nearbyOnly = p_i1670_3_;
+        this.taskOwner = creature;
+        this.shouldCheckSight = checkSight;
+        this.nearbyOnly = onlyNearby;
     }
 
     /**
@@ -121,28 +120,31 @@ public abstract class EntityAITarget extends EntityAIBase
         this.taskOwner.setAttackTarget((EntityLivingBase)null);
     }
 
-    public static boolean func_179445_a(EntityLiving p_179445_0_, EntityLivingBase p_179445_1_, boolean p_179445_2_, boolean p_179445_3_)
+    /**
+     * A static method used to see if an entity is a suitable target through a number of checks.
+     */
+    public static boolean isSuitableTarget(EntityLiving attacker, EntityLivingBase target, boolean includeInvincibles, boolean checkSight)
     {
-        if (p_179445_1_ == null)
+        if (target == null)
         {
             return false;
         }
-        else if (p_179445_1_ == p_179445_0_)
+        else if (target == attacker)
         {
             return false;
         }
-        else if (!p_179445_1_.isEntityAlive())
+        else if (!target.isEntityAlive())
         {
             return false;
         }
-        else if (!p_179445_0_.canAttackClass(p_179445_1_.getClass()))
+        else if (!attacker.canAttackClass(target.getClass()))
         {
             return false;
         }
         else
         {
-            Team team = p_179445_0_.getTeam();
-            Team team1 = p_179445_1_.getTeam();
+            Team team = attacker.getTeam();
+            Team team1 = target.getTeam();
 
             if (team != null && team1 == team)
             {
@@ -150,24 +152,24 @@ public abstract class EntityAITarget extends EntityAIBase
             }
             else
             {
-                if (p_179445_0_ instanceof IEntityOwnable && StringUtils.isNotEmpty(((IEntityOwnable)p_179445_0_).getOwnerId()))
+                if (attacker instanceof IEntityOwnable && StringUtils.isNotEmpty(((IEntityOwnable)attacker).getOwnerId()))
                 {
-                    if (p_179445_1_ instanceof IEntityOwnable && ((IEntityOwnable)p_179445_0_).getOwnerId().equals(((IEntityOwnable)p_179445_1_).getOwnerId()))
+                    if (target instanceof IEntityOwnable && ((IEntityOwnable)attacker).getOwnerId().equals(((IEntityOwnable)target).getOwnerId()))
                     {
                         return false;
                     }
 
-                    if (p_179445_1_ == ((IEntityOwnable)p_179445_0_).getOwner())
+                    if (target == ((IEntityOwnable)attacker).getOwner())
                     {
                         return false;
                     }
                 }
-                else if (p_179445_1_ instanceof EntityPlayer && !p_179445_2_ && ((EntityPlayer)p_179445_1_).capabilities.disableDamage)
+                else if (target instanceof EntityPlayer && !includeInvincibles && ((EntityPlayer)target).capabilities.disableDamage)
                 {
                     return false;
                 }
 
-                return !p_179445_3_ || p_179445_0_.getEntitySenses().canSee(p_179445_1_);
+                return !checkSight || attacker.getEntitySenses().canSee(target);
             }
         }
     }
@@ -176,13 +178,13 @@ public abstract class EntityAITarget extends EntityAIBase
      * A method used to see if an entity is a suitable target through a number of checks. Args : entity,
      * canTargetInvinciblePlayer
      */
-    protected boolean isSuitableTarget(EntityLivingBase p_75296_1_, boolean p_75296_2_)
+    protected boolean isSuitableTarget(EntityLivingBase target, boolean includeInvincibles)
     {
-        if (!func_179445_a(this.taskOwner, p_75296_1_, p_75296_2_, this.shouldCheckSight))
+        if (!isSuitableTarget(this.taskOwner, target, includeInvincibles, this.shouldCheckSight))
         {
             return false;
         }
-        else if (!this.taskOwner.func_180485_d(new BlockPos(p_75296_1_)))
+        else if (!this.taskOwner.isWithinHomeDistanceFromPosition(new BlockPos(target)))
         {
             return false;
         }
@@ -197,7 +199,7 @@ public abstract class EntityAITarget extends EntityAIBase
 
                 if (this.targetSearchStatus == 0)
                 {
-                    this.targetSearchStatus = this.canEasilyReach(p_75296_1_) ? 1 : 2;
+                    this.targetSearchStatus = this.canEasilyReach(target) ? 1 : 2;
                 }
 
                 if (this.targetSearchStatus == 2)

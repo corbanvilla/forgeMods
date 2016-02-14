@@ -28,28 +28,23 @@ public class ItemInWorldManager
     public World theWorld;
     /** The EntityPlayerMP object that this object is connected to. */
     public EntityPlayerMP thisPlayerMP;
-    private WorldSettings.GameType gameType;
+    private WorldSettings.GameType gameType = WorldSettings.GameType.NOT_SET;
     /** True if the player is destroying a block */
     private boolean isDestroyingBlock;
     private int initialDamage;
-    private BlockPos field_180240_f;
+    private BlockPos field_180240_f = BlockPos.ORIGIN;
     private int curblockDamage;
     /**
      * Set to true when the "finished destroying block" packet is received but the block wasn't fully damaged yet. The
      * block will not be destroyed while this is false.
      */
     private boolean receivedFinishDiggingPacket;
-    private BlockPos field_180241_i;
+    private BlockPos field_180241_i = BlockPos.ORIGIN;
     private int initialBlockDamage;
-    private int durabilityRemainingOnBlock;
-    private static final String __OBFID = "CL_00001442";
+    private int durabilityRemainingOnBlock = -1;
 
     public ItemInWorldManager(World worldIn)
     {
-        this.gameType = WorldSettings.GameType.NOT_SET;
-        this.field_180240_f = BlockPos.ORIGIN;
-        this.field_180241_i = BlockPos.ORIGIN;
-        this.durabilityRemainingOnBlock = -1;
         this.theWorld = worldIn;
     }
 
@@ -66,7 +61,7 @@ public class ItemInWorldManager
         return this.gameType;
     }
 
-    public boolean func_180239_c()
+    public boolean survivalOrAdventure()
     {
         return this.gameType.isSurvivalOrAdventure();
     }
@@ -95,8 +90,6 @@ public class ItemInWorldManager
     public void updateBlockRemoving()
     {
         ++this.curblockDamage;
-        float f;
-        int j;
 
         if (this.receivedFinishDiggingPacket)
         {
@@ -109,8 +102,8 @@ public class ItemInWorldManager
             }
             else
             {
-                f = block.getPlayerRelativeBlockHardness(this.thisPlayerMP, this.thisPlayerMP.worldObj, this.field_180241_i) * (float)(i + 1);
-                j = (int)(f * 10.0F);
+                float f = block.getPlayerRelativeBlockHardness(this.thisPlayerMP, this.thisPlayerMP.worldObj, this.field_180241_i) * (float)(i + 1);
+                int j = (int)(f * 10.0F);
 
                 if (j != this.durabilityRemainingOnBlock)
                 {
@@ -138,13 +131,13 @@ public class ItemInWorldManager
             else
             {
                 int k = this.curblockDamage - this.initialDamage;
-                f = block1.getPlayerRelativeBlockHardness(this.thisPlayerMP, this.thisPlayerMP.worldObj, this.field_180241_i) * (float)(k + 1);
-                j = (int)(f * 10.0F);
+                float f1 = block1.getPlayerRelativeBlockHardness(this.thisPlayerMP, this.thisPlayerMP.worldObj, this.field_180240_f) * (float)(k + 1); //Forge: Fix network break progress using wrong position
+                int l = (int)(f1 * 10.0F);
 
-                if (j != this.durabilityRemainingOnBlock)
+                if (l != this.durabilityRemainingOnBlock)
                 {
-                    this.theWorld.sendBlockBreakProgress(this.thisPlayerMP.getEntityId(), this.field_180240_f, j);
-                    this.durabilityRemainingOnBlock = j;
+                    this.theWorld.sendBlockBreakProgress(this.thisPlayerMP.getEntityId(), this.field_180240_f, l);
+                    this.durabilityRemainingOnBlock = l;
                 }
             }
         }
@@ -153,9 +146,6 @@ public class ItemInWorldManager
     /**
      * If not creative, it calls sendBlockBreakProgress until the block is broken first. tryHarvestBlock can also be the
      * result of this call.
-     *  
-     * @param pos The block's coordinates
-     * @param side The specific side that is being hit
      */
     public void onBlockClicked(BlockPos pos, EnumFacing side)
     {
@@ -282,8 +272,6 @@ public class ItemInWorldManager
 
     /**
      * Removes a block and triggers the appropriate events
-     *  
-     * @param pos The coordinates for the block to remove
      */
     private boolean removeBlock(BlockPos pos)
     {
@@ -305,8 +293,6 @@ public class ItemInWorldManager
 
     /**
      * Attempts to harvest a block
-     *  
-     * @param pos The coordinates of the block
      */
     public boolean tryHarvestBlock(BlockPos pos)
     {
@@ -375,30 +361,26 @@ public class ItemInWorldManager
         {
             int i = stack.stackSize;
             int j = stack.getMetadata();
-            ItemStack itemstack1 = stack.useItemRightClick(worldIn, player);
+            ItemStack itemstack = stack.useItemRightClick(worldIn, player);
 
-            if (itemstack1 == stack && (itemstack1 == null || itemstack1.stackSize == i && itemstack1.getMaxItemUseDuration() <= 0 && itemstack1.getMetadata() == j))
+            if (itemstack != stack || itemstack != null && (itemstack.stackSize != i || itemstack.getMaxItemUseDuration() > 0 || itemstack.getMetadata() != j))
             {
-                return false;
-            }
-            else
-            {
-                player.inventory.mainInventory[player.inventory.currentItem] = itemstack1;
+                player.inventory.mainInventory[player.inventory.currentItem] = itemstack;
 
                 if (this.isCreative())
                 {
-                    itemstack1.stackSize = i;
+                    itemstack.stackSize = i;
 
-                    if (itemstack1.isItemStackDamageable())
+                    if (itemstack.isItemStackDamageable())
                     {
-                        itemstack1.setItemDamage(j);
+                        itemstack.setItemDamage(j);
                     }
                 }
 
-                if (itemstack1.stackSize == 0)
+                if (itemstack.stackSize == 0)
                 {
                     player.inventory.mainInventory[player.inventory.currentItem] = null;
-                    net.minecraftforge.event.ForgeEventFactory.onPlayerDestroyItem(player, itemstack1);
+                    net.minecraftforge.event.ForgeEventFactory.onPlayerDestroyItem(player, itemstack);
                 }
 
                 if (!player.isUsingItem())
@@ -408,16 +390,17 @@ public class ItemInWorldManager
 
                 return true;
             }
+            else
+            {
+                return false;
+            }
         }
     }
 
     /**
      * Activate the clicked on block, otherwise use the held item.
-     *  
-     * @param pos The block's coordinates
-     * @param side The side of the block that was clicked on
      */
-    public boolean activateBlockOrUseItem(EntityPlayer player, World worldIn, ItemStack stack, BlockPos pos, EnumFacing side, float p_180236_6_, float p_180236_7_, float p_180236_8_)
+    public boolean activateBlockOrUseItem(EntityPlayer player, World worldIn, ItemStack stack, BlockPos pos, EnumFacing side, float offsetX, float offsetY, float offsetZ)
     {
         if (this.gameType == WorldSettings.GameType.SPECTATOR)
         {
@@ -457,7 +440,7 @@ public class ItemInWorldManager
                 return false;
             }
 
-            if (stack != null && stack.getItem().onItemUseFirst(stack, player, worldIn, pos, side, p_180236_6_, p_180236_7_, p_180236_8_))
+            if (stack != null && stack.getItem().onItemUseFirst(stack, player, worldIn, pos, side, offsetX, offsetY, offsetZ))
             {
                 if (stack.stackSize <= 0) net.minecraftforge.event.ForgeEventFactory.onPlayerDestroyItem(thisPlayerMP, stack);
                 return true;
@@ -473,7 +456,7 @@ public class ItemInWorldManager
             {
                 if (event.useBlock != net.minecraftforge.fml.common.eventhandler.Event.Result.DENY)
                 {
-                    result = iblockstate.getBlock().onBlockActivated(worldIn, pos, iblockstate, player, side, p_180236_6_, p_180236_7_, p_180236_8_);
+                    result = iblockstate.getBlock().onBlockActivated(worldIn, pos, iblockstate, player, side, offsetX, offsetY, offsetZ);
                 }
                 else
                 {
@@ -485,7 +468,7 @@ public class ItemInWorldManager
             {
                 int meta = stack.getMetadata();
                 int size = stack.stackSize;
-                result = stack.onItemUse(player, worldIn, pos, side, p_180236_6_, p_180236_7_, p_180236_8_);
+                result = stack.onItemUse(player, worldIn, pos, side, offsetX, offsetY, offsetZ);
                 if (isCreative())
                 {
                     stack.setItemDamage(meta);

@@ -19,15 +19,14 @@ public class RegionRenderCache extends ChunkCache
     private final BlockPos position;
     private int[] combinedLights;
     private IBlockState[] blockStates;
-    private static final String __OBFID = "CL_00002565";
 
     public RegionRenderCache(World worldIn, BlockPos posFromIn, BlockPos posToIn, int subIn)
     {
         super(worldIn, posFromIn, posToIn, subIn);
         this.position = posFromIn.subtract(new Vec3i(subIn, subIn, subIn));
-        boolean flag = true;
+        int i = 8000;
         this.combinedLights = new int[8000];
-        Arrays.fill(this.combinedLights, -1);
+        Arrays.fill((int[])this.combinedLights, (int) - 1);
         this.blockStates = new IBlockState[8000];
     }
 
@@ -38,18 +37,18 @@ public class RegionRenderCache extends ChunkCache
         return this.chunkArray[i][j].getTileEntity(pos, Chunk.EnumCreateEntityType.QUEUED);
     }
 
-    public int getCombinedLight(BlockPos pos, int p_175626_2_)
+    public int getCombinedLight(BlockPos pos, int lightValue)
     {
-        int j = this.getPositionIndex(pos);
-        int k = this.combinedLights[j];
+        int i = this.getPositionIndex(pos);
+        int j = this.combinedLights[i];
 
-        if (k == -1)
+        if (j == -1)
         {
-            k = super.getCombinedLight(pos, p_175626_2_);
-            this.combinedLights[j] = k;
+            j = super.getCombinedLight(pos, lightValue);
+            this.combinedLights[i] = j;
         }
 
-        return k;
+        return j;
     }
 
     public IBlockState getBlockState(BlockPos pos)

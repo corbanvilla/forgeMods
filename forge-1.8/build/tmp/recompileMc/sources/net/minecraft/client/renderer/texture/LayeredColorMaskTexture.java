@@ -19,14 +19,14 @@ import org.apache.logging.log4j.Logger;
 @SideOnly(Side.CLIENT)
 public class LayeredColorMaskTexture extends AbstractTexture
 {
-    private static final Logger field_174947_f = LogManager.getLogger();
+    /** Access to the Logger, for all your logging needs. */
+    private static final Logger LOG = LogManager.getLogger();
     /** The location of the texture. */
     private final ResourceLocation textureLocation;
-    private final List field_174949_h;
-    private final List field_174950_i;
-    private static final String __OBFID = "CL_00002404";
+    private final List<String> field_174949_h;
+    private final List<EnumDyeColor> field_174950_i;
 
-    public LayeredColorMaskTexture(ResourceLocation textureLocationIn, List p_i46101_2_, List p_i46101_3_)
+    public LayeredColorMaskTexture(ResourceLocation textureLocationIn, List<String> p_i46101_2_, List<EnumDyeColor> p_i46101_3_)
     {
         this.textureLocation = textureLocationIn;
         this.field_174949_h = p_i46101_2_;
@@ -52,7 +52,7 @@ public class LayeredColorMaskTexture extends AbstractTexture
             Graphics graphics = bufferedimage.getGraphics();
             graphics.drawImage(bufferedimage1, 0, 0, (ImageObserver)null);
 
-            for (int j = 0; j < this.field_174949_h.size() && j < this.field_174950_i.size(); ++j)
+            for (int j = 0; j < 17 && j < this.field_174949_h.size() && j < this.field_174950_i.size(); ++j)
             {
                 String s = (String)this.field_174949_h.get(j);
                 MapColor mapcolor = ((EnumDyeColor)this.field_174950_i.get(j)).getMapColor();
@@ -87,7 +87,7 @@ public class LayeredColorMaskTexture extends AbstractTexture
         }
         catch (IOException ioexception)
         {
-            field_174947_f.error("Couldn\'t load layered image", ioexception);
+            LOG.error((String)"Couldn\'t load layered image", (Throwable)ioexception);
             return;
         }
 

@@ -10,7 +10,6 @@ import net.minecraft.world.World;
 public class BiomeGenPlains extends BiomeGenBase
 {
     protected boolean field_150628_aC;
-    private static final String __OBFID = "CL_00000180";
 
     public BiomeGenPlains(int p_i1986_1_)
     {
@@ -23,16 +22,15 @@ public class BiomeGenPlains extends BiomeGenBase
         this.theBiomeDecorator.grassPerChunk = 10;
     }
 
-    public BlockFlower.EnumFlowerType pickRandomFlower(Random p_180623_1_, BlockPos p_180623_2_)
+    public BlockFlower.EnumFlowerType pickRandomFlower(Random rand, BlockPos pos)
     {
-        double d0 = field_180281_af.func_151601_a((double)p_180623_2_.getX() / 200.0D, (double)p_180623_2_.getZ() / 200.0D);
-        int i;
+        double d0 = GRASS_COLOR_NOISE.func_151601_a((double)pos.getX() / 200.0D, (double)pos.getZ() / 200.0D);
 
         if (d0 < -0.8D)
         {
-            i = p_180623_1_.nextInt(4);
+            int j = rand.nextInt(4);
 
-            switch (i)
+            switch (j)
             {
                 case 0:
                     return BlockFlower.EnumFlowerType.ORANGE_TULIP;
@@ -45,9 +43,9 @@ public class BiomeGenPlains extends BiomeGenBase
                     return BlockFlower.EnumFlowerType.WHITE_TULIP;
             }
         }
-        else if (p_180623_1_.nextInt(3) > 0)
+        else if (rand.nextInt(3) > 0)
         {
-            i = p_180623_1_.nextInt(3);
+            int i = rand.nextInt(3);
             return i == 0 ? BlockFlower.EnumFlowerType.POPPY : (i == 1 ? BlockFlower.EnumFlowerType.HOUSTONIA : BlockFlower.EnumFlowerType.OXEYE_DAISY);
         }
         else
@@ -56,13 +54,9 @@ public class BiomeGenPlains extends BiomeGenBase
         }
     }
 
-    public void decorate(World worldIn, Random p_180624_2_, BlockPos p_180624_3_)
+    public void decorate(World worldIn, Random rand, BlockPos pos)
     {
-        double d0 = field_180281_af.func_151601_a((double)(p_180624_3_.getX() + 8) / 200.0D, (double)(p_180624_3_.getZ() + 8) / 200.0D);
-        int i;
-        int j;
-        int k;
-        int l;
+        double d0 = GRASS_COLOR_NOISE.func_151601_a((double)(pos.getX() + 8) / 200.0D, (double)(pos.getZ() + 8) / 200.0D);
 
         if (d0 < -0.8D)
         {
@@ -73,31 +67,31 @@ public class BiomeGenPlains extends BiomeGenBase
         {
             this.theBiomeDecorator.flowersPerChunk = 4;
             this.theBiomeDecorator.grassPerChunk = 10;
-            DOUBLE_PLANT_GENERATOR.func_180710_a(BlockDoublePlant.EnumPlantType.GRASS);
+            DOUBLE_PLANT_GENERATOR.setPlantType(BlockDoublePlant.EnumPlantType.GRASS);
 
-            for (i = 0; i < 7; ++i)
+            for (int i = 0; i < 7; ++i)
             {
-                j = p_180624_2_.nextInt(16) + 8;
-                k = p_180624_2_.nextInt(16) + 8;
-                l = p_180624_2_.nextInt(worldIn.getHorizon(p_180624_3_.add(j, 0, k)).getY() + 32);
-                DOUBLE_PLANT_GENERATOR.generate(worldIn, p_180624_2_, p_180624_3_.add(j, l, k));
+                int j = rand.nextInt(16) + 8;
+                int k = rand.nextInt(16) + 8;
+                int l = rand.nextInt(worldIn.getHeight(pos.add(j, 0, k)).getY() + 32);
+                DOUBLE_PLANT_GENERATOR.generate(worldIn, rand, pos.add(j, l, k));
             }
         }
 
         if (this.field_150628_aC)
         {
-            DOUBLE_PLANT_GENERATOR.func_180710_a(BlockDoublePlant.EnumPlantType.SUNFLOWER);
+            DOUBLE_PLANT_GENERATOR.setPlantType(BlockDoublePlant.EnumPlantType.SUNFLOWER);
 
-            for (i = 0; i < 10; ++i)
+            for (int i1 = 0; i1 < 10; ++i1)
             {
-                j = p_180624_2_.nextInt(16) + 8;
-                k = p_180624_2_.nextInt(16) + 8;
-                l = p_180624_2_.nextInt(worldIn.getHorizon(p_180624_3_.add(j, 0, k)).getY() + 32);
-                DOUBLE_PLANT_GENERATOR.generate(worldIn, p_180624_2_, p_180624_3_.add(j, l, k));
+                int j1 = rand.nextInt(16) + 8;
+                int k1 = rand.nextInt(16) + 8;
+                int l1 = rand.nextInt(worldIn.getHeight(pos.add(j1, 0, k1)).getY() + 32);
+                DOUBLE_PLANT_GENERATOR.generate(worldIn, rand, pos.add(j1, l1, k1));
             }
         }
 
-        super.decorate(worldIn, p_180624_2_, p_180624_3_);
+        super.decorate(worldIn, rand, pos);
     }
 
     public BiomeGenBase createMutatedBiome(int p_180277_1_)

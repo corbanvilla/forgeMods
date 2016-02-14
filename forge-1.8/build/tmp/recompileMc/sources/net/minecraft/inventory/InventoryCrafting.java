@@ -15,13 +15,12 @@ public class InventoryCrafting implements IInventory
     private final int inventoryHeight;
     /** Class containing the callbacks for the events on_GUIClosed and on_CraftMaxtrixChanged. */
     private final Container eventHandler;
-    private static final String __OBFID = "CL_00001743";
 
-    public InventoryCrafting(Container p_i1807_1_, int width, int height)
+    public InventoryCrafting(Container eventHandlerIn, int width, int height)
     {
-        int k = width * height;
-        this.stackList = new ItemStack[k];
-        this.eventHandler = p_i1807_1_;
+        int i = width * height;
+        this.stackList = new ItemStack[i];
+        this.eventHandler = eventHandlerIn;
         this.inventoryWidth = width;
         this.inventoryHeight = height;
     }
@@ -35,7 +34,7 @@ public class InventoryCrafting implements IInventory
     }
 
     /**
-     * Returns the stack in slot i
+     * Returns the stack in the given slot.
      */
     public ItemStack getStackInSlot(int index)
     {
@@ -51,7 +50,7 @@ public class InventoryCrafting implements IInventory
     }
 
     /**
-     * Gets the name of this command sender (usually username, but possibly "Rcon")
+     * Get the name of this object. For players this returns their username
      */
     public String getName()
     {
@@ -66,16 +65,18 @@ public class InventoryCrafting implements IInventory
         return false;
     }
 
+    /**
+     * Get the formatted ChatComponent that will be used for the sender's username in chat
+     */
     public IChatComponent getDisplayName()
     {
         return (IChatComponent)(this.hasCustomName() ? new ChatComponentText(this.getName()) : new ChatComponentTranslation(this.getName(), new Object[0]));
     }
 
     /**
-     * When some containers are closed they call this on each slot, then drop whatever it returns as an EntityItem -
-     * like when you close a workbench GUI.
+     * Removes a stack from the given slot and returns it.
      */
-    public ItemStack getStackInSlotOnClosing(int index)
+    public ItemStack removeStackFromSlot(int index)
     {
         if (this.stackList[index] != null)
         {
@@ -90,25 +91,22 @@ public class InventoryCrafting implements IInventory
     }
 
     /**
-     * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a
-     * new stack.
+     * Removes up to a specified number of items from an inventory slot and returns them in a new stack.
      */
     public ItemStack decrStackSize(int index, int count)
     {
         if (this.stackList[index] != null)
         {
-            ItemStack itemstack;
-
             if (this.stackList[index].stackSize <= count)
             {
-                itemstack = this.stackList[index];
+                ItemStack itemstack1 = this.stackList[index];
                 this.stackList[index] = null;
                 this.eventHandler.onCraftMatrixChanged(this);
-                return itemstack;
+                return itemstack1;
             }
             else
             {
-                itemstack = this.stackList[index].splitStack(count);
+                ItemStack itemstack = this.stackList[index].splitStack(count);
 
                 if (this.stackList[index].stackSize == 0)
                 {
@@ -135,8 +133,7 @@ public class InventoryCrafting implements IInventory
     }
 
     /**
-     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended. *Isn't
-     * this more of a set than a get?*
+     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended.
      */
     public int getInventoryStackLimit()
     {
@@ -147,7 +144,9 @@ public class InventoryCrafting implements IInventory
      * For tile entities, ensures the chunk containing the tile entity is saved to disk later - the game won't think it
      * hasn't changed and skip it.
      */
-    public void markDirty() {}
+    public void markDirty()
+    {
+    }
 
     /**
      * Do not make give this method the name canInteractWith because it clashes with Container
@@ -157,9 +156,13 @@ public class InventoryCrafting implements IInventory
         return true;
     }
 
-    public void openInventory(EntityPlayer player) {}
+    public void openInventory(EntityPlayer player)
+    {
+    }
 
-    public void closeInventory(EntityPlayer player) {}
+    public void closeInventory(EntityPlayer player)
+    {
+    }
 
     /**
      * Returns true if automation is allowed to insert the given stack (ignoring stack size) into the given slot.
@@ -174,7 +177,9 @@ public class InventoryCrafting implements IInventory
         return 0;
     }
 
-    public void setField(int id, int value) {}
+    public void setField(int id, int value)
+    {
+    }
 
     public int getFieldCount()
     {

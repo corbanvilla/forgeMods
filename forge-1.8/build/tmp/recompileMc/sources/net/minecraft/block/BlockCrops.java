@@ -19,7 +19,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BlockCrops extends BlockBush implements IGrowable
 {
     public static final PropertyInteger AGE = PropertyInteger.create("age", 0, 7);
-    private static final String __OBFID = "CL_00000222";
 
     protected BlockCrops()
     {
@@ -76,20 +75,20 @@ public class BlockCrops extends BlockBush implements IGrowable
     protected static float getGrowthChance(Block blockIn, World worldIn, BlockPos pos)
     {
         float f = 1.0F;
-        BlockPos blockpos1 = pos.down();
+        BlockPos blockpos = pos.down();
 
         for (int i = -1; i <= 1; ++i)
         {
             for (int j = -1; j <= 1; ++j)
             {
                 float f1 = 0.0F;
-                IBlockState iblockstate = worldIn.getBlockState(blockpos1.add(i, 0, j));
+                IBlockState iblockstate = worldIn.getBlockState(blockpos.add(i, 0, j));
 
-                if (iblockstate.getBlock().canSustainPlant(worldIn, blockpos1.add(i, 0, j), net.minecraft.util.EnumFacing.UP, (net.minecraftforge.common.IPlantable)blockIn))
+                if (iblockstate.getBlock().canSustainPlant(worldIn, blockpos.add(i, 0, j), net.minecraft.util.EnumFacing.UP, (net.minecraftforge.common.IPlantable)blockIn))
                 {
                     f1 = 1.0F;
 
-                    if (iblockstate.getBlock().isFertile(worldIn, blockpos1.add(i, 0, j)))
+                    if (iblockstate.getBlock().isFertile(worldIn, blockpos.add(i, 0, j)))
                     {
                         f1 = 3.0F;
                     }
@@ -104,12 +103,12 @@ public class BlockCrops extends BlockBush implements IGrowable
             }
         }
 
-        BlockPos blockpos2 = pos.north();
-        BlockPos blockpos3 = pos.south();
-        BlockPos blockpos4 = pos.west();
-        BlockPos blockpos5 = pos.east();
-        boolean flag = blockIn == worldIn.getBlockState(blockpos4).getBlock() || blockIn == worldIn.getBlockState(blockpos5).getBlock();
-        boolean flag1 = blockIn == worldIn.getBlockState(blockpos2).getBlock() || blockIn == worldIn.getBlockState(blockpos3).getBlock();
+        BlockPos blockpos1 = pos.north();
+        BlockPos blockpos2 = pos.south();
+        BlockPos blockpos3 = pos.west();
+        BlockPos blockpos4 = pos.east();
+        boolean flag = blockIn == worldIn.getBlockState(blockpos3).getBlock() || blockIn == worldIn.getBlockState(blockpos4).getBlock();
+        boolean flag1 = blockIn == worldIn.getBlockState(blockpos1).getBlock() || blockIn == worldIn.getBlockState(blockpos2).getBlock();
 
         if (flag && flag1)
         {
@@ -117,7 +116,7 @@ public class BlockCrops extends BlockBush implements IGrowable
         }
         else
         {
-            boolean flag2 = blockIn == worldIn.getBlockState(blockpos4.north()).getBlock() || blockIn == worldIn.getBlockState(blockpos5.north()).getBlock() || blockIn == worldIn.getBlockState(blockpos5.south()).getBlock() || blockIn == worldIn.getBlockState(blockpos4.south()).getBlock();
+            boolean flag2 = blockIn == worldIn.getBlockState(blockpos3.north()).getBlock() || blockIn == worldIn.getBlockState(blockpos4.north()).getBlock() || blockIn == worldIn.getBlockState(blockpos4.south()).getBlock() || blockIn == worldIn.getBlockState(blockpos3.south()).getBlock();
 
             if (flag2)
             {
@@ -145,9 +144,6 @@ public class BlockCrops extends BlockBush implements IGrowable
 
     /**
      * Spawns this Block's drops into the World as EntityItems.
-     *  
-     * @param chance The chance that each Item is actually spawned (1.0 = always, 0.0 = never)
-     * @param fortune The player's fortune level
      */
     public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune)
     {
@@ -156,8 +152,6 @@ public class BlockCrops extends BlockBush implements IGrowable
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {

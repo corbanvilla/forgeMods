@@ -1,23 +1,23 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S3APacketTabComplete implements Packet
+public class S3APacketTabComplete implements Packet<INetHandlerPlayClient>
 {
-    private String[] field_149632_a;
-    private static final String __OBFID = "CL_00001288";
+    private String[] matches;
 
-    public S3APacketTabComplete() {}
-
-    public S3APacketTabComplete(String[] p_i45178_1_)
+    public S3APacketTabComplete()
     {
-        this.field_149632_a = p_i45178_1_;
+    }
+
+    public S3APacketTabComplete(String[] matchesIn)
+    {
+        this.matches = matchesIn;
     }
 
     /**
@@ -25,11 +25,11 @@ public class S3APacketTabComplete implements Packet
      */
     public void readPacketData(PacketBuffer buf) throws IOException
     {
-        this.field_149632_a = new String[buf.readVarIntFromBuffer()];
+        this.matches = new String[buf.readVarIntFromBuffer()];
 
-        for (int i = 0; i < this.field_149632_a.length; ++i)
+        for (int i = 0; i < this.matches.length; ++i)
         {
-            this.field_149632_a[i] = buf.readStringFromBuffer(32767);
+            this.matches[i] = buf.readStringFromBuffer(32767);
         }
     }
 
@@ -38,13 +38,10 @@ public class S3APacketTabComplete implements Packet
      */
     public void writePacketData(PacketBuffer buf) throws IOException
     {
-        buf.writeVarIntToBuffer(this.field_149632_a.length);
-        String[] astring = this.field_149632_a;
-        int i = astring.length;
+        buf.writeVarIntToBuffer(this.matches.length);
 
-        for (int j = 0; j < i; ++j)
+        for (String s : this.matches)
         {
-            String s = astring[j];
             buf.writeString(s);
         }
     }
@@ -60,14 +57,6 @@ public class S3APacketTabComplete implements Packet
     @SideOnly(Side.CLIENT)
     public String[] func_149630_c()
     {
-        return this.field_149632_a;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayClient)handler);
+        return this.matches;
     }
 }

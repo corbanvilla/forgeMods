@@ -21,7 +21,6 @@ public class GuiSpectator extends Gui implements ISpectatorMenuRecipient
     private final Minecraft field_175268_g;
     private long field_175270_h;
     private SpectatorMenu field_175271_i;
-    private static final String __OBFID = "CL_00001940";
 
     public GuiSpectator(Minecraft mcIn)
     {
@@ -52,21 +51,21 @@ public class GuiSpectator extends Gui implements ISpectatorMenuRecipient
     {
         if (this.field_175271_i != null)
         {
-            float f1 = this.func_175265_c();
+            float f = this.func_175265_c();
 
-            if (f1 <= 0.0F)
+            if (f <= 0.0F)
             {
                 this.field_175271_i.func_178641_d();
             }
             else
             {
                 int i = p_175264_1_.getScaledWidth() / 2;
-                float f2 = this.zLevel;
+                float f1 = this.zLevel;
                 this.zLevel = -90.0F;
-                float f3 = (float)p_175264_1_.getScaledHeight() - 22.0F * f1;
+                float f2 = (float)p_175264_1_.getScaledHeight() - 22.0F * f;
                 SpectatorDetails spectatordetails = this.field_175271_i.func_178646_f();
-                this.func_175258_a(p_175264_1_, f1, i, f3, spectatordetails);
-                this.zLevel = f2;
+                this.func_175258_a(p_175264_1_, f, i, f2, spectatordetails);
+                this.zLevel = f1;
             }
         }
     }
@@ -87,9 +86,9 @@ public class GuiSpectator extends Gui implements ISpectatorMenuRecipient
 
         RenderHelper.enableGUIStandardItemLighting();
 
-        for (int j = 0; j < 9; ++j)
+        for (int i = 0; i < 9; ++i)
         {
-            this.func_175266_a(j, p_175258_1_.getScaledWidth() / 2 - 90 + j * 20 + 2, p_175258_4_ + 3.0F, p_175258_2_, p_175258_5_.func_178680_a(j));
+            this.func_175266_a(i, p_175258_1_.getScaledWidth() / 2 - 90 + i * 20 + 2, p_175258_4_ + 3.0F, p_175258_2_, p_175258_5_.func_178680_a(i));
         }
 
         RenderHelper.disableStandardItemLighting();
@@ -103,18 +102,18 @@ public class GuiSpectator extends Gui implements ISpectatorMenuRecipient
 
         if (p_175266_5_ != SpectatorMenu.field_178657_a)
         {
-            int k = (int)(p_175266_4_ * 255.0F);
+            int i = (int)(p_175266_4_ * 255.0F);
             GlStateManager.pushMatrix();
             GlStateManager.translate((float)p_175266_2_, p_175266_3_, 0.0F);
-            float f2 = p_175266_5_.func_178662_A_() ? 1.0F : 0.25F;
-            GlStateManager.color(f2, f2, f2, p_175266_4_);
-            p_175266_5_.func_178663_a(f2, k);
+            float f = p_175266_5_.func_178662_A_() ? 1.0F : 0.25F;
+            GlStateManager.color(f, f, f, p_175266_4_);
+            p_175266_5_.func_178663_a(f, i);
             GlStateManager.popMatrix();
-            String s = String.valueOf(GameSettings.getKeyDisplayString(this.field_175268_g.gameSettings.keyBindsHotbar[p_175266_1_].getKeyCode()));
+            String s = String.valueOf((Object)GameSettings.getKeyDisplayString(this.field_175268_g.gameSettings.keyBindsHotbar[p_175266_1_].getKeyCode()));
 
-            if (k > 3 && p_175266_5_.func_178662_A_())
+            if (i > 3 && p_175266_5_.func_178662_A_())
             {
-                this.field_175268_g.fontRendererObj.drawStringWithShadow(s, (float)(p_175266_2_ + 19 - 2 - this.field_175268_g.fontRendererObj.getStringWidth(s)), p_175266_3_ + 6.0F + 3.0F, 16777215 + (k << 24));
+                this.field_175268_g.fontRendererObj.drawStringWithShadow(s, (float)(p_175266_2_ + 19 - 2 - this.field_175268_g.fontRendererObj.getStringWidth(s)), p_175266_3_ + 6.0F + 3.0F, 16777215 + (i << 24));
             }
         }
     }
@@ -126,7 +125,7 @@ public class GuiSpectator extends Gui implements ISpectatorMenuRecipient
         if (i > 3 && this.field_175271_i != null)
         {
             ISpectatorMenuObject ispectatormenuobject = this.field_175271_i.func_178645_b();
-            String s = ispectatormenuobject != SpectatorMenu.field_178657_a ? ispectatormenuobject.func_178664_z_().getFormattedText() : this.field_175271_i.func_178650_c().func_178670_b().getFormattedText();
+            String s = ispectatormenuobject != SpectatorMenu.field_178657_a ? ispectatormenuobject.getSpectatorName().getFormattedText() : this.field_175271_i.func_178650_c().func_178670_b().getFormattedText();
 
             if (s != null)
             {
@@ -155,16 +154,16 @@ public class GuiSpectator extends Gui implements ISpectatorMenuRecipient
 
     public void func_175259_b(int p_175259_1_)
     {
-        int j;
+        int i;
 
-        for (j = this.field_175271_i.func_178648_e() + p_175259_1_; j >= 0 && j <= 8 && (this.field_175271_i.func_178643_a(j) == SpectatorMenu.field_178657_a || !this.field_175271_i.func_178643_a(j).func_178662_A_()); j += p_175259_1_)
+        for (i = this.field_175271_i.func_178648_e() + p_175259_1_; i >= 0 && i <= 8 && (this.field_175271_i.func_178643_a(i) == SpectatorMenu.field_178657_a || !this.field_175271_i.func_178643_a(i).func_178662_A_()); i += p_175259_1_)
         {
             ;
         }
 
-        if (j >= 0 && j <= 8)
+        if (i >= 0 && i <= 8)
         {
-            this.field_175271_i.func_178644_b(j);
+            this.field_175271_i.func_178644_b(i);
             this.field_175270_h = Minecraft.getSystemTime();
         }
     }

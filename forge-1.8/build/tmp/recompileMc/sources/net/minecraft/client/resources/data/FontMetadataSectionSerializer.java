@@ -11,11 +11,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.Validate;
 
 @SideOnly(Side.CLIENT)
-public class FontMetadataSectionSerializer extends BaseMetadataSectionSerializer
+public class FontMetadataSectionSerializer extends BaseMetadataSectionSerializer<FontMetadataSection>
 {
-    private static final String __OBFID = "CL_00001109";
-
-    public FontMetadataSection deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_)
+    public FontMetadataSection deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_) throws JsonParseException
     {
         JsonObject jsonobject = p_deserialize_1_.getAsJsonObject();
         float[] afloat = new float[256];
@@ -42,29 +40,29 @@ public class FontMetadataSectionSerializer extends BaseMetadataSectionSerializer
                 }
 
                 JsonObject jsonobject2 = jsonobject1.getAsJsonObject("default");
-                f = JsonUtils.getJsonObjectFloatFieldValueOrDefault(jsonobject2, "width", f);
+                f = JsonUtils.getFloat(jsonobject2, "width", f);
                 Validate.inclusiveBetween(0.0D, 3.4028234663852886E38D, (double)f, "Invalid default width");
-                f1 = JsonUtils.getJsonObjectFloatFieldValueOrDefault(jsonobject2, "spacing", f1);
+                f1 = JsonUtils.getFloat(jsonobject2, "spacing", f1);
                 Validate.inclusiveBetween(0.0D, 3.4028234663852886E38D, (double)f1, "Invalid default spacing");
-                f2 = JsonUtils.getJsonObjectFloatFieldValueOrDefault(jsonobject2, "left", f1);
+                f2 = JsonUtils.getFloat(jsonobject2, "left", f1);
                 Validate.inclusiveBetween(0.0D, 3.4028234663852886E38D, (double)f2, "Invalid default left");
             }
 
             for (int i = 0; i < 256; ++i)
             {
-                JsonElement jsonelement1 = jsonobject1.get(Integer.toString(i));
+                JsonElement jsonelement = jsonobject1.get(Integer.toString(i));
                 float f3 = f;
                 float f4 = f1;
                 float f5 = f2;
 
-                if (jsonelement1 != null)
+                if (jsonelement != null)
                 {
-                    JsonObject jsonobject3 = JsonUtils.getElementAsJsonObject(jsonelement1, "characters[" + i + "]");
-                    f3 = JsonUtils.getJsonObjectFloatFieldValueOrDefault(jsonobject3, "width", f);
+                    JsonObject jsonobject3 = JsonUtils.getJsonObject(jsonelement, "characters[" + i + "]");
+                    f3 = JsonUtils.getFloat(jsonobject3, "width", f);
                     Validate.inclusiveBetween(0.0D, 3.4028234663852886E38D, (double)f3, "Invalid width");
-                    f4 = JsonUtils.getJsonObjectFloatFieldValueOrDefault(jsonobject3, "spacing", f1);
+                    f4 = JsonUtils.getFloat(jsonobject3, "spacing", f1);
                     Validate.inclusiveBetween(0.0D, 3.4028234663852886E38D, (double)f4, "Invalid spacing");
-                    f5 = JsonUtils.getJsonObjectFloatFieldValueOrDefault(jsonobject3, "left", f2);
+                    f5 = JsonUtils.getFloat(jsonobject3, "left", f2);
                     Validate.inclusiveBetween(0.0D, 3.4028234663852886E38D, (double)f5, "Invalid left");
                 }
 

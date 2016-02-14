@@ -9,9 +9,10 @@ public class NBTTagByteArray extends NBTBase
 {
     /** The byte array stored in the tag. */
     private byte[] data;
-    private static final String __OBFID = "CL_00001213";
 
-    NBTTagByteArray() {}
+    NBTTagByteArray()
+    {
+    }
 
     public NBTTagByteArray(byte[] data)
     {
@@ -29,10 +30,10 @@ public class NBTTagByteArray extends NBTBase
 
     void read(DataInput input, int depth, NBTSizeTracker sizeTracker) throws IOException
     {
-        sizeTracker.read(32); //Forge: Count the length as well
-        int j = input.readInt();
-        sizeTracker.read((long)(8 * j));
-        this.data = new byte[j];
+        sizeTracker.read(192L);
+        int i = input.readInt();
+        sizeTracker.read((long)(8 * i));
+        this.data = new byte[i];
         input.readFully(this.data);
     }
 

@@ -14,13 +14,12 @@ public class EntityAIMoveTowardsTarget extends EntityAIBase
     private double speed;
     /** If the distance to the target entity is further than this, this AI task will not run. */
     private float maxTargetDistance;
-    private static final String __OBFID = "CL_00001599";
 
-    public EntityAIMoveTowardsTarget(EntityCreature p_i1640_1_, double p_i1640_2_, float p_i1640_4_)
+    public EntityAIMoveTowardsTarget(EntityCreature creature, double speedIn, float targetMaxDistance)
     {
-        this.theEntity = p_i1640_1_;
-        this.speed = p_i1640_2_;
-        this.maxTargetDistance = p_i1640_4_;
+        this.theEntity = creature;
+        this.speed = speedIn;
+        this.maxTargetDistance = targetMaxDistance;
         this.setMutexBits(1);
     }
 

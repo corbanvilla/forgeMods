@@ -1,6 +1,5 @@
 package net.minecraft.entity.item;
 
-import java.util.Iterator;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -32,7 +31,6 @@ public class EntityItem extends Entity
     private String owner;
     /** The EntityItem's random initial float height. */
     public float hoverStart;
-    private static final String __OBFID = "CL_00001669";
 
     /**
      * The maximum age of this EntityItem.  The item is expired once this is reached.
@@ -169,11 +167,8 @@ public class EntityItem extends Entity
      */
     private void searchForOtherItemsNearby()
     {
-        Iterator iterator = this.worldObj.getEntitiesWithinAABB(EntityItem.class, this.getEntityBoundingBox().expand(0.5D, 0.0D, 0.5D)).iterator();
-
-        while (iterator.hasNext())
+        for (EntityItem entityitem : this.worldObj.getEntitiesWithinAABB(EntityItem.class, this.getEntityBoundingBox().expand(0.5D, 0.0D, 0.5D)))
         {
-            EntityItem entityitem = (EntityItem)iterator.next();
             this.combineItems(entityitem);
         }
     }
@@ -367,8 +362,8 @@ public class EntityItem extends Entity
             this.thrower = tagCompund.getString("Thrower");
         }
 
-        NBTTagCompound nbttagcompound1 = tagCompund.getCompoundTag("Item");
-        this.setEntityItemStack(ItemStack.loadItemStackFromNBT(nbttagcompound1));
+        NBTTagCompound nbttagcompound = tagCompund.getCompoundTag("Item");
+        this.setEntityItemStack(ItemStack.loadItemStackFromNBT(nbttagcompound));
 
         ItemStack item = getDataWatcher().getWatchableObjectItemStack(10);
         if (item == null || item.stackSize <= 0) this.setDead();
@@ -418,11 +413,11 @@ public class EntityItem extends Entity
 
                 if (itemstack.getItem() == Items.diamond && this.getThrower() != null)
                 {
-                    EntityPlayer entityplayer1 = this.worldObj.getPlayerEntityByName(this.getThrower());
+                    EntityPlayer entityplayer = this.worldObj.getPlayerEntityByName(this.getThrower());
 
-                    if (entityplayer1 != null && entityplayer1 != entityIn)
+                    if (entityplayer != null && entityplayer != entityIn)
                     {
-                        entityplayer1.triggerAchievement(AchievementList.diamondsToYou);
+                        entityplayer.triggerAchievement(AchievementList.diamondsToYou);
                     }
                 }
 
@@ -443,7 +438,7 @@ public class EntityItem extends Entity
     }
 
     /**
-     * Gets the name of this command sender (usually username, but possibly "Rcon")
+     * Get the name of this object. For players this returns their username
      */
     public String getName()
     {
@@ -481,11 +476,6 @@ public class EntityItem extends Entity
 
         if (itemstack == null)
         {
-            if (this.worldObj != null)
-            {
-                logger.error("Item entity " + this.getEntityId() + " has no item?!");
-            }
-
             return new ItemStack(Blocks.stone);
         }
         else
@@ -562,6 +552,6 @@ public class EntityItem extends Entity
     public void func_174870_v()
     {
         this.setInfinitePickupDelay();
-        this.age = 5999;
+        this.age = getEntityItem().getItem().getEntityLifespan(getEntityItem(), worldObj) - 1;
     }
 }

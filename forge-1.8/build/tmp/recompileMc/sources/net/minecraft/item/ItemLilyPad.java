@@ -15,8 +15,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemLilyPad extends ItemColored
 {
-    private static final String __OBFID = "CL_00000074";
-
     public ItemLilyPad(Block block)
     {
         super(block, false);

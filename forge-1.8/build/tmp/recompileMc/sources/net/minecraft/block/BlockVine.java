@@ -1,6 +1,5 @@
 package net.minecraft.block;
 
-import java.util.Iterator;
 import java.util.Random;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -34,11 +33,6 @@ public class BlockVine extends Block implements net.minecraftforge.common.IShear
     public static final PropertyBool SOUTH = PropertyBool.create("south");
     public static final PropertyBool WEST = PropertyBool.create("west");
     public static final PropertyBool[] ALL_FACES = new PropertyBool[] {UP, NORTH, SOUTH, WEST, EAST};
-    public static final int SOUTH_FLAG = getMetaFlag(EnumFacing.SOUTH);
-    public static final int NORTH_FLAG = getMetaFlag(EnumFacing.NORTH);
-    public static final int EAST_FLAG = getMetaFlag(EnumFacing.EAST);
-    public static final int WEST_FLAG = getMetaFlag(EnumFacing.WEST);
-    private static final String __OBFID = "CL_00000330";
 
     public BlockVine()
     {
@@ -54,7 +48,7 @@ public class BlockVine extends Block implements net.minecraftforge.common.IShear
      */
     public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
     {
-        return state.withProperty(UP, Boolean.valueOf(worldIn.getBlockState(pos.up()).getBlock().isSolidFullCube()));
+        return state.withProperty(UP, Boolean.valueOf(worldIn.getBlockState(pos.up()).getBlock().isBlockNormalCube()));
     }
 
     /**
@@ -65,6 +59,9 @@ public class BlockVine extends Block implements net.minecraftforge.common.IShear
         this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -161,40 +158,38 @@ public class BlockVine extends Block implements net.minecraftforge.common.IShear
      */
     public boolean canPlaceBlockOnSide(World worldIn, BlockPos pos, EnumFacing side)
     {
-        switch (BlockVine.SwitchEnumFacing.FACING_LOOKUP[side.ordinal()])
+        switch (side)
         {
-            case 1:
+            case UP:
                 return this.canPlaceOn(worldIn.getBlockState(pos.up()).getBlock());
-            case 2:
-            case 3:
-            case 4:
-            case 5:
+            case NORTH:
+            case SOUTH:
+            case EAST:
+            case WEST:
                 return this.canPlaceOn(worldIn.getBlockState(pos.offset(side.getOpposite())).getBlock());
             default:
                 return false;
         }
     }
 
-    private boolean canPlaceOn(Block p_150093_1_)
+    private boolean canPlaceOn(Block blockIn)
     {
-        return p_150093_1_.isFullCube() && p_150093_1_.blockMaterial.blocksMovement();
+        return blockIn.isFullCube() && blockIn.blockMaterial.blocksMovement();
     }
 
     private boolean recheckGrownSides(World worldIn, BlockPos pos, IBlockState state)
     {
-        IBlockState iblockstate1 = state;
-        Iterator iterator = EnumFacing.Plane.HORIZONTAL.iterator();
+        IBlockState iblockstate = state;
 
-        while (iterator.hasNext())
+        for (EnumFacing enumfacing : EnumFacing.Plane.HORIZONTAL)
         {
-            EnumFacing enumfacing = (EnumFacing)iterator.next();
             PropertyBool propertybool = getPropertyFor(enumfacing);
 
             if (((Boolean)state.getValue(propertybool)).booleanValue() && !this.canPlaceOn(worldIn.getBlockState(pos.offset(enumfacing)).getBlock()))
             {
-                IBlockState iblockstate2 = worldIn.getBlockState(pos.up());
+                IBlockState iblockstate1 = worldIn.getBlockState(pos.up());
 
-                if (iblockstate2.getBlock() != this || !((Boolean)iblockstate2.getValue(propertybool)).booleanValue())
+                if (iblockstate1.getBlock() != this || !((Boolean)iblockstate1.getValue(propertybool)).booleanValue())
                 {
                     state = state.withProperty(propertybool, Boolean.valueOf(false));
                 }
@@ -207,7 +202,7 @@ public class BlockVine extends Block implements net.minecraftforge.common.IShear
         }
         else
         {
-            if (iblockstate1 != state)
+            if (iblockstate != state)
             {
                 worldIn.setBlockState(pos, state, 2);
             }
@@ -252,25 +247,25 @@ public class BlockVine extends Block implements net.minecraftforge.common.IShear
         {
             if (worldIn.rand.nextInt(4) == 0)
             {
-                byte b0 = 4;
-                int i = 5;
+                int i = 4;
+                int j = 5;
                 boolean flag = false;
-                label189:
+                label62:
 
-                for (int j = -b0; j <= b0; ++j)
+                for (int k = -i; k <= i; ++k)
                 {
-                    for (int k = -b0; k <= b0; ++k)
+                    for (int l = -i; l <= i; ++l)
                     {
-                        for (int l = -1; l <= 1; ++l)
+                        for (int i1 = -1; i1 <= 1; ++i1)
                         {
-                            if (worldIn.getBlockState(pos.add(j, l, k)).getBlock() == this)
+                            if (worldIn.getBlockState(pos.add(k, i1, l)).getBlock() == this)
                             {
-                                --i;
+                                --j;
 
-                                if (i <= 0)
+                                if (j <= 0)
                                 {
                                     flag = true;
-                                    break label189;
+                                    break label62;
                                 }
                             }
                         }
@@ -278,129 +273,113 @@ public class BlockVine extends Block implements net.minecraftforge.common.IShear
                 }
 
                 EnumFacing enumfacing1 = EnumFacing.random(rand);
-                EnumFacing enumfacing2;
+                BlockPos blockpos1 = pos.up();
 
-                if (enumfacing1 == EnumFacing.UP && pos.getY() < 255 && worldIn.isAirBlock(pos.up()))
+                if (enumfacing1 == EnumFacing.UP && pos.getY() < 255 && worldIn.isAirBlock(blockpos1))
                 {
                     if (!flag)
                     {
                         IBlockState iblockstate2 = state;
-                        Iterator iterator1 = EnumFacing.Plane.HORIZONTAL.iterator();
 
-                        while (iterator1.hasNext())
+                        for (EnumFacing enumfacing3 : EnumFacing.Plane.HORIZONTAL)
                         {
-                            enumfacing2 = (EnumFacing)iterator1.next();
-
-                            if (rand.nextBoolean() || !this.canPlaceOn(worldIn.getBlockState(pos.offset(enumfacing2).up()).getBlock()))
+                            if (rand.nextBoolean() || !this.canPlaceOn(worldIn.getBlockState(blockpos1.offset(enumfacing3)).getBlock()))
                             {
-                                iblockstate2 = iblockstate2.withProperty(getPropertyFor(enumfacing2), Boolean.valueOf(false));
+                                iblockstate2 = iblockstate2.withProperty(getPropertyFor(enumfacing3), Boolean.valueOf(false));
                             }
                         }
 
                         if (((Boolean)iblockstate2.getValue(NORTH)).booleanValue() || ((Boolean)iblockstate2.getValue(EAST)).booleanValue() || ((Boolean)iblockstate2.getValue(SOUTH)).booleanValue() || ((Boolean)iblockstate2.getValue(WEST)).booleanValue())
                         {
-                            worldIn.setBlockState(pos.up(), iblockstate2, 2);
+                            worldIn.setBlockState(blockpos1, iblockstate2, 2);
+                        }
+                    }
+                }
+                else if (enumfacing1.getAxis().isHorizontal() && !((Boolean)state.getValue(getPropertyFor(enumfacing1))).booleanValue())
+                {
+                    if (!flag)
+                    {
+                        BlockPos blockpos3 = pos.offset(enumfacing1);
+                        Block block1 = worldIn.getBlockState(blockpos3).getBlock();
+
+                        if (block1.blockMaterial == Material.air)
+                        {
+                            EnumFacing enumfacing2 = enumfacing1.rotateY();
+                            EnumFacing enumfacing4 = enumfacing1.rotateYCCW();
+                            boolean flag1 = ((Boolean)state.getValue(getPropertyFor(enumfacing2))).booleanValue();
+                            boolean flag2 = ((Boolean)state.getValue(getPropertyFor(enumfacing4))).booleanValue();
+                            BlockPos blockpos4 = blockpos3.offset(enumfacing2);
+                            BlockPos blockpos = blockpos3.offset(enumfacing4);
+
+                            if (flag1 && this.canPlaceOn(worldIn.getBlockState(blockpos4).getBlock()))
+                            {
+                                worldIn.setBlockState(blockpos3, this.getDefaultState().withProperty(getPropertyFor(enumfacing2), Boolean.valueOf(true)), 2);
+                            }
+                            else if (flag2 && this.canPlaceOn(worldIn.getBlockState(blockpos).getBlock()))
+                            {
+                                worldIn.setBlockState(blockpos3, this.getDefaultState().withProperty(getPropertyFor(enumfacing4), Boolean.valueOf(true)), 2);
+                            }
+                            else if (flag1 && worldIn.isAirBlock(blockpos4) && this.canPlaceOn(worldIn.getBlockState(pos.offset(enumfacing2)).getBlock()))
+                            {
+                                worldIn.setBlockState(blockpos4, this.getDefaultState().withProperty(getPropertyFor(enumfacing1.getOpposite()), Boolean.valueOf(true)), 2);
+                            }
+                            else if (flag2 && worldIn.isAirBlock(blockpos) && this.canPlaceOn(worldIn.getBlockState(pos.offset(enumfacing4)).getBlock()))
+                            {
+                                worldIn.setBlockState(blockpos, this.getDefaultState().withProperty(getPropertyFor(enumfacing1.getOpposite()), Boolean.valueOf(true)), 2);
+                            }
+                            else if (this.canPlaceOn(worldIn.getBlockState(blockpos3.up()).getBlock()))
+                            {
+                                worldIn.setBlockState(blockpos3, this.getDefaultState(), 2);
+                            }
+                        }
+                        else if (block1.blockMaterial.isOpaque() && block1.isFullCube())
+                        {
+                            worldIn.setBlockState(pos, state.withProperty(getPropertyFor(enumfacing1), Boolean.valueOf(true)), 2);
                         }
                     }
                 }
                 else
                 {
-                    BlockPos blockpos2;
-
-                    if (enumfacing1.getAxis().isHorizontal() && !((Boolean)state.getValue(getPropertyFor(enumfacing1))).booleanValue())
+                    if (pos.getY() > 1)
                     {
-                        if (!flag)
+                        BlockPos blockpos2 = pos.down();
+                        IBlockState iblockstate = worldIn.getBlockState(blockpos2);
+                        Block block = iblockstate.getBlock();
+
+                        if (block.blockMaterial == Material.air)
                         {
-                            blockpos2 = pos.offset(enumfacing1);
-                            Block block1 = worldIn.getBlockState(blockpos2).getBlock();
+                            IBlockState iblockstate1 = state;
 
-                            if (block1.blockMaterial == Material.air)
+                            for (EnumFacing enumfacing : EnumFacing.Plane.HORIZONTAL)
                             {
-                                enumfacing2 = enumfacing1.rotateY();
-                                EnumFacing enumfacing3 = enumfacing1.rotateYCCW();
-                                boolean flag1 = ((Boolean)state.getValue(getPropertyFor(enumfacing2))).booleanValue();
-                                boolean flag2 = ((Boolean)state.getValue(getPropertyFor(enumfacing3))).booleanValue();
-                                BlockPos blockpos3 = blockpos2.offset(enumfacing2);
-                                BlockPos blockpos1 = blockpos2.offset(enumfacing3);
-
-                                if (flag1 && this.canPlaceOn(worldIn.getBlockState(blockpos3).getBlock()))
+                                if (rand.nextBoolean())
                                 {
-                                    worldIn.setBlockState(blockpos2, this.getDefaultState().withProperty(getPropertyFor(enumfacing2), Boolean.valueOf(true)), 2);
-                                }
-                                else if (flag2 && this.canPlaceOn(worldIn.getBlockState(blockpos1).getBlock()))
-                                {
-                                    worldIn.setBlockState(blockpos2, this.getDefaultState().withProperty(getPropertyFor(enumfacing3), Boolean.valueOf(true)), 2);
-                                }
-                                else if (flag1 && worldIn.isAirBlock(blockpos3) && this.canPlaceOn(worldIn.getBlockState(pos.offset(enumfacing2)).getBlock()))
-                                {
-                                    worldIn.setBlockState(blockpos3, this.getDefaultState().withProperty(getPropertyFor(enumfacing1.getOpposite()), Boolean.valueOf(true)), 2);
-                                }
-                                else if (flag2 && worldIn.isAirBlock(blockpos1) && this.canPlaceOn(worldIn.getBlockState(pos.offset(enumfacing3)).getBlock()))
-                                {
-                                    worldIn.setBlockState(blockpos1, this.getDefaultState().withProperty(getPropertyFor(enumfacing1.getOpposite()), Boolean.valueOf(true)), 2);
-                                }
-                                else if (this.canPlaceOn(worldIn.getBlockState(blockpos2.up()).getBlock()))
-                                {
-                                    worldIn.setBlockState(blockpos2, this.getDefaultState(), 2);
+                                    iblockstate1 = iblockstate1.withProperty(getPropertyFor(enumfacing), Boolean.valueOf(false));
                                 }
                             }
-                            else if (block1.blockMaterial.isOpaque() && block1.isFullCube())
+
+                            if (((Boolean)iblockstate1.getValue(NORTH)).booleanValue() || ((Boolean)iblockstate1.getValue(EAST)).booleanValue() || ((Boolean)iblockstate1.getValue(SOUTH)).booleanValue() || ((Boolean)iblockstate1.getValue(WEST)).booleanValue())
                             {
-                                worldIn.setBlockState(pos, state.withProperty(getPropertyFor(enumfacing1), Boolean.valueOf(true)), 2);
+                                worldIn.setBlockState(blockpos2, iblockstate1, 2);
                             }
                         }
-                    }
-                    else
-                    {
-                        if (pos.getY() > 1)
+                        else if (block == this)
                         {
-                            blockpos2 = pos.down();
-                            IBlockState iblockstate3 = worldIn.getBlockState(blockpos2);
-                            Block block = iblockstate3.getBlock();
-                            IBlockState iblockstate1;
-                            Iterator iterator;
-                            EnumFacing enumfacing;
+                            IBlockState iblockstate3 = iblockstate;
 
-                            if (block.blockMaterial == Material.air)
+                            for (EnumFacing enumfacing5 : EnumFacing.Plane.HORIZONTAL)
                             {
-                                iblockstate1 = state;
-                                iterator = EnumFacing.Plane.HORIZONTAL.iterator();
+                                PropertyBool propertybool = getPropertyFor(enumfacing5);
 
-                                while (iterator.hasNext())
+                                if (rand.nextBoolean() && ((Boolean)state.getValue(propertybool)).booleanValue())
                                 {
-                                    enumfacing = (EnumFacing)iterator.next();
-
-                                    if (rand.nextBoolean())
-                                    {
-                                        iblockstate1 = iblockstate1.withProperty(getPropertyFor(enumfacing), Boolean.valueOf(false));
-                                    }
-                                }
-
-                                if (((Boolean)iblockstate1.getValue(NORTH)).booleanValue() || ((Boolean)iblockstate1.getValue(EAST)).booleanValue() || ((Boolean)iblockstate1.getValue(SOUTH)).booleanValue() || ((Boolean)iblockstate1.getValue(WEST)).booleanValue())
-                                {
-                                    worldIn.setBlockState(blockpos2, iblockstate1, 2);
+                                    iblockstate3 = iblockstate3.withProperty(propertybool, Boolean.valueOf(true));
                                 }
                             }
-                            else if (block == this)
+
+                            if (((Boolean)iblockstate3.getValue(NORTH)).booleanValue() || ((Boolean)iblockstate3.getValue(EAST)).booleanValue() || ((Boolean)iblockstate3.getValue(SOUTH)).booleanValue() || ((Boolean)iblockstate3.getValue(WEST)).booleanValue())
                             {
-                                iblockstate1 = iblockstate3;
-                                iterator = EnumFacing.Plane.HORIZONTAL.iterator();
-
-                                while (iterator.hasNext())
-                                {
-                                    enumfacing = (EnumFacing)iterator.next();
-                                    PropertyBool propertybool = getPropertyFor(enumfacing);
-
-                                    if (rand.nextBoolean() || !((Boolean)state.getValue(propertybool)).booleanValue())
-                                    {
-                                        iblockstate1 = iblockstate1.withProperty(propertybool, Boolean.valueOf(false));
-                                    }
-                                }
-
-                                if (((Boolean)iblockstate1.getValue(NORTH)).booleanValue() || ((Boolean)iblockstate1.getValue(EAST)).booleanValue() || ((Boolean)iblockstate1.getValue(SOUTH)).booleanValue() || ((Boolean)iblockstate1.getValue(WEST)).booleanValue())
-                                {
-                                    worldIn.setBlockState(blockpos2, iblockstate1, 2);
-                                }
+                                worldIn.setBlockState(blockpos2, iblockstate3, 2);
                             }
                         }
                     }
@@ -409,11 +388,10 @@ public class BlockVine extends Block implements net.minecraftforge.common.IShear
         }
     }
 
-    private static int getMetaFlag(EnumFacing face)
-    {
-        return 1 << face.getHorizontalIndex();
-    }
-
+    /**
+     * Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the
+     * IBlockstate
+     */
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
         IBlockState iblockstate = this.getDefaultState().withProperty(UP, Boolean.valueOf(false)).withProperty(NORTH, Boolean.valueOf(false)).withProperty(EAST, Boolean.valueOf(false)).withProperty(SOUTH, Boolean.valueOf(false)).withProperty(WEST, Boolean.valueOf(false));
@@ -422,8 +400,6 @@ public class BlockVine extends Block implements net.minecraftforge.common.IShear
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -450,7 +426,7 @@ public class BlockVine extends Block implements net.minecraftforge.common.IShear
      */
     public IBlockState getStateFromMeta(int meta)
     {
-        return this.getDefaultState().withProperty(NORTH, Boolean.valueOf((meta & NORTH_FLAG) > 0)).withProperty(EAST, Boolean.valueOf((meta & EAST_FLAG) > 0)).withProperty(SOUTH, Boolean.valueOf((meta & SOUTH_FLAG) > 0)).withProperty(WEST, Boolean.valueOf((meta & WEST_FLAG) > 0));
+        return this.getDefaultState().withProperty(SOUTH, Boolean.valueOf((meta & 1) > 0)).withProperty(WEST, Boolean.valueOf((meta & 2) > 0)).withProperty(NORTH, Boolean.valueOf((meta & 4) > 0)).withProperty(EAST, Boolean.valueOf((meta & 8) > 0));
     }
 
     @SideOnly(Side.CLIENT)
@@ -466,24 +442,24 @@ public class BlockVine extends Block implements net.minecraftforge.common.IShear
     {
         int i = 0;
 
-        if (((Boolean)state.getValue(NORTH)).booleanValue())
-        {
-            i |= NORTH_FLAG;
-        }
-
-        if (((Boolean)state.getValue(EAST)).booleanValue())
-        {
-            i |= EAST_FLAG;
-        }
-
         if (((Boolean)state.getValue(SOUTH)).booleanValue())
         {
-            i |= SOUTH_FLAG;
+            i |= 1;
         }
 
         if (((Boolean)state.getValue(WEST)).booleanValue())
         {
-            i |= WEST_FLAG;
+            i |= 2;
+        }
+
+        if (((Boolean)state.getValue(NORTH)).booleanValue())
+        {
+            i |= 4;
+        }
+
+        if (((Boolean)state.getValue(EAST)).booleanValue())
+        {
+            i |= 8;
         }
 
         return i;
@@ -496,17 +472,17 @@ public class BlockVine extends Block implements net.minecraftforge.common.IShear
 
     public static PropertyBool getPropertyFor(EnumFacing side)
     {
-        switch (BlockVine.SwitchEnumFacing.FACING_LOOKUP[side.ordinal()])
+        switch (side)
         {
-            case 1:
+            case UP:
                 return UP;
-            case 2:
+            case NORTH:
                 return NORTH;
-            case 3:
+            case SOUTH:
                 return SOUTH;
-            case 4:
+            case EAST:
                 return EAST;
-            case 5:
+            case WEST:
                 return WEST;
             default:
                 throw new IllegalArgumentException(side + " is an invalid choice");
@@ -516,13 +492,9 @@ public class BlockVine extends Block implements net.minecraftforge.common.IShear
     public static int getNumGrownFaces(IBlockState state)
     {
         int i = 0;
-        PropertyBool[] apropertybool = ALL_FACES;
-        int j = apropertybool.length;
 
-        for (int k = 0; k < j; ++k)
+        for (PropertyBool propertybool : ALL_FACES)
         {
-            PropertyBool propertybool = apropertybool[k];
-
             if (((Boolean)state.getValue(propertybool)).booleanValue())
             {
                 ++i;
@@ -531,7 +503,6 @@ public class BlockVine extends Block implements net.minecraftforge.common.IShear
 
         return i;
     }
-
     /*************************FORGE START***********************************/
     @Override public boolean isLadder(IBlockAccess world, BlockPos pos, EntityLivingBase entity){ return true; }
     @Override public boolean isShearable(ItemStack item, IBlockAccess world, BlockPos pos){ return true; }
@@ -542,57 +513,4 @@ public class BlockVine extends Block implements net.minecraftforge.common.IShear
     }
     /*************************FORGE END***********************************/
 
-    static final class SwitchEnumFacing
-        {
-            static final int[] FACING_LOOKUP = new int[EnumFacing.values().length];
-            private static final String __OBFID = "CL_00002049";
-
-            static
-            {
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.UP.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var5)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.NORTH.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var4)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.SOUTH.ordinal()] = 3;
-                }
-                catch (NoSuchFieldError var3)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.EAST.ordinal()] = 4;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.WEST.ordinal()] = 5;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
-            }
-        }
 }

@@ -17,6 +17,7 @@ import net.minecraft.command.ServerCommand;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.rcon.IServer;
+import net.minecraft.network.rcon.RConConsoleSource;
 import net.minecraft.network.rcon.RConThreadMain;
 import net.minecraft.network.rcon.RConThreadQuery;
 import net.minecraft.profiler.PlayerUsageSnooper;
@@ -24,7 +25,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerEula;
 import net.minecraft.server.gui.MinecraftServerGui;
 import net.minecraft.server.management.PreYggdrasilConverter;
-import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.CryptManager;
 import net.minecraft.util.MathHelper;
@@ -41,7 +41,7 @@ import org.apache.logging.log4j.Logger;
 public class DedicatedServer extends MinecraftServer implements IServer
 {
     private static final Logger logger = LogManager.getLogger();
-    public final List pendingCommandList = Collections.synchronizedList(Lists.newArrayList());
+    public final List<ServerCommand> pendingCommandList = Collections.<ServerCommand>synchronizedList(Lists.<ServerCommand>newArrayList());
     private RConThreadQuery theRConThreadQuery;
     private RConThreadMain theRConThreadMain;
     private PropertyManager settings;
@@ -50,14 +50,12 @@ public class DedicatedServer extends MinecraftServer implements IServer
     private WorldSettings.GameType gameType;
     private boolean guiIsEnabled;
     public static boolean allowPlayerLogins = false;
-    private static final String __OBFID = "CL_00001784";
 
     public DedicatedServer(File workDir)
     {
         super(workDir, Proxy.NO_PROXY, USER_CACHE_FILE);
         Thread thread = new Thread("Server Infinisleeper")
         {
-            private static final String __OBFID = "CL_00001787";
             {
                 this.setDaemon(true);
                 this.start();
@@ -68,12 +66,9 @@ public class DedicatedServer extends MinecraftServer implements IServer
                 {
                     try
                     {
-                        while (true)
-                        {
-                            Thread.sleep(2147483647L);
-                        }
+                        Thread.sleep(2147483647L);
                     }
-                    catch (InterruptedException interruptedexception)
+                    catch (InterruptedException var2)
                     {
                         ;
                     }
@@ -89,9 +84,9 @@ public class DedicatedServer extends MinecraftServer implements IServer
     {
         Thread thread = new Thread("Server console handler")
         {
-            private static final String __OBFID = "CL_00001786";
             public void run()
             {
+                if (net.minecraftforge.server.console.TerminalHandler.handleCommands(DedicatedServer.this)) return;
                 BufferedReader bufferedreader = new BufferedReader(new InputStreamReader(System.in));
                 String s4;
 
@@ -104,13 +99,13 @@ public class DedicatedServer extends MinecraftServer implements IServer
                 }
                 catch (IOException ioexception1)
                 {
-                    DedicatedServer.logger.error("Exception handling console input", ioexception1);
+                    DedicatedServer.logger.error((String)"Exception handling console input", (Throwable)ioexception1);
                 }
             }
         };
         thread.setDaemon(true);
         thread.start();
-        logger.info("Starting minecraft server version 1.8");
+        logger.info("Starting minecraft server version 1.8.9");
 
         if (Runtime.getRuntime().maxMemory() / 1024L / 1024L < 512L)
         {
@@ -201,7 +196,7 @@ public class DedicatedServer extends MinecraftServer implements IServer
 
             if (this.convertFiles())
             {
-                this.getPlayerProfileCache().func_152658_c();
+                this.getPlayerProfileCache().save();
             }
 
             if (!PreYggdrasilConverter.tryConvert(this.settings))
@@ -235,7 +230,7 @@ public class DedicatedServer extends MinecraftServer implements IServer
                             k = l;
                         }
                     }
-                    catch (NumberFormatException numberformatexception)
+                    catch (NumberFormatException var16)
                     {
                         k = (long)s.hashCode();
                     }
@@ -315,7 +310,7 @@ public class DedicatedServer extends MinecraftServer implements IServer
      */
     public EnumDifficulty getDifficulty()
     {
-        return EnumDifficulty.getDifficultyEnum(this.settings.getIntProperty("difficulty", 1));
+        return EnumDifficulty.getDifficultyEnum(this.settings.getIntProperty("difficulty", EnumDifficulty.NORMAL.getDifficultyId()));
     }
 
     /**
@@ -331,19 +326,6 @@ public class DedicatedServer extends MinecraftServer implements IServer
      */
     protected void finalTick(CrashReport report)
     {
-        while (this.isServerRunning())
-        {
-            this.executePendingCommands();
-
-            try
-            {
-                Thread.sleep(10L);
-            }
-            catch (InterruptedException interruptedexception)
-            {
-                ;
-            }
-        }
     }
 
     /**
@@ -352,19 +334,17 @@ public class DedicatedServer extends MinecraftServer implements IServer
     public CrashReport addServerInfoToCrashReport(CrashReport report)
     {
         report = super.addServerInfoToCrashReport(report);
-        report.getCategory().addCrashSectionCallable("Is Modded", new Callable()
+        report.getCategory().addCrashSectionCallable("Is Modded", new Callable<String>()
         {
-            private static final String __OBFID = "CL_00001785";
-            public String call()
+            public String call() throws Exception
             {
                 String s = DedicatedServer.this.getServerModName();
                 return !s.equals("vanilla") ? "Definitely; Server brand changed to \'" + s + "\'" : "Unknown (can\'t tell)";
             }
         });
-        report.getCategory().addCrashSectionCallable("Type", new Callable()
+        report.getCategory().addCrashSectionCallable("Type", new Callable<String>()
         {
-            private static final String __OBFID = "CL_00001788";
-            public String call()
+            public String call() throws Exception
             {
                 return "Dedicated Server (map_server.txt)";
             }
@@ -398,8 +378,8 @@ public class DedicatedServer extends MinecraftServer implements IServer
 
     public void addServerStatsToSnooper(PlayerUsageSnooper playerSnooper)
     {
-        playerSnooper.addClientStat("whitelist_enabled", Boolean.valueOf(this.func_180508_aN().isWhiteListEnabled()));
-        playerSnooper.addClientStat("whitelist_count", Integer.valueOf(this.func_180508_aN().getWhitelistedPlayerNames().length));
+        playerSnooper.addClientStat("whitelist_enabled", Boolean.valueOf(this.getConfigurationManager().isWhiteListEnabled()));
+        playerSnooper.addClientStat("whitelist_count", Integer.valueOf(this.getConfigurationManager().getWhitelistedPlayerNames().length));
         super.addServerStatsToSnooper(playerSnooper);
     }
 
@@ -421,7 +401,7 @@ public class DedicatedServer extends MinecraftServer implements IServer
         while (!this.pendingCommandList.isEmpty())
         {
             ServerCommand servercommand = (ServerCommand)this.pendingCommandList.remove(0);
-            this.getCommandManager().executeCommand(servercommand.sender, servercommand.input);
+            this.getCommandManager().executeCommand(servercommand.sender, servercommand.command);
         }
     }
 
@@ -430,7 +410,16 @@ public class DedicatedServer extends MinecraftServer implements IServer
         return true;
     }
 
-    public DedicatedPlayerList func_180508_aN()
+    /**
+     * Get if native transport should be used. Native transport means linux server performance improvements and
+     * optimized packet sending/receiving on linux
+     */
+    public boolean shouldUseNativeTransport()
+    {
+        return this.settings.getBooleanProperty("use-native-transport", true);
+    }
+
+    public DedicatedPlayerList getConfigurationManager()
     {
         return (DedicatedPlayerList)super.getConfigurationManager();
     }
@@ -525,11 +514,11 @@ public class DedicatedServer extends MinecraftServer implements IServer
         {
             return false;
         }
-        else if (this.func_180508_aN().getOppedPlayers().hasEntries())
+        else if (this.getConfigurationManager().getOppedPlayers().isEmpty())
         {
             return false;
         }
-        else if (this.func_180508_aN().canSendCommands(playerIn.getGameProfile()))
+        else if (this.getConfigurationManager().canSendCommands(playerIn.getGameProfile()))
         {
             return false;
         }
@@ -539,9 +528,9 @@ public class DedicatedServer extends MinecraftServer implements IServer
         }
         else
         {
-            BlockPos blockpos1 = worldIn.getSpawnPoint();
-            int i = MathHelper.abs_int(pos.getX() - blockpos1.getX());
-            int j = MathHelper.abs_int(pos.getZ() - blockpos1.getZ());
+            BlockPos blockpos = worldIn.getSpawnPoint();
+            int i = MathHelper.abs_int(pos.getX() - blockpos.getX());
+            int j = MathHelper.abs_int(pos.getZ() - blockpos.getZ());
             int k = Math.max(i, j);
             return k <= this.getSpawnProtectionSize();
         }
@@ -557,6 +546,22 @@ public class DedicatedServer extends MinecraftServer implements IServer
         super.setPlayerIdleTimeout(idleTimeout);
         this.settings.setProperty("player-idle-timeout", Integer.valueOf(idleTimeout));
         this.saveProperties();
+    }
+
+    /**
+     * Get if RCON command events should be broadcast to ops
+     */
+    public boolean shouldBroadcastRconToOps()
+    {
+        return this.settings.getBooleanProperty("broadcast-rcon-to-ops", true);
+    }
+
+    /**
+     * Get if console command events should be broadcast to ops
+     */
+    public boolean shouldBroadcastConsoleToOps()
+    {
+        return this.settings.getBooleanProperty("broadcast-console-to-ops", true);
     }
 
     public boolean isAnnouncingPlayerAchievements()
@@ -591,9 +596,8 @@ public class DedicatedServer extends MinecraftServer implements IServer
     protected boolean convertFiles() throws IOException
     {
         boolean flag = false;
-        int i;
 
-        for (i = 0; !flag && i <= 2; ++i)
+        for (int i = 0; !flag && i <= 2; ++i)
         {
             if (i > 0)
             {
@@ -606,9 +610,9 @@ public class DedicatedServer extends MinecraftServer implements IServer
 
         boolean flag1 = false;
 
-        for (i = 0; !flag1 && i <= 2; ++i)
+        for (int j = 0; !flag1 && j <= 2; ++j)
         {
-            if (i > 0)
+            if (j > 0)
             {
                 logger.warn("Encountered a problem while converting the ip banlist, retrying in a few seconds");
                 this.sleepFiveSeconds();
@@ -619,9 +623,9 @@ public class DedicatedServer extends MinecraftServer implements IServer
 
         boolean flag2 = false;
 
-        for (i = 0; !flag2 && i <= 2; ++i)
+        for (int k = 0; !flag2 && k <= 2; ++k)
         {
-            if (i > 0)
+            if (k > 0)
             {
                 logger.warn("Encountered a problem while converting the op list, retrying in a few seconds");
                 this.sleepFiveSeconds();
@@ -632,9 +636,9 @@ public class DedicatedServer extends MinecraftServer implements IServer
 
         boolean flag3 = false;
 
-        for (i = 0; !flag3 && i <= 2; ++i)
+        for (int l = 0; !flag3 && l <= 2; ++l)
         {
-            if (i > 0)
+            if (l > 0)
             {
                 logger.warn("Encountered a problem while converting the whitelist, retrying in a few seconds");
                 this.sleepFiveSeconds();
@@ -645,9 +649,9 @@ public class DedicatedServer extends MinecraftServer implements IServer
 
         boolean flag4 = false;
 
-        for (i = 0; !flag4 && i <= 2; ++i)
+        for (int i1 = 0; !flag4 && i1 <= 2; ++i1)
         {
-            if (i > 0)
+            if (i1 > 0)
             {
                 logger.warn("Encountered a problem while converting the player save files, retrying in a few seconds");
                 this.sleepFiveSeconds();
@@ -665,7 +669,7 @@ public class DedicatedServer extends MinecraftServer implements IServer
         {
             Thread.sleep(5000L);
         }
-        catch (InterruptedException interruptedexception)
+        catch (InterruptedException var2)
         {
             ;
         }
@@ -676,9 +680,24 @@ public class DedicatedServer extends MinecraftServer implements IServer
         return this.settings.getLongProperty("max-tick-time", TimeUnit.MINUTES.toMillis(1L));
     }
 
-    // $FF: synthetic method
-    public ServerConfigurationManager getConfigurationManager()
+    /**
+     * Used by RCon's Query in the form of "MajorServerMod 1.2.3: MyPlugin 1.3; AnotherPlugin 2.1; AndSoForth 1.0".
+     */
+    public String getPlugins()
     {
-        return this.func_180508_aN();
+        return "";
     }
+
+    /**
+     * Handle a command received by an RCon instance
+     */
+    public String handleRConCommand(String command)
+    {
+        RConConsoleSource.getInstance().resetLog();
+        this.commandManager.executeCommand(RConConsoleSource.getInstance(), command);
+        return RConConsoleSource.getInstance().getLogContents();
+    }
+
+    //Forge: Enable formated text for colors in console.
+    @Override public void addChatMessage(net.minecraft.util.IChatComponent message) { logger.info(message.getFormattedText()); }
 }

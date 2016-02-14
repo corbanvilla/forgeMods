@@ -1,7 +1,6 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -11,22 +10,23 @@ import net.minecraft.world.WorldType;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S07PacketRespawn implements Packet
+public class S07PacketRespawn implements Packet<INetHandlerPlayClient>
 {
-    private int field_149088_a;
-    private EnumDifficulty field_149086_b;
-    private WorldSettings.GameType field_149087_c;
-    private WorldType field_149085_d;
-    private static final String __OBFID = "CL_00001322";
+    private int dimensionID;
+    private EnumDifficulty difficulty;
+    private WorldSettings.GameType gameType;
+    private WorldType worldType;
 
-    public S07PacketRespawn() {}
-
-    public S07PacketRespawn(int p_i45213_1_, EnumDifficulty p_i45213_2_, WorldType p_i45213_3_, WorldSettings.GameType p_i45213_4_)
+    public S07PacketRespawn()
     {
-        this.field_149088_a = p_i45213_1_;
-        this.field_149086_b = p_i45213_2_;
-        this.field_149087_c = p_i45213_4_;
-        this.field_149085_d = p_i45213_3_;
+    }
+
+    public S07PacketRespawn(int dimensionIDIn, EnumDifficulty difficultyIn, WorldType worldTypeIn, WorldSettings.GameType gameTypeIn)
+    {
+        this.dimensionID = dimensionIDIn;
+        this.difficulty = difficultyIn;
+        this.gameType = gameTypeIn;
+        this.worldType = worldTypeIn;
     }
 
     /**
@@ -42,14 +42,14 @@ public class S07PacketRespawn implements Packet
      */
     public void readPacketData(PacketBuffer buf) throws IOException
     {
-        this.field_149088_a = buf.readInt();
-        this.field_149086_b = EnumDifficulty.getDifficultyEnum(buf.readUnsignedByte());
-        this.field_149087_c = WorldSettings.GameType.getByID(buf.readUnsignedByte());
-        this.field_149085_d = WorldType.parseWorldType(buf.readStringFromBuffer(16));
+        this.dimensionID = buf.readInt();
+        this.difficulty = EnumDifficulty.getDifficultyEnum(buf.readUnsignedByte());
+        this.gameType = WorldSettings.GameType.getByID(buf.readUnsignedByte());
+        this.worldType = WorldType.parseWorldType(buf.readStringFromBuffer(16));
 
-        if (this.field_149085_d == null)
+        if (this.worldType == null)
         {
-            this.field_149085_d = WorldType.DEFAULT;
+            this.worldType = WorldType.DEFAULT;
         }
     }
 
@@ -58,41 +58,33 @@ public class S07PacketRespawn implements Packet
      */
     public void writePacketData(PacketBuffer buf) throws IOException
     {
-        buf.writeInt(this.field_149088_a);
-        buf.writeByte(this.field_149086_b.getDifficultyId());
-        buf.writeByte(this.field_149087_c.getID());
-        buf.writeString(this.field_149085_d.getWorldTypeName());
+        buf.writeInt(this.dimensionID);
+        buf.writeByte(this.difficulty.getDifficultyId());
+        buf.writeByte(this.gameType.getID());
+        buf.writeString(this.worldType.getWorldTypeName());
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_149082_c()
+    public int getDimensionID()
     {
-        return this.field_149088_a;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayClient)handler);
+        return this.dimensionID;
     }
 
     @SideOnly(Side.CLIENT)
-    public EnumDifficulty func_149081_d()
+    public EnumDifficulty getDifficulty()
     {
-        return this.field_149086_b;
+        return this.difficulty;
     }
 
     @SideOnly(Side.CLIENT)
-    public WorldSettings.GameType func_149083_e()
+    public WorldSettings.GameType getGameType()
     {
-        return this.field_149087_c;
+        return this.gameType;
     }
 
     @SideOnly(Side.CLIENT)
-    public WorldType func_149080_f()
+    public WorldType getWorldType()
     {
-        return this.field_149085_d;
+        return this.worldType;
     }
 }

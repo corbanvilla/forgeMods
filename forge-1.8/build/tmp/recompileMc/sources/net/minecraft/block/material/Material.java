@@ -14,7 +14,7 @@ public class Material
     public static final Material leaves = (new Material(MapColor.foliageColor)).setBurning().setTranslucent().setNoPushMobility();
     public static final Material plants = (new MaterialLogic(MapColor.foliageColor)).setNoPushMobility();
     public static final Material vine = (new MaterialLogic(MapColor.foliageColor)).setBurning().setNoPushMobility().setReplaceable();
-    public static final Material sponge = new Material(MapColor.clothColor);
+    public static final Material sponge = new Material(MapColor.yellowColor);
     public static final Material cloth = (new Material(MapColor.clothColor)).setBurning();
     public static final Material fire = (new MaterialTransparent(MapColor.airColor)).setNoPushMobility();
     public static final Material sand = new Material(MapColor.sandColor);
@@ -37,7 +37,6 @@ public class Material
     public static final Material cake = (new Material(MapColor.airColor)).setNoPushMobility();
     public static final Material web = (new Material(MapColor.clothColor)
     {
-        private static final String __OBFID = "CL_00000543";
         /**
          * Returns if this material is considered solid or not
          */
@@ -68,7 +67,6 @@ public class Material
      */
     private int mobilityFlag;
     private boolean isAdventureModeExempt;
-    private static final String __OBFID = "CL_00000542";
 
     public Material(MapColor color)
     {

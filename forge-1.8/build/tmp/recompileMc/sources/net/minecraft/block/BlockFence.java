@@ -1,6 +1,7 @@
 package net.minecraft.block;
 
 import java.util.List;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -29,21 +30,23 @@ public class BlockFence extends Block
     public static final PropertyBool SOUTH = PropertyBool.create("south");
     /** Whether this fence connects in the western direction */
     public static final PropertyBool WEST = PropertyBool.create("west");
-    private static final String __OBFID = "CL_00000242";
 
     public BlockFence(Material materialIn)
     {
-        super(materialIn);
+        this(materialIn, materialIn.getMaterialMapColor());
+    }
+
+    public BlockFence(Material p_i46395_1_, MapColor p_i46395_2_)
+    {
+        super(p_i46395_1_, p_i46395_2_);
         this.setDefaultState(this.blockState.getBaseState().withProperty(NORTH, Boolean.valueOf(false)).withProperty(EAST, Boolean.valueOf(false)).withProperty(SOUTH, Boolean.valueOf(false)).withProperty(WEST, Boolean.valueOf(false)));
         this.setCreativeTab(CreativeTabs.tabDecorations);
     }
 
     /**
      * Add all collision boxes of this Block to the list that intersect with the given mask.
-     *  
-     * @param collidingEntity the Entity colliding with this Block
      */
-    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List list, Entity collidingEntity)
+    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity)
     {
         boolean flag = this.canConnectTo(worldIn, pos.north());
         boolean flag1 = this.canConnectTo(worldIn, pos.south());
@@ -136,6 +139,9 @@ public class BlockFence extends Block
         this.setBlockBounds(f, 0.0F, f2, f1, 1.0F, f3);
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;

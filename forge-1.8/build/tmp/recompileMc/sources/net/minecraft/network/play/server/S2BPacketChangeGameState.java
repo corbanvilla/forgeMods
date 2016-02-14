@@ -1,21 +1,21 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S2BPacketChangeGameState implements Packet
+public class S2BPacketChangeGameState implements Packet<INetHandlerPlayClient>
 {
     public static final String[] MESSAGE_NAMES = new String[] {"tile.bed.notValid"};
     private int state;
     private float field_149141_c;
-    private static final String __OBFID = "CL_00001301";
 
-    public S2BPacketChangeGameState() {}
+    public S2BPacketChangeGameState()
+    {
+    }
 
     public S2BPacketChangeGameState(int stateIn, float p_i45194_2_)
     {
@@ -50,17 +50,9 @@ public class S2BPacketChangeGameState implements Packet
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_149138_c()
+    public int getGameState()
     {
         return this.state;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayClient)handler);
     }
 
     @SideOnly(Side.CLIENT)

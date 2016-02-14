@@ -23,7 +23,6 @@ public class EnchantmentProtection extends Enchantment
      * 4 = projectile.
      */
     public final int protectionType;
-    private static final String __OBFID = "CL_00000121";
 
     public EnchantmentProtection(int p_i45765_1_, ResourceLocation p_i45765_2_, int p_i45765_3_, int p_i45765_4_)
     {
@@ -62,9 +61,6 @@ public class EnchantmentProtection extends Enchantment
 
     /**
      * Calculates the damage protection of the enchantment based on level and damage source passed.
-     *  
-     * @param level The level of this enchantment.
-     * @param source The source of the damage.
      */
     public int calcModifierDamage(int level, DamageSource source)
     {
@@ -89,8 +85,6 @@ public class EnchantmentProtection extends Enchantment
 
     /**
      * Determines if the enchantment passed can be applyied together with this enchantment.
-     *  
-     * @param ench A possible enchantment that may be applied along side this enchantment, depending on the results.
      */
     public boolean canApplyTogether(Enchantment ench)
     {
@@ -110,11 +104,11 @@ public class EnchantmentProtection extends Enchantment
      */
     public static int getFireTimeForEntity(Entity p_92093_0_, int p_92093_1_)
     {
-        int j = EnchantmentHelper.getMaxEnchantmentLevel(Enchantment.fireProtection.effectId, p_92093_0_.getInventory());
+        int i = EnchantmentHelper.getMaxEnchantmentLevel(Enchantment.fireProtection.effectId, p_92093_0_.getInventory());
 
-        if (j > 0)
+        if (i > 0)
         {
-            p_92093_1_ -= MathHelper.floor_float((float)p_92093_1_ * (float)j * 0.15F);
+            p_92093_1_ -= MathHelper.floor_float((float)p_92093_1_ * (float)i * 0.15F);
         }
 
         return p_92093_1_;

@@ -5,20 +5,17 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
 
 public class RegionFileCache
 {
-    /** A map containing Files as keys and RegionFiles as values */
-    private static final Map regionsByFilename = Maps.newHashMap();
-    private static final String __OBFID = "CL_00000383";
+    private static final Map<File, RegionFile> regionsByFilename = Maps.<File, RegionFile>newHashMap();
 
     public static synchronized RegionFile createOrLoadRegionFile(File worldDir, int chunkX, int chunkZ)
     {
-        File file2 = new File(worldDir, "region");
-        File file3 = new File(file2, "r." + (chunkX >> 5) + "." + (chunkZ >> 5) + ".mca");
-        RegionFile regionfile = (RegionFile)regionsByFilename.get(file3);
+        File file1 = new File(worldDir, "region");
+        File file2 = new File(file1, "r." + (chunkX >> 5) + "." + (chunkZ >> 5) + ".mca");
+        RegionFile regionfile = (RegionFile)regionsByFilename.get(file2);
 
         if (regionfile != null)
         {
@@ -26,9 +23,9 @@ public class RegionFileCache
         }
         else
         {
-            if (!file2.exists())
+            if (!file1.exists())
             {
-                file2.mkdirs();
+                file1.mkdirs();
             }
 
             if (regionsByFilename.size() >= 256)
@@ -36,8 +33,8 @@ public class RegionFileCache
                 clearRegionFileReferences();
             }
 
-            RegionFile regionfile1 = new RegionFile(file3);
-            regionsByFilename.put(file3, regionfile1);
+            RegionFile regionfile1 = new RegionFile(file2);
+            regionsByFilename.put(file2, regionfile1);
             return regionfile1;
         }
     }
@@ -47,12 +44,8 @@ public class RegionFileCache
      */
     public static synchronized void clearRegionFileReferences()
     {
-        Iterator iterator = regionsByFilename.values().iterator();
-
-        while (iterator.hasNext())
+        for (RegionFile regionfile : regionsByFilename.values())
         {
-            RegionFile regionfile = (RegionFile)iterator.next();
-
             try
             {
                 if (regionfile != null)

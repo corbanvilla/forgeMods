@@ -1,7 +1,6 @@
 package net.minecraft.client.renderer;
 
 import java.util.Collection;
-import java.util.Iterator;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.inventory.Container;
@@ -15,15 +14,15 @@ public abstract class InventoryEffectRenderer extends GuiContainer
 {
     /** True if there is some potion effect to display */
     private boolean hasActivePotionEffects;
-    private static final String __OBFID = "CL_00000755";
 
-    public InventoryEffectRenderer(Container p_i1089_1_)
+    public InventoryEffectRenderer(Container inventorySlotsIn)
     {
-        super(p_i1089_1_);
+        super(inventorySlotsIn);
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
     public void initGui()
     {
@@ -33,7 +32,12 @@ public abstract class InventoryEffectRenderer extends GuiContainer
 
     protected void updateActivePotionEffects()
     {
-        if (!this.mc.thePlayer.getActivePotionEffects().isEmpty())
+        boolean hasVisibleEffect = false;
+        for(PotionEffect potioneffect : this.mc.thePlayer.getActivePotionEffects()) {
+            Potion potion = Potion.potionTypes[potioneffect.getPotionID()];
+            if(potion.shouldRender(potioneffect)) { hasVisibleEffect = true; break; }
+        }
+        if (!this.mc.thePlayer.getActivePotionEffects().isEmpty() && hasVisibleEffect)
         {
             this.guiLeft = 160 + (this.width - this.xSize - 200) / 2;
             this.hasActivePotionEffects = true;
@@ -65,32 +69,32 @@ public abstract class InventoryEffectRenderer extends GuiContainer
     {
         int i = this.guiLeft - 124;
         int j = this.guiTop;
-        boolean flag = true;
-        Collection collection = this.mc.thePlayer.getActivePotionEffects();
+        int k = 166;
+        Collection<PotionEffect> collection = this.mc.thePlayer.getActivePotionEffects();
 
         if (!collection.isEmpty())
         {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             GlStateManager.disableLighting();
-            int k = 33;
+            int l = 33;
 
             if (collection.size() > 5)
             {
-                k = 132 / (collection.size() - 1);
+                l = 132 / (collection.size() - 1);
             }
 
-            for (Iterator iterator = this.mc.thePlayer.getActivePotionEffects().iterator(); iterator.hasNext(); j += k)
+            for (PotionEffect potioneffect : this.mc.thePlayer.getActivePotionEffects())
             {
-                PotionEffect potioneffect = (PotionEffect)iterator.next();
                 Potion potion = Potion.potionTypes[potioneffect.getPotionID()];
+                if(!potion.shouldRender(potioneffect)) continue;
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                 this.mc.getTextureManager().bindTexture(inventoryBackground);
                 this.drawTexturedModalRect(i, j, 0, 166, 140, 32);
 
                 if (potion.hasStatusIcon())
                 {
-                    int l = potion.getStatusIconIndex();
-                    this.drawTexturedModalRect(i + 6, j + 7, 0 + l % 8 * 18, 198 + l / 8 * 18, 18, 18);
+                    int i1 = potion.getStatusIconIndex();
+                    this.drawTexturedModalRect(i + 6, j + 7, 0 + i1 % 8 * 18, 198 + i1 / 8 * 18, 18, 18);
                 }
 
                 potion.renderInventoryEffect(i, j, potioneffect, mc);
@@ -113,6 +117,7 @@ public abstract class InventoryEffectRenderer extends GuiContainer
                 this.fontRendererObj.drawStringWithShadow(s1, (float)(i + 10 + 18), (float)(j + 6), 16777215);
                 String s = Potion.getDurationString(potioneffect);
                 this.fontRendererObj.drawStringWithShadow(s, (float)(i + 10 + 18), (float)(j + 6 + 10), 8355711);
+                j += l;
             }
         }
     }

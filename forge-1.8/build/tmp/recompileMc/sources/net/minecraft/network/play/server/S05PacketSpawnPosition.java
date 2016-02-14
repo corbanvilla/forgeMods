@@ -1,7 +1,6 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -9,16 +8,17 @@ import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S05PacketSpawnPosition implements Packet
+public class S05PacketSpawnPosition implements Packet<INetHandlerPlayClient>
 {
-    private BlockPos field_179801_a;
-    private static final String __OBFID = "CL_00001336";
+    private BlockPos spawnBlockPos;
 
-    public S05PacketSpawnPosition() {}
-
-    public S05PacketSpawnPosition(BlockPos p_i45956_1_)
+    public S05PacketSpawnPosition()
     {
-        this.field_179801_a = p_i45956_1_;
+    }
+
+    public S05PacketSpawnPosition(BlockPos spawnBlockPosIn)
+    {
+        this.spawnBlockPos = spawnBlockPosIn;
     }
 
     /**
@@ -26,7 +26,7 @@ public class S05PacketSpawnPosition implements Packet
      */
     public void readPacketData(PacketBuffer buf) throws IOException
     {
-        this.field_179801_a = buf.readBlockPos();
+        this.spawnBlockPos = buf.readBlockPos();
     }
 
     /**
@@ -34,25 +34,20 @@ public class S05PacketSpawnPosition implements Packet
      */
     public void writePacketData(PacketBuffer buf) throws IOException
     {
-        buf.writeBlockPos(this.field_179801_a);
-    }
-
-    public void func_180752_a(INetHandlerPlayClient p_180752_1_)
-    {
-        p_180752_1_.handleSpawnPosition(this);
-    }
-
-    @SideOnly(Side.CLIENT)
-    public BlockPos func_179800_a()
-    {
-        return this.field_179801_a;
+        buf.writeBlockPos(this.spawnBlockPos);
     }
 
     /**
      * Passes this Packet on to the NetHandler for processing.
      */
-    public void processPacket(INetHandler handler)
+    public void processPacket(INetHandlerPlayClient handler)
     {
-        this.func_180752_a((INetHandlerPlayClient)handler);
+        handler.handleSpawnPosition(this);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public BlockPos getSpawnPos()
+    {
+        return this.spawnBlockPos;
     }
 }

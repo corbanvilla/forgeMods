@@ -11,20 +11,19 @@ import org.apache.commons.lang3.StringUtils;
 @SideOnly(Side.CLIENT)
 public class JsonException extends IOException
 {
-    private final List field_151383_a = Lists.newArrayList();
+    private final List<JsonException.Entry> field_151383_a = Lists.<JsonException.Entry>newArrayList();
     private final String field_151382_b;
-    private static final String __OBFID = "CL_00001414";
 
     public JsonException(String p_i45279_1_)
     {
-        this.field_151383_a.add(new JsonException.Entry(null));
+        this.field_151383_a.add(new JsonException.Entry());
         this.field_151382_b = p_i45279_1_;
     }
 
     public JsonException(String p_i45280_1_, Throwable p_i45280_2_)
     {
         super(p_i45280_2_);
-        this.field_151383_a.add(new JsonException.Entry(null));
+        this.field_151383_a.add(new JsonException.Entry());
         this.field_151382_b = p_i45280_1_;
     }
 
@@ -36,7 +35,7 @@ public class JsonException extends IOException
     public void func_151381_b(String p_151381_1_)
     {
         ((JsonException.Entry)this.field_151383_a.get(0)).field_151376_a = p_151381_1_;
-        this.field_151383_a.add(0, new JsonException.Entry(null));
+        this.field_151383_a.add(0, new JsonException.Entry());
     }
 
     public String getMessage()
@@ -67,13 +66,12 @@ public class JsonException extends IOException
     public static class Entry
         {
             private String field_151376_a;
-            private final List field_151375_b;
-            private static final String __OBFID = "CL_00001416";
+            private final List<String> field_151375_b;
 
             private Entry()
             {
                 this.field_151376_a = null;
-                this.field_151375_b = Lists.newArrayList();
+                this.field_151375_b = Lists.<String>newArrayList();
             }
 
             private void func_151373_a(String p_151373_1_)
@@ -83,17 +81,12 @@ public class JsonException extends IOException
 
             public String func_151372_b()
             {
-                return StringUtils.join(this.field_151375_b, "->");
+                return StringUtils.join((Iterable)this.field_151375_b, "->");
             }
 
             public String toString()
             {
                 return this.field_151376_a != null ? (!this.field_151375_b.isEmpty() ? this.field_151376_a + " " + this.func_151372_b() : this.field_151376_a) : (!this.field_151375_b.isEmpty() ? "(Unknown file) " + this.func_151372_b() : "(Unknown file)");
-            }
-
-            Entry(Object p_i45278_1_)
-            {
-                this();
             }
         }
 }

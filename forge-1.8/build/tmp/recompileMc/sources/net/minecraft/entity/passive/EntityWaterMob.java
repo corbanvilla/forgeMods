@@ -7,8 +7,6 @@ import net.minecraft.world.World;
 
 public abstract class EntityWaterMob extends EntityLiving implements IAnimals
 {
-    private static final String __OBFID = "CL_00001653";
-
     public EntityWaterMob(World worldIn)
     {
         super(worldIn);
@@ -28,9 +26,9 @@ public abstract class EntityWaterMob extends EntityLiving implements IAnimals
     }
 
     /**
-     * Whether or not the current entity is in lava
+     * Checks that the entity is not colliding with any blocks / liquids
      */
-    public boolean handleLavaMovement()
+    public boolean isNotColliding()
     {
         return this.worldObj.checkNoEntityCollision(this.getEntityBoundingBox(), this);
     }

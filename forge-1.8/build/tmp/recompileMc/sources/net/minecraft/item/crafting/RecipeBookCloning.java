@@ -9,19 +9,17 @@ import net.minecraft.world.World;
 
 public class RecipeBookCloning implements IRecipe
 {
-    private static final String __OBFID = "CL_00000081";
-
     /**
      * Used to check if a recipe matches current crafting inventory
      */
-    public boolean matches(InventoryCrafting p_77569_1_, World worldIn)
+    public boolean matches(InventoryCrafting inv, World worldIn)
     {
         int i = 0;
         ItemStack itemstack = null;
 
-        for (int j = 0; j < p_77569_1_.getSizeInventory(); ++j)
+        for (int j = 0; j < inv.getSizeInventory(); ++j)
         {
-            ItemStack itemstack1 = p_77569_1_.getStackInSlot(j);
+            ItemStack itemstack1 = inv.getStackInSlot(j);
 
             if (itemstack1 != null)
             {
@@ -52,14 +50,14 @@ public class RecipeBookCloning implements IRecipe
     /**
      * Returns an Item that is the result of this recipe
      */
-    public ItemStack getCraftingResult(InventoryCrafting p_77572_1_)
+    public ItemStack getCraftingResult(InventoryCrafting inv)
     {
         int i = 0;
         ItemStack itemstack = null;
 
-        for (int j = 0; j < p_77572_1_.getSizeInventory(); ++j)
+        for (int j = 0; j < inv.getSizeInventory(); ++j)
         {
-            ItemStack itemstack1 = p_77572_1_.getStackInSlot(j);
+            ItemStack itemstack1 = inv.getStackInSlot(j);
 
             if (itemstack1 != null)
             {
@@ -116,13 +114,13 @@ public class RecipeBookCloning implements IRecipe
         return null;
     }
 
-    public ItemStack[] getRemainingItems(InventoryCrafting p_179532_1_)
+    public ItemStack[] getRemainingItems(InventoryCrafting inv)
     {
-        ItemStack[] aitemstack = new ItemStack[p_179532_1_.getSizeInventory()];
+        ItemStack[] aitemstack = new ItemStack[inv.getSizeInventory()];
 
         for (int i = 0; i < aitemstack.length; ++i)
         {
-            ItemStack itemstack = p_179532_1_.getStackInSlot(i);
+            ItemStack itemstack = inv.getStackInSlot(i);
 
             if (itemstack != null && itemstack.getItem() instanceof ItemEditableBook)
             {

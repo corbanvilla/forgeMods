@@ -1,16 +1,17 @@
 package net.minecraft.command;
 
+import java.util.List;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.BlockPos;
 
 public class CommandKill extends CommandBase
 {
-    private static final String __OBFID = "CL_00000570";
-
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
-    public String getName()
+    public String getCommandName()
     {
         return "kill";
     }
@@ -23,21 +24,29 @@ public class CommandKill extends CommandBase
         return 2;
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.kill.usage";
     }
 
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
-    public void execute(ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length == 0)
         {
-            EntityPlayerMP entityplayermp = getCommandSenderAsPlayer(sender);
-            entityplayermp.onKillCommand();
-            notifyOperators(sender, this, "commands.kill.successful", new Object[] {entityplayermp.getDisplayName()});
+            EntityPlayer entityplayer = getCommandSenderAsPlayer(sender);
+            entityplayer.onKillCommand();
+            notifyOperators(sender, this, "commands.kill.successful", new Object[] {entityplayer.getDisplayName()});
         }
         else
         {
@@ -49,9 +58,16 @@ public class CommandKill extends CommandBase
 
     /**
      * Return whether the specified command parameter index is a username parameter.
+     *  
+     * @param args The arguments that were passed
      */
     public boolean isUsernameIndex(String[] args, int index)
     {
         return index == 0;
+    }
+
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    {
+        return args.length == 1 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames()) : null;
     }
 }

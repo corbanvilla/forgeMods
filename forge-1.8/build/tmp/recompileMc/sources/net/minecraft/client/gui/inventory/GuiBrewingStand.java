@@ -15,7 +15,6 @@ public class GuiBrewingStand extends GuiContainer
     /** The player inventory bound to this GUI. */
     private final InventoryPlayer playerInventory;
     private IInventory tileBrewingStand;
-    private static final String __OBFID = "CL_00000746";
 
     public GuiBrewingStand(InventoryPlayer playerInv, IInventory p_i45506_2_)
     {
@@ -41,49 +40,49 @@ public class GuiBrewingStand extends GuiContainer
     {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(brewingStandGuiTextures);
-        int k = (this.width - this.xSize) / 2;
-        int l = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(k, l, 0, 0, this.xSize, this.ySize);
-        int i1 = this.tileBrewingStand.getField(0);
+        int i = (this.width - this.xSize) / 2;
+        int j = (this.height - this.ySize) / 2;
+        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
+        int k = this.tileBrewingStand.getField(0);
 
-        if (i1 > 0)
+        if (k > 0)
         {
-            int j1 = (int)(28.0F * (1.0F - (float)i1 / 400.0F));
+            int l = (int)(28.0F * (1.0F - (float)k / 400.0F));
 
-            if (j1 > 0)
+            if (l > 0)
             {
-                this.drawTexturedModalRect(k + 97, l + 16, 176, 0, 9, j1);
+                this.drawTexturedModalRect(i + 97, j + 16, 176, 0, 9, l);
             }
 
-            int k1 = i1 / 2 % 7;
+            int i1 = k / 2 % 7;
 
-            switch (k1)
+            switch (i1)
             {
                 case 0:
-                    j1 = 29;
+                    l = 29;
                     break;
                 case 1:
-                    j1 = 24;
+                    l = 24;
                     break;
                 case 2:
-                    j1 = 20;
+                    l = 20;
                     break;
                 case 3:
-                    j1 = 16;
+                    l = 16;
                     break;
                 case 4:
-                    j1 = 11;
+                    l = 11;
                     break;
                 case 5:
-                    j1 = 6;
+                    l = 6;
                     break;
                 case 6:
-                    j1 = 0;
+                    l = 0;
             }
 
-            if (j1 > 0)
+            if (l > 0)
             {
-                this.drawTexturedModalRect(k + 65, l + 14 + 29 - j1, 185, 29 - j1, 12, j1);
+                this.drawTexturedModalRect(i + 65, j + 14 + 29 - l, 185, 29 - l, 12, l);
             }
         }
     }

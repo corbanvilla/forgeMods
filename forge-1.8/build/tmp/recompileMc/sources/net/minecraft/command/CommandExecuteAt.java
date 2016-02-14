@@ -12,12 +12,10 @@ import net.minecraft.world.World;
 
 public class CommandExecuteAt extends CommandBase
 {
-    private static final String __OBFID = "CL_00002344";
-
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
-    public String getName()
+    public String getCommandName()
     {
         return "execute";
     }
@@ -30,15 +28,23 @@ public class CommandExecuteAt extends CommandBase
         return 2;
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.execute.usage";
     }
 
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
-    public void execute(final ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(final ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 5)
         {
@@ -46,76 +52,83 @@ public class CommandExecuteAt extends CommandBase
         }
         else
         {
-            final Entity entity = func_175759_a(sender, args[0], Entity.class);
-            final double d0 = func_175761_b(entity.posX, args[1], false);
-            final double d1 = func_175761_b(entity.posY, args[2], false);
-            final double d2 = func_175761_b(entity.posZ, args[3], false);
+            final Entity entity = getEntity(sender, args[0], Entity.class);
+            final double d0 = parseDouble(entity.posX, args[1], false);
+            final double d1 = parseDouble(entity.posY, args[2], false);
+            final double d2 = parseDouble(entity.posZ, args[3], false);
             final BlockPos blockpos = new BlockPos(d0, d1, d2);
-            byte b0 = 4;
+            int i = 4;
 
             if ("detect".equals(args[4]) && args.length > 10)
             {
-                World world = sender.getEntityWorld();
-                double d3 = func_175761_b(d0, args[5], false);
-                double d4 = func_175761_b(d1, args[6], false);
-                double d5 = func_175761_b(d2, args[7], false);
+                World world = entity.getEntityWorld();
+                double d3 = parseDouble(d0, args[5], false);
+                double d4 = parseDouble(d1, args[6], false);
+                double d5 = parseDouble(d2, args[7], false);
                 Block block = getBlockByText(sender, args[8]);
-                int j = parseInt(args[9], -1, 15);
+                int k = parseInt(args[9], -1, 15);
                 BlockPos blockpos1 = new BlockPos(d3, d4, d5);
                 IBlockState iblockstate = world.getBlockState(blockpos1);
 
-                if (iblockstate.getBlock() != block || j >= 0 && iblockstate.getBlock().getMetaFromState(iblockstate) != j)
+                if (iblockstate.getBlock() != block || k >= 0 && iblockstate.getBlock().getMetaFromState(iblockstate) != k)
                 {
                     throw new CommandException("commands.execute.failed", new Object[] {"detect", entity.getName()});
                 }
 
-                b0 = 10;
+                i = 10;
             }
 
-            String s = func_180529_a(args, b0);
+            String s = buildString(args, i);
             ICommandSender icommandsender = new ICommandSender()
             {
-                private static final String __OBFID = "CL_00002343";
                 /**
-                 * Gets the name of this command sender (usually username, but possibly "Rcon")
+                 * Get the name of this object. For players this returns their username
                  */
                 public String getName()
                 {
                     return entity.getName();
                 }
+                /**
+                 * Get the formatted ChatComponent that will be used for the sender's username in chat
+                 */
                 public IChatComponent getDisplayName()
                 {
                     return entity.getDisplayName();
                 }
                 /**
-                 * Notifies this sender of some sort of information.  This is for messages intended to display to the
-                 * user.  Used for typical output (like "you asked for whether or not this game rule is set, so here's
-                 * your answer"), warnings (like "I fetched this block for you by ID, but I'd like you to know that
-                 * every time you do this, I die a little inside"), and errors (like "it's not called iron_pixacke,
-                 * silly").
+                 * Send a chat message to the CommandSender
                  */
-                public void addChatMessage(IChatComponent message)
+                public void addChatMessage(IChatComponent component)
                 {
-                    sender.addChatMessage(message);
+                    sender.addChatMessage(component);
                 }
                 /**
-                 * Returns true if the CommandSender may execute the given command
-                 *  
-                 * @param permLevel The permission level required to execute the command
-                 * @param commandName The name of the command
+                 * Returns {@code true} if the CommandSender is allowed to execute the command, {@code false} if not
                  */
-                public boolean canUseCommand(int permLevel, String commandName)
+                public boolean canCommandSenderUseCommand(int permLevel, String commandName)
                 {
-                    return sender.canUseCommand(permLevel, commandName);
+                    return sender.canCommandSenderUseCommand(permLevel, commandName);
                 }
+                /**
+                 * Get the position in the world. <b>{@code null} is not allowed!</b> If you are not an entity in the
+                 * world, return the coordinates 0, 0, 0
+                 */
                 public BlockPos getPosition()
                 {
                     return blockpos;
                 }
+                /**
+                 * Get the position vector. <b>{@code null} is not allowed!</b> If you are not an entity in the world,
+                 * return 0.0D, 0.0D, 0.0D
+                 */
                 public Vec3 getPositionVector()
                 {
                     return new Vec3(d0, d1, d2);
                 }
+                /**
+                 * Get the world, if available. <b>{@code null} is not allowed!</b> If you are not an entity in the
+                 * world, return the overworld
+                 */
                 public World getEntityWorld()
                 {
                     return entity.worldObj;
@@ -133,7 +146,7 @@ public class CommandExecuteAt extends CommandBase
                 public boolean sendCommandFeedback()
                 {
                     MinecraftServer minecraftserver = MinecraftServer.getServer();
-                    return minecraftserver == null || minecraftserver.worldServers[0].getGameRules().getGameRuleBooleanValue("commandBlockOutput");
+                    return minecraftserver == null || minecraftserver.worldServers[0].getGameRules().getBoolean("commandBlockOutput");
                 }
                 public void setCommandStat(CommandResultStats.Type type, int amount)
                 {
@@ -144,27 +157,29 @@ public class CommandExecuteAt extends CommandBase
 
             try
             {
-                int i = icommandmanager.executeCommand(icommandsender, s);
+                int j = icommandmanager.executeCommand(icommandsender, s);
 
-                if (i < 1)
+                if (j < 1)
                 {
                     throw new CommandException("commands.execute.allInvocationsFailed", new Object[] {s});
                 }
             }
-            catch (Throwable throwable)
+            catch (Throwable var23)
             {
                 throw new CommandException("commands.execute.failed", new Object[] {s, entity.getName()});
             }
         }
     }
 
-    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
-        return args.length == 1 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames()) : (args.length > 1 && args.length <= 4 ? func_175771_a(args, 1, pos) : (args.length > 5 && args.length <= 8 && "detect".equals(args[4]) ? func_175771_a(args, 5, pos) : (args.length == 9 && "detect".equals(args[4]) ? func_175762_a(args, Block.blockRegistry.getKeys()) : null)));
+        return args.length == 1 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames()) : (args.length > 1 && args.length <= 4 ? func_175771_a(args, 1, pos) : (args.length > 5 && args.length <= 8 && "detect".equals(args[4]) ? func_175771_a(args, 5, pos) : (args.length == 9 && "detect".equals(args[4]) ? getListOfStringsMatchingLastWord(args, Block.blockRegistry.getKeys()) : null)));
     }
 
     /**
      * Return whether the specified command parameter index is a username parameter.
+     *  
+     * @param args The arguments that were passed
      */
     public boolean isUsernameIndex(String[] args, int index)
     {

@@ -5,11 +5,9 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import net.minecraft.network.PacketBuffer;
 
-public class MessageSerializer2 extends MessageToByteEncoder
+public class MessageSerializer2 extends MessageToByteEncoder<ByteBuf>
 {
-    private static final String __OBFID = "CL_00001256";
-
-    protected void encode(ChannelHandlerContext p_encode_1_, ByteBuf p_encode_2_, ByteBuf p_encode_3_)
+    protected void encode(ChannelHandlerContext p_encode_1_, ByteBuf p_encode_2_, ByteBuf p_encode_3_) throws Exception
     {
         int i = p_encode_2_.readableBytes();
         int j = PacketBuffer.getVarIntSize(i);
@@ -25,10 +23,5 @@ public class MessageSerializer2 extends MessageToByteEncoder
             packetbuffer.writeVarIntToBuffer(i);
             packetbuffer.writeBytes(p_encode_2_, p_encode_2_.readerIndex(), i);
         }
-    }
-
-    protected void encode(ChannelHandlerContext p_encode_1_, Object p_encode_2_, ByteBuf p_encode_3_)
-    {
-        this.encode(p_encode_1_, (ByteBuf)p_encode_2_, p_encode_3_);
     }
 }

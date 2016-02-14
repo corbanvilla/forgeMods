@@ -9,6 +9,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.stats.StatList;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -21,7 +22,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BlockCake extends Block
 {
     public static final PropertyInteger BITES = PropertyInteger.create("bites", 0, 6);
-    private static final String __OBFID = "CL_00000211";
 
     protected BlockCake()
     {
@@ -67,6 +67,9 @@ public class BlockCake extends Block
         return false;
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -87,6 +90,7 @@ public class BlockCake extends Block
     {
         if (player.canEat(false))
         {
+            player.triggerAchievement(StatList.field_181724_H);
             player.getFoodStats().addStats(2, 0.1F);
             int i = ((Integer)state.getValue(BITES)).intValue();
 
@@ -132,8 +136,6 @@ public class BlockCake extends Block
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -154,18 +156,18 @@ public class BlockCake extends Block
         return Items.cake;
     }
 
-    @SideOnly(Side.CLIENT)
-    public EnumWorldBlockLayer getBlockLayer()
-    {
-        return EnumWorldBlockLayer.CUTOUT;
-    }
-
     /**
      * Convert the BlockState into the correct metadata value
      */
     public int getMetaFromState(IBlockState state)
     {
         return ((Integer)state.getValue(BITES)).intValue();
+    }
+
+    @SideOnly(Side.CLIENT)
+    public EnumWorldBlockLayer getBlockLayer()
+    {
+        return EnumWorldBlockLayer.CUTOUT;
     }
 
     protected BlockState createBlockState()

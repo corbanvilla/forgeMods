@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureUtil;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
@@ -23,7 +24,6 @@ public class Framebuffer
     public int depthBuffer;
     public float[] framebufferColor;
     public int framebufferFilter;
-    private static final String __OBFID = "CL_00000959";
 
     public Framebuffer(int p_i45078_1_, int p_i45078_2_, boolean p_i45078_3_)
     {
@@ -39,12 +39,12 @@ public class Framebuffer
         this.createBindFramebuffer(p_i45078_1_, p_i45078_2_);
     }
 
-    public void createBindFramebuffer(int p_147613_1_, int p_147613_2_)
+    public void createBindFramebuffer(int width, int height)
     {
         if (!OpenGlHelper.isFramebufferEnabled())
         {
-            this.framebufferWidth = p_147613_1_;
-            this.framebufferHeight = p_147613_2_;
+            this.framebufferWidth = width;
+            this.framebufferHeight = height;
         }
         else
         {
@@ -55,7 +55,7 @@ public class Framebuffer
                 this.deleteFramebuffer();
             }
 
-            this.createFramebuffer(p_147613_1_, p_147613_2_);
+            this.createFramebuffer(width, height);
             this.checkFramebufferComplete();
             OpenGlHelper.glBindFramebuffer(OpenGlHelper.GL_FRAMEBUFFER, 0);
         }
@@ -89,12 +89,12 @@ public class Framebuffer
         }
     }
 
-    public void createFramebuffer(int p_147605_1_, int p_147605_2_)
+    public void createFramebuffer(int width, int height)
     {
-        this.framebufferWidth = p_147605_1_;
-        this.framebufferHeight = p_147605_2_;
-        this.framebufferTextureWidth = p_147605_1_;
-        this.framebufferTextureHeight = p_147605_2_;
+        this.framebufferWidth = width;
+        this.framebufferHeight = height;
+        this.framebufferTextureWidth = width;
+        this.framebufferTextureHeight = height;
 
         if (!OpenGlHelper.isFramebufferEnabled())
         {
@@ -112,7 +112,7 @@ public class Framebuffer
 
             this.setFramebufferFilter(9728);
             GlStateManager.bindTexture(this.framebufferTexture);
-            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, this.framebufferTextureWidth, this.framebufferTextureHeight, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (ByteBuffer)null);
+            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, this.framebufferTextureWidth, this.framebufferTextureHeight, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (ByteBuffer)((ByteBuffer)null));
             OpenGlHelper.glBindFramebuffer(OpenGlHelper.GL_FRAMEBUFFER, this.framebufferObject);
             OpenGlHelper.glFramebufferTexture2D(OpenGlHelper.GL_FRAMEBUFFER, OpenGlHelper.GL_COLOR_ATTACHMENT0, 3553, this.framebufferTexture, 0);
 
@@ -262,12 +262,11 @@ public class Framebuffer
             float f3 = (float)this.framebufferHeight / (float)this.framebufferTextureHeight;
             Tessellator tessellator = Tessellator.getInstance();
             WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-            worldrenderer.startDrawingQuads();
-            worldrenderer.setColorOpaque_I(-1);
-            worldrenderer.addVertexWithUV(0.0D, (double)f1, 0.0D, 0.0D, 0.0D);
-            worldrenderer.addVertexWithUV((double)f, (double)f1, 0.0D, (double)f2, 0.0D);
-            worldrenderer.addVertexWithUV((double)f, 0.0D, 0.0D, (double)f2, (double)f3);
-            worldrenderer.addVertexWithUV(0.0D, 0.0D, 0.0D, 0.0D, (double)f3);
+            worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+            worldrenderer.pos(0.0D, (double)f1, 0.0D).tex(0.0D, 0.0D).color(255, 255, 255, 255).endVertex();
+            worldrenderer.pos((double)f, (double)f1, 0.0D).tex((double)f2, 0.0D).color(255, 255, 255, 255).endVertex();
+            worldrenderer.pos((double)f, 0.0D, 0.0D).tex((double)f2, (double)f3).color(255, 255, 255, 255).endVertex();
+            worldrenderer.pos(0.0D, 0.0D, 0.0D).tex(0.0D, (double)f3).color(255, 255, 255, 255).endVertex();
             tessellator.draw();
             this.unbindFramebufferTexture();
             GlStateManager.depthMask(true);

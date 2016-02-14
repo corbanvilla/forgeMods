@@ -13,13 +13,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public interface IResourcePack
 {
-    InputStream getInputStream(ResourceLocation p_110590_1_) throws IOException;
+    InputStream getInputStream(ResourceLocation location) throws IOException;
 
-    boolean resourceExists(ResourceLocation p_110589_1_);
+    boolean resourceExists(ResourceLocation location);
 
-    Set getResourceDomains();
+    Set<String> getResourceDomains();
 
-    IMetadataSection getPackMetadata(IMetadataSerializer p_135058_1_, String p_135058_2_) throws IOException;
+    <T extends IMetadataSection> T getPackMetadata(IMetadataSerializer p_135058_1_, String p_135058_2_) throws IOException;
 
     BufferedImage getPackImage() throws IOException;
 

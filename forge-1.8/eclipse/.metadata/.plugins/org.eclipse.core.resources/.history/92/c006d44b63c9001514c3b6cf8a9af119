@@ -1,8 +1,0 @@
-package org.devoxx4kids.forge.mods;
-
-import net.minecraft.command.ICommand;
-
-public class FlamingPigs implements ICommand{
-	
-
-}

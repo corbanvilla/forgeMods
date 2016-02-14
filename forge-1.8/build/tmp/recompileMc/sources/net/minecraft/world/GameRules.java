@@ -1,14 +1,12 @@
 package net.minecraft.world;
 
-import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
 import net.minecraft.nbt.NBTTagCompound;
 
 public class GameRules
 {
-    private TreeMap theGameRules = new TreeMap();
-    private static final String __OBFID = "CL_00000136";
+    private TreeMap<String, GameRules.Value> theGameRules = new TreeMap();
 
     public GameRules()
     {
@@ -18,6 +16,7 @@ public class GameRules
         this.addGameRule("doMobSpawning", "true", GameRules.ValueType.BOOLEAN_VALUE);
         this.addGameRule("doMobLoot", "true", GameRules.ValueType.BOOLEAN_VALUE);
         this.addGameRule("doTileDrops", "true", GameRules.ValueType.BOOLEAN_VALUE);
+        this.addGameRule("doEntityDrops", "true", GameRules.ValueType.BOOLEAN_VALUE);
         this.addGameRule("commandBlockOutput", "true", GameRules.ValueType.BOOLEAN_VALUE);
         this.addGameRule("naturalRegeneration", "true", GameRules.ValueType.BOOLEAN_VALUE);
         this.addGameRule("doDaylightCycle", "true", GameRules.ValueType.BOOLEAN_VALUE);
@@ -35,11 +34,11 @@ public class GameRules
 
     public void setOrCreateGameRule(String key, String ruleValue)
     {
-        GameRules.Value value = (GameRules.Value)this.theGameRules.get(key);
+        GameRules.Value gamerules$value = (GameRules.Value)this.theGameRules.get(key);
 
-        if (value != null)
+        if (gamerules$value != null)
         {
-            value.setValue(ruleValue);
+            gamerules$value.setValue(ruleValue);
         }
         else
         {
@@ -50,40 +49,38 @@ public class GameRules
     /**
      * Gets the string Game Rule value.
      */
-    public String getGameRuleStringValue(String name)
+    public String getString(String name)
     {
-        GameRules.Value value = (GameRules.Value)this.theGameRules.get(name);
-        return value != null ? value.getGameRuleStringValue() : "";
+        GameRules.Value gamerules$value = (GameRules.Value)this.theGameRules.get(name);
+        return gamerules$value != null ? gamerules$value.getString() : "";
     }
 
     /**
      * Gets the boolean Game Rule value.
      */
-    public boolean getGameRuleBooleanValue(String name)
+    public boolean getBoolean(String name)
     {
-        GameRules.Value value = (GameRules.Value)this.theGameRules.get(name);
-        return value != null ? value.getGameRuleBooleanValue() : false;
+        GameRules.Value gamerules$value = (GameRules.Value)this.theGameRules.get(name);
+        return gamerules$value != null ? gamerules$value.getBoolean() : false;
     }
 
     public int getInt(String name)
     {
-        GameRules.Value value = (GameRules.Value)this.theGameRules.get(name);
-        return value != null ? value.getInt() : 0;
+        GameRules.Value gamerules$value = (GameRules.Value)this.theGameRules.get(name);
+        return gamerules$value != null ? gamerules$value.getInt() : 0;
     }
 
     /**
      * Return the defined game rules as NBT.
      */
-    public NBTTagCompound writeGameRulesToNBT()
+    public NBTTagCompound writeToNBT()
     {
         NBTTagCompound nbttagcompound = new NBTTagCompound();
-        Iterator iterator = this.theGameRules.keySet().iterator();
 
-        while (iterator.hasNext())
+        for (String s : this.theGameRules.keySet())
         {
-            String s = (String)iterator.next();
-            GameRules.Value value = (GameRules.Value)this.theGameRules.get(s);
-            nbttagcompound.setString(s, value.getGameRuleStringValue());
+            GameRules.Value gamerules$value = (GameRules.Value)this.theGameRules.get(s);
+            nbttagcompound.setString(s, gamerules$value.getString());
         }
 
         return nbttagcompound;
@@ -92,14 +89,10 @@ public class GameRules
     /**
      * Set defined game rules from NBT.
      */
-    public void readGameRulesFromNBT(NBTTagCompound nbt)
+    public void readFromNBT(NBTTagCompound nbt)
     {
-        Set set = nbt.getKeySet();
-        Iterator iterator = set.iterator();
-
-        while (iterator.hasNext())
+        for (String s : nbt.getKeySet())
         {
-            String s = (String)iterator.next();
             String s1 = nbt.getString(s);
             this.setOrCreateGameRule(s, s1);
         }
@@ -110,7 +103,8 @@ public class GameRules
      */
     public String[] getRules()
     {
-        return (String[])this.theGameRules.keySet().toArray(new String[0]);
+        Set<String> set = this.theGameRules.keySet();
+        return (String[])set.toArray(new String[set.size()]);
     }
 
     /**
@@ -123,8 +117,8 @@ public class GameRules
 
     public boolean areSameType(String key, GameRules.ValueType otherValue)
     {
-        GameRules.Value value = (GameRules.Value)this.theGameRules.get(key);
-        return value != null && (value.getType() == otherValue || otherValue == GameRules.ValueType.ANY_VALUE);
+        GameRules.Value gamerules$value = (GameRules.Value)this.theGameRules.get(key);
+        return gamerules$value != null && (gamerules$value.getType() == otherValue || otherValue == GameRules.ValueType.ANY_VALUE);
     }
 
     static class Value
@@ -134,7 +128,6 @@ public class GameRules
             private int valueInteger;
             private double valueDouble;
             private final GameRules.ValueType type;
-            private static final String __OBFID = "CL_00000137";
 
             public Value(String value, GameRules.ValueType type)
             {
@@ -155,7 +148,7 @@ public class GameRules
                 {
                     this.valueInteger = Integer.parseInt(value);
                 }
-                catch (NumberFormatException numberformatexception1)
+                catch (NumberFormatException var4)
                 {
                     ;
                 }
@@ -164,7 +157,7 @@ public class GameRules
                 {
                     this.valueDouble = Double.parseDouble(value);
                 }
-                catch (NumberFormatException numberformatexception)
+                catch (NumberFormatException var3)
                 {
                     ;
                 }
@@ -173,7 +166,7 @@ public class GameRules
             /**
              * Gets the GameRule's value as String.
              */
-            public String getGameRuleStringValue()
+            public String getString()
             {
                 return this.valueString;
             }
@@ -181,7 +174,7 @@ public class GameRules
             /**
              * Gets the GameRule's value as boolean.
              */
-            public boolean getGameRuleBooleanValue()
+            public boolean getBoolean()
             {
                 return this.valueBoolean;
             }
@@ -202,7 +195,5 @@ public class GameRules
         ANY_VALUE,
         BOOLEAN_VALUE,
         NUMERICAL_VALUE;
-
-        private static final String __OBFID = "CL_00002151";
     }
 }

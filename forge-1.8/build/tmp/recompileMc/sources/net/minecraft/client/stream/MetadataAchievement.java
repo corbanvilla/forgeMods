@@ -7,8 +7,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class MetadataAchievement extends Metadata
 {
-    private static final String __OBFID = "CL_00001824";
-
     public MetadataAchievement(Achievement p_i1032_1_)
     {
         super("achievement");

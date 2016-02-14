@@ -1,6 +1,5 @@
 package net.minecraft.block;
 
-import java.util.Iterator;
 import java.util.Random;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -22,7 +21,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BlockCactus extends Block implements net.minecraftforge.common.IPlantable
 {
     public static final PropertyInteger AGE = PropertyInteger.create("age", 0, 15);
-    private static final String __OBFID = "CL_00000210";
 
     protected BlockCactus()
     {
@@ -34,9 +32,9 @@ public class BlockCactus extends Block implements net.minecraftforge.common.IPla
 
     public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
-        BlockPos blockpos1 = pos.up();
+        BlockPos blockpos = pos.up();
 
-        if (worldIn.isAirBlock(blockpos1))
+        if (worldIn.isAirBlock(blockpos))
         {
             int i;
 
@@ -51,10 +49,10 @@ public class BlockCactus extends Block implements net.minecraftforge.common.IPla
 
                 if (j == 15)
                 {
-                    worldIn.setBlockState(blockpos1, this.getDefaultState());
-                    IBlockState iblockstate1 = state.withProperty(AGE, Integer.valueOf(0));
-                    worldIn.setBlockState(pos, iblockstate1, 4);
-                    this.onNeighborBlockChange(worldIn, blockpos1, iblockstate1, this);
+                    worldIn.setBlockState(blockpos, this.getDefaultState());
+                    IBlockState iblockstate = state.withProperty(AGE, Integer.valueOf(0));
+                    worldIn.setBlockState(pos, iblockstate, 4);
+                    this.onNeighborBlockChange(worldIn, blockpos, iblockstate, this);
                 }
                 else
                 {
@@ -82,6 +80,9 @@ public class BlockCactus extends Block implements net.minecraftforge.common.IPla
         return false;
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -105,12 +106,8 @@ public class BlockCactus extends Block implements net.minecraftforge.common.IPla
 
     public boolean canBlockStay(World worldIn, BlockPos pos)
     {
-        Iterator iterator = EnumFacing.Plane.HORIZONTAL.iterator();
-
-        while (iterator.hasNext())
+        for (EnumFacing enumfacing : EnumFacing.Plane.HORIZONTAL)
         {
-            EnumFacing enumfacing = (EnumFacing)iterator.next();
-
             if (worldIn.getBlockState(pos.offset(enumfacing)).getBlock().getMaterial().isSolid())
             {
                 return false;

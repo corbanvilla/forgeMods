@@ -20,19 +20,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockNewLeaf extends BlockLeaves
 {
-    public static final PropertyEnum VARIANT = PropertyEnum.create("variant", BlockPlanks.EnumType.class, new Predicate()
+    public static final PropertyEnum<BlockPlanks.EnumType> VARIANT = PropertyEnum.<BlockPlanks.EnumType>create("variant", BlockPlanks.EnumType.class, new Predicate<BlockPlanks.EnumType>()
     {
-        private static final String __OBFID = "CL_00002090";
-        public boolean apply(BlockPlanks.EnumType type)
+        public boolean apply(BlockPlanks.EnumType p_apply_1_)
         {
-            return type.getMetadata() >= 4;
-        }
-        public boolean apply(Object p_apply_1_)
-        {
-            return this.apply((BlockPlanks.EnumType)p_apply_1_);
+            return p_apply_1_.getMetadata() >= 4;
         }
     });
-    private static final String __OBFID = "CL_00000276";
 
     public BlockNewLeaf()
     {
@@ -48,7 +42,8 @@ public class BlockNewLeaf extends BlockLeaves
     }
 
     /**
-     * Get the damage value that this Block should drop
+     * Gets the metadata of the item this Block can drop. This method is called when the block gets destroyed. It
+     * returns the metadata of the dropped item based on the old metadata of the block.
      */
     public int damageDropped(IBlockState state)
     {
@@ -65,7 +60,7 @@ public class BlockNewLeaf extends BlockLeaves
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
     {
         list.add(new ItemStack(itemIn, 1, 0));
         list.add(new ItemStack(itemIn, 1, 1));
@@ -89,8 +84,8 @@ public class BlockNewLeaf extends BlockLeaves
      */
     public int getMetaFromState(IBlockState state)
     {
-        byte b0 = 0;
-        int i = b0 | ((BlockPlanks.EnumType)state.getValue(VARIANT)).getMetadata() - 4;
+        int i = 0;
+        i = i | ((BlockPlanks.EnumType)state.getValue(VARIANT)).getMetadata() - 4;
 
         if (!((Boolean)state.getValue(DECAYABLE)).booleanValue())
         {

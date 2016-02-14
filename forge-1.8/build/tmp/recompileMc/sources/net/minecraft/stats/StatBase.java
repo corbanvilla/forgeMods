@@ -8,6 +8,7 @@ import net.minecraft.scoreboard.IScoreObjectiveCriteria;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
+import net.minecraft.util.IJsonSerializable;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -20,11 +21,10 @@ public class StatBase
     public boolean isIndependent;
     private final IStatType type;
     private final IScoreObjectiveCriteria field_150957_c;
-    private Class field_150956_d;
+    private Class <? extends IJsonSerializable > field_150956_d;
     private static NumberFormat numberFormat = NumberFormat.getIntegerInstance(Locale.US);
     public static IStatType simpleStatType = new IStatType()
     {
-        private static final String __OBFID = "CL_00001473";
         /**
          * Formats a given stat for human consumption.
          */
@@ -37,7 +37,6 @@ public class StatBase
     private static DecimalFormat decimalFormat = new DecimalFormat("########0.00");
     public static IStatType timeStatType = new IStatType()
     {
-        private static final String __OBFID = "CL_00001474";
         /**
          * Formats a given stat for human consumption.
          */
@@ -54,7 +53,6 @@ public class StatBase
     };
     public static IStatType distanceStatType = new IStatType()
     {
-        private static final String __OBFID = "CL_00001475";
         /**
          * Formats a given stat for human consumption.
          */
@@ -68,7 +66,6 @@ public class StatBase
     };
     public static IStatType field_111202_k = new IStatType()
     {
-        private static final String __OBFID = "CL_00001476";
         /**
          * Formats a given stat for human consumption.
          */
@@ -78,20 +75,19 @@ public class StatBase
             return StatBase.decimalFormat.format((double)p_75843_1_ * 0.1D);
         }
     };
-    private static final String __OBFID = "CL_00001472";
 
-    public StatBase(String p_i45307_1_, IChatComponent p_i45307_2_, IStatType p_i45307_3_)
+    public StatBase(String statIdIn, IChatComponent statNameIn, IStatType typeIn)
     {
-        this.statId = p_i45307_1_;
-        this.statName = p_i45307_2_;
-        this.type = p_i45307_3_;
+        this.statId = statIdIn;
+        this.statName = statNameIn;
+        this.type = typeIn;
         this.field_150957_c = new ObjectiveStat(this);
         IScoreObjectiveCriteria.INSTANCES.put(this.field_150957_c.getName(), this.field_150957_c);
     }
 
-    public StatBase(String p_i45308_1_, IChatComponent p_i45308_2_)
+    public StatBase(String statIdIn, IChatComponent statNameIn)
     {
-        this(p_i45308_1_, p_i45308_2_, simpleStatType);
+        this(statIdIn, statNameIn, simpleStatType);
     }
 
     /**
@@ -130,7 +126,7 @@ public class StatBase
     }
 
     @SideOnly(Side.CLIENT)
-    public String func_75968_a(int p_75968_1_)
+    public String format(int p_75968_1_)
     {
         return this.type.format(p_75968_1_);
     }
@@ -183,12 +179,12 @@ public class StatBase
         return this.field_150957_c;
     }
 
-    public Class func_150954_l()
+    public Class <? extends IJsonSerializable > func_150954_l()
     {
         return this.field_150956_d;
     }
 
-    public StatBase func_150953_b(Class p_150953_1_)
+    public StatBase func_150953_b(Class <? extends IJsonSerializable > p_150953_1_)
     {
         this.field_150956_d = p_150953_1_;
         return this;

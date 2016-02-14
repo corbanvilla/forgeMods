@@ -12,7 +12,6 @@ public class WorldServerMulti extends WorldServer
 {
     private WorldServer delegate;
     private IBorderListener borderListener;
-    private static final String __OBFID = "CL_00001430";
 
     public WorldServerMulti(MinecraftServer server, ISaveHandler saveHandlerIn, int dimensionId, WorldServer delegate, Profiler profilerIn)
     {
@@ -20,7 +19,6 @@ public class WorldServerMulti extends WorldServer
         this.delegate = delegate;
         this.borderListener = new IBorderListener()
         {
-            private static final String __OBFID = "CL_00002273";
             public void onSizeChanged(WorldBorder border, double newSize)
             {
                 WorldServerMulti.this.getWorldBorder().setTransition(newSize);

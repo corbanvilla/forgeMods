@@ -6,8 +6,6 @@ import net.minecraft.world.biome.BiomeGenMesa;
 
 public class GenLayerShore extends GenLayer
 {
-    private static final String __OBFID = "CL_00000568";
-
     public GenLayerShore(long p_i2130_1_, GenLayer p_i2130_3_)
     {
         super(p_i2130_1_);
@@ -23,113 +21,109 @@ public class GenLayerShore extends GenLayer
         int[] aint = this.parent.getInts(areaX - 1, areaY - 1, areaWidth + 2, areaHeight + 2);
         int[] aint1 = IntCache.getIntCache(areaWidth * areaHeight);
 
-        for (int i1 = 0; i1 < areaHeight; ++i1)
+        for (int i = 0; i < areaHeight; ++i)
         {
-            for (int j1 = 0; j1 < areaWidth; ++j1)
+            for (int j = 0; j < areaWidth; ++j)
             {
-                this.initChunkSeed((long)(j1 + areaX), (long)(i1 + areaY));
-                int k1 = aint[j1 + 1 + (i1 + 1) * (areaWidth + 2)];
-                BiomeGenBase biomegenbase = BiomeGenBase.getBiome(k1);
-                int l1;
-                int i2;
-                int j2;
-                int k2;
+                this.initChunkSeed((long)(j + areaX), (long)(i + areaY));
+                int k = aint[j + 1 + (i + 1) * (areaWidth + 2)];
+                BiomeGenBase biomegenbase = BiomeGenBase.getBiome(k);
 
-                if (k1 == BiomeGenBase.mushroomIsland.biomeID)
+                if (k == BiomeGenBase.mushroomIsland.biomeID)
                 {
-                    l1 = aint[j1 + 1 + (i1 + 1 - 1) * (areaWidth + 2)];
-                    i2 = aint[j1 + 1 + 1 + (i1 + 1) * (areaWidth + 2)];
-                    j2 = aint[j1 + 1 - 1 + (i1 + 1) * (areaWidth + 2)];
-                    k2 = aint[j1 + 1 + (i1 + 1 + 1) * (areaWidth + 2)];
+                    int j2 = aint[j + 1 + (i + 1 - 1) * (areaWidth + 2)];
+                    int i3 = aint[j + 1 + 1 + (i + 1) * (areaWidth + 2)];
+                    int l3 = aint[j + 1 - 1 + (i + 1) * (areaWidth + 2)];
+                    int k4 = aint[j + 1 + (i + 1 + 1) * (areaWidth + 2)];
 
-                    if (l1 != BiomeGenBase.ocean.biomeID && i2 != BiomeGenBase.ocean.biomeID && j2 != BiomeGenBase.ocean.biomeID && k2 != BiomeGenBase.ocean.biomeID)
+                    if (j2 != BiomeGenBase.ocean.biomeID && i3 != BiomeGenBase.ocean.biomeID && l3 != BiomeGenBase.ocean.biomeID && k4 != BiomeGenBase.ocean.biomeID)
                     {
-                        aint1[j1 + i1 * areaWidth] = k1;
+                        aint1[j + i * areaWidth] = k;
                     }
                     else
                     {
-                        aint1[j1 + i1 * areaWidth] = BiomeGenBase.mushroomIslandShore.biomeID;
+                        aint1[j + i * areaWidth] = BiomeGenBase.mushroomIslandShore.biomeID;
                     }
                 }
                 else if (biomegenbase != null && biomegenbase.getBiomeClass() == BiomeGenJungle.class)
                 {
-                    l1 = aint[j1 + 1 + (i1 + 1 - 1) * (areaWidth + 2)];
-                    i2 = aint[j1 + 1 + 1 + (i1 + 1) * (areaWidth + 2)];
-                    j2 = aint[j1 + 1 - 1 + (i1 + 1) * (areaWidth + 2)];
-                    k2 = aint[j1 + 1 + (i1 + 1 + 1) * (areaWidth + 2)];
+                    int i2 = aint[j + 1 + (i + 1 - 1) * (areaWidth + 2)];
+                    int l2 = aint[j + 1 + 1 + (i + 1) * (areaWidth + 2)];
+                    int k3 = aint[j + 1 - 1 + (i + 1) * (areaWidth + 2)];
+                    int j4 = aint[j + 1 + (i + 1 + 1) * (areaWidth + 2)];
 
-                    if (this.func_151631_c(l1) && this.func_151631_c(i2) && this.func_151631_c(j2) && this.func_151631_c(k2))
+                    if (this.func_151631_c(i2) && this.func_151631_c(l2) && this.func_151631_c(k3) && this.func_151631_c(j4))
                     {
-                        if (!isBiomeOceanic(l1) && !isBiomeOceanic(i2) && !isBiomeOceanic(j2) && !isBiomeOceanic(k2))
+                        if (!isBiomeOceanic(i2) && !isBiomeOceanic(l2) && !isBiomeOceanic(k3) && !isBiomeOceanic(j4))
                         {
-                            aint1[j1 + i1 * areaWidth] = k1;
+                            aint1[j + i * areaWidth] = k;
                         }
                         else
                         {
-                            aint1[j1 + i1 * areaWidth] = BiomeGenBase.beach.biomeID;
+                            aint1[j + i * areaWidth] = BiomeGenBase.beach.biomeID;
                         }
                     }
                     else
                     {
-                        aint1[j1 + i1 * areaWidth] = BiomeGenBase.jungleEdge.biomeID;
+                        aint1[j + i * areaWidth] = BiomeGenBase.jungleEdge.biomeID;
                     }
                 }
-                else if (k1 != BiomeGenBase.extremeHills.biomeID && k1 != BiomeGenBase.extremeHillsPlus.biomeID && k1 != BiomeGenBase.extremeHillsEdge.biomeID)
+                else if (k != BiomeGenBase.extremeHills.biomeID && k != BiomeGenBase.extremeHillsPlus.biomeID && k != BiomeGenBase.extremeHillsEdge.biomeID)
                 {
                     if (biomegenbase != null && biomegenbase.isSnowyBiome())
                     {
-                        this.func_151632_a(aint, aint1, j1, i1, areaWidth, k1, BiomeGenBase.coldBeach.biomeID);
+                        this.func_151632_a(aint, aint1, j, i, areaWidth, k, BiomeGenBase.coldBeach.biomeID);
                     }
-                    else if (k1 != BiomeGenBase.mesa.biomeID && k1 != BiomeGenBase.mesaPlateau_F.biomeID)
+                    else if (k != BiomeGenBase.mesa.biomeID && k != BiomeGenBase.mesaPlateau_F.biomeID)
                     {
-                        if (k1 != BiomeGenBase.ocean.biomeID && k1 != BiomeGenBase.deepOcean.biomeID && k1 != BiomeGenBase.river.biomeID && k1 != BiomeGenBase.swampland.biomeID)
+                        if (k != BiomeGenBase.ocean.biomeID && k != BiomeGenBase.deepOcean.biomeID && k != BiomeGenBase.river.biomeID && k != BiomeGenBase.swampland.biomeID)
                         {
-                            l1 = aint[j1 + 1 + (i1 + 1 - 1) * (areaWidth + 2)];
-                            i2 = aint[j1 + 1 + 1 + (i1 + 1) * (areaWidth + 2)];
-                            j2 = aint[j1 + 1 - 1 + (i1 + 1) * (areaWidth + 2)];
-                            k2 = aint[j1 + 1 + (i1 + 1 + 1) * (areaWidth + 2)];
+                            int l1 = aint[j + 1 + (i + 1 - 1) * (areaWidth + 2)];
+                            int k2 = aint[j + 1 + 1 + (i + 1) * (areaWidth + 2)];
+                            int j3 = aint[j + 1 - 1 + (i + 1) * (areaWidth + 2)];
+                            int i4 = aint[j + 1 + (i + 1 + 1) * (areaWidth + 2)];
 
-                            if (!isBiomeOceanic(l1) && !isBiomeOceanic(i2) && !isBiomeOceanic(j2) && !isBiomeOceanic(k2))
+                            if (!isBiomeOceanic(l1) && !isBiomeOceanic(k2) && !isBiomeOceanic(j3) && !isBiomeOceanic(i4))
                             {
-                                aint1[j1 + i1 * areaWidth] = k1;
+                                aint1[j + i * areaWidth] = k;
                             }
                             else
                             {
-                                aint1[j1 + i1 * areaWidth] = BiomeGenBase.beach.biomeID;
+                                aint1[j + i * areaWidth] = BiomeGenBase.beach.biomeID;
                             }
                         }
                         else
                         {
-                            aint1[j1 + i1 * areaWidth] = k1;
+                            aint1[j + i * areaWidth] = k;
                         }
                     }
                     else
                     {
-                        l1 = aint[j1 + 1 + (i1 + 1 - 1) * (areaWidth + 2)];
-                        i2 = aint[j1 + 1 + 1 + (i1 + 1) * (areaWidth + 2)];
-                        j2 = aint[j1 + 1 - 1 + (i1 + 1) * (areaWidth + 2)];
-                        k2 = aint[j1 + 1 + (i1 + 1 + 1) * (areaWidth + 2)];
+                        int l = aint[j + 1 + (i + 1 - 1) * (areaWidth + 2)];
+                        int i1 = aint[j + 1 + 1 + (i + 1) * (areaWidth + 2)];
+                        int j1 = aint[j + 1 - 1 + (i + 1) * (areaWidth + 2)];
+                        int k1 = aint[j + 1 + (i + 1 + 1) * (areaWidth + 2)];
 
-                        if (!isBiomeOceanic(l1) && !isBiomeOceanic(i2) && !isBiomeOceanic(j2) && !isBiomeOceanic(k2))
+                        if (!isBiomeOceanic(l) && !isBiomeOceanic(i1) && !isBiomeOceanic(j1) && !isBiomeOceanic(k1))
                         {
-                            if (this.func_151633_d(l1) && this.func_151633_d(i2) && this.func_151633_d(j2) && this.func_151633_d(k2))
+                            if (this.func_151633_d(l) && this.func_151633_d(i1) && this.func_151633_d(j1) && this.func_151633_d(k1))
                             {
-                                aint1[j1 + i1 * areaWidth] = k1;
+                                aint1[j + i * areaWidth] = k;
                             }
                             else
                             {
-                                aint1[j1 + i1 * areaWidth] = BiomeGenBase.desert.biomeID;
+                                aint1[j + i * areaWidth] = BiomeGenBase.desert.biomeID;
                             }
                         }
                         else
                         {
-                            aint1[j1 + i1 * areaWidth] = k1;
+                            aint1[j + i * areaWidth] = k;
                         }
                     }
                 }
                 else
                 {
-                    this.func_151632_a(aint, aint1, j1, i1, areaWidth, k1, BiomeGenBase.stoneBeach.biomeID);
+                    this.func_151632_a(aint, aint1, j, i, areaWidth, k, BiomeGenBase.stoneBeach.biomeID);
                 }
             }
         }
@@ -145,12 +139,12 @@ public class GenLayerShore extends GenLayer
         }
         else
         {
-            int j1 = p_151632_1_[p_151632_3_ + 1 + (p_151632_4_ + 1 - 1) * (p_151632_5_ + 2)];
-            int k1 = p_151632_1_[p_151632_3_ + 1 + 1 + (p_151632_4_ + 1) * (p_151632_5_ + 2)];
-            int l1 = p_151632_1_[p_151632_3_ + 1 - 1 + (p_151632_4_ + 1) * (p_151632_5_ + 2)];
-            int i2 = p_151632_1_[p_151632_3_ + 1 + (p_151632_4_ + 1 + 1) * (p_151632_5_ + 2)];
+            int i = p_151632_1_[p_151632_3_ + 1 + (p_151632_4_ + 1 - 1) * (p_151632_5_ + 2)];
+            int j = p_151632_1_[p_151632_3_ + 1 + 1 + (p_151632_4_ + 1) * (p_151632_5_ + 2)];
+            int k = p_151632_1_[p_151632_3_ + 1 - 1 + (p_151632_4_ + 1) * (p_151632_5_ + 2)];
+            int l = p_151632_1_[p_151632_3_ + 1 + (p_151632_4_ + 1 + 1) * (p_151632_5_ + 2)];
 
-            if (!isBiomeOceanic(j1) && !isBiomeOceanic(k1) && !isBiomeOceanic(l1) && !isBiomeOceanic(i2))
+            if (!isBiomeOceanic(i) && !isBiomeOceanic(j) && !isBiomeOceanic(k) && !isBiomeOceanic(l))
             {
                 p_151632_2_[p_151632_3_ + p_151632_4_ * p_151632_5_] = p_151632_6_;
             }

@@ -24,7 +24,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BlockCocoa extends BlockDirectional implements IGrowable
 {
     public static final PropertyInteger AGE = PropertyInteger.create("age", 0, 2);
-    private static final String __OBFID = "CL_00000216";
 
     public BlockCocoa()
     {
@@ -53,8 +52,8 @@ public class BlockCocoa extends BlockDirectional implements IGrowable
     public boolean canBlockStay(World worldIn, BlockPos pos, IBlockState state)
     {
         pos = pos.offset((EnumFacing)state.getValue(FACING));
-        IBlockState iblockstate1 = worldIn.getBlockState(pos);
-        return iblockstate1.getBlock() == Blocks.log && iblockstate1.getValue(BlockPlanks.VARIANT) == BlockPlanks.EnumType.JUNGLE;
+        IBlockState iblockstate = worldIn.getBlockState(pos);
+        return iblockstate.getBlock() == Blocks.log && iblockstate.getValue(BlockPlanks.VARIANT) == BlockPlanks.EnumType.JUNGLE;
     }
 
     public boolean isFullCube()
@@ -62,6 +61,9 @@ public class BlockCocoa extends BlockDirectional implements IGrowable
         return false;
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -73,13 +75,7 @@ public class BlockCocoa extends BlockDirectional implements IGrowable
         return super.getCollisionBoundingBox(worldIn, pos, state);
     }
 
-    @SideOnly(Side.CLIENT)
-    public AxisAlignedBB getSelectedBoundingBox(World worldIn, BlockPos pos)
-    {
-        this.setBlockBoundsBasedOnState(worldIn, pos);
-        return super.getSelectedBoundingBox(worldIn, pos);
-    }
-
+    @SuppressWarnings("incomplete-switch")
     public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
     {
         IBlockState iblockstate = worldIn.getBlockState(pos);
@@ -89,28 +85,35 @@ public class BlockCocoa extends BlockDirectional implements IGrowable
         int k = 5 + i * 2;
         float f = (float)j / 2.0F;
 
-        switch (BlockCocoa.SwitchEnumFacing.FACING_LOOKUP[enumfacing.ordinal()])
+        switch (enumfacing)
         {
-            case 1:
+            case SOUTH:
                 this.setBlockBounds((8.0F - f) / 16.0F, (12.0F - (float)k) / 16.0F, (15.0F - (float)j) / 16.0F, (8.0F + f) / 16.0F, 0.75F, 0.9375F);
                 break;
-            case 2:
+            case NORTH:
                 this.setBlockBounds((8.0F - f) / 16.0F, (12.0F - (float)k) / 16.0F, 0.0625F, (8.0F + f) / 16.0F, 0.75F, (1.0F + (float)j) / 16.0F);
                 break;
-            case 3:
+            case WEST:
                 this.setBlockBounds(0.0625F, (12.0F - (float)k) / 16.0F, (8.0F - f) / 16.0F, (1.0F + (float)j) / 16.0F, 0.75F, (8.0F + f) / 16.0F);
                 break;
-            case 4:
+            case EAST:
                 this.setBlockBounds((15.0F - (float)j) / 16.0F, (12.0F - (float)k) / 16.0F, (8.0F - f) / 16.0F, 0.9375F, 0.75F, (8.0F + f) / 16.0F);
         }
     }
 
+    /**
+     * Called by ItemBlocks after a block is set in the world, to allow post-place logic
+     */
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
     {
         EnumFacing enumfacing = EnumFacing.fromAngle((double)placer.rotationYaw);
         worldIn.setBlockState(pos, state.withProperty(FACING, enumfacing), 2);
     }
 
+    /**
+     * Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the
+     * IBlockstate
+     */
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
         if (!facing.getAxis().isHorizontal())
@@ -132,6 +135,13 @@ public class BlockCocoa extends BlockDirectional implements IGrowable
         }
     }
 
+    @SideOnly(Side.CLIENT)
+    public AxisAlignedBB getSelectedBoundingBox(World worldIn, BlockPos pos)
+    {
+        this.setBlockBoundsBasedOnState(worldIn, pos);
+        return super.getSelectedBoundingBox(worldIn, pos);
+    }
+
     private void dropBlock(World worldIn, BlockPos pos, IBlockState state)
     {
         worldIn.setBlockState(pos, Blocks.air.getDefaultState(), 3);
@@ -140,9 +150,6 @@ public class BlockCocoa extends BlockDirectional implements IGrowable
 
     /**
      * Spawns this Block's drops into the World as EntityItems.
-     *  
-     * @param chance The chance that each Item is actually spawned (1.0 = always, 0.0 = never)
-     * @param fortune The player's fortune level
      */
     public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune)
     {
@@ -153,15 +160,15 @@ public class BlockCocoa extends BlockDirectional implements IGrowable
     public java.util.List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune)
     {
         java.util.List<ItemStack> dropped = super.getDrops(world, pos, state, fortune);
-        int j = ((Integer)state.getValue(AGE)).intValue();
-        byte b0 = 1;
+        int i = ((Integer)state.getValue(AGE)).intValue();
+        int j = 1;
 
-        if (j >= 2)
+        if (i >= 2)
         {
-            b0 = 3;
+            j = 3;
         }
 
-        for (int k = 0; k < b0; ++k)
+        for (int k = 0; k < j; ++k)
         {
             dropped.add(new ItemStack(Items.dye, 1, EnumDyeColor.BROWN.getDyeDamage()));
         }
@@ -216,9 +223,9 @@ public class BlockCocoa extends BlockDirectional implements IGrowable
      */
     public int getMetaFromState(IBlockState state)
     {
-        byte b0 = 0;
-        int i = b0 | ((EnumFacing)state.getValue(FACING)).getHorizontalIndex();
-        i |= ((Integer)state.getValue(AGE)).intValue() << 2;
+        int i = 0;
+        i = i | ((EnumFacing)state.getValue(FACING)).getHorizontalIndex();
+        i = i | ((Integer)state.getValue(AGE)).intValue() << 2;
         return i;
     }
 
@@ -226,49 +233,4 @@ public class BlockCocoa extends BlockDirectional implements IGrowable
     {
         return new BlockState(this, new IProperty[] {FACING, AGE});
     }
-
-    static final class SwitchEnumFacing
-        {
-            static final int[] FACING_LOOKUP = new int[EnumFacing.values().length];
-            private static final String __OBFID = "CL_00002130";
-
-            static
-            {
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.SOUTH.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var4)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.NORTH.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var3)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.WEST.ordinal()] = 3;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.EAST.ordinal()] = 4;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
-            }
-        }
 }

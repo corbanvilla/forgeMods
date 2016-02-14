@@ -1,7 +1,6 @@
 package net.minecraft.crash;
 
 import com.google.common.collect.Lists;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import net.minecraft.block.Block;
@@ -12,9 +11,8 @@ public class CrashReportCategory
 {
     private final CrashReport crashReport;
     private final String name;
-    private final List children = Lists.newArrayList();
+    private final List<CrashReportCategory.Entry> children = Lists.<CrashReportCategory.Entry>newArrayList();
     private StackTraceElement[] stackTrace = new StackTraceElement[0];
-    private static final String __OBFID = "CL_00001409";
 
     public CrashReportCategory(CrashReport report, String name)
     {
@@ -38,36 +36,27 @@ public class CrashReportCategory
         {
             stringbuilder.append(String.format("World: (%d,%d,%d)", new Object[] {Integer.valueOf(i), Integer.valueOf(j), Integer.valueOf(k)}));
         }
-        catch (Throwable throwable2)
+        catch (Throwable var17)
         {
             stringbuilder.append("(Error finding world loc)");
         }
 
         stringbuilder.append(", ");
-        int l;
-        int i1;
-        int j1;
-        int k1;
-        int l1;
-        int i2;
-        int j2;
-        int k2;
-        int l2;
 
         try
         {
-            l = i >> 4;
-            i1 = k >> 4;
-            j1 = i & 15;
-            k1 = j >> 4;
-            l1 = k & 15;
-            i2 = l << 4;
-            j2 = i1 << 4;
-            k2 = (l + 1 << 4) - 1;
-            l2 = (i1 + 1 << 4) - 1;
+            int l = i >> 4;
+            int i1 = k >> 4;
+            int j1 = i & 15;
+            int k1 = j >> 4;
+            int l1 = k & 15;
+            int i2 = l << 4;
+            int j2 = i1 << 4;
+            int k2 = (l + 1 << 4) - 1;
+            int l2 = (i1 + 1 << 4) - 1;
             stringbuilder.append(String.format("Chunk: (at %d,%d,%d in %d,%d; contains blocks %d,0,%d to %d,255,%d)", new Object[] {Integer.valueOf(j1), Integer.valueOf(k1), Integer.valueOf(l1), Integer.valueOf(l), Integer.valueOf(i1), Integer.valueOf(i2), Integer.valueOf(j2), Integer.valueOf(k2), Integer.valueOf(l2)}));
         }
-        catch (Throwable throwable1)
+        catch (Throwable var16)
         {
             stringbuilder.append("(Error finding chunk loc)");
         }
@@ -76,19 +65,19 @@ public class CrashReportCategory
 
         try
         {
-            l = i >> 9;
-            i1 = k >> 9;
-            j1 = l << 5;
-            k1 = i1 << 5;
-            l1 = (l + 1 << 5) - 1;
-            i2 = (i1 + 1 << 5) - 1;
-            j2 = l << 9;
-            k2 = i1 << 9;
-            l2 = (l + 1 << 9) - 1;
-            int i3 = (i1 + 1 << 9) - 1;
-            stringbuilder.append(String.format("Region: (%d,%d; contains chunks %d,%d to %d,%d, blocks %d,0,%d to %d,255,%d)", new Object[] {Integer.valueOf(l), Integer.valueOf(i1), Integer.valueOf(j1), Integer.valueOf(k1), Integer.valueOf(l1), Integer.valueOf(i2), Integer.valueOf(j2), Integer.valueOf(k2), Integer.valueOf(l2), Integer.valueOf(i3)}));
+            int j3 = i >> 9;
+            int k3 = k >> 9;
+            int l3 = j3 << 5;
+            int i4 = k3 << 5;
+            int j4 = (j3 + 1 << 5) - 1;
+            int k4 = (k3 + 1 << 5) - 1;
+            int l4 = j3 << 9;
+            int i5 = k3 << 9;
+            int j5 = (j3 + 1 << 9) - 1;
+            int i3 = (k3 + 1 << 9) - 1;
+            stringbuilder.append(String.format("Region: (%d,%d; contains chunks %d,%d to %d,%d, blocks %d,0,%d to %d,255,%d)", new Object[] {Integer.valueOf(j3), Integer.valueOf(k3), Integer.valueOf(l3), Integer.valueOf(i4), Integer.valueOf(j4), Integer.valueOf(k4), Integer.valueOf(l4), Integer.valueOf(i5), Integer.valueOf(j5), Integer.valueOf(i3)}));
         }
-        catch (Throwable throwable)
+        catch (Throwable var15)
         {
             stringbuilder.append("(Error finding world loc)");
         }
@@ -99,7 +88,7 @@ public class CrashReportCategory
     /**
      * Adds a Crashreport section with the given name with the value set to the result of the given Callable;
      */
-    public void addCrashSectionCallable(String sectionName, Callable callable)
+    public void addCrashSectionCallable(String sectionName, Callable<String> callable)
     {
         try
         {
@@ -157,9 +146,9 @@ public class CrashReportCategory
     {
         if (this.stackTrace.length != 0 && s1 != null)
         {
-            StackTraceElement stacktraceelement2 = this.stackTrace[0];
+            StackTraceElement stacktraceelement = this.stackTrace[0];
 
-            if (stacktraceelement2.isNativeMethod() == s1.isNativeMethod() && stacktraceelement2.getClassName().equals(s1.getClassName()) && stacktraceelement2.getFileName().equals(s1.getFileName()) && stacktraceelement2.getMethodName().equals(s1.getMethodName()))
+            if (stacktraceelement.isNativeMethod() == s1.isNativeMethod() && stacktraceelement.getClassName().equals(s1.getClassName()) && stacktraceelement.getFileName().equals(s1.getFileName()) && stacktraceelement.getMethodName().equals(s1.getMethodName()))
             {
                 if (s2 != null != this.stackTrace.length > 1)
                 {
@@ -200,26 +189,21 @@ public class CrashReportCategory
     {
         builder.append("-- ").append(this.name).append(" --\n");
         builder.append("Details:");
-        Iterator iterator = this.children.iterator();
 
-        while (iterator.hasNext())
+        for (CrashReportCategory.Entry crashreportcategory$entry : this.children)
         {
-            CrashReportCategory.Entry entry = (CrashReportCategory.Entry)iterator.next();
             builder.append("\n\t");
-            builder.append(entry.getKey());
+            builder.append(crashreportcategory$entry.getKey());
             builder.append(": ");
-            builder.append(entry.getValue());
+            builder.append(crashreportcategory$entry.getValue());
         }
 
         if (this.stackTrace != null && this.stackTrace.length > 0)
         {
             builder.append("\nStacktrace:");
-            StackTraceElement[] astacktraceelement = this.stackTrace;
-            int j = astacktraceelement.length;
 
-            for (int i = 0; i < j; ++i)
+            for (StackTraceElement stacktraceelement : this.stackTrace)
             {
-                StackTraceElement stacktraceelement = astacktraceelement[i];
                 builder.append("\n\tat ");
                 builder.append(stacktraceelement.toString());
             }
@@ -234,25 +218,23 @@ public class CrashReportCategory
     public static void addBlockInfo(CrashReportCategory category, final BlockPos pos, final Block blockIn, final int blockData)
     {
         final int i = Block.getIdFromBlock(blockIn);
-        category.addCrashSectionCallable("Block type", new Callable()
+        category.addCrashSectionCallable("Block type", new Callable<String>()
         {
-            private static final String __OBFID = "CL_00001426";
-            public String call()
+            public String call() throws Exception
             {
                 try
                 {
                     return String.format("ID #%d (%s // %s)", new Object[] {Integer.valueOf(i), blockIn.getUnlocalizedName(), blockIn.getClass().getCanonicalName()});
                 }
-                catch (Throwable throwable)
+                catch (Throwable var2)
                 {
                     return "ID #" + i;
                 }
             }
         });
-        category.addCrashSectionCallable("Block data value", new Callable()
+        category.addCrashSectionCallable("Block data value", new Callable<String>()
         {
-            private static final String __OBFID = "CL_00001441";
-            public String call()
+            public String call() throws Exception
             {
                 if (blockData < 0)
                 {
@@ -265,10 +247,9 @@ public class CrashReportCategory
                 }
             }
         });
-        category.addCrashSectionCallable("Block location", new Callable()
+        category.addCrashSectionCallable("Block location", new Callable<String>()
         {
-            private static final String __OBFID = "CL_00001465";
-            public String call()
+            public String call() throws Exception
             {
                 return CrashReportCategory.getCoordinateInfo(pos);
             }
@@ -277,18 +258,16 @@ public class CrashReportCategory
 
     public static void addBlockInfo(CrashReportCategory category, final BlockPos pos, final IBlockState state)
     {
-        category.addCrashSectionCallable("Block", new Callable()
+        category.addCrashSectionCallable("Block", new Callable<String>()
         {
-            private static final String __OBFID = "CL_00002617";
-            public String call()
+            public String call() throws Exception
             {
                 return state.toString();
             }
         });
-        category.addCrashSectionCallable("Block location", new Callable()
+        category.addCrashSectionCallable("Block location", new Callable<String>()
         {
-            private static final String __OBFID = "CL_00002616";
-            public String call()
+            public String call() throws Exception
             {
                 return CrashReportCategory.getCoordinateInfo(pos);
             }
@@ -299,7 +278,6 @@ public class CrashReportCategory
         {
             private final String key;
             private final String value;
-            private static final String __OBFID = "CL_00001489";
 
             public Entry(String key, Object value)
             {

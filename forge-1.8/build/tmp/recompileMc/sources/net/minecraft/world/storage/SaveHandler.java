@@ -28,18 +28,17 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData
     private final long initializationTime = MinecraftServer.getCurrentTimeMillis();
     /** The directory name of the world */
     private final String saveDirectoryName;
-    private static final String __OBFID = "CL_00000585";
 
-    public SaveHandler(File savesDirectory, String p_i2146_2_, boolean p_i2146_3_)
+    public SaveHandler(File savesDirectory, String directoryName, boolean playersDirectoryIn)
     {
-        this.worldDirectory = new File(savesDirectory, p_i2146_2_);
+        this.worldDirectory = new File(savesDirectory, directoryName);
         this.worldDirectory.mkdirs();
         this.playersDirectory = new File(this.worldDirectory, "playerdata");
         this.mapDataDir = new File(this.worldDirectory, "data");
         this.mapDataDir.mkdirs();
-        this.saveDirectoryName = p_i2146_2_;
+        this.saveDirectoryName = directoryName;
 
-        if (p_i2146_3_)
+        if (playersDirectoryIn)
         {
             this.playersDirectory.mkdirs();
         }
@@ -103,7 +102,7 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData
                 datainputstream.close();
             }
         }
-        catch (IOException ioexception)
+        catch (IOException var7)
         {
             throw new MinecraftException("Failed to check session lock, aborting");
         }
@@ -123,8 +122,6 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData
     public WorldInfo loadWorldInfo()
     {
         File file1 = new File(this.worldDirectory, "level.dat");
-        NBTTagCompound nbttagcompound;
-        NBTTagCompound nbttagcompound1;
 
         WorldInfo worldInfo = null;
 
@@ -132,10 +129,10 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData
         {
             try
             {
-                nbttagcompound = CompressedStreamTools.readCompressed(new FileInputStream(file1));
-                nbttagcompound1 = nbttagcompound.getCompoundTag("Data");
-                worldInfo = new WorldInfo(nbttagcompound1);
-                net.minecraftforge.fml.common.FMLCommonHandler.instance().handleWorldDataLoad(this, worldInfo, nbttagcompound);
+                NBTTagCompound nbttagcompound2 = CompressedStreamTools.readCompressed(new FileInputStream(file1));
+                NBTTagCompound nbttagcompound3 = nbttagcompound2.getCompoundTag("Data");
+                worldInfo = new WorldInfo(nbttagcompound3);
+                net.minecraftforge.fml.common.FMLCommonHandler.instance().handleWorldDataLoad(this, worldInfo, nbttagcompound2);
                 return worldInfo;
             }
             catch (net.minecraftforge.fml.common.StartupQuery.AbortedException e)
@@ -155,8 +152,8 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData
         {
             try
             {
-                nbttagcompound = CompressedStreamTools.readCompressed(new FileInputStream(file1));
-                nbttagcompound1 = nbttagcompound.getCompoundTag("Data");
+                NBTTagCompound nbttagcompound = CompressedStreamTools.readCompressed(new FileInputStream(file1));
+                NBTTagCompound nbttagcompound1 = nbttagcompound.getCompoundTag("Data");
                 worldInfo = new WorldInfo(nbttagcompound1);
                 net.minecraftforge.fml.common.FMLCommonHandler.instance().handleWorldDataLoad(this, worldInfo, nbttagcompound);
                 return worldInfo;
@@ -179,18 +176,18 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData
      */
     public void saveWorldInfoWithPlayer(WorldInfo worldInformation, NBTTagCompound tagCompound)
     {
-        NBTTagCompound nbttagcompound1 = worldInformation.cloneNBTCompound(tagCompound);
-        NBTTagCompound nbttagcompound2 = new NBTTagCompound();
-        nbttagcompound2.setTag("Data", nbttagcompound1);
+        NBTTagCompound nbttagcompound = worldInformation.cloneNBTCompound(tagCompound);
+        NBTTagCompound nbttagcompound1 = new NBTTagCompound();
+        nbttagcompound1.setTag("Data", nbttagcompound);
 
-        net.minecraftforge.fml.common.FMLCommonHandler.instance().handleWorldDataSave(this, worldInformation, nbttagcompound2);
+        net.minecraftforge.fml.common.FMLCommonHandler.instance().handleWorldDataSave(this, worldInformation, nbttagcompound1);
 
         try
         {
             File file1 = new File(this.worldDirectory, "level.dat_new");
             File file2 = new File(this.worldDirectory, "level.dat_old");
             File file3 = new File(this.worldDirectory, "level.dat");
-            CompressedStreamTools.writeCompressed(nbttagcompound2, new FileOutputStream(file1));
+            CompressedStreamTools.writeCompressed(nbttagcompound1, new FileOutputStream(file1));
 
             if (file2.exists())
             {
@@ -263,14 +260,14 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData
     /**
      * Writes the player data to disk from the specified PlayerEntityMP.
      */
-    public void writePlayerData(EntityPlayer p_75753_1_)
+    public void writePlayerData(EntityPlayer player)
     {
         try
         {
             NBTTagCompound nbttagcompound = new NBTTagCompound();
-            p_75753_1_.writeToNBT(nbttagcompound);
-            File file1 = new File(this.playersDirectory, p_75753_1_.getUniqueID().toString() + ".dat.tmp");
-            File file2 = new File(this.playersDirectory, p_75753_1_.getUniqueID().toString() + ".dat");
+            player.writeToNBT(nbttagcompound);
+            File file1 = new File(this.playersDirectory, player.getUniqueID().toString() + ".dat.tmp");
+            File file2 = new File(this.playersDirectory, player.getUniqueID().toString() + ".dat");
             CompressedStreamTools.writeCompressed(nbttagcompound, new FileOutputStream(file1));
 
             if (file2.exists())
@@ -279,41 +276,41 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData
             }
 
             file1.renameTo(file2);
-            net.minecraftforge.event.ForgeEventFactory.firePlayerSavingEvent(p_75753_1_, this.playersDirectory, p_75753_1_.getUniqueID().toString());
+            net.minecraftforge.event.ForgeEventFactory.firePlayerSavingEvent(player, this.playersDirectory, player.getUniqueID().toString());
         }
-        catch (Exception exception)
+        catch (Exception var5)
         {
-            logger.warn("Failed to save player data for " + p_75753_1_.getName());
+            logger.warn("Failed to save player data for " + player.getName());
         }
     }
 
     /**
      * Reads the player data from disk into the specified PlayerEntityMP.
      */
-    public NBTTagCompound readPlayerData(EntityPlayer p_75752_1_)
+    public NBTTagCompound readPlayerData(EntityPlayer player)
     {
         NBTTagCompound nbttagcompound = null;
 
         try
         {
-            File file1 = new File(this.playersDirectory, p_75752_1_.getUniqueID().toString() + ".dat");
+            File file1 = new File(this.playersDirectory, player.getUniqueID().toString() + ".dat");
 
             if (file1.exists() && file1.isFile())
             {
                 nbttagcompound = CompressedStreamTools.readCompressed(new FileInputStream(file1));
             }
         }
-        catch (Exception exception)
+        catch (Exception var4)
         {
-            logger.warn("Failed to load player data for " + p_75752_1_.getName());
+            logger.warn("Failed to load player data for " + player.getName());
         }
 
         if (nbttagcompound != null)
         {
-            p_75752_1_.readFromNBT(nbttagcompound);
+            player.readFromNBT(nbttagcompound);
         }
 
-        net.minecraftforge.event.ForgeEventFactory.firePlayerLoadingEvent(p_75752_1_, playersDirectory, p_75752_1_.getUniqueID().toString());
+        net.minecraftforge.event.ForgeEventFactory.firePlayerLoadingEvent(player, playersDirectory, player.getUniqueID().toString());
         return nbttagcompound;
     }
 
@@ -348,7 +345,9 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData
     /**
      * Called to flush all changes to disk, waiting for them to complete.
      */
-    public void flush() {}
+    public void flush()
+    {
+    }
 
     /**
      * Gets the file location of the given map

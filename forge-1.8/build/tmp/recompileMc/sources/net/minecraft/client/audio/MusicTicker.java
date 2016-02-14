@@ -2,20 +2,19 @@ package net.minecraft.client.audio;
 
 import java.util.Random;
 import net.minecraft.client.Minecraft;
-import net.minecraft.server.gui.IUpdatePlayerListBox;
+import net.minecraft.util.ITickable;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class MusicTicker implements IUpdatePlayerListBox
+public class MusicTicker implements ITickable
 {
     private final Random rand = new Random();
     private final Minecraft mc;
     private ISound currentMusic;
     private int timeUntilNextMusic = 100;
-    private static final String __OBFID = "CL_00001138";
 
     public MusicTicker(Minecraft mcIn)
     {
@@ -23,32 +22,47 @@ public class MusicTicker implements IUpdatePlayerListBox
     }
 
     /**
-     * Updates the JList with a new model.
+     * Like the old updateEntity(), except more generic.
      */
     public void update()
     {
-        MusicTicker.MusicType musictype = this.mc.getAmbientMusicType();
+        MusicTicker.MusicType musicticker$musictype = this.mc.getAmbientMusicType();
 
         if (this.currentMusic != null)
         {
-            if (!musictype.getMusicLocation().equals(this.currentMusic.getSoundLocation()))
+            if (!musicticker$musictype.getMusicLocation().equals(this.currentMusic.getSoundLocation()))
             {
                 this.mc.getSoundHandler().stopSound(this.currentMusic);
-                this.timeUntilNextMusic = MathHelper.getRandomIntegerInRange(this.rand, 0, musictype.getMinDelay() / 2);
+                this.timeUntilNextMusic = MathHelper.getRandomIntegerInRange(this.rand, 0, musicticker$musictype.getMinDelay() / 2);
             }
 
             if (!this.mc.getSoundHandler().isSoundPlaying(this.currentMusic))
             {
                 this.currentMusic = null;
-                this.timeUntilNextMusic = Math.min(MathHelper.getRandomIntegerInRange(this.rand, musictype.getMinDelay(), musictype.getMaxDelay()), this.timeUntilNextMusic);
+                this.timeUntilNextMusic = Math.min(MathHelper.getRandomIntegerInRange(this.rand, musicticker$musictype.getMinDelay(), musicticker$musictype.getMaxDelay()), this.timeUntilNextMusic);
             }
         }
 
         if (this.currentMusic == null && this.timeUntilNextMusic-- <= 0)
         {
-            this.currentMusic = PositionedSoundRecord.create(musictype.getMusicLocation());
-            this.mc.getSoundHandler().playSound(this.currentMusic);
-            this.timeUntilNextMusic = Integer.MAX_VALUE;
+            this.func_181558_a(musicticker$musictype);
+        }
+    }
+
+    public void func_181558_a(MusicTicker.MusicType p_181558_1_)
+    {
+        this.currentMusic = PositionedSoundRecord.create(p_181558_1_.getMusicLocation());
+        this.mc.getSoundHandler().playSound(this.currentMusic);
+        this.timeUntilNextMusic = Integer.MAX_VALUE;
+    }
+
+    public void func_181557_a()
+    {
+        if (this.currentMusic != null)
+        {
+            this.mc.getSoundHandler().stopSound(this.currentMusic);
+            this.currentMusic = null;
+            this.timeUntilNextMusic = 0;
         }
     }
 
@@ -62,17 +76,16 @@ public class MusicTicker implements IUpdatePlayerListBox
         NETHER(new ResourceLocation("minecraft:music.game.nether"), 1200, 3600),
         END_BOSS(new ResourceLocation("minecraft:music.game.end.dragon"), 0, 0),
         END(new ResourceLocation("minecraft:music.game.end"), 6000, 24000);
+
         private final ResourceLocation musicLocation;
         private final int minDelay;
         private final int maxDelay;
 
-        private static final String __OBFID = "CL_00001139";
-
-        private MusicType(ResourceLocation location, int p_i45111_4_, int p_i45111_5_)
+        private MusicType(ResourceLocation location, int minDelayIn, int maxDelayIn)
         {
             this.musicLocation = location;
-            this.minDelay = p_i45111_4_;
-            this.maxDelay = p_i45111_5_;
+            this.minDelay = minDelayIn;
+            this.maxDelay = maxDelayIn;
         }
 
         public ResourceLocation getMusicLocation()

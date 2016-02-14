@@ -1,6 +1,7 @@
 package net.minecraft.block;
 
 import java.util.List;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
@@ -19,8 +20,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockCarpet extends Block
 {
-    public static final PropertyEnum COLOR = PropertyEnum.create("color", EnumDyeColor.class);
-    private static final String __OBFID = "CL_00000338";
+    public static final PropertyEnum<EnumDyeColor> COLOR = PropertyEnum.<EnumDyeColor>create("color", EnumDyeColor.class);
 
     protected BlockCarpet()
     {
@@ -32,6 +32,17 @@ public class BlockCarpet extends Block
         this.setBlockBoundsFromMeta(0);
     }
 
+    /**
+     * Get the MapColor for this Block and the given BlockState
+     */
+    public MapColor getMapColor(IBlockState state)
+    {
+        return ((EnumDyeColor)state.getValue(COLOR)).getMapColor();
+    }
+
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -57,8 +68,8 @@ public class BlockCarpet extends Block
 
     protected void setBlockBoundsFromMeta(int meta)
     {
-        byte b0 = 0;
-        float f = (float)(1 * (1 + b0)) / 16.0F;
+        int i = 0;
+        float f = (float)(1 * (1 + i)) / 16.0F;
         this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, f, 1.0F);
     }
 
@@ -101,7 +112,8 @@ public class BlockCarpet extends Block
     }
 
     /**
-     * Get the damage value that this Block should drop
+     * Gets the metadata of the item this Block can drop. This method is called when the block gets destroyed. It
+     * returns the metadata of the dropped item based on the old metadata of the block.
      */
     public int damageDropped(IBlockState state)
     {
@@ -112,7 +124,7 @@ public class BlockCarpet extends Block
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
     {
         for (int i = 0; i < 16; ++i)
         {

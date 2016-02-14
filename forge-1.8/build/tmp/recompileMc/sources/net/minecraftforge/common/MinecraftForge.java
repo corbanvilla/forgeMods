@@ -54,6 +54,7 @@ public class MinecraftForge
        OreDictionary.getOreName(0);
 
        //Force these classes to be defined, Should prevent derp error hiding.
+       @SuppressWarnings("unused")
        CrashReport fake = new CrashReport("ThisIsFake", new Exception("Not real"));
        //Lets init World's crash report inner classes to prevent them from hiding errors.
        String[] handlers = {
@@ -69,6 +70,9 @@ public class MinecraftForge
            "net.minecraft.crash.CrashReportCategory$1",
            "net.minecraft.crash.CrashReportCategory$2",
            "net.minecraft.crash.CrashReportCategory$3",
+           "net.minecraft.crash.CrashReportCategory$4",
+           "net.minecraft.crash.CrashReportCategory$5",
+           "net.minecraft.crash.CrashReportCategory$Entry",
            "net.minecraft.entity.Entity$1",
            "net.minecraft.entity.Entity$2",
            "net.minecraft.entity.Entity$3",
@@ -153,7 +157,7 @@ public class MinecraftForge
            //FMLLog.info("\t" + s);
            try
            {
-               Class cls = Class.forName(s, false, MinecraftForge.class.getClassLoader());
+               Class<?> cls = Class.forName(s, false, MinecraftForge.class.getClassLoader());
                if (cls != null && !Callable.class.isAssignableFrom(cls))
                {
                    //FMLLog.info("\t% s is not a instance of callable!", s);
@@ -165,10 +169,5 @@ public class MinecraftForge
        UsernameCache.load();
        // Load before all the mods, so MC owns the MC fluids
        FluidRegistry.validateFluidRegistry();
-   }
-
-   public static String getBrandingVersion()
-   {
-       return "Minecraft Forge "+ ForgeVersion.getVersion();
    }
 }

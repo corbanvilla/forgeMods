@@ -2,29 +2,32 @@ package net.minecraft.network.play.client;
 
 import java.io.IOException;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class C10PacketCreativeInventoryAction implements Packet
+public class C10PacketCreativeInventoryAction implements Packet<INetHandlerPlayServer>
 {
     private int slotId;
     private ItemStack stack;
-    private static final String __OBFID = "CL_00001369";
 
-    public C10PacketCreativeInventoryAction() {}
-
-    @SideOnly(Side.CLIENT)
-    public C10PacketCreativeInventoryAction(int p_i45263_1_, ItemStack p_i45263_2_)
+    public C10PacketCreativeInventoryAction()
     {
-        this.slotId = p_i45263_1_;
-        this.stack = p_i45263_2_ != null ? p_i45263_2_.copy() : null;
     }
 
-    public void handle(INetHandlerPlayServer handler)
+    @SideOnly(Side.CLIENT)
+    public C10PacketCreativeInventoryAction(int slotIdIn, ItemStack stackIn)
+    {
+        this.slotId = slotIdIn;
+        this.stack = stackIn != null ? stackIn.copy() : null;
+    }
+
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
+    public void processPacket(INetHandlerPlayServer handler)
     {
         handler.processCreativeInventoryAction(this);
     }
@@ -55,13 +58,5 @@ public class C10PacketCreativeInventoryAction implements Packet
     public ItemStack getStack()
     {
         return this.stack;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.handle((INetHandlerPlayServer)handler);
     }
 }

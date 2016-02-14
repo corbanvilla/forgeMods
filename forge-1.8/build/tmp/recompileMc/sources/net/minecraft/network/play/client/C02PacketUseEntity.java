@@ -2,7 +2,6 @@ package net.minecraft.network.play.client;
 
 import java.io.IOException;
 import net.minecraft.entity.Entity;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
@@ -11,14 +10,15 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class C02PacketUseEntity implements Packet
+public class C02PacketUseEntity implements Packet<INetHandlerPlayServer>
 {
     private int entityId;
     private C02PacketUseEntity.Action action;
     private Vec3 hitVec;
-    private static final String __OBFID = "CL_00001357";
 
-    public C02PacketUseEntity() {}
+    public C02PacketUseEntity()
+    {
+    }
 
     @SideOnly(Side.CLIENT)
     public C02PacketUseEntity(Entity entity, C02PacketUseEntity.Action action)
@@ -87,20 +87,10 @@ public class C02PacketUseEntity implements Packet
         return this.hitVec;
     }
 
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayServer)handler);
-    }
-
     public static enum Action
     {
         INTERACT,
         ATTACK,
         INTERACT_AT;
-
-        private static final String __OBFID = "CL_00001358";
     }
 }

@@ -1,20 +1,19 @@
 package net.minecraft.tileentity;
 
 import com.google.common.collect.Lists;
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class TileEntityPiston extends TileEntity implements IUpdatePlayerListBox
+public class TileEntityPiston extends TileEntity implements ITickable
 {
     private IBlockState pistonState;
     private EnumFacing pistonFacing;
@@ -24,10 +23,11 @@ public class TileEntityPiston extends TileEntity implements IUpdatePlayerListBox
     private float progress;
     /** the progress in (de)extending */
     private float lastProgress;
-    private List field_174933_k = Lists.newArrayList();
-    private static final String __OBFID = "CL_00000369";
+    private List<Entity> field_174933_k = Lists.<Entity>newArrayList();
 
-    public TileEntityPiston() {}
+    public TileEntityPiston()
+    {
+    }
 
     public TileEntityPiston(IBlockState pistonStateIn, EnumFacing pistonFacingIn, boolean extendingIn, boolean shouldHeadBeRenderedIn)
     {
@@ -66,17 +66,21 @@ public class TileEntityPiston extends TileEntity implements IUpdatePlayerListBox
         return this.shouldHeadBeRendered;
     }
 
-    public float func_145860_a(float p_145860_1_)
+    /**
+     * Get interpolated progress value (between lastProgress and progress) given the fractional time between ticks as an
+     * argument
+     */
+    public float getProgress(float ticks)
     {
-        if (p_145860_1_ > 1.0F)
+        if (ticks > 1.0F)
         {
-            p_145860_1_ = 1.0F;
+            ticks = 1.0F;
         }
 
-        return this.lastProgress + (this.progress - this.lastProgress) * p_145860_1_;
+        return this.lastProgress + (this.progress - this.lastProgress) * ticks;
     }
 
-    private void func_145863_a(float p_145863_1_, float p_145863_2_)
+    private void launchWithSlimeBlock(float p_145863_1_, float p_145863_2_)
     {
         if (this.extending)
         {
@@ -91,28 +95,25 @@ public class TileEntityPiston extends TileEntity implements IUpdatePlayerListBox
 
         if (axisalignedbb != null)
         {
-            List list = this.worldObj.getEntitiesWithinAABBExcludingEntity((Entity)null, axisalignedbb);
+            List<Entity> list = this.worldObj.getEntitiesWithinAABBExcludingEntity((Entity)null, axisalignedbb);
 
             if (!list.isEmpty())
             {
                 this.field_174933_k.addAll(list);
-                Iterator iterator = this.field_174933_k.iterator();
 
-                while (iterator.hasNext())
+                for (Entity entity : this.field_174933_k)
                 {
-                    Entity entity = (Entity)iterator.next();
-
                     if (this.pistonState.getBlock() == Blocks.slime_block && this.extending)
                     {
-                        switch (TileEntityPiston.SwitchAxis.field_177248_a[this.pistonFacing.getAxis().ordinal()])
+                        switch (this.pistonFacing.getAxis())
                         {
-                            case 1:
+                            case X:
                                 entity.motionX = (double)this.pistonFacing.getFrontOffsetX();
                                 break;
-                            case 2:
+                            case Y:
                                 entity.motionY = (double)this.pistonFacing.getFrontOffsetY();
                                 break;
-                            case 3:
+                            case Z:
                                 entity.motionZ = (double)this.pistonFacing.getFrontOffsetZ();
                         }
                     }
@@ -128,21 +129,21 @@ public class TileEntityPiston extends TileEntity implements IUpdatePlayerListBox
     }
 
     @SideOnly(Side.CLIENT)
-    public float func_174929_b(float p_174929_1_)
+    public float getOffsetX(float ticks)
     {
-        return this.extending ? (this.func_145860_a(p_174929_1_) - 1.0F) * (float)this.pistonFacing.getFrontOffsetX() : (1.0F - this.func_145860_a(p_174929_1_)) * (float)this.pistonFacing.getFrontOffsetX();
+        return this.extending ? (this.getProgress(ticks) - 1.0F) * (float)this.pistonFacing.getFrontOffsetX() : (1.0F - this.getProgress(ticks)) * (float)this.pistonFacing.getFrontOffsetX();
     }
 
     @SideOnly(Side.CLIENT)
-    public float func_174928_c(float p_174928_1_)
+    public float getOffsetY(float ticks)
     {
-        return this.extending ? (this.func_145860_a(p_174928_1_) - 1.0F) * (float)this.pistonFacing.getFrontOffsetY() : (1.0F - this.func_145860_a(p_174928_1_)) * (float)this.pistonFacing.getFrontOffsetY();
+        return this.extending ? (this.getProgress(ticks) - 1.0F) * (float)this.pistonFacing.getFrontOffsetY() : (1.0F - this.getProgress(ticks)) * (float)this.pistonFacing.getFrontOffsetY();
     }
 
     @SideOnly(Side.CLIENT)
-    public float func_174926_d(float p_174926_1_)
+    public float getOffsetZ(float ticks)
     {
-        return this.extending ? (this.func_145860_a(p_174926_1_) - 1.0F) * (float)this.pistonFacing.getFrontOffsetZ() : (1.0F - this.func_145860_a(p_174926_1_)) * (float)this.pistonFacing.getFrontOffsetZ();
+        return this.extending ? (this.getProgress(ticks) - 1.0F) * (float)this.pistonFacing.getFrontOffsetZ() : (1.0F - this.getProgress(ticks)) * (float)this.pistonFacing.getFrontOffsetZ();
     }
 
     /**
@@ -166,7 +167,7 @@ public class TileEntityPiston extends TileEntity implements IUpdatePlayerListBox
     }
 
     /**
-     * Updates the JList with a new model.
+     * Like the old updateEntity(), except more generic.
      */
     public void update()
     {
@@ -174,7 +175,7 @@ public class TileEntityPiston extends TileEntity implements IUpdatePlayerListBox
 
         if (this.lastProgress >= 1.0F)
         {
-            this.func_145863_a(1.0F, 0.25F);
+            this.launchWithSlimeBlock(1.0F, 0.25F);
             this.worldObj.removeTileEntity(this.pos);
             this.invalidate();
 
@@ -196,7 +197,7 @@ public class TileEntityPiston extends TileEntity implements IUpdatePlayerListBox
 
             if (this.extending)
             {
-                this.func_145863_a(this.progress, this.progress - this.lastProgress + 0.0625F);
+                this.launchWithSlimeBlock(this.progress, this.progress - this.lastProgress + 0.0625F);
             }
         }
     }
@@ -219,40 +220,4 @@ public class TileEntityPiston extends TileEntity implements IUpdatePlayerListBox
         compound.setFloat("progress", this.lastProgress);
         compound.setBoolean("extending", this.extending);
     }
-
-    static final class SwitchAxis
-        {
-            static final int[] field_177248_a = new int[EnumFacing.Axis.values().length];
-            private static final String __OBFID = "CL_00002034";
-
-            static
-            {
-                try
-                {
-                    field_177248_a[EnumFacing.Axis.X.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var3)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_177248_a[EnumFacing.Axis.Y.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_177248_a[EnumFacing.Axis.Z.ordinal()] = 3;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
-            }
-        }
 }

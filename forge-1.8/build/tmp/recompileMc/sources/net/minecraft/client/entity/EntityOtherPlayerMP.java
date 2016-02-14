@@ -21,11 +21,10 @@ public class EntityOtherPlayerMP extends AbstractClientPlayer
     private double otherPlayerMPZ;
     private double otherPlayerMPYaw;
     private double otherPlayerMPPitch;
-    private static final String __OBFID = "CL_00000939";
 
-    public EntityOtherPlayerMP(World worldIn, GameProfile p_i45075_2_)
+    public EntityOtherPlayerMP(World worldIn, GameProfile gameProfileIn)
     {
-        super(worldIn, p_i45075_2_);
+        super(worldIn, gameProfileIn);
         this.stepHeight = 0.0F;
         this.noClip = true;
         this.renderOffsetY = 0.25F;
@@ -40,14 +39,14 @@ public class EntityOtherPlayerMP extends AbstractClientPlayer
         return true;
     }
 
-    public void func_180426_a(double p_180426_1_, double p_180426_3_, double p_180426_5_, float p_180426_7_, float p_180426_8_, int p_180426_9_, boolean p_180426_10_)
+    public void setPositionAndRotation2(double x, double y, double z, float yaw, float pitch, int posRotationIncrements, boolean p_180426_10_)
     {
-        this.otherPlayerMPX = p_180426_1_;
-        this.otherPlayerMPY = p_180426_3_;
-        this.otherPlayerMPZ = p_180426_5_;
-        this.otherPlayerMPYaw = (double)p_180426_7_;
-        this.otherPlayerMPPitch = (double)p_180426_8_;
-        this.otherPlayerMPPosRotationIncrements = p_180426_9_;
+        this.otherPlayerMPX = x;
+        this.otherPlayerMPY = y;
+        this.otherPlayerMPZ = z;
+        this.otherPlayerMPYaw = (double)yaw;
+        this.otherPlayerMPPitch = (double)pitch;
+        this.otherPlayerMPPosRotationIncrements = posRotationIncrements;
     }
 
     /**
@@ -153,27 +152,25 @@ public class EntityOtherPlayerMP extends AbstractClientPlayer
     }
 
     /**
-     * Notifies this sender of some sort of information.  This is for messages intended to display to the user.  Used
-     * for typical output (like "you asked for whether or not this game rule is set, so here's your answer"), warnings
-     * (like "I fetched this block for you by ID, but I'd like you to know that every time you do this, I die a little
-     * inside"), and errors (like "it's not called iron_pixacke, silly").
+     * Send a chat message to the CommandSender
      */
-    public void addChatMessage(IChatComponent message)
+    public void addChatMessage(IChatComponent component)
     {
-        Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(message);
+        Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(component);
     }
 
     /**
-     * Returns true if the CommandSender may execute the given command
-     *  
-     * @param permLevel The permission level required to execute the command
-     * @param commandName The name of the command
+     * Returns {@code true} if the CommandSender is allowed to execute the command, {@code false} if not
      */
-    public boolean canUseCommand(int permLevel, String commandName)
+    public boolean canCommandSenderUseCommand(int permLevel, String commandName)
     {
         return false;
     }
 
+    /**
+     * Get the position in the world. <b>{@code null} is not allowed!</b> If you are not an entity in the world, return
+     * the coordinates 0, 0, 0
+     */
     public BlockPos getPosition()
     {
         return new BlockPos(this.posX + 0.5D, this.posY + 0.5D, this.posZ + 0.5D);

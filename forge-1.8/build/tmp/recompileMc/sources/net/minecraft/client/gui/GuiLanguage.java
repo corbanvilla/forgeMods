@@ -3,7 +3,6 @@ package net.minecraft.client.gui;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
@@ -28,7 +27,6 @@ public class GuiLanguage extends GuiScreen
     private GuiOptionButton forceUnicodeFontBtn;
     /** The button to confirm the current settings. */
     private GuiOptionButton confirmSettingsBtn;
-    private static final String __OBFID = "CL_00000698";
 
     public GuiLanguage(GuiScreen screen, GameSettings gameSettingsObj, LanguageManager manager)
     {
@@ -38,7 +36,8 @@ public class GuiLanguage extends GuiScreen
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
     public void initGui()
     {
@@ -57,6 +56,9 @@ public class GuiLanguage extends GuiScreen
         this.list.handleMouseInput();
     }
 
+    /**
+     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
+     */
     protected void actionPerformed(GuiButton button) throws IOException
     {
         if (button.enabled)
@@ -69,11 +71,12 @@ public class GuiLanguage extends GuiScreen
                     this.mc.displayGuiScreen(this.parentScreen);
                     break;
                 case 100:
+
                     if (button instanceof GuiOptionButton)
                     {
                         this.game_settings_3.setOptionValue(((GuiOptionButton)button).returnEnumOptions(), 1);
                         button.displayString = this.game_settings_3.getKeyBinding(GameSettings.Options.FORCE_UNICODE_FONT);
-                        ScaledResolution scaledresolution = new ScaledResolution(this.mc, this.mc.displayWidth, this.mc.displayHeight);
+                        ScaledResolution scaledresolution = new ScaledResolution(this.mc);
                         int i = scaledresolution.getScaledWidth();
                         int j = scaledresolution.getScaledHeight();
                         this.setWorldAndResolution(this.mc, i, j);
@@ -100,20 +103,15 @@ public class GuiLanguage extends GuiScreen
     @SideOnly(Side.CLIENT)
     class List extends GuiSlot
     {
-        /** A list containing the many different locale language codes. */
-        private final java.util.List langCodeList = Lists.newArrayList();
-        /** The map containing the Locale-Language pairs. */
-        private final Map languageMap = Maps.newHashMap();
-        private static final String __OBFID = "CL_00000699";
+        private final java.util.List<String> langCodeList = Lists.<String>newArrayList();
+        private final Map<String, Language> languageMap = Maps.<String, Language>newHashMap();
 
         public List(Minecraft mcIn)
         {
             super(mcIn, GuiLanguage.this.width, GuiLanguage.this.height, 32, GuiLanguage.this.height - 65 + 4, 18);
-            Iterator iterator = GuiLanguage.this.languageManager.getLanguages().iterator();
 
-            while (iterator.hasNext())
+            for (Language language : GuiLanguage.this.languageManager.getLanguages())
             {
-                Language language = (Language)iterator.next();
                 this.languageMap.put(language.getLanguageCode(), language);
                 this.langCodeList.add(language.getLanguageCode());
             }
@@ -161,7 +159,7 @@ public class GuiLanguage extends GuiScreen
             GuiLanguage.this.drawDefaultBackground();
         }
 
-        protected void drawSlot(int entryID, int p_180791_2_, int p_180791_3_, int p_180791_4_, int p_180791_5_, int p_180791_6_)
+        protected void drawSlot(int entryID, int p_180791_2_, int p_180791_3_, int p_180791_4_, int mouseXIn, int mouseYIn)
         {
             GuiLanguage.this.fontRendererObj.setBidiFlag(true);
             GuiLanguage.this.drawCenteredString(GuiLanguage.this.fontRendererObj, ((Language)this.languageMap.get(this.langCodeList.get(entryID))).toString(), this.width / 2, p_180791_3_ + 1, 16777215);

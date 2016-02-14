@@ -15,7 +15,7 @@ public interface IProgressUpdate
      * and the WorkingString to "working...".
      */
     @SideOnly(Side.CLIENT)
-    void resetProgressAndMessage(String p_73721_1_);
+    void resetProgressAndMessage(String message);
 
     /**
      * Displays a string on the loading screen supposed to indicate what is being done currently.

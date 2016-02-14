@@ -21,18 +21,23 @@ public class ForgeCommand extends CommandBase {
 
     public ForgeCommand(MinecraftServer server)
     {
-        this.server = new WeakReference(server);
+        this.server = new WeakReference<MinecraftServer>(server);
     }
 
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
     @Override
-    public String getName()
+    public String getCommandName()
     {
         return "forge";
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     @Override
     public String getCommandUsage(ICommandSender icommandsender)
     {
@@ -48,10 +53,13 @@ public class ForgeCommand extends CommandBase {
         return 2;
     }
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
     @Override
-    public void execute(ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length == 0)
         {
@@ -80,7 +88,7 @@ public class ForgeCommand extends CommandBase {
     }
 
     @Override
-    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
         if (args.length == 1)
         {
@@ -93,7 +101,7 @@ public class ForgeCommand extends CommandBase {
         else if (args.length == 2)
         {
             if ("tps".equals(args[0])) {
-                return func_175762_a(args, getServer().worldTickTimes.keySet());
+                return getListOfStringsMatchingLastWord(args, getServer().worldTickTimes.keySet());
             }
             else if ("track".equals(args[0]))
             {
@@ -106,7 +114,7 @@ public class ForgeCommand extends CommandBase {
         }
         return null;
     }
-    
+
     private void handleTracking(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length != 3)

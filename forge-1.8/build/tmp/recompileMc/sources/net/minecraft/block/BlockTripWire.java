@@ -1,6 +1,5 @@
 package net.minecraft.block;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import net.minecraft.block.material.Material;
@@ -32,7 +31,6 @@ public class BlockTripWire extends Block
     public static final PropertyBool EAST = PropertyBool.create("east");
     public static final PropertyBool SOUTH = PropertyBool.create("south");
     public static final PropertyBool WEST = PropertyBool.create("west");
-    private static final String __OBFID = "CL_00000328";
 
     public BlockTripWire()
     {
@@ -56,6 +54,9 @@ public class BlockTripWire extends Block
         return null;
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -74,8 +75,6 @@ public class BlockTripWire extends Block
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -148,38 +147,27 @@ public class BlockTripWire extends Block
 
     private void notifyHook(World worldIn, BlockPos pos, IBlockState state)
     {
-        EnumFacing[] aenumfacing = new EnumFacing[] {EnumFacing.SOUTH, EnumFacing.WEST};
-        int i = aenumfacing.length;
-        int j = 0;
-
-        while (j < i)
+        for (EnumFacing enumfacing : new EnumFacing[] {EnumFacing.SOUTH, EnumFacing.WEST})
         {
-            EnumFacing enumfacing = aenumfacing[j];
-            int k = 1;
-
-            while (true)
+            for (int i = 1; i < 42; ++i)
             {
-                if (k < 42)
-                {
-                    BlockPos blockpos1 = pos.offset(enumfacing, k);
-                    IBlockState iblockstate1 = worldIn.getBlockState(blockpos1);
+                BlockPos blockpos = pos.offset(enumfacing, i);
+                IBlockState iblockstate = worldIn.getBlockState(blockpos);
 
-                    if (iblockstate1.getBlock() == Blocks.tripwire_hook)
+                if (iblockstate.getBlock() == Blocks.tripwire_hook)
+                {
+                    if (iblockstate.getValue(BlockTripWireHook.FACING) == enumfacing.getOpposite())
                     {
-                        if (iblockstate1.getValue(BlockTripWireHook.FACING) == enumfacing.getOpposite())
-                        {
-                            Blocks.tripwire_hook.func_176260_a(worldIn, blockpos1, iblockstate1, false, true, k, state);
-                        }
+                        Blocks.tripwire_hook.func_176260_a(worldIn, blockpos, iblockstate, false, true, i, state);
                     }
-                    else if (iblockstate1.getBlock() == Blocks.tripwire)
-                    {
-                        ++k;
-                        continue;
-                    }
+
+                    break;
                 }
 
-                ++j;
-                break;
+                if (iblockstate.getBlock() != Blocks.tripwire)
+                {
+                    break;
+                }
             }
         }
     }
@@ -201,7 +189,9 @@ public class BlockTripWire extends Block
     /**
      * Called randomly when setTickRandomly is set to true (used by e.g. crops to grow, etc.)
      */
-    public void randomTick(World worldIn, BlockPos pos, IBlockState state, Random random) {}
+    public void randomTick(World worldIn, BlockPos pos, IBlockState state, Random random)
+    {
+    }
 
     public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
@@ -219,16 +209,12 @@ public class BlockTripWire extends Block
         IBlockState iblockstate = worldIn.getBlockState(pos);
         boolean flag = ((Boolean)iblockstate.getValue(POWERED)).booleanValue();
         boolean flag1 = false;
-        List list = worldIn.getEntitiesWithinAABBExcludingEntity((Entity)null, new AxisAlignedBB((double)pos.getX() + this.minX, (double)pos.getY() + this.minY, (double)pos.getZ() + this.minZ, (double)pos.getX() + this.maxX, (double)pos.getY() + this.maxY, (double)pos.getZ() + this.maxZ));
+        List <? extends Entity > list = worldIn.getEntitiesWithinAABBExcludingEntity((Entity)null, new AxisAlignedBB((double)pos.getX() + this.minX, (double)pos.getY() + this.minY, (double)pos.getZ() + this.minZ, (double)pos.getX() + this.maxX, (double)pos.getY() + this.maxY, (double)pos.getZ() + this.maxZ));
 
         if (!list.isEmpty())
         {
-            Iterator iterator = list.iterator();
-
-            while (iterator.hasNext())
+            for (Entity entity : list)
             {
-                Entity entity = (Entity)iterator.next();
-
                 if (!entity.doesEntityNotTriggerPressurePlate())
                 {
                     flag1 = true;
@@ -252,19 +238,19 @@ public class BlockTripWire extends Block
 
     public static boolean isConnectedTo(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing direction)
     {
-        BlockPos blockpos1 = pos.offset(direction);
-        IBlockState iblockstate1 = worldIn.getBlockState(blockpos1);
-        Block block = iblockstate1.getBlock();
+        BlockPos blockpos = pos.offset(direction);
+        IBlockState iblockstate = worldIn.getBlockState(blockpos);
+        Block block = iblockstate.getBlock();
 
         if (block == Blocks.tripwire_hook)
         {
-            EnumFacing enumfacing1 = direction.getOpposite();
-            return iblockstate1.getValue(BlockTripWireHook.FACING) == enumfacing1;
+            EnumFacing enumfacing = direction.getOpposite();
+            return iblockstate.getValue(BlockTripWireHook.FACING) == enumfacing;
         }
         else if (block == Blocks.tripwire)
         {
             boolean flag = ((Boolean)state.getValue(SUSPENDED)).booleanValue();
-            boolean flag1 = ((Boolean)iblockstate1.getValue(SUSPENDED)).booleanValue();
+            boolean flag1 = ((Boolean)iblockstate.getValue(SUSPENDED)).booleanValue();
             return flag == flag1;
         }
         else

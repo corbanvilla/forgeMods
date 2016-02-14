@@ -1,6 +1,5 @@
 package net.minecraft.entity.ai;
 
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.entity.passive.EntityAnimal;
 
@@ -9,14 +8,13 @@ public class EntityAIFollowParent extends EntityAIBase
     /** The child that is following its parent. */
     EntityAnimal childAnimal;
     EntityAnimal parentAnimal;
-    double field_75347_c;
-    private int field_75345_d;
-    private static final String __OBFID = "CL_00001586";
+    double moveSpeed;
+    private int delayCounter;
 
-    public EntityAIFollowParent(EntityAnimal p_i1626_1_, double p_i1626_2_)
+    public EntityAIFollowParent(EntityAnimal animal, double speed)
     {
-        this.childAnimal = p_i1626_1_;
-        this.field_75347_c = p_i1626_2_;
+        this.childAnimal = animal;
+        this.moveSpeed = speed;
     }
 
     /**
@@ -30,15 +28,12 @@ public class EntityAIFollowParent extends EntityAIBase
         }
         else
         {
-            List list = this.childAnimal.worldObj.getEntitiesWithinAABB(this.childAnimal.getClass(), this.childAnimal.getEntityBoundingBox().expand(8.0D, 4.0D, 8.0D));
+            List<EntityAnimal> list = this.childAnimal.worldObj.<EntityAnimal>getEntitiesWithinAABB(this.childAnimal.getClass(), this.childAnimal.getEntityBoundingBox().expand(8.0D, 4.0D, 8.0D));
             EntityAnimal entityanimal = null;
             double d0 = Double.MAX_VALUE;
-            Iterator iterator = list.iterator();
 
-            while (iterator.hasNext())
+            for (EntityAnimal entityanimal1 : list)
             {
-                EntityAnimal entityanimal1 = (EntityAnimal)iterator.next();
-
                 if (entityanimal1.getGrowingAge() >= 0)
                 {
                     double d1 = this.childAnimal.getDistanceSqToEntity(entityanimal1);
@@ -92,7 +87,7 @@ public class EntityAIFollowParent extends EntityAIBase
      */
     public void startExecuting()
     {
-        this.field_75345_d = 0;
+        this.delayCounter = 0;
     }
 
     /**
@@ -108,10 +103,10 @@ public class EntityAIFollowParent extends EntityAIBase
      */
     public void updateTask()
     {
-        if (--this.field_75345_d <= 0)
+        if (--this.delayCounter <= 0)
         {
-            this.field_75345_d = 10;
-            this.childAnimal.getNavigator().tryMoveToEntityLiving(this.parentAnimal, this.field_75347_c);
+            this.delayCounter = 10;
+            this.childAnimal.getNavigator().tryMoveToEntityLiving(this.parentAnimal, this.moveSpeed);
         }
     }
 }

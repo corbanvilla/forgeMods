@@ -14,7 +14,6 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.init.Blocks;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityPiston;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
@@ -22,18 +21,18 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class TileEntityPistonRenderer extends TileEntitySpecialRenderer
+public class TileEntityPistonRenderer extends TileEntitySpecialRenderer<TileEntityPiston>
 {
-    private final BlockRendererDispatcher blockRenderer = Minecraft.getMinecraft().getBlockRendererDispatcher();
-    private static final String __OBFID = "CL_00002469";
+    private BlockRendererDispatcher blockRenderer;
 
-    public void func_178461_a(TileEntityPiston p_178461_1_, double p_178461_2_, double p_178461_4_, double p_178461_6_, float p_178461_8_, int p_178461_9_)
+    public void renderTileEntityAt(TileEntityPiston te, double x, double y, double z, float partialTicks, int destroyStage)
     {
-        BlockPos blockpos = p_178461_1_.getPos();
-        IBlockState iblockstate = p_178461_1_.getPistonState();
+        if(blockRenderer == null) blockRenderer = Minecraft.getMinecraft().getBlockRendererDispatcher();
+        BlockPos blockpos = te.getPos();
+        IBlockState iblockstate = te.getPistonState();
         Block block = iblockstate.getBlock();
 
-        if (block.getMaterial() != Material.air && p_178461_1_.func_145860_a(p_178461_8_) < 1.0F)
+        if (block.getMaterial() != Material.air && te.getProgress(partialTicks) < 1.0F)
         {
             Tessellator tessellator = Tessellator.getInstance();
             WorldRenderer worldrenderer = tessellator.getWorldRenderer();
@@ -52,24 +51,22 @@ public class TileEntityPistonRenderer extends TileEntitySpecialRenderer
                 GlStateManager.shadeModel(7424);
             }
 
-            worldrenderer.startDrawingQuads();
-            worldrenderer.setVertexFormat(DefaultVertexFormats.BLOCK);
-            worldrenderer.setTranslation((double)((float)p_178461_2_ - (float)blockpos.getX() + p_178461_1_.func_174929_b(p_178461_8_)), (double)((float)p_178461_4_ - (float)blockpos.getY() + p_178461_1_.func_174928_c(p_178461_8_)), (double)((float)p_178461_6_ - (float)blockpos.getZ() + p_178461_1_.func_174926_d(p_178461_8_)));
-            worldrenderer.setColorOpaque_F(1.0F, 1.0F, 1.0F);
+            worldrenderer.begin(7, DefaultVertexFormats.BLOCK);
+            worldrenderer.setTranslation((double)((float)x - (float)blockpos.getX() + te.getOffsetX(partialTicks)), (double)((float)y - (float)blockpos.getY() + te.getOffsetY(partialTicks)), (double)((float)z - (float)blockpos.getZ() + te.getOffsetZ(partialTicks)));
             World world = this.getWorld();
 
-            if (block == Blocks.piston_head && p_178461_1_.func_145860_a(p_178461_8_) < 0.5F)
+            if (block == Blocks.piston_head && te.getProgress(partialTicks) < 0.5F)
             {
                 iblockstate = iblockstate.withProperty(BlockPistonExtension.SHORT, Boolean.valueOf(true));
                 this.blockRenderer.getBlockModelRenderer().renderModel(world, this.blockRenderer.getModelFromBlockState(iblockstate, world, blockpos), iblockstate, blockpos, worldrenderer, true);
             }
-            else if (p_178461_1_.shouldPistonHeadBeRendered() && !p_178461_1_.isExtending())
+            else if (te.shouldPistonHeadBeRendered() && !te.isExtending())
             {
-                BlockPistonExtension.EnumPistonType enumpistontype = block == Blocks.sticky_piston ? BlockPistonExtension.EnumPistonType.STICKY : BlockPistonExtension.EnumPistonType.DEFAULT;
-                IBlockState iblockstate1 = Blocks.piston_head.getDefaultState().withProperty(BlockPistonExtension.TYPE, enumpistontype).withProperty(BlockPistonExtension.FACING, iblockstate.getValue(BlockPistonBase.FACING));
-                iblockstate1 = iblockstate1.withProperty(BlockPistonExtension.SHORT, Boolean.valueOf(p_178461_1_.func_145860_a(p_178461_8_) >= 0.5F));
+                BlockPistonExtension.EnumPistonType blockpistonextension$enumpistontype = block == Blocks.sticky_piston ? BlockPistonExtension.EnumPistonType.STICKY : BlockPistonExtension.EnumPistonType.DEFAULT;
+                IBlockState iblockstate1 = Blocks.piston_head.getDefaultState().withProperty(BlockPistonExtension.TYPE, blockpistonextension$enumpistontype).withProperty(BlockPistonExtension.FACING, iblockstate.getValue(BlockPistonBase.FACING));
+                iblockstate1 = iblockstate1.withProperty(BlockPistonExtension.SHORT, Boolean.valueOf(te.getProgress(partialTicks) >= 0.5F));
                 this.blockRenderer.getBlockModelRenderer().renderModel(world, this.blockRenderer.getModelFromBlockState(iblockstate1, world, blockpos), iblockstate1, blockpos, worldrenderer, true);
-                worldrenderer.setTranslation((double)((float)p_178461_2_ - (float)blockpos.getX()), (double)((float)p_178461_4_ - (float)blockpos.getY()), (double)((float)p_178461_6_ - (float)blockpos.getZ()));
+                worldrenderer.setTranslation((double)((float)x - (float)blockpos.getX()), (double)((float)y - (float)blockpos.getY()), (double)((float)z - (float)blockpos.getZ()));
                 iblockstate.withProperty(BlockPistonBase.EXTENDED, Boolean.valueOf(true));
                 this.blockRenderer.getBlockModelRenderer().renderModel(world, this.blockRenderer.getModelFromBlockState(iblockstate, world, blockpos), iblockstate, blockpos, worldrenderer, true);
             }
@@ -82,10 +79,5 @@ public class TileEntityPistonRenderer extends TileEntitySpecialRenderer
             tessellator.draw();
             RenderHelper.enableStandardItemLighting();
         }
-    }
-
-    public void renderTileEntityAt(TileEntity p_180535_1_, double posX, double posZ, double p_180535_6_, float p_180535_8_, int p_180535_9_)
-    {
-        this.func_178461_a((TileEntityPiston)p_180535_1_, posX, posZ, p_180535_6_, p_180535_8_, p_180535_9_);
     }
 }

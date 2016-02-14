@@ -8,7 +8,6 @@ public abstract class WorldSavedData
     public final String mapName;
     /** Whether this MapDataBase needs saving to disk. */
     private boolean dirty;
-    private static final String __OBFID = "CL_00000580";
 
     public WorldSavedData(String name)
     {

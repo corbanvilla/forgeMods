@@ -1,5 +1,6 @@
 package net.minecraft.block;
 
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -20,11 +21,10 @@ import net.minecraft.world.World;
 public class BlockJukebox extends BlockContainer
 {
     public static final PropertyBool HAS_RECORD = PropertyBool.create("has_record");
-    private static final String __OBFID = "CL_00000260";
 
     protected BlockJukebox()
     {
-        super(Material.wood);
+        super(Material.wood, MapColor.dirtColor);
         this.setDefaultState(this.blockState.getBaseState().withProperty(HAS_RECORD, Boolean.valueOf(false)));
         this.setCreativeTab(CreativeTabs.tabDecorations);
     }
@@ -66,14 +66,14 @@ public class BlockJukebox extends BlockContainer
 
             if (tileentity instanceof BlockJukebox.TileEntityJukebox)
             {
-                BlockJukebox.TileEntityJukebox tileentityjukebox = (BlockJukebox.TileEntityJukebox)tileentity;
-                ItemStack itemstack = tileentityjukebox.getRecord();
+                BlockJukebox.TileEntityJukebox blockjukebox$tileentityjukebox = (BlockJukebox.TileEntityJukebox)tileentity;
+                ItemStack itemstack = blockjukebox$tileentityjukebox.getRecord();
 
                 if (itemstack != null)
                 {
                     worldIn.playAuxSFX(1005, pos, 0);
                     worldIn.playRecord(pos, (String)null);
-                    tileentityjukebox.setRecord((ItemStack)null);
+                    blockjukebox$tileentityjukebox.setRecord((ItemStack)null);
                     float f = 0.7F;
                     double d0 = (double)(worldIn.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
                     double d1 = (double)(worldIn.rand.nextFloat() * f) + (double)(1.0F - f) * 0.2D + 0.6D;
@@ -95,9 +95,6 @@ public class BlockJukebox extends BlockContainer
 
     /**
      * Spawns this Block's drops into the World as EntityItems.
-     *  
-     * @param chance The chance that each Item is actually spawned (1.0 = always, 0.0 = never)
-     * @param fortune The player's fortune level
      */
     public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune)
     {
@@ -138,7 +135,7 @@ public class BlockJukebox extends BlockContainer
     }
 
     /**
-     * The type of render function that is called for this block
+     * The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render
      */
     public int getRenderType()
     {
@@ -169,7 +166,6 @@ public class BlockJukebox extends BlockContainer
     public static class TileEntityJukebox extends TileEntity
         {
             private ItemStack record;
-            private static final String __OBFID = "CL_00000261";
 
             public void readFromNBT(NBTTagCompound compound)
             {

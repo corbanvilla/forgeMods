@@ -1,7 +1,6 @@
 package net.minecraft.client.resources.model;
 
 import com.google.common.collect.Lists;
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BreakingFour;
@@ -15,15 +14,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class SimpleBakedModel implements IBakedModel
 {
-    protected final List generalQuads;
-    protected final List faceQuads;
+    protected final List<BakedQuad> generalQuads;
+    protected final List<List<BakedQuad>> faceQuads;
     protected final boolean ambientOcclusion;
     protected final boolean gui3d;
     protected final TextureAtlasSprite texture;
     protected final ItemCameraTransforms cameraTransforms;
-    private static final String __OBFID = "CL_00002386";
 
-    public SimpleBakedModel(List p_i46077_1_, List p_i46077_2_, boolean p_i46077_3_, boolean p_i46077_4_, TextureAtlasSprite p_i46077_5_, ItemCameraTransforms p_i46077_6_)
+    public SimpleBakedModel(List<BakedQuad> p_i46077_1_, List<List<BakedQuad>> p_i46077_2_, boolean p_i46077_3_, boolean p_i46077_4_, TextureAtlasSprite p_i46077_5_, ItemCameraTransforms p_i46077_6_)
     {
         this.generalQuads = p_i46077_1_;
         this.faceQuads = p_i46077_2_;
@@ -33,12 +31,12 @@ public class SimpleBakedModel implements IBakedModel
         this.cameraTransforms = p_i46077_6_;
     }
 
-    public List getFaceQuads(EnumFacing p_177551_1_)
+    public List<BakedQuad> getFaceQuads(EnumFacing p_177551_1_)
     {
         return (List)this.faceQuads.get(p_177551_1_.ordinal());
     }
 
-    public List getGeneralQuads()
+    public List<BakedQuad> getGeneralQuads()
     {
         return this.generalQuads;
     }
@@ -58,7 +56,7 @@ public class SimpleBakedModel implements IBakedModel
         return false;
     }
 
-    public TextureAtlasSprite getTexture()
+    public TextureAtlasSprite getParticleTexture()
     {
         return this.texture;
     }
@@ -71,29 +69,25 @@ public class SimpleBakedModel implements IBakedModel
     @SideOnly(Side.CLIENT)
     public static class Builder
         {
-            private final List builderGeneralQuads;
-            private final List builderFaceQuads;
+            private final List<BakedQuad> builderGeneralQuads;
+            private final List<List<BakedQuad>> builderFaceQuads;
             private final boolean builderAmbientOcclusion;
             private TextureAtlasSprite builderTexture;
             private boolean builderGui3d;
             private ItemCameraTransforms builderCameraTransforms;
-            private static final String __OBFID = "CL_00002385";
 
             public Builder(ModelBlock p_i46074_1_)
             {
-                this(p_i46074_1_.isAmbientOcclusion(), p_i46074_1_.isGui3d(), new ItemCameraTransforms(p_i46074_1_.getThirdPersonTransform(), p_i46074_1_.getFirstPersonTransform(), p_i46074_1_.getHeadTransform(), p_i46074_1_.getInGuiTransform()));
+                this(p_i46074_1_.isAmbientOcclusion(), p_i46074_1_.isGui3d(), p_i46074_1_.func_181682_g());
             }
 
             public Builder(IBakedModel p_i46075_1_, TextureAtlasSprite p_i46075_2_)
             {
                 this(p_i46075_1_.isAmbientOcclusion(), p_i46075_1_.isGui3d(), p_i46075_1_.getItemCameraTransforms());
-                this.builderTexture = p_i46075_1_.getTexture();
-                EnumFacing[] aenumfacing = EnumFacing.values();
-                int i = aenumfacing.length;
+                this.builderTexture = p_i46075_1_.getParticleTexture();
 
-                for (int j = 0; j < i; ++j)
+                for (EnumFacing enumfacing : EnumFacing.values())
                 {
-                    EnumFacing enumfacing = aenumfacing[j];
                     this.addFaceBreakingFours(p_i46075_1_, p_i46075_2_, enumfacing);
                 }
 
@@ -102,37 +96,28 @@ public class SimpleBakedModel implements IBakedModel
 
             private void addFaceBreakingFours(IBakedModel p_177649_1_, TextureAtlasSprite p_177649_2_, EnumFacing p_177649_3_)
             {
-                Iterator iterator = p_177649_1_.getFaceQuads(p_177649_3_).iterator();
-
-                while (iterator.hasNext())
+                for (BakedQuad bakedquad : p_177649_1_.getFaceQuads(p_177649_3_))
                 {
-                    BakedQuad bakedquad = (BakedQuad)iterator.next();
                     this.addFaceQuad(p_177649_3_, new BreakingFour(bakedquad, p_177649_2_));
                 }
             }
 
             private void addGeneralBreakingFours(IBakedModel p_177647_1_, TextureAtlasSprite p_177647_2_)
             {
-                Iterator iterator = p_177647_1_.getGeneralQuads().iterator();
-
-                while (iterator.hasNext())
+                for (BakedQuad bakedquad : p_177647_1_.getGeneralQuads())
                 {
-                    BakedQuad bakedquad = (BakedQuad)iterator.next();
                     this.addGeneralQuad(new BreakingFour(bakedquad, p_177647_2_));
                 }
             }
 
             private Builder(boolean p_i46076_1_, boolean p_i46076_2_, ItemCameraTransforms p_i46076_3_)
             {
-                this.builderGeneralQuads = Lists.newArrayList();
-                this.builderFaceQuads = Lists.newArrayListWithCapacity(6);
-                EnumFacing[] aenumfacing = EnumFacing.values();
-                int i = aenumfacing.length;
+                this.builderGeneralQuads = Lists.<BakedQuad>newArrayList();
+                this.builderFaceQuads = Lists.<List<BakedQuad>>newArrayListWithCapacity(6);
 
-                for (int j = 0; j < i; ++j)
+                for (EnumFacing enumfacing : EnumFacing.values())
                 {
-                    EnumFacing enumfacing = aenumfacing[j];
-                    this.builderFaceQuads.add(Lists.newArrayList());
+                    this.builderFaceQuads.add(Lists.<BakedQuad>newArrayList());
                 }
 
                 this.builderAmbientOcclusion = p_i46076_1_;

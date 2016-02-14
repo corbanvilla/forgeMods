@@ -12,64 +12,45 @@ import net.minecraft.block.properties.IProperty;
 public abstract class BlockStateBase implements IBlockState
 {
     private static final Joiner COMMA_JOINER = Joiner.on(',');
-    private static final Function MAP_ENTRY_TO_STRING = new Function()
+    private static final Function<Entry<IProperty, Comparable>, String> MAP_ENTRY_TO_STRING = new Function<Entry<IProperty, Comparable>, String>()
     {
-        private static final String __OBFID = "CL_00002031";
-        public String func_177225_a(Entry p_177225_1_)
+        public String apply(Entry<IProperty, Comparable> p_apply_1_)
         {
-            if (p_177225_1_ == null)
+            if (p_apply_1_ == null)
             {
                 return "<NULL>";
             }
             else
             {
-                IProperty iproperty = (IProperty)p_177225_1_.getKey();
-                return iproperty.getName() + "=" + iproperty.getName((Comparable)p_177225_1_.getValue());
+                IProperty iproperty = (IProperty)p_apply_1_.getKey();
+                return iproperty.getName() + "=" + iproperty.getName((Comparable)p_apply_1_.getValue());
             }
-        }
-        public Object apply(Object p_apply_1_)
-        {
-            return this.func_177225_a((Entry)p_apply_1_);
         }
     };
-    private static final String __OBFID = "CL_00002032";
 
-    /**
-     * Create a version of this BlockState with the given property cycled to the next value in order. If the property
-     * was at the highest possible value, it is set to the lowest one instead.
-     */
-    public IBlockState cycleProperty(IProperty property)
+    public <T extends Comparable<T>> IBlockState cycleProperty(IProperty<T> property)
     {
-        return this.withProperty(property, (Comparable)cyclePropertyValue(property.getAllowedValues(), this.getValue(property)));
+        return this.withProperty(property, cyclePropertyValue(property.getAllowedValues(), this.getValue(property)));
     }
 
-    /**
-     * Helper method for cycleProperty.
-     *  
-     * @param values The collection of values
-     * @param currentValue The current value
-     */
-    protected static Object cyclePropertyValue(Collection values, Object currentValue)
+    protected static <T> T cyclePropertyValue(Collection<T> values, T currentValue)
     {
-        Iterator iterator = values.iterator();
+        Iterator<T> iterator = values.iterator();
 
-        do
+        while (iterator.hasNext())
         {
-            if (!iterator.hasNext())
+            if (iterator.next().equals(currentValue))
             {
-                return iterator.next();
+                if (iterator.hasNext())
+                {
+                    return (T)iterator.next();
+                }
+
+                return (T)values.iterator().next();
             }
         }
-        while (!iterator.next().equals(currentValue));
 
-        if (iterator.hasNext())
-        {
-            return iterator.next();
-        }
-        else
-        {
-            return values.iterator().next();
-        }
+        return (T)iterator.next();
     }
 
     public String toString()

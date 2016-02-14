@@ -22,19 +22,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockOldLeaf extends BlockLeaves
 {
-    public static final PropertyEnum VARIANT = PropertyEnum.create("variant", BlockPlanks.EnumType.class, new Predicate()
+    public static final PropertyEnum<BlockPlanks.EnumType> VARIANT = PropertyEnum.<BlockPlanks.EnumType>create("variant", BlockPlanks.EnumType.class, new Predicate<BlockPlanks.EnumType>()
     {
-        private static final String __OBFID = "CL_00002085";
-        public boolean apply(BlockPlanks.EnumType type)
+        public boolean apply(BlockPlanks.EnumType p_apply_1_)
         {
-            return type.getMetadata() < 4;
-        }
-        public boolean apply(Object p_apply_1_)
-        {
-            return this.apply((BlockPlanks.EnumType)p_apply_1_);
+            return p_apply_1_.getMetadata() < 4;
         }
     });
-    private static final String __OBFID = "CL_00000280";
 
     public BlockOldLeaf()
     {
@@ -50,8 +44,8 @@ public class BlockOldLeaf extends BlockLeaves
         }
         else
         {
-            BlockPlanks.EnumType enumtype = (BlockPlanks.EnumType)state.getValue(VARIANT);
-            return enumtype == BlockPlanks.EnumType.SPRUCE ? ColorizerFoliage.getFoliageColorPine() : (enumtype == BlockPlanks.EnumType.BIRCH ? ColorizerFoliage.getFoliageColorBirch() : super.getRenderColor(state));
+            BlockPlanks.EnumType blockplanks$enumtype = (BlockPlanks.EnumType)state.getValue(VARIANT);
+            return blockplanks$enumtype == BlockPlanks.EnumType.SPRUCE ? ColorizerFoliage.getFoliageColorPine() : (blockplanks$enumtype == BlockPlanks.EnumType.BIRCH ? ColorizerFoliage.getFoliageColorBirch() : super.getRenderColor(state));
         }
     }
 
@@ -62,14 +56,14 @@ public class BlockOldLeaf extends BlockLeaves
 
         if (iblockstate.getBlock() == this)
         {
-            BlockPlanks.EnumType enumtype = (BlockPlanks.EnumType)iblockstate.getValue(VARIANT);
+            BlockPlanks.EnumType blockplanks$enumtype = (BlockPlanks.EnumType)iblockstate.getValue(VARIANT);
 
-            if (enumtype == BlockPlanks.EnumType.SPRUCE)
+            if (blockplanks$enumtype == BlockPlanks.EnumType.SPRUCE)
             {
                 return ColorizerFoliage.getFoliageColorPine();
             }
 
-            if (enumtype == BlockPlanks.EnumType.BIRCH)
+            if (blockplanks$enumtype == BlockPlanks.EnumType.BIRCH)
             {
                 return ColorizerFoliage.getFoliageColorBirch();
             }
@@ -95,7 +89,7 @@ public class BlockOldLeaf extends BlockLeaves
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
     {
         list.add(new ItemStack(itemIn, 1, BlockPlanks.EnumType.OAK.getMetadata()));
         list.add(new ItemStack(itemIn, 1, BlockPlanks.EnumType.SPRUCE.getMetadata()));
@@ -121,8 +115,8 @@ public class BlockOldLeaf extends BlockLeaves
      */
     public int getMetaFromState(IBlockState state)
     {
-        byte b0 = 0;
-        int i = b0 | ((BlockPlanks.EnumType)state.getValue(VARIANT)).getMetadata();
+        int i = 0;
+        i = i | ((BlockPlanks.EnumType)state.getValue(VARIANT)).getMetadata();
 
         if (!((Boolean)state.getValue(DECAYABLE)).booleanValue())
         {
@@ -148,7 +142,8 @@ public class BlockOldLeaf extends BlockLeaves
     }
 
     /**
-     * Get the damage value that this Block should drop
+     * Gets the metadata of the item this Block can drop. This method is called when the block gets destroyed. It
+     * returns the metadata of the dropped item based on the old metadata of the block.
      */
     public int damageDropped(IBlockState state)
     {

@@ -10,8 +10,6 @@ import net.minecraft.world.World;
 
 public class BlockStaticLiquid extends BlockLiquid
 {
-    private static final String __OBFID = "CL_00000315";
-
     protected BlockStaticLiquid(Material materialIn)
     {
         super(materialIn);
@@ -34,35 +32,35 @@ public class BlockStaticLiquid extends BlockLiquid
         }
     }
 
-    private void updateLiquid(World worldIn, BlockPos p_176370_2_, IBlockState p_176370_3_)
+    private void updateLiquid(World worldIn, BlockPos pos, IBlockState state)
     {
         BlockDynamicLiquid blockdynamicliquid = getFlowingBlock(this.blockMaterial);
-        worldIn.setBlockState(p_176370_2_, blockdynamicliquid.getDefaultState().withProperty(LEVEL, p_176370_3_.getValue(LEVEL)), 2);
-        worldIn.scheduleUpdate(p_176370_2_, blockdynamicliquid, this.tickRate(worldIn));
+        worldIn.setBlockState(pos, blockdynamicliquid.getDefaultState().withProperty(LEVEL, state.getValue(LEVEL)), 2);
+        worldIn.scheduleUpdate(pos, blockdynamicliquid, this.tickRate(worldIn));
     }
 
     public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
         if (this.blockMaterial == Material.lava)
         {
-            if (worldIn.getGameRules().getGameRuleBooleanValue("doFireTick"))
+            if (worldIn.getGameRules().getBoolean("doFireTick"))
             {
                 int i = rand.nextInt(3);
 
                 if (i > 0)
                 {
-                    BlockPos blockpos1 = pos;
+                    BlockPos blockpos = pos;
 
                     for (int j = 0; j < i; ++j)
                     {
-                        blockpos1 = blockpos1.add(rand.nextInt(3) - 1, 1, rand.nextInt(3) - 1);
-                        Block block = worldIn.getBlockState(blockpos1).getBlock();
+                        blockpos = blockpos.add(rand.nextInt(3) - 1, 1, rand.nextInt(3) - 1);
+                        Block block = worldIn.getBlockState(blockpos).getBlock();
 
                         if (block.blockMaterial == Material.air)
                         {
-                            if (this.isSurroundingBlockFlammable(worldIn, blockpos1))
+                            if (this.isSurroundingBlockFlammable(worldIn, blockpos))
                             {
-                                worldIn.setBlockState(blockpos1, Blocks.fire.getDefaultState());
+                                worldIn.setBlockState(blockpos, Blocks.fire.getDefaultState());
                                 return;
                             }
                         }
@@ -76,11 +74,11 @@ public class BlockStaticLiquid extends BlockLiquid
                 {
                     for (int k = 0; k < 3; ++k)
                     {
-                        BlockPos blockpos2 = pos.add(rand.nextInt(3) - 1, 0, rand.nextInt(3) - 1);
+                        BlockPos blockpos1 = pos.add(rand.nextInt(3) - 1, 0, rand.nextInt(3) - 1);
 
-                        if (worldIn.isAirBlock(blockpos2.up()) && this.getCanBlockBurn(worldIn, blockpos2))
+                        if (worldIn.isAirBlock(blockpos1.up()) && this.getCanBlockBurn(worldIn, blockpos1))
                         {
-                            worldIn.setBlockState(blockpos2.up(), Blocks.fire.getDefaultState());
+                            worldIn.setBlockState(blockpos1.up(), Blocks.fire.getDefaultState());
                         }
                     }
                 }
@@ -90,13 +88,8 @@ public class BlockStaticLiquid extends BlockLiquid
 
     protected boolean isSurroundingBlockFlammable(World worldIn, BlockPos pos)
     {
-        EnumFacing[] aenumfacing = EnumFacing.values();
-        int i = aenumfacing.length;
-
-        for (int j = 0; j < i; ++j)
+        for (EnumFacing enumfacing : EnumFacing.values())
         {
-            EnumFacing enumfacing = aenumfacing[j];
-
             if (this.getCanBlockBurn(worldIn, pos.offset(enumfacing)))
             {
                 return true;
@@ -106,8 +99,8 @@ public class BlockStaticLiquid extends BlockLiquid
         return false;
     }
 
-    private boolean getCanBlockBurn(World worldIn, BlockPos p_176368_2_)
+    private boolean getCanBlockBurn(World worldIn, BlockPos pos)
     {
-        return worldIn.getBlockState(p_176368_2_).getBlock().getMaterial().getCanBurn();
+        return worldIn.getBlockState(pos).getBlock().getMaterial().getCanBurn();
     }
 }

@@ -7,8 +7,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BiomeGenEnd extends BiomeGenBase
 {
-    private static final String __OBFID = "CL_00000187";
-
     public BiomeGenEnd(int p_i1990_1_)
     {
         super(p_i1990_1_);

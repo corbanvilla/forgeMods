@@ -3,6 +3,7 @@ package net.minecraft.realms;
 import java.lang.reflect.Constructor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.GuiScreenRealmsProxy;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
@@ -13,7 +14,6 @@ public class RealmsBridge extends RealmsScreen
 {
     private static final Logger LOGGER = LogManager.getLogger();
     private GuiScreen previousScreen;
-    private static final String __OBFID = "CL_00001869";
 
     public void switchToRealms(GuiScreen p_switchToRealms_1_)
     {
@@ -21,15 +21,33 @@ public class RealmsBridge extends RealmsScreen
 
         try
         {
-            Class oclass = Class.forName("com.mojang.realmsclient.RealmsMainScreen");
-            Constructor constructor = oclass.getDeclaredConstructor(new Class[] {RealmsScreen.class});
+            Class<?> oclass = Class.forName("com.mojang.realmsclient.RealmsMainScreen");
+            Constructor<?> constructor = oclass.getDeclaredConstructor(new Class[] {RealmsScreen.class});
             constructor.setAccessible(true);
             Object object = constructor.newInstance(new Object[] {this});
             Minecraft.getMinecraft().displayGuiScreen(((RealmsScreen)object).getProxy());
         }
         catch (Exception exception)
         {
-            LOGGER.error("Realms module missing", exception);
+            LOGGER.error((String)"Realms module missing", (Throwable)exception);
+        }
+    }
+
+    public GuiScreenRealmsProxy getNotificationScreen(GuiScreen p_getNotificationScreen_1_)
+    {
+        try
+        {
+            this.previousScreen = p_getNotificationScreen_1_;
+            Class<?> oclass = Class.forName("com.mojang.realmsclient.gui.screens.RealmsNotificationsScreen");
+            Constructor<?> constructor = oclass.getDeclaredConstructor(new Class[] {RealmsScreen.class});
+            constructor.setAccessible(true);
+            Object object = constructor.newInstance(new Object[] {this});
+            return ((RealmsScreen)object).getProxy();
+        }
+        catch (Exception exception)
+        {
+            LOGGER.error((String)"Realms module missing", (Throwable)exception);
+            return null;
         }
     }
 

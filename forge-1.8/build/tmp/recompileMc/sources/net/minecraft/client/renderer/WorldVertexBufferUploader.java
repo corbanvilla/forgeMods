@@ -1,7 +1,6 @@
 package net.minecraft.client.renderer;
 
 import java.nio.ByteBuffer;
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
@@ -12,87 +11,34 @@ import org.lwjgl.opengl.GL11;
 @SideOnly(Side.CLIENT)
 public class WorldVertexBufferUploader
 {
-    private static final String __OBFID = "CL_00002567";
-
-    public int draw(WorldRenderer p_178177_1_, int p_178177_2_)
+    @SuppressWarnings("incomplete-switch")
+    public void draw(WorldRenderer p_181679_1_)
     {
-        if (p_178177_2_ > 0)
+        if (p_181679_1_.getVertexCount() > 0)
         {
-            VertexFormat vertexformat = p_178177_1_.getVertexFormat();
-            int j = vertexformat.getNextOffset();
-            ByteBuffer bytebuffer = p_178177_1_.getByteBuffer();
-            List list = vertexformat.getElements();
-            Iterator iterator = list.iterator();
-            VertexFormatElement vertexformatelement;
-            VertexFormatElement.EnumUsage enumusage;
-            int k;
+            VertexFormat vertexformat = p_181679_1_.getVertexFormat();
+            int i = vertexformat.getNextOffset();
+            ByteBuffer bytebuffer = p_181679_1_.getByteBuffer();
+            List<VertexFormatElement> list = vertexformat.getElements();
 
-            while (iterator.hasNext())
+            for (int j = 0; j < list.size(); ++j)
             {
                 // moved to VertexFormatElement.preDraw
-                vertexformatelement = (VertexFormatElement)iterator.next();
-                vertexformatelement.getUsage().preDraw(vertexformatelement, j, bytebuffer);
+                VertexFormatElement vertexformatelement = (VertexFormatElement)list.get(j);
+                vertexformatelement.getUsage().preDraw(vertexformat, j, i, bytebuffer);
             }
 
-            GL11.glDrawArrays(p_178177_1_.getDrawMode(), 0, p_178177_1_.getVertexCount());
-            iterator = list.iterator();
+            GL11.glDrawArrays(p_181679_1_.getDrawMode(), 0, p_181679_1_.getVertexCount());
+            int i1 = 0;
 
-            while (iterator.hasNext())
+            for (int j1 = list.size(); i1 < j1; ++i1)
             {
-             // moved to VertexFormatElement.postDraw
-                vertexformatelement = (VertexFormatElement)iterator.next();
-                vertexformatelement.getUsage().postDraw(vertexformatelement, j, bytebuffer);
+                VertexFormatElement vertexformatelement1 = (VertexFormatElement)list.get(i1);
+                // moved to VertexFormatElement.postDraw
+                vertexformatelement1.getUsage().postDraw(vertexformat, i1, i, bytebuffer);
             }
         }
 
-        p_178177_1_.reset();
-        return p_178177_2_;
+        p_181679_1_.reset();
     }
-
-    @SideOnly(Side.CLIENT)
-
-    static final class SwitchEnumUsage
-        {
-            static final int[] VALUES = new int[VertexFormatElement.EnumUsage.values().length];
-            private static final String __OBFID = "CL_00002566";
-
-            static
-            {
-                try
-                {
-                    VALUES[VertexFormatElement.EnumUsage.POSITION.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var4)
-                {
-                    ;
-                }
-
-                try
-                {
-                    VALUES[VertexFormatElement.EnumUsage.UV.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var3)
-                {
-                    ;
-                }
-
-                try
-                {
-                    VALUES[VertexFormatElement.EnumUsage.COLOR.ordinal()] = 3;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
-
-                try
-                {
-                    VALUES[VertexFormatElement.EnumUsage.NORMAL.ordinal()] = 4;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
-            }
-        }
 }

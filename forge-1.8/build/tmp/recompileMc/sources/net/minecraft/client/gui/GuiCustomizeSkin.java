@@ -13,27 +13,24 @@ public class GuiCustomizeSkin extends GuiScreen
     private final GuiScreen parentScreen;
     /** The title of the GUI. */
     private String title;
-    private static final String __OBFID = "CL_00001932";
 
-    public GuiCustomizeSkin(GuiScreen p_i45516_1_)
+    public GuiCustomizeSkin(GuiScreen parentScreenIn)
     {
-        this.parentScreen = p_i45516_1_;
+        this.parentScreen = parentScreenIn;
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
     public void initGui()
     {
         int i = 0;
         this.title = I18n.format("options.skinCustomisation.title", new Object[0]);
-        EnumPlayerModelParts[] aenumplayermodelparts = EnumPlayerModelParts.values();
-        int j = aenumplayermodelparts.length;
 
-        for (int k = 0; k < j; ++k)
+        for (EnumPlayerModelParts enumplayermodelparts : EnumPlayerModelParts.values())
         {
-            EnumPlayerModelParts enumplayermodelparts = aenumplayermodelparts[k];
-            this.buttonList.add(new GuiCustomizeSkin.ButtonPart(enumplayermodelparts.getPartId(), this.width / 2 - 155 + i % 2 * 160, this.height / 6 + 24 * (i >> 1), 150, 20, enumplayermodelparts, null));
+            this.buttonList.add(new GuiCustomizeSkin.ButtonPart(enumplayermodelparts.getPartId(), this.width / 2 - 155 + i % 2 * 160, this.height / 6 + 24 * (i >> 1), 150, 20, enumplayermodelparts));
             ++i;
         }
 
@@ -45,6 +42,9 @@ public class GuiCustomizeSkin extends GuiScreen
         this.buttonList.add(new GuiButton(200, this.width / 2 - 100, this.height / 6 + 24 * (i >> 1), I18n.format("gui.done", new Object[0])));
     }
 
+    /**
+     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
+     */
     protected void actionPerformed(GuiButton button) throws IOException
     {
         if (button.enabled)
@@ -56,7 +56,7 @@ public class GuiCustomizeSkin extends GuiScreen
             }
             else if (button instanceof GuiCustomizeSkin.ButtonPart)
             {
-                EnumPlayerModelParts enumplayermodelparts = ((GuiCustomizeSkin.ButtonPart)button).field_175234_p;
+                EnumPlayerModelParts enumplayermodelparts = ((GuiCustomizeSkin.ButtonPart)button).playerModelParts;
                 this.mc.gameSettings.switchModelPartEnabled(enumplayermodelparts);
                 button.displayString = this.func_175358_a(enumplayermodelparts);
             }
@@ -73,11 +73,11 @@ public class GuiCustomizeSkin extends GuiScreen
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
-    private String func_175358_a(EnumPlayerModelParts p_175358_1_)
+    private String func_175358_a(EnumPlayerModelParts playerModelParts)
     {
         String s;
 
-        if (this.mc.gameSettings.getModelParts().contains(p_175358_1_))
+        if (this.mc.gameSettings.getModelParts().contains(playerModelParts))
         {
             s = I18n.format("options.on", new Object[0]);
         }
@@ -86,24 +86,18 @@ public class GuiCustomizeSkin extends GuiScreen
             s = I18n.format("options.off", new Object[0]);
         }
 
-        return p_175358_1_.func_179326_d().getFormattedText() + ": " + s;
+        return playerModelParts.func_179326_d().getFormattedText() + ": " + s;
     }
 
     @SideOnly(Side.CLIENT)
     class ButtonPart extends GuiButton
     {
-        private final EnumPlayerModelParts field_175234_p;
-        private static final String __OBFID = "CL_00001930";
+        private final EnumPlayerModelParts playerModelParts;
 
-        private ButtonPart(int p_i45514_2_, int p_i45514_3_, int p_i45514_4_, int p_i45514_5_, int p_i45514_6_, EnumPlayerModelParts p_i45514_7_)
+        private ButtonPart(int p_i45514_2_, int p_i45514_3_, int p_i45514_4_, int p_i45514_5_, int p_i45514_6_, EnumPlayerModelParts playerModelParts)
         {
-            super(p_i45514_2_, p_i45514_3_, p_i45514_4_, p_i45514_5_, p_i45514_6_, GuiCustomizeSkin.this.func_175358_a(p_i45514_7_));
-            this.field_175234_p = p_i45514_7_;
-        }
-
-        ButtonPart(int p_i45515_2_, int p_i45515_3_, int p_i45515_4_, int p_i45515_5_, int p_i45515_6_, EnumPlayerModelParts p_i45515_7_, Object p_i45515_8_)
-        {
-            this(p_i45515_2_, p_i45515_3_, p_i45515_4_, p_i45515_5_, p_i45515_6_, p_i45515_7_);
+            super(p_i45514_2_, p_i45514_3_, p_i45514_4_, p_i45514_5_, p_i45514_6_, GuiCustomizeSkin.this.func_175358_a(playerModelParts));
+            this.playerModelParts = playerModelParts;
         }
     }
 }

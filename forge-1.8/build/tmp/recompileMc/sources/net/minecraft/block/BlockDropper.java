@@ -15,7 +15,6 @@ import net.minecraft.world.World;
 public class BlockDropper extends BlockDispenser
 {
     private final IBehaviorDispenseItem dropBehavior = new BehaviorDefaultDispenseItem();
-    private static final String __OBFID = "CL_00000233";
 
     protected IBehaviorDispenseItem getBehavior(ItemStack stack)
     {
@@ -47,31 +46,31 @@ public class BlockDropper extends BlockDispenser
             {
                 ItemStack itemstack = tileentitydispenser.getStackInSlot(i);
 
-                if (itemstack != null)
+                if (itemstack != null && net.minecraftforge.items.VanillaInventoryCodeHooks.dropperInsertHook(worldIn, pos, tileentitydispenser, i, itemstack))
                 {
                     EnumFacing enumfacing = (EnumFacing)worldIn.getBlockState(pos).getValue(FACING);
-                    BlockPos blockpos1 = pos.offset(enumfacing);
-                    IInventory iinventory = TileEntityHopper.func_145893_b(worldIn, (double)blockpos1.getX(), (double)blockpos1.getY(), (double)blockpos1.getZ());
+                    BlockPos blockpos = pos.offset(enumfacing);
+                    IInventory iinventory = TileEntityHopper.getInventoryAtPosition(worldIn, (double)blockpos.getX(), (double)blockpos.getY(), (double)blockpos.getZ());
                     ItemStack itemstack1;
 
                     if (iinventory == null)
                     {
                         itemstack1 = this.dropBehavior.dispense(blocksourceimpl, itemstack);
 
-                        if (itemstack1 != null && itemstack1.stackSize == 0)
+                        if (itemstack1 != null && itemstack1.stackSize <= 0)
                         {
                             itemstack1 = null;
                         }
                     }
                     else
                     {
-                        itemstack1 = TileEntityHopper.func_174918_a(iinventory, itemstack.copy().splitStack(1), enumfacing.getOpposite());
+                        itemstack1 = TileEntityHopper.putStackInInventoryAllSlots(iinventory, itemstack.copy().splitStack(1), enumfacing.getOpposite());
 
                         if (itemstack1 == null)
                         {
                             itemstack1 = itemstack.copy();
 
-                            if (--itemstack1.stackSize == 0)
+                            if (--itemstack1.stackSize <= 0)
                             {
                                 itemstack1 = null;
                             }

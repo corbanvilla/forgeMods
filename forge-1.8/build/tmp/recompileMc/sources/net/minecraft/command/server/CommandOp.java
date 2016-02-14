@@ -2,7 +2,6 @@ package net.minecraft.command.server;
 
 import com.google.common.collect.Lists;
 import com.mojang.authlib.GameProfile;
-import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -13,12 +12,10 @@ import net.minecraft.util.BlockPos;
 
 public class CommandOp extends CommandBase
 {
-    private static final String __OBFID = "CL_00000694";
-
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
-    public String getName()
+    public String getCommandName()
     {
         return "op";
     }
@@ -31,15 +28,23 @@ public class CommandOp extends CommandBase
         return 3;
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.op.usage";
     }
 
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
-    public void execute(ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length == 1 && args[0].length() > 0)
         {
@@ -62,26 +67,22 @@ public class CommandOp extends CommandBase
         }
     }
 
-    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
         if (args.length == 1)
         {
             String s = args[args.length - 1];
-            ArrayList arraylist = Lists.newArrayList();
-            GameProfile[] agameprofile = MinecraftServer.getServer().getGameProfiles();
-            int i = agameprofile.length;
+            List<String> list = Lists.<String>newArrayList();
 
-            for (int j = 0; j < i; ++j)
+            for (GameProfile gameprofile : MinecraftServer.getServer().getGameProfiles())
             {
-                GameProfile gameprofile = agameprofile[j];
-
                 if (!MinecraftServer.getServer().getConfigurationManager().canSendCommands(gameprofile) && doesStringStartWith(s, gameprofile.getName()))
                 {
-                    arraylist.add(gameprofile.getName());
+                    list.add(gameprofile.getName());
                 }
             }
 
-            return arraylist;
+            return list;
         }
         else
         {

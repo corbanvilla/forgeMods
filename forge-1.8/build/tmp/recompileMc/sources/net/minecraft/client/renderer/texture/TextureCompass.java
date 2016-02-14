@@ -15,7 +15,6 @@ public class TextureCompass extends TextureAtlasSprite
     /** Speed and direction of compass rotation */
     public double angleDelta;
     public static String field_176608_l;
-    private static final String __OBFID = "CL_00001071";
 
     public TextureCompass(String iconName)
     {
@@ -44,42 +43,42 @@ public class TextureCompass extends TextureAtlasSprite
     {
         if (!this.framesTextureData.isEmpty())
         {
-            double d3 = 0.0D;
+            double d0 = 0.0D;
 
             if (worldIn != null && !p_94241_8_)
             {
                 BlockPos blockpos = worldIn.getSpawnPoint();
-                double d4 = (double)blockpos.getX() - p_94241_2_;
-                double d5 = (double)blockpos.getZ() - p_94241_4_;
-                p_94241_6_ %= 360.0D;
-                d3 = -((p_94241_6_ - 90.0D) * Math.PI / 180.0D - Math.atan2(d5, d4));
+                double d1 = (double)blockpos.getX() - p_94241_2_;
+                double d2 = (double)blockpos.getZ() - p_94241_4_;
+                p_94241_6_ = p_94241_6_ % 360.0D;
+                d0 = -((p_94241_6_ - 90.0D) * Math.PI / 180.0D - Math.atan2(d2, d1));
 
                 if (!worldIn.provider.isSurfaceWorld())
                 {
-                    d3 = Math.random() * Math.PI * 2.0D;
+                    d0 = Math.random() * Math.PI * 2.0D;
                 }
             }
 
             if (p_94241_9_)
             {
-                this.currentAngle = d3;
+                this.currentAngle = d0;
             }
             else
             {
-                double d6;
+                double d3;
 
-                for (d6 = d3 - this.currentAngle; d6 < -Math.PI; d6 += (Math.PI * 2D))
+                for (d3 = d0 - this.currentAngle; d3 < -Math.PI; d3 += (Math.PI * 2D))
                 {
                     ;
                 }
 
-                while (d6 >= Math.PI)
+                while (d3 >= Math.PI)
                 {
-                    d6 -= (Math.PI * 2D);
+                    d3 -= (Math.PI * 2D);
                 }
 
-                d6 = MathHelper.clamp_double(d6, -1.0D, 1.0D);
-                this.angleDelta += d6 * 0.1D;
+                d3 = MathHelper.clamp_double(d3, -1.0D, 1.0D);
+                this.angleDelta += d3 * 0.1D;
                 this.angleDelta *= 0.8D;
                 this.currentAngle += this.angleDelta;
             }

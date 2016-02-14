@@ -2,9 +2,7 @@ package net.minecraft.client.gui;
 
 import com.google.common.collect.Lists;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.item.ItemStack;
 import net.minecraft.realms.RealmsButton;
@@ -16,12 +14,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class GuiScreenRealmsProxy extends GuiScreen
 {
     private RealmsScreen field_154330_a;
-    private static final String __OBFID = "CL_00001847";
 
     public GuiScreenRealmsProxy(RealmsScreen p_i1087_1_)
     {
         this.field_154330_a = p_i1087_1_;
-        super.buttonList = Collections.synchronizedList(Lists.newArrayList());
+        super.buttonList = Collections.<GuiButton>synchronizedList(Lists.<GuiButton>newArrayList());
     }
 
     public RealmsScreen func_154321_a()
@@ -30,7 +27,8 @@ public class GuiScreenRealmsProxy extends GuiScreen
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
     public void initGui()
     {
@@ -43,9 +41,16 @@ public class GuiScreenRealmsProxy extends GuiScreen
         super.drawCenteredString(this.fontRendererObj, p_154325_1_, p_154325_2_, p_154325_3_, p_154325_4_);
     }
 
-    public void func_154322_b(String p_154322_1_, int p_154322_2_, int p_154322_3_, int p_154322_4_)
+    public void func_154322_b(String p_154322_1_, int p_154322_2_, int p_154322_3_, int p_154322_4_, boolean p_154322_5_)
     {
-        super.drawString(this.fontRendererObj, p_154322_1_, p_154322_2_, p_154322_3_, p_154322_4_);
+        if (p_154322_5_)
+        {
+            super.drawString(this.fontRendererObj, p_154322_1_, p_154322_2_, p_154322_3_, p_154322_4_);
+        }
+        else
+        {
+            this.fontRendererObj.drawString(p_154322_1_, p_154322_2_, p_154322_3_, p_154322_4_);
+        }
     }
 
     /**
@@ -109,7 +114,10 @@ public class GuiScreenRealmsProxy extends GuiScreen
         super.drawCreativeTabHoveringText(tabName, mouseX, mouseY);
     }
 
-    public void drawHoveringText(List textLines, int x, int y)
+    /**
+     * Draws a List of strings as a tooltip. Every entry is drawn on a seperate line.
+     */
+    public void drawHoveringText(List<String> textLines, int x, int y)
     {
         super.drawHoveringText(textLines, x, y);
     }
@@ -138,11 +146,14 @@ public class GuiScreenRealmsProxy extends GuiScreen
         this.fontRendererObj.drawStringWithShadow(p_154319_1_, (float)p_154319_2_, (float)p_154319_3_, p_154319_4_);
     }
 
-    public List func_154323_a(String p_154323_1_, int p_154323_2_)
+    public List<String> func_154323_a(String p_154323_1_, int p_154323_2_)
     {
         return this.fontRendererObj.listFormattedStringToWidth(p_154323_1_, p_154323_2_);
     }
 
+    /**
+     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
+     */
     public final void actionPerformed(GuiButton button) throws IOException
     {
         this.field_154330_a.buttonClicked(((GuiButtonRealmsProxy)button).getRealmsButton());
@@ -158,23 +169,21 @@ public class GuiScreenRealmsProxy extends GuiScreen
         super.buttonList.add(p_154327_1_.getProxy());
     }
 
-    public List func_154320_j()
+    public List<RealmsButton> func_154320_j()
     {
-        ArrayList arraylist = Lists.newArrayListWithExpectedSize(super.buttonList.size());
-        Iterator iterator = super.buttonList.iterator();
+        List<RealmsButton> list = Lists.<RealmsButton>newArrayListWithExpectedSize(super.buttonList.size());
 
-        while (iterator.hasNext())
+        for (GuiButton guibutton : super.buttonList)
         {
-            GuiButton guibutton = (GuiButton)iterator.next();
-            arraylist.add(((GuiButtonRealmsProxy)guibutton).getRealmsButton());
+            list.add(((GuiButtonRealmsProxy)guibutton).getRealmsButton());
         }
 
-        return arraylist;
+        return list;
     }
 
     public void func_154328_b(RealmsButton p_154328_1_)
     {
-        super.buttonList.remove(p_154328_1_);
+        super.buttonList.remove(p_154328_1_.getProxy());
     }
 
     /**
@@ -222,7 +231,7 @@ public class GuiScreenRealmsProxy extends GuiScreen
     }
 
     /**
-     * Fired when a key is typed (except F11 who toggle full screen). This is the equivalent of
+     * Fired when a key is typed (except F11 which toggles full screen). This is the equivalent of
      * KeyListener.keyTyped(KeyEvent e). Args : character (character on the key), keyCode (lwjgl Keyboard key code)
      */
     public void keyTyped(char typedChar, int keyCode) throws IOException

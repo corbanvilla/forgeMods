@@ -5,7 +5,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -24,35 +23,26 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class TeleportToPlayer implements ISpectatorMenuView, ISpectatorMenuObject
 {
-    private static final Ordering field_178674_a = Ordering.from(new Comparator()
+    private static final Ordering<NetworkPlayerInfo> field_178674_a = Ordering.from(new Comparator<NetworkPlayerInfo>()
     {
-        private static final String __OBFID = "CL_00001921";
-        public int func_178746_a(NetworkPlayerInfo p_178746_1_, NetworkPlayerInfo p_178746_2_)
+        public int compare(NetworkPlayerInfo p_compare_1_, NetworkPlayerInfo p_compare_2_)
         {
-            return ComparisonChain.start().compare(p_178746_1_.getGameProfile().getId(), p_178746_2_.getGameProfile().getId()).result();
-        }
-        public int compare(Object p_compare_1_, Object p_compare_2_)
-        {
-            return this.func_178746_a((NetworkPlayerInfo)p_compare_1_, (NetworkPlayerInfo)p_compare_2_);
+            return ComparisonChain.start().compare(p_compare_1_.getGameProfile().getId(), p_compare_2_.getGameProfile().getId()).result();
         }
     });
-    private final List field_178673_b;
-    private static final String __OBFID = "CL_00001922";
+    private final List<ISpectatorMenuObject> field_178673_b;
 
     public TeleportToPlayer()
     {
-        this(field_178674_a.sortedCopy(Minecraft.getMinecraft().getNetHandler().func_175106_d()));
+        this(field_178674_a.<NetworkPlayerInfo>sortedCopy(Minecraft.getMinecraft().getNetHandler().getPlayerInfoMap()));
     }
 
-    public TeleportToPlayer(Collection p_i45493_1_)
+    public TeleportToPlayer(Collection<NetworkPlayerInfo> p_i45493_1_)
     {
-        this.field_178673_b = Lists.newArrayList();
-        Iterator iterator = field_178674_a.sortedCopy(p_i45493_1_).iterator();
+        this.field_178673_b = Lists.<ISpectatorMenuObject>newArrayList();
 
-        while (iterator.hasNext())
+        for (NetworkPlayerInfo networkplayerinfo : field_178674_a.sortedCopy(p_i45493_1_))
         {
-            NetworkPlayerInfo networkplayerinfo = (NetworkPlayerInfo)iterator.next();
-
             if (networkplayerinfo.getGameType() != WorldSettings.GameType.SPECTATOR)
             {
                 this.field_178673_b.add(new PlayerMenuObject(networkplayerinfo.getGameProfile()));
@@ -60,7 +50,7 @@ public class TeleportToPlayer implements ISpectatorMenuView, ISpectatorMenuObjec
         }
     }
 
-    public List func_178669_a()
+    public List<ISpectatorMenuObject> func_178669_a()
     {
         return this.field_178673_b;
     }
@@ -70,17 +60,17 @@ public class TeleportToPlayer implements ISpectatorMenuView, ISpectatorMenuObjec
         return new ChatComponentText("Select a player to teleport to");
     }
 
-    public void func_178661_a(SpectatorMenu p_178661_1_)
+    public void func_178661_a(SpectatorMenu menu)
     {
-        p_178661_1_.func_178647_a(this);
+        menu.func_178647_a(this);
     }
 
-    public IChatComponent func_178664_z_()
+    public IChatComponent getSpectatorName()
     {
         return new ChatComponentText("Teleport to player");
     }
 
-    public void func_178663_a(float p_178663_1_, int p_178663_2_)
+    public void func_178663_a(float p_178663_1_, int alpha)
     {
         Minecraft.getMinecraft().getTextureManager().bindTexture(GuiSpectator.field_175269_a);
         Gui.drawModalRectWithCustomSizedTexture(0, 0, 0.0F, 0.0F, 16, 16, 256.0F, 256.0F);

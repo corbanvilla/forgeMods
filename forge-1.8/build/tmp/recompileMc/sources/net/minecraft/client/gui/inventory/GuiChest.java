@@ -17,7 +17,6 @@ public class GuiChest extends GuiContainer
     private IInventory lowerChestInventory;
     /** window height is calculated with these values; the more rows, the heigher */
     private int inventoryRows;
-    private static final String __OBFID = "CL_00000749";
 
     public GuiChest(IInventory upperInv, IInventory lowerInv)
     {
@@ -25,10 +24,10 @@ public class GuiChest extends GuiContainer
         this.upperChestInventory = upperInv;
         this.lowerChestInventory = lowerInv;
         this.allowUserInput = false;
-        short short1 = 222;
-        int i = short1 - 108;
+        int i = 222;
+        int j = i - 108;
         this.inventoryRows = lowerInv.getSizeInventory() / 9;
-        this.ySize = i + this.inventoryRows * 18;
+        this.ySize = j + this.inventoryRows * 18;
     }
 
     /**
@@ -47,9 +46,9 @@ public class GuiChest extends GuiContainer
     {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(CHEST_GUI_TEXTURE);
-        int k = (this.width - this.xSize) / 2;
-        int l = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(k, l, 0, 0, this.xSize, this.inventoryRows * 18 + 17);
-        this.drawTexturedModalRect(k, l + this.inventoryRows * 18 + 17, 0, 126, this.xSize, 96);
+        int i = (this.width - this.xSize) / 2;
+        int j = (this.height - this.ySize) / 2;
+        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.inventoryRows * 18 + 17);
+        this.drawTexturedModalRect(i, j + this.inventoryRows * 18 + 17, 0, 126, this.xSize, 96);
     }
 }

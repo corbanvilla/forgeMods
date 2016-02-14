@@ -22,6 +22,7 @@ public enum EnumDyeColor implements IStringSerializable
     GREEN(13, 2, "green", "green", MapColor.greenColor, EnumChatFormatting.DARK_GREEN),
     RED(14, 1, "red", "red", MapColor.redColor, EnumChatFormatting.DARK_RED),
     BLACK(15, 0, "black", "black", MapColor.blackColor, EnumChatFormatting.BLACK);
+
     private static final EnumDyeColor[] META_LOOKUP = new EnumDyeColor[values().length];
     private static final EnumDyeColor[] DYE_DMG_LOOKUP = new EnumDyeColor[values().length];
     private final int meta;
@@ -30,8 +31,6 @@ public enum EnumDyeColor implements IStringSerializable
     private final String unlocalizedName;
     private final MapColor mapColor;
     private final EnumChatFormatting chatColor;
-
-    private static final String __OBFID = "CL_00002180";
 
     private EnumDyeColor(int meta, int dyeDamage, String name, String unlocalizedName, MapColor mapColorIn, EnumChatFormatting chatColor)
     {
@@ -95,14 +94,10 @@ public enum EnumDyeColor implements IStringSerializable
 
     static
     {
-        EnumDyeColor[] var0 = values();
-        int var1 = var0.length;
-
-        for (int var2 = 0; var2 < var1; ++var2)
+        for (EnumDyeColor enumdyecolor : values())
         {
-            EnumDyeColor var3 = var0[var2];
-            META_LOOKUP[var3.getMetadata()] = var3;
-            DYE_DMG_LOOKUP[var3.getDyeDamage()] = var3;
+            META_LOOKUP[enumdyecolor.getMetadata()] = enumdyecolor;
+            DYE_DMG_LOOKUP[enumdyecolor.getDyeDamage()] = enumdyecolor;
         }
     }
 }

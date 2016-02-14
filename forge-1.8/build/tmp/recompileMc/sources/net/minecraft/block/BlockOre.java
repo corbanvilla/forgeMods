@@ -1,6 +1,7 @@
 package net.minecraft.block;
 
 import java.util.Random;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -10,23 +11,23 @@ import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class BlockOre extends Block
 {
-    private static final String __OBFID = "CL_00000282";
-
     public BlockOre()
     {
-        super(Material.rock);
+        this(Material.rock.getMaterialMapColor());
+    }
+
+    public BlockOre(MapColor p_i46390_1_)
+    {
+        super(Material.rock, p_i46390_1_);
         this.setCreativeTab(CreativeTabs.tabBlock);
     }
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -48,14 +49,14 @@ public class BlockOre extends Block
     {
         if (fortune > 0 && Item.getItemFromBlock(this) != this.getItemDropped((IBlockState)this.getBlockState().getValidStates().iterator().next(), random, fortune))
         {
-            int j = random.nextInt(fortune + 2) - 1;
+            int i = random.nextInt(fortune + 2) - 1;
 
-            if (j < 0)
+            if (i < 0)
             {
-                j = 0;
+                i = 0;
             }
 
-            return this.quantityDropped(random) * (j + 1);
+            return this.quantityDropped(random) * (i + 1);
         }
         else
         {
@@ -65,45 +66,42 @@ public class BlockOre extends Block
 
     /**
      * Spawns this Block's drops into the World as EntityItems.
-     *  
-     * @param chance The chance that each Item is actually spawned (1.0 = always, 0.0 = never)
-     * @param fortune The player's fortune level
      */
     public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune)
     {
         super.dropBlockAsItemWithChance(worldIn, pos, state, chance, fortune);
     }
     @Override
-    public int getExpDrop(IBlockAccess world, BlockPos pos, int fortune)
+    public int getExpDrop(net.minecraft.world.IBlockAccess world, BlockPos pos, int fortune)
     {
         IBlockState state = world.getBlockState(pos);
         Random rand = world instanceof World ? ((World)world).rand : new Random();
         if (this.getItemDropped(state, rand, fortune) != Item.getItemFromBlock(this))
         {
-            int j = 0;
+            int i = 0;
 
             if (this == Blocks.coal_ore)
             {
-                j = MathHelper.getRandomIntegerInRange(rand, 0, 2);
+                i = MathHelper.getRandomIntegerInRange(rand, 0, 2);
             }
             else if (this == Blocks.diamond_ore)
             {
-                j = MathHelper.getRandomIntegerInRange(rand, 3, 7);
+                i = MathHelper.getRandomIntegerInRange(rand, 3, 7);
             }
             else if (this == Blocks.emerald_ore)
             {
-                j = MathHelper.getRandomIntegerInRange(rand, 3, 7);
+                i = MathHelper.getRandomIntegerInRange(rand, 3, 7);
             }
             else if (this == Blocks.lapis_ore)
             {
-                j = MathHelper.getRandomIntegerInRange(rand, 2, 5);
+                i = MathHelper.getRandomIntegerInRange(rand, 2, 5);
             }
             else if (this == Blocks.quartz_ore)
             {
-                j = MathHelper.getRandomIntegerInRange(rand, 2, 5);
+                i = MathHelper.getRandomIntegerInRange(rand, 2, 5);
             }
 
-            return j;
+            return i;
         }
         return 0;
     }
@@ -114,7 +112,8 @@ public class BlockOre extends Block
     }
 
     /**
-     * Get the damage value that this Block should drop
+     * Gets the metadata of the item this Block can drop. This method is called when the block gets destroyed. It
+     * returns the metadata of the dropped item based on the old metadata of the block.
      */
     public int damageDropped(IBlockState state)
     {

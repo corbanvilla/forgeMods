@@ -3,7 +3,6 @@ package net.minecraft.world.biome;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import java.awt.Color;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +13,7 @@ import net.minecraft.block.BlockSand;
 import net.minecraft.block.BlockTallGrass;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityEnderman;
@@ -50,9 +50,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraftforge.common.*;
-import net.minecraftforge.event.terraingen.*;
-
 public abstract class BiomeGenBase
 {
     private static final Logger logger = LogManager.getLogger();
@@ -71,8 +68,8 @@ public abstract class BiomeGenBase
     protected static final BiomeGenBase.Height height_PartiallySubmerged = new BiomeGenBase.Height(-0.2F, 0.1F);
     /** An array of all the biomes, indexed by biome id. */
     private static final BiomeGenBase[] biomeList = new BiomeGenBase[256];
-    public static final Set explorationBiomesList = Sets.newHashSet();
-    public static final Map BIOME_ID_MAP = Maps.newHashMap();
+    public static final Set<BiomeGenBase> explorationBiomesList = Sets.<BiomeGenBase>newHashSet();
+    public static final Map<String, BiomeGenBase> BIOME_ID_MAP = Maps.<String, BiomeGenBase>newHashMap();
     public static final BiomeGenBase ocean = (new BiomeGenOcean(0)).setColor(112).setBiomeName("Ocean").setHeight(height_Oceans);
     public static final BiomeGenBase plains = (new BiomeGenPlains(1)).setColor(9286496).setBiomeName("Plains");
     public static final BiomeGenBase desert = (new BiomeGenDesert(2)).setColor(16421912).setBiomeName("Desert").setDisableRain().setTemperatureRainfall(2.0F, 0.0F).setHeight(height_LowPlains);
@@ -122,16 +119,16 @@ public abstract class BiomeGenBase
     public static final BiomeGenBase mesaPlateau = (new BiomeGenMesa(39, false, false)).setColor(13274213).setBiomeName("Mesa Plateau").setHeight(height_HighPlateaus);
     public static final BiomeGenBase field_180279_ad = ocean;
     protected static final NoiseGeneratorPerlin temperatureNoise;
-    protected static final NoiseGeneratorPerlin field_180281_af;
+    protected static final NoiseGeneratorPerlin GRASS_COLOR_NOISE;
     protected static final WorldGenDoublePlant DOUBLE_PLANT_GENERATOR;
     public String biomeName;
     public int color;
     public int field_150609_ah;
     /** The block expected to be on the top of this biome */
-    public IBlockState topBlock;
+    public IBlockState topBlock = Blocks.grass.getDefaultState();
     /** The block to fill spots in when not on the top */
-    public IBlockState fillerBlock;
-    public int fillerBlockMetadata;
+    public IBlockState fillerBlock = Blocks.dirt.getDefaultState();
+    public int fillerBlockMetadata = 5169201;
     /** The minimum height of this biome. Default 0.1. */
     public float minHeight;
     /** The maximum height of this biome. Default 0.3. */
@@ -144,13 +141,10 @@ public abstract class BiomeGenBase
     public int waterColorMultiplier;
     /** The biome decorator. */
     public BiomeDecorator theBiomeDecorator;
-    /** Holds the classes of IMobs (hostile mobs) that can be spawned in the biome. */
-    protected List spawnableMonsterList;
-    /** Holds the classes of any creature that can be spawned in the biome as friendly creature. */
-    protected List spawnableCreatureList;
-    /** Holds the classes of any aquatic creature that can be spawned in the water of the biome. */
-    protected List spawnableWaterCreatureList;
-    protected List spawnableCaveCreatureList;
+    protected List<BiomeGenBase.SpawnListEntry> spawnableMonsterList;
+    protected List<BiomeGenBase.SpawnListEntry> spawnableCreatureList;
+    protected List<BiomeGenBase.SpawnListEntry> spawnableWaterCreatureList;
+    protected List<BiomeGenBase.SpawnListEntry> spawnableCaveCreatureList;
     /** Set to true if snow is enabled for this biome. */
     protected boolean enableSnow;
     /** Is true (default) if the biome support rain (desert and nether can't have rain) */
@@ -163,33 +157,29 @@ public abstract class BiomeGenBase
     protected WorldGenBigTree worldGeneratorBigTree;
     /** The swamp tree generator. */
     protected WorldGenSwamp worldGeneratorSwamp;
-    private static final String __OBFID = "CL_00000158";
 
-    public BiomeGenBase(int p_i1971_1_)
+    public BiomeGenBase(int id)
     {
-        this(p_i1971_1_, true);
+        this(id, true);
     }
-    public BiomeGenBase(int p_i1971_1_, boolean register)
+    public BiomeGenBase(int id, boolean register)
     {
-        this.topBlock = Blocks.grass.getDefaultState();
-        this.fillerBlock = Blocks.dirt.getDefaultState();
-        this.fillerBlockMetadata = 5169201;
         this.minHeight = height_Default.rootHeight;
         this.maxHeight = height_Default.variation;
         this.temperature = 0.5F;
         this.rainfall = 0.5F;
         this.waterColorMultiplier = 16777215;
-        this.spawnableMonsterList = Lists.newArrayList();
-        this.spawnableCreatureList = Lists.newArrayList();
-        this.spawnableWaterCreatureList = Lists.newArrayList();
-        this.spawnableCaveCreatureList = Lists.newArrayList();
+        this.spawnableMonsterList = Lists.<BiomeGenBase.SpawnListEntry>newArrayList();
+        this.spawnableCreatureList = Lists.<BiomeGenBase.SpawnListEntry>newArrayList();
+        this.spawnableWaterCreatureList = Lists.<BiomeGenBase.SpawnListEntry>newArrayList();
+        this.spawnableCaveCreatureList = Lists.<BiomeGenBase.SpawnListEntry>newArrayList();
         this.enableRain = true;
         this.worldGeneratorTrees = new WorldGenTrees(false);
         this.worldGeneratorBigTree = new WorldGenBigTree(false);
         this.worldGeneratorSwamp = new WorldGenSwamp();
-        this.biomeID = p_i1971_1_;
+        this.biomeID = id;
         if (register)
-        biomeList[p_i1971_1_] = this;
+        biomeList[id] = this;
         this.theBiomeDecorator = this.createBiomeDecorator();
         this.spawnableCreatureList.add(new BiomeGenBase.SpawnListEntry(EntitySheep.class, 12, 4, 4));
         this.spawnableCreatureList.add(new BiomeGenBase.SpawnListEntry(EntityRabbit.class, 10, 3, 3));
@@ -219,24 +209,24 @@ public abstract class BiomeGenBase
     /**
      * Sets the temperature and rainfall of this biome.
      */
-    public BiomeGenBase setTemperatureRainfall(float p_76732_1_, float p_76732_2_)
+    public BiomeGenBase setTemperatureRainfall(float temperatureIn, float rainfallIn)
     {
-        if (p_76732_1_ > 0.1F && p_76732_1_ < 0.2F)
+        if (temperatureIn > 0.1F && temperatureIn < 0.2F)
         {
             throw new IllegalArgumentException("Please avoid temperatures in the range 0.1 - 0.2 because of snow");
         }
         else
         {
-            this.temperature = p_76732_1_;
-            this.rainfall = p_76732_2_;
+            this.temperature = temperatureIn;
+            this.rainfall = rainfallIn;
             return this;
         }
     }
 
-    public final BiomeGenBase setHeight(BiomeGenBase.Height p_150570_1_)
+    public final BiomeGenBase setHeight(BiomeGenBase.Height heights)
     {
-        this.minHeight = p_150570_1_.rootHeight;
-        this.maxHeight = p_150570_1_.variation;
+        this.minHeight = heights.rootHeight;
+        this.maxHeight = heights.variation;
         return this;
     }
 
@@ -249,22 +239,22 @@ public abstract class BiomeGenBase
         return this;
     }
 
-    public WorldGenAbstractTree genBigTreeChance(Random p_150567_1_)
+    public WorldGenAbstractTree genBigTreeChance(Random rand)
     {
-        return (WorldGenAbstractTree)(p_150567_1_.nextInt(10) == 0 ? this.worldGeneratorBigTree : this.worldGeneratorTrees);
+        return (WorldGenAbstractTree)(rand.nextInt(10) == 0 ? this.worldGeneratorBigTree : this.worldGeneratorTrees);
     }
 
     /**
      * Gets a WorldGen appropriate for this biome.
      */
-    public WorldGenerator getRandomWorldGenForGrass(Random p_76730_1_)
+    public WorldGenerator getRandomWorldGenForGrass(Random rand)
     {
         return new WorldGenTallGrass(BlockTallGrass.EnumType.GRASS);
     }
 
-    public BlockFlower.EnumFlowerType pickRandomFlower(Random p_180623_1_, BlockPos p_180623_2_)
+    public BlockFlower.EnumFlowerType pickRandomFlower(Random rand, BlockPos pos)
     {
-        return p_180623_1_.nextInt(3) > 0 ? BlockFlower.EnumFlowerType.DANDELION : BlockFlower.EnumFlowerType.POPPY;
+        return rand.nextInt(3) > 0 ? BlockFlower.EnumFlowerType.DANDELION : BlockFlower.EnumFlowerType.POPPY;
     }
 
     /**
@@ -276,21 +266,21 @@ public abstract class BiomeGenBase
         return this;
     }
 
-    public BiomeGenBase setBiomeName(String p_76735_1_)
+    public BiomeGenBase setBiomeName(String name)
     {
-        this.biomeName = p_76735_1_;
+        this.biomeName = name;
         return this;
     }
 
-    public BiomeGenBase setFillerBlockMetadata(int p_76733_1_)
+    public BiomeGenBase setFillerBlockMetadata(int meta)
     {
-        this.fillerBlockMetadata = p_76733_1_;
+        this.fillerBlockMetadata = meta;
         return this;
     }
 
-    public BiomeGenBase setColor(int p_76739_1_)
+    public BiomeGenBase setColor(int colorIn)
     {
-        this.func_150557_a(p_76739_1_, false);
+        this.func_150557_a(colorIn, false);
         return this;
     }
 
@@ -322,28 +312,25 @@ public abstract class BiomeGenBase
     @SideOnly(Side.CLIENT)
     public int getSkyColorByTemp(float p_76731_1_)
     {
-        p_76731_1_ /= 3.0F;
+        p_76731_1_ = p_76731_1_ / 3.0F;
         p_76731_1_ = MathHelper.clamp_float(p_76731_1_, -1.0F, 1.0F);
-        return Color.getHSBColor(0.62222224F - p_76731_1_ * 0.05F, 0.5F + p_76731_1_ * 0.1F, 1.0F).getRGB();
+        return MathHelper.hsvToRGB(0.62222224F - p_76731_1_ * 0.05F, 0.5F + p_76731_1_ * 0.1F, 1.0F);
     }
 
-    /**
-     * Returns the correspondent list of the EnumCreatureType informed.
-     */
-    public List getSpawnableList(EnumCreatureType p_76747_1_)
+    public List<BiomeGenBase.SpawnListEntry> getSpawnableList(EnumCreatureType creatureType)
     {
-        switch (BiomeGenBase.SwitchEnumCreatureType.field_180275_a[p_76747_1_.ordinal()])
+        switch (creatureType)
         {
-            case 1:
+            case MONSTER:
                 return this.spawnableMonsterList;
-            case 2:
+            case CREATURE:
                 return this.spawnableCreatureList;
-            case 3:
+            case WATER_CREATURE:
                 return this.spawnableWaterCreatureList;
-            case 4:
+            case AMBIENT:
                 return this.spawnableCaveCreatureList;
             default:
-                return Collections.emptyList();
+                return Collections.<BiomeGenBase.SpawnListEntry>emptyList();
         }
     }
 
@@ -398,8 +385,6 @@ public abstract class BiomeGenBase
 
     /**
      * Gets a floating point representation of this biome's temperature
-     *  
-     * @param pos The coordinates for a block in the biome
      */
     public final float getFloatTemperature(BlockPos pos)
     {
@@ -414,23 +399,23 @@ public abstract class BiomeGenBase
         }
     }
 
-    public void decorate(World worldIn, Random p_180624_2_, BlockPos p_180624_3_)
+    public void decorate(World worldIn, Random rand, BlockPos pos)
     {
-        this.theBiomeDecorator.decorate(worldIn, p_180624_2_, this, p_180624_3_);
+        this.theBiomeDecorator.decorate(worldIn, rand, this, pos);
     }
 
     @SideOnly(Side.CLIENT)
-    public int getGrassColorAtPos(BlockPos p_180627_1_)
+    public int getGrassColorAtPos(BlockPos pos)
     {
-        double d0 = (double)MathHelper.clamp_float(this.getFloatTemperature(p_180627_1_), 0.0F, 1.0F);
+        double d0 = (double)MathHelper.clamp_float(this.getFloatTemperature(pos), 0.0F, 1.0F);
         double d1 = (double)MathHelper.clamp_float(this.getFloatRainfall(), 0.0F, 1.0F);
         return getModdedBiomeGrassColor(ColorizerGrass.getGrassColor(d0, d1));
     }
 
     @SideOnly(Side.CLIENT)
-    public int getFoliageColorAtPos(BlockPos p_180625_1_)
+    public int getFoliageColorAtPos(BlockPos pos)
     {
-        double d0 = (double)MathHelper.clamp_float(this.getFloatTemperature(p_180625_1_), 0.0F, 1.0F);
+        double d0 = (double)MathHelper.clamp_float(this.getFloatTemperature(pos), 0.0F, 1.0F);
         double d1 = (double)MathHelper.clamp_float(this.getFloatRainfall(), 0.0F, 1.0F);
         return getModdedBiomeFoliageColor(ColorizerFoliage.getFoliageColor(d0, d1));
     }
@@ -440,53 +425,54 @@ public abstract class BiomeGenBase
         return this.enableSnow;
     }
 
-    public void genTerrainBlocks(World worldIn, Random p_180622_2_, ChunkPrimer p_180622_3_, int p_180622_4_, int p_180622_5_, double p_180622_6_)
+    public void genTerrainBlocks(World worldIn, Random rand, ChunkPrimer chunkPrimerIn, int p_180622_4_, int p_180622_5_, double p_180622_6_)
     {
-        this.generateBiomeTerrain(worldIn, p_180622_2_, p_180622_3_, p_180622_4_, p_180622_5_, p_180622_6_);
+        this.generateBiomeTerrain(worldIn, rand, chunkPrimerIn, p_180622_4_, p_180622_5_, p_180622_6_);
     }
 
-    public final void generateBiomeTerrain(World worldIn, Random p_180628_2_, ChunkPrimer p_180628_3_, int p_180628_4_, int p_180628_5_, double p_180628_6_)
+    public final void generateBiomeTerrain(World worldIn, Random rand, ChunkPrimer chunkPrimerIn, int p_180628_4_, int p_180628_5_, double p_180628_6_)
     {
-        boolean flag = true;
+        int i = worldIn.getSeaLevel();
         IBlockState iblockstate = this.topBlock;
         IBlockState iblockstate1 = this.fillerBlock;
-        int k = -1;
-        int l = (int)(p_180628_6_ / 3.0D + 3.0D + p_180628_2_.nextDouble() * 0.25D);
-        int i1 = p_180628_4_ & 15;
-        int j1 = p_180628_5_ & 15;
+        int j = -1;
+        int k = (int)(p_180628_6_ / 3.0D + 3.0D + rand.nextDouble() * 0.25D);
+        int l = p_180628_4_ & 15;
+        int i1 = p_180628_5_ & 15;
+        BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
 
-        for (int k1 = 255; k1 >= 0; --k1)
+        for (int j1 = 255; j1 >= 0; --j1)
         {
-            if (k1 <= p_180628_2_.nextInt(5))
+            if (j1 <= rand.nextInt(5))
             {
-                p_180628_3_.setBlockState(j1, k1, i1, Blocks.bedrock.getDefaultState());
+                chunkPrimerIn.setBlockState(i1, j1, l, Blocks.bedrock.getDefaultState());
             }
             else
             {
-                IBlockState iblockstate2 = p_180628_3_.getBlockState(j1, k1, i1);
+                IBlockState iblockstate2 = chunkPrimerIn.getBlockState(i1, j1, l);
 
                 if (iblockstate2.getBlock().getMaterial() == Material.air)
                 {
-                    k = -1;
+                    j = -1;
                 }
                 else if (iblockstate2.getBlock() == Blocks.stone)
                 {
-                    if (k == -1)
+                    if (j == -1)
                     {
-                        if (l <= 0)
+                        if (k <= 0)
                         {
                             iblockstate = null;
                             iblockstate1 = Blocks.stone.getDefaultState();
                         }
-                        else if (k1 >= 59 && k1 <= 64)
+                        else if (j1 >= i - 4 && j1 <= i + 1)
                         {
                             iblockstate = this.topBlock;
                             iblockstate1 = this.fillerBlock;
                         }
 
-                        if (k1 < 63 && (iblockstate == null || iblockstate.getBlock().getMaterial() == Material.air))
+                        if (j1 < i && (iblockstate == null || iblockstate.getBlock().getMaterial() == Material.air))
                         {
-                            if (this.getFloatTemperature(new BlockPos(p_180628_4_, k1, p_180628_5_)) < 0.15F)
+                            if (this.getFloatTemperature(blockpos$mutableblockpos.set(p_180628_4_, j1, p_180628_5_)) < 0.15F)
                             {
                                 iblockstate = Blocks.ice.getDefaultState();
                             }
@@ -496,31 +482,31 @@ public abstract class BiomeGenBase
                             }
                         }
 
-                        k = l;
+                        j = k;
 
-                        if (k1 >= 62)
+                        if (j1 >= i - 1)
                         {
-                            p_180628_3_.setBlockState(j1, k1, i1, iblockstate);
+                            chunkPrimerIn.setBlockState(i1, j1, l, iblockstate);
                         }
-                        else if (k1 < 56 - l)
+                        else if (j1 < i - 7 - k)
                         {
                             iblockstate = null;
                             iblockstate1 = Blocks.stone.getDefaultState();
-                            p_180628_3_.setBlockState(j1, k1, i1, Blocks.gravel.getDefaultState());
+                            chunkPrimerIn.setBlockState(i1, j1, l, Blocks.gravel.getDefaultState());
                         }
                         else
                         {
-                            p_180628_3_.setBlockState(j1, k1, i1, iblockstate1);
+                            chunkPrimerIn.setBlockState(i1, j1, l, iblockstate1);
                         }
                     }
-                    else if (k > 0)
+                    else if (j > 0)
                     {
-                        --k;
-                        p_180628_3_.setBlockState(j1, k1, i1, iblockstate1);
+                        --j;
+                        chunkPrimerIn.setBlockState(i1, j1, l, iblockstate1);
 
-                        if (k == 0 && iblockstate1.getBlock() == Blocks.sand)
+                        if (j == 0 && iblockstate1.getBlock() == Blocks.sand)
                         {
-                            k = p_180628_2_.nextInt(4) + Math.max(0, k1 - 63);
+                            j = rand.nextInt(4) + Math.max(0, j1 - 63);
                             iblockstate1 = iblockstate1.getValue(BlockSand.VARIANT) == BlockSand.EnumType.RED_SAND ? Blocks.red_sandstone.getDefaultState() : Blocks.sandstone.getDefaultState();
                         }
                     }
@@ -543,7 +529,7 @@ public abstract class BiomeGenBase
         return new BiomeGenMutated(p_180277_1_, this);
     }
 
-    public Class getBiomeClass()
+    public Class <? extends BiomeGenBase > getBiomeClass()
     {
         return this.getClass();
     }
@@ -551,9 +537,9 @@ public abstract class BiomeGenBase
     /**
      * returns true if the biome specified is equal to this biome
      */
-    public boolean isEqualTo(BiomeGenBase p_150569_1_)
+    public boolean isEqualTo(BiomeGenBase biome)
     {
-        return p_150569_1_ == this ? true : (p_150569_1_ == null ? false : this.getBiomeClass() == p_150569_1_.getBiomeClass());
+        return biome == this ? true : (biome == null ? false : this.getBiomeClass() == biome.getBiomeClass());
     }
 
     public BiomeGenBase.TempCategory getTempCategory()
@@ -570,21 +556,21 @@ public abstract class BiomeGenBase
     /**
      * return the biome specified by biomeID, or 0 (ocean) if out of bounds
      */
-    public static BiomeGenBase getBiome(int p_150568_0_)
+    public static BiomeGenBase getBiome(int id)
     {
-        return getBiomeFromBiomeList(p_150568_0_, (BiomeGenBase)null);
+        return getBiomeFromBiomeList(id, (BiomeGenBase)null);
     }
 
-    public static BiomeGenBase getBiomeFromBiomeList(int p_180276_0_, BiomeGenBase p_180276_1_)
+    public static BiomeGenBase getBiomeFromBiomeList(int biomeId, BiomeGenBase biome)
     {
-        if (p_180276_0_ >= 0 && p_180276_0_ <= biomeList.length)
+        if (biomeId >= 0 && biomeId <= biomeList.length)
         {
-            BiomeGenBase biomegenbase1 = biomeList[p_180276_0_];
-            return biomegenbase1 == null ? p_180276_1_ : biomegenbase1;
+            BiomeGenBase biomegenbase = biomeList[biomeId];
+            return biomegenbase == null ? biome : biomegenbase;
         }
         else
         {
-            logger.warn("Biome ID is out of bounds: " + p_180276_0_ + ", defaulting to 0 (Ocean)");
+            logger.warn("Biome ID is out of bounds: " + biomeId + ", defaulting to 0 (Ocean)");
             return ocean;
         }
     }
@@ -594,27 +580,27 @@ public abstract class BiomeGenBase
 
     public BiomeDecorator getModdedBiomeDecorator(BiomeDecorator original)
     {
-        return new DeferredBiomeDecorator(original);
+        return new net.minecraftforge.event.terraingen.DeferredBiomeDecorator(original);
     }
 
     public int getWaterColorMultiplier()
     {
-        BiomeEvent.GetWaterColor event = new BiomeEvent.GetWaterColor(this, waterColorMultiplier);
-        MinecraftForge.EVENT_BUS.post(event);
+        net.minecraftforge.event.terraingen.BiomeEvent.GetWaterColor event = new net.minecraftforge.event.terraingen.BiomeEvent.GetWaterColor(this, waterColorMultiplier);
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event);
         return event.newColor;
     }
 
     public int getModdedBiomeGrassColor(int original)
     {
-        BiomeEvent.GetGrassColor event = new BiomeEvent.GetGrassColor(this, original);
-        MinecraftForge.EVENT_BUS.post(event);
+        net.minecraftforge.event.terraingen.BiomeEvent.GetGrassColor event = new net.minecraftforge.event.terraingen.BiomeEvent.GetGrassColor(this, original);
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event);
         return event.newColor;
     }
 
     public int getModdedBiomeFoliageColor(int original)
     {
-        BiomeEvent.GetFoliageColor event = new BiomeEvent.GetFoliageColor(this, original);
-        MinecraftForge.EVENT_BUS.post(event);
+        net.minecraftforge.event.terraingen.BiomeEvent.GetFoliageColor event = new net.minecraftforge.event.terraingen.BiomeEvent.GetFoliageColor(this, original);
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event);
         return event.newColor;
     }
 
@@ -690,25 +676,21 @@ public abstract class BiomeGenBase
         extremeHills.createMutation();
         extremeHillsPlus.createMutation();
         megaTaiga.createMutatedBiome(megaTaigaHills.biomeID + 128).setBiomeName("Redwood Taiga Hills M");
-        BiomeGenBase[] var0 = biomeList;
-        int var1 = var0.length;
 
-        for (int var2 = 0; var2 < var1; ++var2)
+        for (BiomeGenBase biomegenbase : biomeList)
         {
-            BiomeGenBase var3 = var0[var2];
-
-            if (var3 != null)
+            if (biomegenbase != null)
             {
-                if (BIOME_ID_MAP.containsKey(var3.biomeName))
+                if (BIOME_ID_MAP.containsKey(biomegenbase.biomeName))
                 {
-                    throw new Error("Biome \"" + var3.biomeName + "\" is defined as both ID " + ((BiomeGenBase)BIOME_ID_MAP.get(var3.biomeName)).biomeID + " and " + var3.biomeID);
+                    throw new Error("Biome \"" + biomegenbase.biomeName + "\" is defined as both ID " + ((BiomeGenBase)BIOME_ID_MAP.get(biomegenbase.biomeName)).biomeID + " and " + biomegenbase.biomeID);
                 }
 
-                BIOME_ID_MAP.put(var3.biomeName, var3);
+                BIOME_ID_MAP.put(biomegenbase.biomeName, biomegenbase);
 
-                if (var3.biomeID < 128)
+                if (biomegenbase.biomeID < 128)
                 {
-                    explorationBiomesList.add(var3);
+                    explorationBiomesList.add(biomegenbase);
                 }
             }
         }
@@ -718,7 +700,7 @@ public abstract class BiomeGenBase
         explorationBiomesList.remove(frozenOcean);
         explorationBiomesList.remove(extremeHillsEdge);
         temperatureNoise = new NoiseGeneratorPerlin(new Random(1234L), 1);
-        field_180281_af = new NoiseGeneratorPerlin(new Random(2345L), 1);
+        GRASS_COLOR_NOISE = new NoiseGeneratorPerlin(new Random(2345L), 1);
         DOUBLE_PLANT_GENERATOR = new WorldGenDoublePlant();
     }
 
@@ -726,12 +708,11 @@ public abstract class BiomeGenBase
         {
             public float rootHeight;
             public float variation;
-            private static final String __OBFID = "CL_00000159";
 
-            public Height(float p_i45371_1_, float p_i45371_2_)
+            public Height(float rootHeightIn, float variationIn)
             {
-                this.rootHeight = p_i45371_1_;
-                this.variation = p_i45371_2_;
+                this.rootHeight = rootHeightIn;
+                this.variation = variationIn;
             }
 
             /**
@@ -746,68 +727,21 @@ public abstract class BiomeGenBase
 
     public static class SpawnListEntry extends WeightedRandom.Item
         {
-            /** Holds the class of the entity to be spawned. */
-            public Class entityClass;
+            public Class <? extends EntityLiving > entityClass;
             public int minGroupCount;
             public int maxGroupCount;
-            private static final String __OBFID = "CL_00000161";
 
-            public SpawnListEntry(Class p_i1970_1_, int p_i1970_2_, int p_i1970_3_, int p_i1970_4_)
+            public SpawnListEntry(Class <? extends EntityLiving > entityclassIn, int weight, int groupCountMin, int groupCountMax)
             {
-                super(p_i1970_2_);
-                this.entityClass = p_i1970_1_;
-                this.minGroupCount = p_i1970_3_;
-                this.maxGroupCount = p_i1970_4_;
+                super(weight);
+                this.entityClass = entityclassIn;
+                this.minGroupCount = groupCountMin;
+                this.maxGroupCount = groupCountMax;
             }
 
             public String toString()
             {
                 return this.entityClass.getSimpleName() + "*(" + this.minGroupCount + "-" + this.maxGroupCount + "):" + this.itemWeight;
-            }
-        }
-
-    static final class SwitchEnumCreatureType
-        {
-            static final int[] field_180275_a = new int[EnumCreatureType.values().length];
-            private static final String __OBFID = "CL_00002150";
-
-            static
-            {
-                try
-                {
-                    field_180275_a[EnumCreatureType.MONSTER.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var4)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_180275_a[EnumCreatureType.CREATURE.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var3)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_180275_a[EnumCreatureType.WATER_CREATURE.ordinal()] = 3;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_180275_a[EnumCreatureType.AMBIENT.ordinal()] = 4;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
             }
         }
 
@@ -817,7 +751,5 @@ public abstract class BiomeGenBase
         COLD,
         MEDIUM,
         WARM;
-
-        private static final String __OBFID = "CL_00000160";
     }
 }

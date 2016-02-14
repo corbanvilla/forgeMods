@@ -24,7 +24,6 @@ public class PotionEffect
     @SideOnly(Side.CLIENT)
     private boolean isPotionDurationMax;
     private boolean showParticles;
-    private static final String __OBFID = "CL_00001529";
     /** List of ItemStack that can cure the potion effect **/
     private java.util.List<net.minecraft.item.ItemStack> curativeItems;
 
@@ -221,12 +220,12 @@ public class PotionEffect
      */
     public static PotionEffect readCustomPotionEffectFromNBT(NBTTagCompound nbt)
     {
-        int b0 = nbt.getByte("Id") & 0xff;
+        int i = nbt.getByte("Id") & 0xff;
 
-        if (b0 >= 0 && b0 < Potion.potionTypes.length && Potion.potionTypes[b0] != null)
+        if (i >= 0 && i < Potion.potionTypes.length && Potion.potionTypes[i] != null)
         {
-            byte b1 = nbt.getByte("Amplifier");
-            int i = nbt.getInteger("Duration");
+            int j = nbt.getByte("Amplifier");
+            int k = nbt.getInteger("Duration");
             boolean flag = nbt.getBoolean("Ambient");
             boolean flag1 = true;
 
@@ -235,7 +234,7 @@ public class PotionEffect
                 flag1 = nbt.getBoolean("ShowParticles");
             }
 
-            return new PotionEffect(b0, i, b1, flag, flag1);
+            return new PotionEffect(i, k, j, flag, flag1);
         }
         else
         {
@@ -275,16 +274,15 @@ public class PotionEffect
      */
     public boolean isCurativeItem(net.minecraft.item.ItemStack stack)
     {
-        boolean found = false;
         for (net.minecraft.item.ItemStack curativeItem : this.curativeItems)
         {
             if (curativeItem.isItemEqual(stack))
             {
-                found = true;
+                return true;
             }
         }
 
-        return found;
+        return false;
     }
 
     /***
@@ -302,15 +300,7 @@ public class PotionEffect
      */
     public void addCurativeItem(net.minecraft.item.ItemStack stack)
     {
-        boolean found = false;
-        for (net.minecraft.item.ItemStack curativeItem : this.curativeItems)
-        {
-            if (curativeItem.isItemEqual(stack))
-            {
-                found = true;
-            }
-        }
-        if (!found)
+        if (!this.isCurativeItem(stack))
         {
             this.curativeItems.add(stack);
         }

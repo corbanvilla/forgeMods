@@ -20,7 +20,6 @@ public class ThreadLanServerPing extends Thread
     private final DatagramSocket socket;
     private boolean isStopping = true;
     private final String address;
-    private static final String __OBFID = "CL_00001137";
 
     public ThreadLanServerPing(String p_i1321_1_, String p_i1321_2_) throws IOException
     {
@@ -54,7 +53,7 @@ public class ThreadLanServerPing extends Thread
             {
                 sleep(1500L);
             }
-            catch (InterruptedException interruptedexception)
+            catch (InterruptedException var5)
             {
                 ;
             }

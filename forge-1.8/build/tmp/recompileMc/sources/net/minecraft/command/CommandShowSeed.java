@@ -7,20 +7,18 @@ import net.minecraft.world.World;
 
 public class CommandShowSeed extends CommandBase
 {
-    private static final String __OBFID = "CL_00001053";
-
     /**
-     * Returns true if the given command sender is allowed to execute this command
+     * Returns true if the given command sender is allowed to use this command.
      */
-    public boolean canCommandSenderUse(ICommandSender sender)
+    public boolean canCommandSenderUseCommand(ICommandSender sender)
     {
-        return MinecraftServer.getServer().isSinglePlayer() || super.canCommandSenderUse(sender);
+        return MinecraftServer.getServer().isSinglePlayer() || super.canCommandSenderUseCommand(sender);
     }
 
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
-    public String getName()
+    public String getCommandName()
     {
         return "seed";
     }
@@ -33,17 +31,25 @@ public class CommandShowSeed extends CommandBase
         return 2;
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.seed.usage";
     }
 
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
-    public void execute(ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
-        Object object = sender instanceof EntityPlayer ? ((EntityPlayer)sender).worldObj : MinecraftServer.getServer().worldServerForDimension(0);
-        sender.addChatMessage(new ChatComponentTranslation("commands.seed.success", new Object[] {Long.valueOf(((World)object).getSeed())}));
+        World world = (World)(sender instanceof EntityPlayer ? ((EntityPlayer)sender).worldObj : MinecraftServer.getServer().worldServerForDimension(0));
+        sender.addChatMessage(new ChatComponentTranslation("commands.seed.success", new Object[] {Long.valueOf(world.getSeed())}));
     }
 }

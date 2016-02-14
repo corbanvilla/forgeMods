@@ -15,7 +15,6 @@ public class EntityFireworkRocket extends Entity
     private int fireworkAge;
     /** The lifetime of the firework in ticks. When the age reaches the lifetime the firework explodes. */
     private int lifetime;
-    private static final String __OBFID = "CL_00001718";
 
     public EntityFireworkRocket(World worldIn)
     {
@@ -77,8 +76,8 @@ public class EntityFireworkRocket extends Entity
         if (this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F)
         {
             float f = MathHelper.sqrt_double(x * x + z * z);
-            this.prevRotationYaw = this.rotationYaw = (float)(Math.atan2(x, z) * 180.0D / Math.PI);
-            this.prevRotationPitch = this.rotationPitch = (float)(Math.atan2(y, (double)f) * 180.0D / Math.PI);
+            this.prevRotationYaw = this.rotationYaw = (float)(MathHelper.atan2(x, z) * 180.0D / Math.PI);
+            this.prevRotationPitch = this.rotationPitch = (float)(MathHelper.atan2(y, (double)f) * 180.0D / Math.PI);
         }
     }
 
@@ -96,9 +95,9 @@ public class EntityFireworkRocket extends Entity
         this.motionY += 0.04D;
         this.moveEntity(this.motionX, this.motionY, this.motionZ);
         float f = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
-        this.rotationYaw = (float)(Math.atan2(this.motionX, this.motionZ) * 180.0D / Math.PI);
+        this.rotationYaw = (float)(MathHelper.atan2(this.motionX, this.motionZ) * 180.0D / Math.PI);
 
-        for (this.rotationPitch = (float)(Math.atan2(this.motionY, (double)f) * 180.0D / Math.PI); this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F)
+        for (this.rotationPitch = (float)(MathHelper.atan2(this.motionY, (double)f) * 180.0D / Math.PI); this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F)
         {
             ;
         }
@@ -141,9 +140,9 @@ public class EntityFireworkRocket extends Entity
     }
 
     @SideOnly(Side.CLIENT)
-    public void handleHealthUpdate(byte p_70103_1_)
+    public void handleStatusUpdate(byte id)
     {
-        if (p_70103_1_ == 17 && this.worldObj.isRemote)
+        if (id == 17 && this.worldObj.isRemote)
         {
             ItemStack itemstack = this.dataWatcher.getWatchableObjectItemStack(8);
             NBTTagCompound nbttagcompound = null;
@@ -156,7 +155,7 @@ public class EntityFireworkRocket extends Entity
             this.worldObj.makeFireworks(this.posX, this.posY, this.posZ, this.motionX, this.motionY, this.motionZ, nbttagcompound);
         }
 
-        super.handleHealthUpdate(p_70103_1_);
+        super.handleStatusUpdate(id);
     }
 
     /**
@@ -170,9 +169,9 @@ public class EntityFireworkRocket extends Entity
 
         if (itemstack != null)
         {
-            NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-            itemstack.writeToNBT(nbttagcompound1);
-            tagCompound.setTag("FireworksItem", nbttagcompound1);
+            NBTTagCompound nbttagcompound = new NBTTagCompound();
+            itemstack.writeToNBT(nbttagcompound);
+            tagCompound.setTag("FireworksItem", nbttagcompound);
         }
     }
 
@@ -183,11 +182,11 @@ public class EntityFireworkRocket extends Entity
     {
         this.fireworkAge = tagCompund.getInteger("Life");
         this.lifetime = tagCompund.getInteger("LifeTime");
-        NBTTagCompound nbttagcompound1 = tagCompund.getCompoundTag("FireworksItem");
+        NBTTagCompound nbttagcompound = tagCompund.getCompoundTag("FireworksItem");
 
-        if (nbttagcompound1 != null)
+        if (nbttagcompound != null)
         {
-            ItemStack itemstack = ItemStack.loadItemStackFromNBT(nbttagcompound1);
+            ItemStack itemstack = ItemStack.loadItemStackFromNBT(nbttagcompound);
 
             if (itemstack != null)
             {
@@ -199,15 +198,15 @@ public class EntityFireworkRocket extends Entity
     /**
      * Gets how bright this entity is.
      */
-    public float getBrightness(float p_70013_1_)
+    public float getBrightness(float partialTicks)
     {
-        return super.getBrightness(p_70013_1_);
+        return super.getBrightness(partialTicks);
     }
 
     @SideOnly(Side.CLIENT)
-    public int getBrightnessForRender(float p_70070_1_)
+    public int getBrightnessForRender(float partialTicks)
     {
-        return super.getBrightnessForRender(p_70070_1_);
+        return super.getBrightnessForRender(partialTicks);
     }
 
     /**

@@ -8,21 +8,19 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class ModelArmorStandArmor extends ModelBiped
 {
-    private static final String __OBFID = "CL_00002632";
-
     public ModelArmorStandArmor()
     {
         this(0.0F);
     }
 
-    public ModelArmorStandArmor(float p_i46307_1_)
+    public ModelArmorStandArmor(float modelSize)
     {
-        this(p_i46307_1_, 64, 32);
+        this(modelSize, 64, 32);
     }
 
-    protected ModelArmorStandArmor(float p_i46308_1_, int p_i46308_2_, int p_i46308_3_)
+    protected ModelArmorStandArmor(float modelSize, int textureWidthIn, int textureHeightIn)
     {
-        super(p_i46308_1_, 0.0F, p_i46308_2_, p_i46308_3_);
+        super(modelSize, 0.0F, textureWidthIn, textureHeightIn);
     }
 
     /**
@@ -30,11 +28,11 @@ public class ModelArmorStandArmor extends ModelBiped
      * and legs, where par1 represents the time(so that arms and legs swing back and forth) and par2 represents how
      * "far" arms and legs can swing at most.
      */
-    public void setRotationAngles(float p_78087_1_, float p_78087_2_, float p_78087_3_, float p_78087_4_, float p_78087_5_, float p_78087_6_, Entity p_78087_7_)
+    public void setRotationAngles(float p_78087_1_, float p_78087_2_, float p_78087_3_, float p_78087_4_, float p_78087_5_, float p_78087_6_, Entity entityIn)
     {
-        if (p_78087_7_ instanceof EntityArmorStand)
+        if (entityIn instanceof EntityArmorStand)
         {
-            EntityArmorStand entityarmorstand = (EntityArmorStand)p_78087_7_;
+            EntityArmorStand entityarmorstand = (EntityArmorStand)entityIn;
             this.bipedHead.rotateAngleX = 0.017453292F * entityarmorstand.getHeadRotation().getX();
             this.bipedHead.rotateAngleY = 0.017453292F * entityarmorstand.getHeadRotation().getY();
             this.bipedHead.rotateAngleZ = 0.017453292F * entityarmorstand.getHeadRotation().getZ();

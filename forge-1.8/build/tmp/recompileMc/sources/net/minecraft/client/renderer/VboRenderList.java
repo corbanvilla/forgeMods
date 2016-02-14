@@ -1,6 +1,5 @@
 package net.minecraft.client.renderer;
 
-import java.util.Iterator;
 import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.client.renderer.vertex.VertexBuffer;
 import net.minecraft.util.EnumWorldBlockLayer;
@@ -11,18 +10,13 @@ import org.lwjgl.opengl.GL11;
 @SideOnly(Side.CLIENT)
 public class VboRenderList extends ChunkRenderContainer
 {
-    private static final String __OBFID = "CL_00002533";
-
-    public void renderChunkLayer(EnumWorldBlockLayer p_178001_1_)
+    public void renderChunkLayer(EnumWorldBlockLayer layer)
     {
         if (this.initialized)
         {
-            Iterator iterator = this.renderChunks.iterator();
-
-            while (iterator.hasNext())
+            for (RenderChunk renderchunk : this.renderChunks)
             {
-                RenderChunk renderchunk = (RenderChunk)iterator.next();
-                VertexBuffer vertexbuffer = renderchunk.getVertexBufferByLayer(p_178001_1_.ordinal());
+                VertexBuffer vertexbuffer = renderchunk.getVertexBufferByLayer(layer.ordinal());
                 GlStateManager.pushMatrix();
                 this.preRenderChunk(renderchunk);
                 renderchunk.multModelviewMatrix();

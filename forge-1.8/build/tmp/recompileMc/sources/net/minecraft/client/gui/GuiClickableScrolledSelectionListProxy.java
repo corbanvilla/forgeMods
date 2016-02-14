@@ -11,7 +11,6 @@ import org.lwjgl.input.Mouse;
 public class GuiClickableScrolledSelectionListProxy extends GuiSlot
 {
     private final RealmsClickableScrolledSelectionList field_178046_u;
-    private static final String __OBFID = "CL_00001939";
 
     public GuiClickableScrolledSelectionListProxy(RealmsClickableScrolledSelectionList selectionList, int p_i45526_2_, int p_i45526_3_, int p_i45526_4_, int p_i45526_5_, int p_i45526_6_)
     {
@@ -45,9 +44,9 @@ public class GuiClickableScrolledSelectionListProxy extends GuiSlot
         this.field_178046_u.renderBackground();
     }
 
-    protected void drawSlot(int entryID, int p_180791_2_, int p_180791_3_, int p_180791_4_, int p_180791_5_, int p_180791_6_)
+    protected void drawSlot(int entryID, int p_180791_2_, int p_180791_3_, int p_180791_4_, int mouseXIn, int mouseYIn)
     {
-        this.field_178046_u.renderItem(entryID, p_180791_2_, p_180791_3_, p_180791_4_, p_180791_5_, p_180791_6_);
+        this.field_178046_u.renderItem(entryID, p_180791_2_, p_180791_3_, p_180791_4_, mouseXIn, mouseYIn);
     }
 
     public int func_178044_e()
@@ -96,26 +95,26 @@ public class GuiClickableScrolledSelectionListProxy extends GuiSlot
     /**
      * Draws the selection box around the selected slot element.
      */
-    protected void drawSelectionBox(int p_148120_1_, int p_148120_2_, int p_148120_3_, int p_148120_4_)
+    protected void drawSelectionBox(int p_148120_1_, int p_148120_2_, int mouseXIn, int mouseYIn)
     {
-        int i1 = this.getSize();
+        int i = this.getSize();
 
-        for (int j1 = 0; j1 < i1; ++j1)
+        for (int j = 0; j < i; ++j)
         {
-            int k1 = p_148120_2_ + j1 * this.slotHeight + this.headerPadding;
-            int l1 = this.slotHeight - 4;
+            int k = p_148120_2_ + j * this.slotHeight + this.headerPadding;
+            int l = this.slotHeight - 4;
 
-            if (k1 > this.bottom || k1 + l1 < this.top)
+            if (k > this.bottom || k + l < this.top)
             {
-                this.func_178040_a(j1, p_148120_1_, k1);
+                this.func_178040_a(j, p_148120_1_, k);
             }
 
-            if (this.showSelectionBox && this.isSelected(j1))
+            if (this.showSelectionBox && this.isSelected(j))
             {
-                this.func_178043_a(this.width, k1, l1, Tezzelator.instance);
+                this.func_178043_a(this.width, k, l, Tezzelator.instance);
             }
 
-            this.drawSlot(j1, p_148120_1_, k1, l1, p_148120_3_, p_148120_4_);
+            this.drawSlot(j, p_148120_1_, k, l, mouseXIn, mouseYIn);
         }
     }
 }

@@ -20,8 +20,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockSilverfish extends Block
 {
-    public static final PropertyEnum VARIANT = PropertyEnum.create("variant", BlockSilverfish.EnumType.class);
-    private static final String __OBFID = "CL_00000271";
+    public static final PropertyEnum<BlockSilverfish.EnumType> VARIANT = PropertyEnum.<BlockSilverfish.EnumType>create("variant", BlockSilverfish.EnumType.class);
 
     public BlockSilverfish()
     {
@@ -47,17 +46,17 @@ public class BlockSilverfish extends Block
 
     protected ItemStack createStackedBlock(IBlockState state)
     {
-        switch (BlockSilverfish.SwitchEnumType.TYPE_LOOKUP[((BlockSilverfish.EnumType)state.getValue(VARIANT)).ordinal()])
+        switch ((BlockSilverfish.EnumType)state.getValue(VARIANT))
         {
-            case 1:
+            case COBBLESTONE:
                 return new ItemStack(Blocks.cobblestone);
-            case 2:
+            case STONEBRICK:
                 return new ItemStack(Blocks.stonebrick);
-            case 3:
+            case MOSSY_STONEBRICK:
                 return new ItemStack(Blocks.stonebrick, 1, BlockStoneBrick.EnumType.MOSSY.getMetadata());
-            case 4:
+            case CRACKED_STONEBRICK:
                 return new ItemStack(Blocks.stonebrick, 1, BlockStoneBrick.EnumType.CRACKED.getMetadata());
-            case 5:
+            case CHISELED_STONEBRICK:
                 return new ItemStack(Blocks.stonebrick, 1, BlockStoneBrick.EnumType.CHISELED.getMetadata());
             default:
                 return new ItemStack(Blocks.stone);
@@ -66,13 +65,10 @@ public class BlockSilverfish extends Block
 
     /**
      * Spawns this Block's drops into the World as EntityItems.
-     *  
-     * @param chance The chance that each Item is actually spawned (1.0 = always, 0.0 = never)
-     * @param fortune The player's fortune level
      */
     public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune)
     {
-        if (!worldIn.isRemote && worldIn.getGameRules().getGameRuleBooleanValue("doTileDrops"))
+        if (!worldIn.isRemote && worldIn.getGameRules().getBoolean("doTileDrops"))
         {
             EntitySilverfish entitysilverfish = new EntitySilverfish(worldIn);
             entitysilverfish.setLocationAndAngles((double)pos.getX() + 0.5D, (double)pos.getY(), (double)pos.getZ() + 0.5D, 0.0F, 0.0F);
@@ -91,15 +87,11 @@ public class BlockSilverfish extends Block
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
     {
-        BlockSilverfish.EnumType[] aenumtype = BlockSilverfish.EnumType.values();
-        int i = aenumtype.length;
-
-        for (int j = 0; j < i; ++j)
+        for (BlockSilverfish.EnumType blocksilverfish$enumtype : BlockSilverfish.EnumType.values())
         {
-            BlockSilverfish.EnumType enumtype = aenumtype[j];
-            list.add(new ItemStack(itemIn, 1, enumtype.getMetadata()));
+            list.add(new ItemStack(itemIn, 1, blocksilverfish$enumtype.getMetadata()));
         }
     }
 
@@ -126,60 +118,53 @@ public class BlockSilverfish extends Block
 
     public static enum EnumType implements IStringSerializable
     {
-        STONE(0, "stone", (BlockSilverfish.SwitchEnumType)null)
+        STONE(0, "stone")
         {
-            private static final String __OBFID = "CL_00002097";
             public IBlockState getModelBlock()
             {
                 return Blocks.stone.getDefaultState().withProperty(BlockStone.VARIANT, BlockStone.EnumType.STONE);
             }
         },
-        COBBLESTONE(1, "cobblestone", "cobble", (BlockSilverfish.SwitchEnumType)null)
+        COBBLESTONE(1, "cobblestone", "cobble")
         {
-            private static final String __OBFID = "CL_00002096";
             public IBlockState getModelBlock()
             {
                 return Blocks.cobblestone.getDefaultState();
             }
         },
-        STONEBRICK(2, "stone_brick", "brick", (BlockSilverfish.SwitchEnumType)null)
+        STONEBRICK(2, "stone_brick", "brick")
         {
-            private static final String __OBFID = "CL_00002095";
             public IBlockState getModelBlock()
             {
                 return Blocks.stonebrick.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.DEFAULT);
             }
         },
-        MOSSY_STONEBRICK(3, "mossy_brick", "mossybrick", (BlockSilverfish.SwitchEnumType)null)
+        MOSSY_STONEBRICK(3, "mossy_brick", "mossybrick")
         {
-            private static final String __OBFID = "CL_00002094";
             public IBlockState getModelBlock()
             {
                 return Blocks.stonebrick.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.MOSSY);
             }
         },
-        CRACKED_STONEBRICK(4, "cracked_brick", "crackedbrick", (BlockSilverfish.SwitchEnumType)null)
+        CRACKED_STONEBRICK(4, "cracked_brick", "crackedbrick")
         {
-            private static final String __OBFID = "CL_00002093";
             public IBlockState getModelBlock()
             {
                 return Blocks.stonebrick.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.CRACKED);
             }
         },
-        CHISELED_STONEBRICK(5, "chiseled_brick", "chiseledbrick", (BlockSilverfish.SwitchEnumType)null)
+        CHISELED_STONEBRICK(5, "chiseled_brick", "chiseledbrick")
         {
-            private static final String __OBFID = "CL_00002092";
             public IBlockState getModelBlock()
             {
                 return Blocks.stonebrick.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.CHISELED);
             }
         };
+
         private static final BlockSilverfish.EnumType[] META_LOOKUP = new BlockSilverfish.EnumType[values().length];
         private final int meta;
         private final String name;
         private final String unlocalizedName;
-
-        private static final String __OBFID = "CL_00002098";
 
         private EnumType(int meta, String name)
         {
@@ -227,96 +212,23 @@ public class BlockSilverfish extends Block
 
         public static BlockSilverfish.EnumType forModelBlock(IBlockState model)
         {
-            BlockSilverfish.EnumType[] aenumtype = values();
-            int i = aenumtype.length;
-
-            for (int j = 0; j < i; ++j)
+            for (BlockSilverfish.EnumType blocksilverfish$enumtype : values())
             {
-                BlockSilverfish.EnumType enumtype = aenumtype[j];
-
-                if (model == enumtype.getModelBlock())
+                if (model == blocksilverfish$enumtype.getModelBlock())
                 {
-                    return enumtype;
+                    return blocksilverfish$enumtype;
                 }
             }
 
             return STONE;
         }
 
-        EnumType(int meta, String name, BlockSilverfish.SwitchEnumType dummy)
-        {
-            this(meta, name);
-        }
-
-        EnumType(int meta, String name, String unlocalizedName, BlockSilverfish.SwitchEnumType dummy)
-        {
-            this(meta, name, unlocalizedName);
-        }
-
         static
         {
-            BlockSilverfish.EnumType[] var0 = values();
-            int var1 = var0.length;
-
-            for (int var2 = 0; var2 < var1; ++var2)
+            for (BlockSilverfish.EnumType blocksilverfish$enumtype : values())
             {
-                BlockSilverfish.EnumType var3 = var0[var2];
-                META_LOOKUP[var3.getMetadata()] = var3;
+                META_LOOKUP[blocksilverfish$enumtype.getMetadata()] = blocksilverfish$enumtype;
             }
         }
     }
-
-    static final class SwitchEnumType
-        {
-            static final int[] TYPE_LOOKUP = new int[BlockSilverfish.EnumType.values().length];
-            private static final String __OBFID = "CL_00002099";
-
-            static
-            {
-                try
-                {
-                    TYPE_LOOKUP[BlockSilverfish.EnumType.COBBLESTONE.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var5)
-                {
-                    ;
-                }
-
-                try
-                {
-                    TYPE_LOOKUP[BlockSilverfish.EnumType.STONEBRICK.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var4)
-                {
-                    ;
-                }
-
-                try
-                {
-                    TYPE_LOOKUP[BlockSilverfish.EnumType.MOSSY_STONEBRICK.ordinal()] = 3;
-                }
-                catch (NoSuchFieldError var3)
-                {
-                    ;
-                }
-
-                try
-                {
-                    TYPE_LOOKUP[BlockSilverfish.EnumType.CRACKED_STONEBRICK.ordinal()] = 4;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
-
-                try
-                {
-                    TYPE_LOOKUP[BlockSilverfish.EnumType.CHISELED_STONEBRICK.ordinal()] = 5;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
-            }
-        }
 }

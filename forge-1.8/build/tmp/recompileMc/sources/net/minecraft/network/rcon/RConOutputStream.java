@@ -13,7 +13,6 @@ public class RConOutputStream
     private ByteArrayOutputStream byteArrayOutput;
     /** ByteArrayOutputStream wrapper */
     private DataOutputStream output;
-    private static final String __OBFID = "CL_00001798";
 
     public RConOutputStream(int size)
     {

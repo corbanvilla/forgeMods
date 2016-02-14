@@ -11,11 +11,9 @@ import net.minecraft.world.storage.WorldInfo;
 
 public class AnvilSaveHandler extends SaveHandler
 {
-    private static final String __OBFID = "CL_00000581";
-
-    public AnvilSaveHandler(File savesDirectory, String p_i2142_2_, boolean p_i2142_3_)
+    public AnvilSaveHandler(File savesDirectory, String p_i2142_2_, boolean storePlayerdata)
     {
-        super(savesDirectory, p_i2142_2_, p_i2142_3_);
+        super(savesDirectory, p_i2142_2_, storePlayerdata);
     }
 
     /**
@@ -24,13 +22,12 @@ public class AnvilSaveHandler extends SaveHandler
     public IChunkLoader getChunkLoader(WorldProvider provider)
     {
         File file1 = this.getWorldDirectory();
-        File file2;
 
         if (provider.getSaveFolder() != null)
         {
-            file2 = new File(file1, provider.getSaveFolder());
-            file2.mkdirs();
-            return new AnvilChunkLoader(file2);
+            File file3 = new File(file1, provider.getSaveFolder());
+            file3.mkdirs();
+            return new AnvilChunkLoader(file3);
         }
         else
         {

@@ -18,7 +18,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class EntityMinecartTNT extends EntityMinecart
 {
     private int minecartTNTFuse = -1;
-    private static final String __OBFID = "CL_00001680";
 
     public EntityMinecartTNT(World worldIn)
     {
@@ -93,7 +92,7 @@ public class EntityMinecartTNT extends EntityMinecart
         super.killMinecart(p_94095_1_);
         double d0 = this.motionX * this.motionX + this.motionZ * this.motionZ;
 
-        if (!p_94095_1_.isExplosion())
+        if (!p_94095_1_.isExplosion() && this.worldObj.getGameRules().getBoolean("doEntityDrops"))
         {
             this.entityDropItem(new ItemStack(Blocks.tnt, 1), 0.0F);
         }
@@ -111,14 +110,14 @@ public class EntityMinecartTNT extends EntityMinecart
     {
         if (!this.worldObj.isRemote)
         {
-            double d1 = Math.sqrt(p_94103_1_);
+            double d0 = Math.sqrt(p_94103_1_);
 
-            if (d1 > 5.0D)
+            if (d0 > 5.0D)
             {
-                d1 = 5.0D;
+                d0 = 5.0D;
             }
 
-            this.worldObj.createExplosion(this, this.posX, this.posY, this.posZ, (float)(4.0D + this.rand.nextDouble() * 1.5D * d1), true);
+            this.worldObj.createExplosion(this, this.posX, this.posY, this.posZ, (float)(4.0D + this.rand.nextDouble() * 1.5D * d0), true);
             this.setDead();
         }
     }
@@ -127,8 +126,8 @@ public class EntityMinecartTNT extends EntityMinecart
     {
         if (distance >= 3.0F)
         {
-            float f2 = distance / 10.0F;
-            this.explodeCart((double)(f2 * f2));
+            float f = distance / 10.0F;
+            this.explodeCart((double)(f * f));
         }
 
         super.fall(distance, damageMultiplier);
@@ -137,24 +136,24 @@ public class EntityMinecartTNT extends EntityMinecart
     /**
      * Called every tick the minecart is on an activator rail. Args: x, y, z, is the rail receiving power
      */
-    public void onActivatorRailPass(int p_96095_1_, int p_96095_2_, int p_96095_3_, boolean p_96095_4_)
+    public void onActivatorRailPass(int x, int y, int z, boolean receivingPower)
     {
-        if (p_96095_4_ && this.minecartTNTFuse < 0)
+        if (receivingPower && this.minecartTNTFuse < 0)
         {
             this.ignite();
         }
     }
 
     @SideOnly(Side.CLIENT)
-    public void handleHealthUpdate(byte p_70103_1_)
+    public void handleStatusUpdate(byte id)
     {
-        if (p_70103_1_ == 10)
+        if (id == 10)
         {
             this.ignite();
         }
         else
         {
-            super.handleHealthUpdate(p_70103_1_);
+            super.handleStatusUpdate(id);
         }
     }
 
@@ -196,14 +195,14 @@ public class EntityMinecartTNT extends EntityMinecart
     /**
      * Explosion resistance of a block relative to this entity
      */
-    public float getExplosionResistance(Explosion p_180428_1_, World worldIn, BlockPos p_180428_3_, IBlockState p_180428_4_)
+    public float getExplosionResistance(Explosion explosionIn, World worldIn, BlockPos pos, IBlockState blockStateIn)
     {
-        return this.isIgnited() && (BlockRailBase.isRailBlock(p_180428_4_) || BlockRailBase.isRailBlock(worldIn, p_180428_3_.up())) ? 0.0F : super.getExplosionResistance(p_180428_1_, worldIn, p_180428_3_, p_180428_4_);
+        return !this.isIgnited() || !BlockRailBase.isRailBlock(blockStateIn) && !BlockRailBase.isRailBlock(worldIn, pos.up()) ? super.getExplosionResistance(explosionIn, worldIn, pos, blockStateIn) : 0.0F;
     }
 
-    public boolean func_174816_a(Explosion p_174816_1_, World worldIn, BlockPos p_174816_3_, IBlockState p_174816_4_, float p_174816_5_)
+    public boolean verifyExplosion(Explosion explosionIn, World worldIn, BlockPos pos, IBlockState blockStateIn, float p_174816_5_)
     {
-        return this.isIgnited() && (BlockRailBase.isRailBlock(p_174816_4_) || BlockRailBase.isRailBlock(worldIn, p_174816_3_.up())) ? false : super.func_174816_a(p_174816_1_, worldIn, p_174816_3_, p_174816_4_, p_174816_5_);
+        return !this.isIgnited() || !BlockRailBase.isRailBlock(blockStateIn) && !BlockRailBase.isRailBlock(worldIn, pos.up()) ? super.verifyExplosion(explosionIn, worldIn, pos, blockStateIn, p_174816_5_) : false;
     }
 
     /**

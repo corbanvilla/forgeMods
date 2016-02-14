@@ -9,7 +9,6 @@ public class EntityBodyHelper
     /** Used to progressively ajust the rotation of the body to the rotation of the head */
     private int rotationTickCounter;
     private float prevRenderYawHead;
-    private static final String __OBFID = "CL_00001570";
 
     public EntityBodyHelper(EntityLivingBase p_i1611_1_)
     {
@@ -43,7 +42,7 @@ public class EntityBodyHelper
             else
             {
                 ++this.rotationTickCounter;
-                boolean flag = true;
+                int i = 10;
 
                 if (this.rotationTickCounter > 10)
                 {
@@ -61,18 +60,18 @@ public class EntityBodyHelper
      */
     private float computeAngleWithBound(float p_75665_1_, float p_75665_2_, float p_75665_3_)
     {
-        float f3 = MathHelper.wrapAngleTo180_float(p_75665_1_ - p_75665_2_);
+        float f = MathHelper.wrapAngleTo180_float(p_75665_1_ - p_75665_2_);
 
-        if (f3 < -p_75665_3_)
+        if (f < -p_75665_3_)
         {
-            f3 = -p_75665_3_;
+            f = -p_75665_3_;
         }
 
-        if (f3 >= p_75665_3_)
+        if (f >= p_75665_3_)
         {
-            f3 = p_75665_3_;
+            f = p_75665_3_;
         }
 
-        return p_75665_1_ - f3;
+        return p_75665_1_ - f;
     }
 }

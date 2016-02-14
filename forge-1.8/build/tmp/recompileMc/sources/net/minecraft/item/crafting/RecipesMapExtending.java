@@ -9,8 +9,6 @@ import net.minecraft.world.storage.MapData;
 
 public class RecipesMapExtending extends ShapedRecipes
 {
-    private static final String __OBFID = "CL_00000088";
-
     public RecipesMapExtending()
     {
         super(3, 3, new ItemStack[] {new ItemStack(Items.paper), new ItemStack(Items.paper), new ItemStack(Items.paper), new ItemStack(Items.paper), new ItemStack(Items.filled_map, 0, 32767), new ItemStack(Items.paper), new ItemStack(Items.paper), new ItemStack(Items.paper), new ItemStack(Items.paper)}, new ItemStack(Items.map, 0, 0));
@@ -19,9 +17,9 @@ public class RecipesMapExtending extends ShapedRecipes
     /**
      * Used to check if a recipe matches current crafting inventory
      */
-    public boolean matches(InventoryCrafting p_77569_1_, World worldIn)
+    public boolean matches(InventoryCrafting inv, World worldIn)
     {
-        if (!super.matches(p_77569_1_, worldIn))
+        if (!super.matches(inv, worldIn))
         {
             return false;
         }
@@ -29,9 +27,9 @@ public class RecipesMapExtending extends ShapedRecipes
         {
             ItemStack itemstack = null;
 
-            for (int i = 0; i < p_77569_1_.getSizeInventory() && itemstack == null; ++i)
+            for (int i = 0; i < inv.getSizeInventory() && itemstack == null; ++i)
             {
-                ItemStack itemstack1 = p_77569_1_.getStackInSlot(i);
+                ItemStack itemstack1 = inv.getStackInSlot(i);
 
                 if (itemstack1 != null && itemstack1.getItem() == Items.filled_map)
                 {
@@ -54,13 +52,13 @@ public class RecipesMapExtending extends ShapedRecipes
     /**
      * Returns an Item that is the result of this recipe
      */
-    public ItemStack getCraftingResult(InventoryCrafting p_77572_1_)
+    public ItemStack getCraftingResult(InventoryCrafting inv)
     {
         ItemStack itemstack = null;
 
-        for (int i = 0; i < p_77572_1_.getSizeInventory() && itemstack == null; ++i)
+        for (int i = 0; i < inv.getSizeInventory() && itemstack == null; ++i)
         {
-            ItemStack itemstack1 = p_77572_1_.getStackInSlot(i);
+            ItemStack itemstack1 = inv.getStackInSlot(i);
 
             if (itemstack1 != null && itemstack1.getItem() == Items.filled_map)
             {

@@ -17,7 +17,7 @@ public class EntityXPOrb extends Entity
     public int xpColor;
     /** The age of the XP orb in ticks. */
     public int xpOrbAge;
-    public int field_70532_c;
+    public int delayBeforeCanPickup;
     /** The health of this XP orb. */
     private int xpOrbHealth = 5;
     /** This is how much XP this orb has. */
@@ -26,7 +26,6 @@ public class EntityXPOrb extends Entity
     private EntityPlayer closestPlayer;
     /** Threshold color for tracking players */
     private int xpTargetColor;
-    private static final String __OBFID = "CL_00001544";
 
     public EntityXPOrb(World worldIn, double x, double y, double z, int expValue)
     {
@@ -55,17 +54,19 @@ public class EntityXPOrb extends Entity
         this.setSize(0.25F, 0.25F);
     }
 
-    protected void entityInit() {}
+    protected void entityInit()
+    {
+    }
 
     @SideOnly(Side.CLIENT)
-    public int getBrightnessForRender(float p_70070_1_)
+    public int getBrightnessForRender(float partialTicks)
     {
-        float f1 = 0.5F;
-        f1 = MathHelper.clamp_float(f1, 0.0F, 1.0F);
-        int i = super.getBrightnessForRender(p_70070_1_);
+        float f = 0.5F;
+        f = MathHelper.clamp_float(f, 0.0F, 1.0F);
+        int i = super.getBrightnessForRender(partialTicks);
         int j = i & 255;
         int k = i >> 16 & 255;
-        j += (int)(f1 * 15.0F * 16.0F);
+        j = j + (int)(f * 15.0F * 16.0F);
 
         if (j > 240)
         {
@@ -82,9 +83,9 @@ public class EntityXPOrb extends Entity
     {
         super.onUpdate();
 
-        if (this.field_70532_c > 0)
+        if (this.delayBeforeCanPickup > 0)
         {
-            --this.field_70532_c;
+            --this.delayBeforeCanPickup;
         }
 
         this.prevPosX = this.posX;
@@ -128,7 +129,7 @@ public class EntityXPOrb extends Entity
 
             if (d5 > 0.0D)
             {
-                d5 *= d5;
+                d5 = d5 * d5;
                 this.motionX += d1 / d4 * d5 * 0.1D;
                 this.motionY += d2 / d4 * d5 * 0.1D;
                 this.motionZ += d3 / d4 * d5 * 0.1D;
@@ -228,7 +229,7 @@ public class EntityXPOrb extends Entity
     {
         if (!this.worldObj.isRemote)
         {
-            if (this.field_70532_c == 0 && entityIn.xpCooldown == 0)
+            if (this.delayBeforeCanPickup == 0 && entityIn.xpCooldown == 0)
             {
                 if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.player.PlayerPickupXpEvent(entityIn, this))) return;
                 entityIn.xpCooldown = 2;
@@ -260,8 +261,6 @@ public class EntityXPOrb extends Entity
 
     /**
      * Get a fragment of the maximum experience points value for the supplied value of experience points value.
-     *  
-     * @param expValue The experience value to fragment
      */
     public static int getXPSplit(int expValue)
     {

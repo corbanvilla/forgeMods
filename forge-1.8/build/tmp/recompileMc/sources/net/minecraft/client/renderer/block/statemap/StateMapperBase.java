@@ -1,7 +1,6 @@
 package net.minecraft.client.renderer.block.statemap;
 
 import com.google.common.collect.Maps;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import net.minecraft.block.Block;
@@ -14,18 +13,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public abstract class StateMapperBase implements IStateMapper
 {
-    protected Map mapStateModelLocations = Maps.newLinkedHashMap();
-    private static final String __OBFID = "CL_00002479";
+    protected Map<IBlockState, ModelResourceLocation> mapStateModelLocations = Maps.<IBlockState, ModelResourceLocation>newLinkedHashMap();
 
-    public String getPropertyString(Map p_178131_1_)
+    public String getPropertyString(Map<IProperty, Comparable> p_178131_1_)
     {
         StringBuilder stringbuilder = new StringBuilder();
-        Iterator iterator = p_178131_1_.entrySet().iterator();
 
-        while (iterator.hasNext())
+        for (Entry<IProperty, Comparable> entry : p_178131_1_.entrySet())
         {
-            Entry entry = (Entry)iterator.next();
-
             if (stringbuilder.length() != 0)
             {
                 stringbuilder.append(",");
@@ -46,18 +41,15 @@ public abstract class StateMapperBase implements IStateMapper
         return stringbuilder.toString();
     }
 
-    public Map putStateModelLocations(Block p_178130_1_)
+    public Map<IBlockState, ModelResourceLocation> putStateModelLocations(Block blockIn)
     {
-        Iterator iterator = p_178130_1_.getBlockState().getValidStates().iterator();
-
-        while (iterator.hasNext())
+        for (IBlockState iblockstate : blockIn.getBlockState().getValidStates())
         {
-            IBlockState iblockstate = (IBlockState)iterator.next();
             this.mapStateModelLocations.put(iblockstate, this.getModelResourceLocation(iblockstate));
         }
 
         return this.mapStateModelLocations;
     }
 
-    protected abstract ModelResourceLocation getModelResourceLocation(IBlockState p_178132_1_);
+    protected abstract ModelResourceLocation getModelResourceLocation(IBlockState state);
 }

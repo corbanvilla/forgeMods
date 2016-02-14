@@ -6,37 +6,40 @@ public class ResourceLocation
 {
     protected final String resourceDomain;
     protected final String resourcePath;
-    private static final String __OBFID = "CL_00001082";
 
-    protected ResourceLocation(int p_i45928_1_, String ... resourcePathIn)
+    protected ResourceLocation(int p_i45928_1_, String... resourceName)
     {
-        this.resourceDomain = org.apache.commons.lang3.StringUtils.isEmpty(resourcePathIn[0]) ? "minecraft" : resourcePathIn[0].toLowerCase();
-        this.resourcePath = resourcePathIn[1];
+        this.resourceDomain = org.apache.commons.lang3.StringUtils.isEmpty(resourceName[0]) ? "minecraft" : resourceName[0].toLowerCase();
+        this.resourcePath = resourceName[1];
         Validate.notNull(this.resourcePath);
     }
 
-    public ResourceLocation(String p_i1293_1_)
+    public ResourceLocation(String resourceName)
     {
-        this(0, func_177516_a(p_i1293_1_));
+        this(0, splitObjectName(resourceName));
     }
 
-    public ResourceLocation(String p_i1292_1_, String p_i1292_2_)
+    public ResourceLocation(String resourceDomainIn, String resourcePathIn)
     {
-        this(0, new String[] {p_i1292_1_, p_i1292_2_});
+        this(0, new String[] {resourceDomainIn, resourcePathIn});
     }
 
-    protected static String[] func_177516_a(String p_177516_0_)
+    /**
+     * Splits an object name (such as minecraft:apple) into the domain and path parts and returns these as an array of
+     * length 2. If no colon is present in the passed value the returned array will contain {null, toSplit}.
+     */
+    protected static String[] splitObjectName(String toSplit)
     {
-        String[] astring = new String[] {null, p_177516_0_};
-        int i = p_177516_0_.indexOf(58);
+        String[] astring = new String[] {null, toSplit};
+        int i = toSplit.indexOf(58);
 
         if (i >= 0)
         {
-            astring[1] = p_177516_0_.substring(i + 1, p_177516_0_.length());
+            astring[1] = toSplit.substring(i + 1, toSplit.length());
 
             if (i > 1)
             {
-                astring[0] = p_177516_0_.substring(0, i);
+                astring[0] = toSplit.substring(0, i);
             }
         }
 

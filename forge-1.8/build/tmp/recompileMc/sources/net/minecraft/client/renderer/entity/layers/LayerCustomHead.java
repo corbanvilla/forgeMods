@@ -18,23 +18,23 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntitySkull;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.StringUtils;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class LayerCustomHead implements LayerRenderer
+public class LayerCustomHead implements LayerRenderer<EntityLivingBase>
 {
     private final ModelRenderer field_177209_a;
-    private static final String __OBFID = "CL_00002422";
 
     public LayerCustomHead(ModelRenderer p_i46120_1_)
     {
         this.field_177209_a = p_i46120_1_;
     }
 
-    public void doRenderLayer(EntityLivingBase p_177141_1_, float p_177141_2_, float p_177141_3_, float p_177141_4_, float p_177141_5_, float p_177141_6_, float p_177141_7_, float p_177141_8_)
+    public void doRenderLayer(EntityLivingBase entitylivingbaseIn, float p_177141_2_, float p_177141_3_, float partialTicks, float p_177141_5_, float p_177141_6_, float p_177141_7_, float scale)
     {
-        ItemStack itemstack = p_177141_1_.getCurrentArmor(3);
+        ItemStack itemstack = entitylivingbaseIn.getCurrentArmor(3);
 
         if (itemstack != null && itemstack.getItem() != null)
         {
@@ -42,20 +42,19 @@ public class LayerCustomHead implements LayerRenderer
             Minecraft minecraft = Minecraft.getMinecraft();
             GlStateManager.pushMatrix();
 
-            if (p_177141_1_.isSneaking())
+            if (entitylivingbaseIn.isSneaking())
             {
                 GlStateManager.translate(0.0F, 0.2F, 0.0F);
             }
 
-            boolean flag = p_177141_1_ instanceof EntityVillager || p_177141_1_ instanceof EntityZombie && ((EntityZombie)p_177141_1_).isVillager();
-            float f7;
+            boolean flag = entitylivingbaseIn instanceof EntityVillager || entitylivingbaseIn instanceof EntityZombie && ((EntityZombie)entitylivingbaseIn).isVillager();
 
-            if (!flag && p_177141_1_.isChild())
+            if (!flag && entitylivingbaseIn.isChild())
             {
-                f7 = 2.0F;
-                float f8 = 1.4F;
-                GlStateManager.scale(f8 / f7, f8 / f7, f8 / f7);
-                GlStateManager.translate(0.0F, 16.0F * p_177141_8_, 0.0F);
+                float f = 2.0F;
+                float f1 = 1.4F;
+                GlStateManager.scale(f1 / f, f1 / f, f1 / f);
+                GlStateManager.translate(0.0F, 16.0F * scale, 0.0F);
             }
 
             this.field_177209_a.postRender(0.0625F);
@@ -63,22 +62,22 @@ public class LayerCustomHead implements LayerRenderer
 
             if (item instanceof ItemBlock)
             {
-                f7 = 0.625F;
+                float f2 = 0.625F;
                 GlStateManager.translate(0.0F, -0.25F, 0.0F);
                 GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
-                GlStateManager.scale(f7, -f7, -f7);
+                GlStateManager.scale(f2, -f2, -f2);
 
                 if (flag)
                 {
                     GlStateManager.translate(0.0F, 0.1875F, 0.0F);
                 }
 
-                minecraft.getItemRenderer().renderItem(p_177141_1_, itemstack, ItemCameraTransforms.TransformType.HEAD);
+                minecraft.getItemRenderer().renderItem(entitylivingbaseIn, itemstack, ItemCameraTransforms.TransformType.HEAD);
             }
             else if (item == Items.skull)
             {
-                f7 = 1.1875F;
-                GlStateManager.scale(f7, -f7, -f7);
+                float f3 = 1.1875F;
+                GlStateManager.scale(f3, -f3, -f3);
 
                 if (flag)
                 {
@@ -97,8 +96,13 @@ public class LayerCustomHead implements LayerRenderer
                     }
                     else if (nbttagcompound.hasKey("SkullOwner", 8))
                     {
-                        gameprofile = TileEntitySkull.updateGameprofile(new GameProfile((UUID)null, nbttagcompound.getString("SkullOwner")));
-                        nbttagcompound.setTag("SkullOwner", NBTUtil.writeGameProfile(new NBTTagCompound(), gameprofile));
+                        String s = nbttagcompound.getString("SkullOwner");
+
+                        if (!StringUtils.isNullOrEmpty(s))
+                        {
+                            gameprofile = TileEntitySkull.updateGameprofile(new GameProfile((UUID)null, s));
+                            nbttagcompound.setTag("SkullOwner", NBTUtil.writeGameProfile(new NBTTagCompound(), gameprofile));
+                        }
                     }
                 }
 

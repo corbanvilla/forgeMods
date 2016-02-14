@@ -6,22 +6,20 @@ import net.minecraft.util.ResourceLocation;
 
 public class PotionAbsorption extends Potion
 {
-    private static final String __OBFID = "CL_00001524";
-
-    protected PotionAbsorption(int p_i45901_1_, ResourceLocation p_i45901_2_, boolean p_i45901_3_, int p_i45901_4_)
+    protected PotionAbsorption(int potionID, ResourceLocation location, boolean badEffect, int potionColor)
     {
-        super(p_i45901_1_, p_i45901_2_, p_i45901_3_, p_i45901_4_);
+        super(potionID, location, badEffect, potionColor);
     }
 
-    public void removeAttributesModifiersFromEntity(EntityLivingBase p_111187_1_, BaseAttributeMap p_111187_2_, int p_111187_3_)
+    public void removeAttributesModifiersFromEntity(EntityLivingBase entityLivingBaseIn, BaseAttributeMap p_111187_2_, int amplifier)
     {
-        p_111187_1_.setAbsorptionAmount(p_111187_1_.getAbsorptionAmount() - (float)(4 * (p_111187_3_ + 1)));
-        super.removeAttributesModifiersFromEntity(p_111187_1_, p_111187_2_, p_111187_3_);
+        entityLivingBaseIn.setAbsorptionAmount(entityLivingBaseIn.getAbsorptionAmount() - (float)(4 * (amplifier + 1)));
+        super.removeAttributesModifiersFromEntity(entityLivingBaseIn, p_111187_2_, amplifier);
     }
 
-    public void applyAttributesModifiersToEntity(EntityLivingBase p_111185_1_, BaseAttributeMap p_111185_2_, int p_111185_3_)
+    public void applyAttributesModifiersToEntity(EntityLivingBase entityLivingBaseIn, BaseAttributeMap p_111185_2_, int amplifier)
     {
-        p_111185_1_.setAbsorptionAmount(p_111185_1_.getAbsorptionAmount() + (float)(4 * (p_111185_3_ + 1)));
-        super.applyAttributesModifiersToEntity(p_111185_1_, p_111185_2_, p_111185_3_);
+        entityLivingBaseIn.setAbsorptionAmount(entityLivingBaseIn.getAbsorptionAmount() + (float)(4 * (amplifier + 1)));
+        super.applyAttributesModifiersToEntity(entityLivingBaseIn, p_111185_2_, amplifier);
     }
 }

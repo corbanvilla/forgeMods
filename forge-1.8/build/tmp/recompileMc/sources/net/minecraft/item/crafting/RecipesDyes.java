@@ -10,16 +10,12 @@ import net.minecraft.item.ItemStack;
 
 public class RecipesDyes
 {
-    private static final String __OBFID = "CL_00000082";
-
     /**
      * Adds the dye recipes to the CraftingManager.
      */
     public void addRecipes(CraftingManager p_77607_1_)
     {
-        int i;
-
-        for (i = 0; i < 16; ++i)
+        for (int i = 0; i < 16; ++i)
         {
             p_77607_1_.addShapelessRecipe(new ItemStack(Blocks.wool, 1, i), new Object[] {new ItemStack(Items.dye, 1, 15 - i), new ItemStack(Item.getItemFromBlock(Blocks.wool), 1, 0)});
             p_77607_1_.addRecipe(new ItemStack(Blocks.stained_hardened_clay, 8, 15 - i), new Object[] {"###", "#X#", "###", '#', new ItemStack(Blocks.hardened_clay), 'X', new ItemStack(Items.dye, 1, i)});
@@ -55,9 +51,9 @@ public class RecipesDyes
         p_77607_1_.addShapelessRecipe(new ItemStack(Items.dye, 2, EnumDyeColor.RED.getDyeDamage()), new Object[] {new ItemStack(Blocks.double_plant, 1, BlockDoublePlant.EnumPlantType.ROSE.getMeta())});
         p_77607_1_.addShapelessRecipe(new ItemStack(Items.dye, 2, EnumDyeColor.PINK.getDyeDamage()), new Object[] {new ItemStack(Blocks.double_plant, 1, BlockDoublePlant.EnumPlantType.PAEONIA.getMeta())});
 
-        for (i = 0; i < 16; ++i)
+        for (int j = 0; j < 16; ++j)
         {
-            p_77607_1_.addRecipe(new ItemStack(Blocks.carpet, 3, i), new Object[] {"##", '#', new ItemStack(Blocks.wool, 1, i)});
+            p_77607_1_.addRecipe(new ItemStack(Blocks.carpet, 3, j), new Object[] {"##", '#', new ItemStack(Blocks.wool, 1, j)});
         }
     }
 }

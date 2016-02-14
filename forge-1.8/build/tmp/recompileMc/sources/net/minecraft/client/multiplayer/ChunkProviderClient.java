@@ -1,7 +1,6 @@
 package net.minecraft.client.multiplayer;
 
 import com.google.common.collect.Lists;
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.BlockPos;
@@ -9,6 +8,7 @@ import net.minecraft.util.IProgressUpdate;
 import net.minecraft.util.LongHashMap;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraft.world.chunk.IChunkProvider;
@@ -26,16 +26,10 @@ public class ChunkProviderClient implements IChunkProvider
      * coordinates.
      */
     private Chunk blankChunk;
-    /** The mapping between ChunkCoordinates and Chunks that ChunkProviderClient maintains. */
-    private LongHashMap chunkMapping = new LongHashMap();
-    /**
-     * This may have been intended to be an iterable version of all currently loaded chunks (MultiplayerChunkCache),
-     * with identical contents to chunkMapping's values. However it is never actually added to.
-     */
-    private List chunkListing = Lists.newArrayList();
+    private LongHashMap<Chunk> chunkMapping = new LongHashMap();
+    private List<Chunk> chunkListing = Lists.<Chunk>newArrayList();
     /** Reference to the World object. */
     private World worldObj;
-    private static final String __OBFID = "CL_00000880";
 
     public ChunkProviderClient(World worldIn)
     {
@@ -95,7 +89,7 @@ public class ChunkProviderClient implements IChunkProvider
      * Two modes of operation: if passed true, save all Chunks in one go.  If passed false, save up to two chunks.
      * Return true if all chunks have been saved.
      */
-    public boolean saveChunks(boolean p_73151_1_, IProgressUpdate p_73151_2_)
+    public boolean saveChunks(boolean p_73151_1_, IProgressUpdate progressCallback)
     {
         return true;
     }
@@ -104,7 +98,9 @@ public class ChunkProviderClient implements IChunkProvider
      * Save extra data not associated with any Chunk.  Not saved during autosave, only during world unload.  Currently
      * unimplemented.
      */
-    public void saveExtraData() {}
+    public void saveExtraData()
+    {
+    }
 
     /**
      * Unloads chunks that are marked to be unloaded. This is not guaranteed to unload every such chunk.
@@ -112,11 +108,9 @@ public class ChunkProviderClient implements IChunkProvider
     public boolean unloadQueuedChunks()
     {
         long i = System.currentTimeMillis();
-        Iterator iterator = this.chunkListing.iterator();
 
-        while (iterator.hasNext())
+        for (Chunk chunk : this.chunkListing)
         {
-            Chunk chunk = (Chunk)iterator.next();
             chunk.func_150804_b(System.currentTimeMillis() - i > 5L);
         }
 
@@ -139,7 +133,9 @@ public class ChunkProviderClient implements IChunkProvider
     /**
      * Populates chunk with ores etc etc
      */
-    public void populate(IChunkProvider p_73153_1_, int p_73153_2_, int p_73153_3_) {}
+    public void populate(IChunkProvider p_73153_1_, int p_73153_2_, int p_73153_3_)
+    {
+    }
 
     public boolean func_177460_a(IChunkProvider p_177460_1_, Chunk p_177460_2_, int p_177460_3_, int p_177460_4_)
     {
@@ -154,12 +150,12 @@ public class ChunkProviderClient implements IChunkProvider
         return "MultiplayerChunkCache: " + this.chunkMapping.getNumHashElements() + ", " + this.chunkListing.size();
     }
 
-    public List func_177458_a(EnumCreatureType p_177458_1_, BlockPos p_177458_2_)
+    public List<BiomeGenBase.SpawnListEntry> getPossibleCreatures(EnumCreatureType creatureType, BlockPos pos)
     {
         return null;
     }
 
-    public BlockPos getStrongholdGen(World worldIn, String p_180513_2_, BlockPos p_180513_3_)
+    public BlockPos getStrongholdGen(World worldIn, String structureName, BlockPos position)
     {
         return null;
     }
@@ -169,7 +165,9 @@ public class ChunkProviderClient implements IChunkProvider
         return this.chunkListing.size();
     }
 
-    public void recreateStructures(Chunk p_180514_1_, int p_180514_2_, int p_180514_3_) {}
+    public void recreateStructures(Chunk p_180514_1_, int p_180514_2_, int p_180514_3_)
+    {
+    }
 
     public Chunk provideChunk(BlockPos blockPosIn)
     {

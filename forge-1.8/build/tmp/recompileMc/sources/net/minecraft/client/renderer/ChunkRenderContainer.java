@@ -14,29 +14,28 @@ public abstract class ChunkRenderContainer
     private double viewEntityX;
     private double viewEntityY;
     private double viewEntityZ;
-    protected List renderChunks = Lists.newArrayListWithCapacity(17424);
+    protected List<RenderChunk> renderChunks = Lists.<RenderChunk>newArrayListWithCapacity(17424);
     protected boolean initialized;
-    private static final String __OBFID = "CL_00002563";
 
-    public void initialize(double p_178004_1_, double p_178004_3_, double p_178004_5_)
+    public void initialize(double viewEntityXIn, double viewEntityYIn, double viewEntityZIn)
     {
         this.initialized = true;
         this.renderChunks.clear();
-        this.viewEntityX = p_178004_1_;
-        this.viewEntityY = p_178004_3_;
-        this.viewEntityZ = p_178004_5_;
+        this.viewEntityX = viewEntityXIn;
+        this.viewEntityY = viewEntityYIn;
+        this.viewEntityZ = viewEntityZIn;
     }
 
-    public void preRenderChunk(RenderChunk p_178003_1_)
+    public void preRenderChunk(RenderChunk renderChunkIn)
     {
-        BlockPos blockpos = p_178003_1_.getPosition();
+        BlockPos blockpos = renderChunkIn.getPosition();
         GlStateManager.translate((float)((double)blockpos.getX() - this.viewEntityX), (float)((double)blockpos.getY() - this.viewEntityY), (float)((double)blockpos.getZ() - this.viewEntityZ));
     }
 
-    public void addRenderChunk(RenderChunk p_178002_1_, EnumWorldBlockLayer p_178002_2_)
+    public void addRenderChunk(RenderChunk renderChunkIn, EnumWorldBlockLayer layer)
     {
-        this.renderChunks.add(p_178002_1_);
+        this.renderChunks.add(renderChunkIn);
     }
 
-    public abstract void renderChunkLayer(EnumWorldBlockLayer p_178001_1_);
+    public abstract void renderChunkLayer(EnumWorldBlockLayer layer);
 }

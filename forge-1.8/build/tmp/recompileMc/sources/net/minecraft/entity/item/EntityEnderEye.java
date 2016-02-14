@@ -21,7 +21,6 @@ public class EntityEnderEye extends Entity
     private double targetZ;
     private int despawnTimer;
     private boolean shatterOrDrop;
-    private static final String __OBFID = "CL_00001716";
 
     public EntityEnderEye(World worldIn)
     {
@@ -29,7 +28,9 @@ public class EntityEnderEye extends Entity
         this.setSize(0.25F, 0.25F);
     }
 
-    protected void entityInit() {}
+    protected void entityInit()
+    {
+    }
 
     /**
      * Checks if the entity is in range to render by using the past in distance and comparing it to its average edge
@@ -38,17 +39,23 @@ public class EntityEnderEye extends Entity
     @SideOnly(Side.CLIENT)
     public boolean isInRangeToRenderDist(double distance)
     {
-        double d1 = this.getEntityBoundingBox().getAverageEdgeLength() * 4.0D;
-        d1 *= 64.0D;
-        return distance < d1 * d1;
+        double d0 = this.getEntityBoundingBox().getAverageEdgeLength() * 4.0D;
+
+        if (Double.isNaN(d0))
+        {
+            d0 = 4.0D;
+        }
+
+        d0 = d0 * 64.0D;
+        return distance < d0 * d0;
     }
 
-    public EntityEnderEye(World worldIn, double p_i1758_2_, double p_i1758_4_, double p_i1758_6_)
+    public EntityEnderEye(World worldIn, double x, double y, double z)
     {
         super(worldIn);
         this.despawnTimer = 0;
         this.setSize(0.25F, 0.25F);
-        this.setPosition(p_i1758_2_, p_i1758_4_, p_i1758_6_);
+        this.setPosition(x, y, z);
     }
 
     public void moveTowards(BlockPos p_180465_1_)
@@ -90,8 +97,8 @@ public class EntityEnderEye extends Entity
         if (this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F)
         {
             float f = MathHelper.sqrt_double(x * x + z * z);
-            this.prevRotationYaw = this.rotationYaw = (float)(Math.atan2(x, z) * 180.0D / Math.PI);
-            this.prevRotationPitch = this.rotationPitch = (float)(Math.atan2(y, (double)f) * 180.0D / Math.PI);
+            this.prevRotationYaw = this.rotationYaw = (float)(MathHelper.atan2(x, z) * 180.0D / Math.PI);
+            this.prevRotationPitch = this.rotationPitch = (float)(MathHelper.atan2(y, (double)f) * 180.0D / Math.PI);
         }
     }
 
@@ -108,9 +115,9 @@ public class EntityEnderEye extends Entity
         this.posY += this.motionY;
         this.posZ += this.motionZ;
         float f = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
-        this.rotationYaw = (float)(Math.atan2(this.motionX, this.motionZ) * 180.0D / Math.PI);
+        this.rotationYaw = (float)(MathHelper.atan2(this.motionX, this.motionZ) * 180.0D / Math.PI);
 
-        for (this.rotationPitch = (float)(Math.atan2(this.motionY, (double)f) * 180.0D / Math.PI); this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F)
+        for (this.rotationPitch = (float)(MathHelper.atan2(this.motionY, (double)f) * 180.0D / Math.PI); this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F)
         {
             ;
         }
@@ -138,7 +145,7 @@ public class EntityEnderEye extends Entity
             double d0 = this.targetX - this.posX;
             double d1 = this.targetZ - this.posZ;
             float f1 = (float)Math.sqrt(d0 * d0 + d1 * d1);
-            float f2 = (float)Math.atan2(d1, d0);
+            float f2 = (float)MathHelper.atan2(d1, d0);
             double d2 = (double)f + (double)(f1 - f) * 0.0025D;
 
             if (f1 < 1.0F)
@@ -198,23 +205,27 @@ public class EntityEnderEye extends Entity
     /**
      * (abstract) Protected helper method to write subclass entity data to NBT.
      */
-    public void writeEntityToNBT(NBTTagCompound tagCompound) {}
+    public void writeEntityToNBT(NBTTagCompound tagCompound)
+    {
+    }
 
     /**
      * (abstract) Protected helper method to read subclass entity data from NBT.
      */
-    public void readEntityFromNBT(NBTTagCompound tagCompund) {}
+    public void readEntityFromNBT(NBTTagCompound tagCompund)
+    {
+    }
 
     /**
      * Gets how bright this entity is.
      */
-    public float getBrightness(float p_70013_1_)
+    public float getBrightness(float partialTicks)
     {
         return 1.0F;
     }
 
     @SideOnly(Side.CLIENT)
-    public int getBrightnessForRender(float p_70070_1_)
+    public int getBrightnessForRender(float partialTicks)
     {
         return 15728880;
     }

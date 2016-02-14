@@ -1,6 +1,7 @@
 package net.minecraft.realms;
 
 import com.google.common.collect.Lists;
+import com.mojang.authlib.GameProfile;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collections;
@@ -19,6 +20,7 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -26,20 +28,18 @@ import org.apache.logging.log4j.Logger;
 public class RealmsServerStatusPinger
 {
     private static final Logger LOGGER = LogManager.getLogger();
-    private final List connections = Collections.synchronizedList(Lists.newArrayList());
-    private static final String __OBFID = "CL_00001854";
+    private final List<NetworkManager> connections = Collections.<NetworkManager>synchronizedList(Lists.<NetworkManager>newArrayList());
 
     public void pingServer(final String p_pingServer_1_, final RealmsServerPing p_pingServer_2_) throws UnknownHostException
     {
         if (p_pingServer_1_ != null && !p_pingServer_1_.startsWith("0.0.0.0") && !p_pingServer_1_.isEmpty())
         {
             RealmsServerAddress realmsserveraddress = RealmsServerAddress.parseString(p_pingServer_1_);
-            final NetworkManager networkmanager = NetworkManager.provideLanClient(InetAddress.getByName(realmsserveraddress.getHost()), realmsserveraddress.getPort());
+            final NetworkManager networkmanager = NetworkManager.func_181124_a(InetAddress.getByName(realmsserveraddress.getHost()), realmsserveraddress.getPort(), false);
             this.connections.add(networkmanager);
             networkmanager.setNetHandler(new INetHandlerStatusClient()
             {
                 private boolean field_154345_e = false;
-                private static final String __OBFID = "CL_00001807";
                 public void handleServerInfo(S00PacketServerInfo packetIn)
                 {
                     ServerStatusResponse serverstatusresponse = packetIn.getResponse();
@@ -47,6 +47,37 @@ public class RealmsServerStatusPinger
                     if (serverstatusresponse.getPlayerCountData() != null)
                     {
                         p_pingServer_2_.nrOfPlayers = String.valueOf(serverstatusresponse.getPlayerCountData().getOnlinePlayerCount());
+
+                        if (ArrayUtils.isNotEmpty(serverstatusresponse.getPlayerCountData().getPlayers()))
+                        {
+                            StringBuilder stringbuilder = new StringBuilder();
+
+                            for (GameProfile gameprofile : serverstatusresponse.getPlayerCountData().getPlayers())
+                            {
+                                if (stringbuilder.length() > 0)
+                                {
+                                    stringbuilder.append("\n");
+                                }
+
+                                stringbuilder.append(gameprofile.getName());
+                            }
+
+                            if (serverstatusresponse.getPlayerCountData().getPlayers().length < serverstatusresponse.getPlayerCountData().getOnlinePlayerCount())
+                            {
+                                if (stringbuilder.length() > 0)
+                                {
+                                    stringbuilder.append("\n");
+                                }
+
+                                stringbuilder.append("... and ").append(serverstatusresponse.getPlayerCountData().getOnlinePlayerCount() - serverstatusresponse.getPlayerCountData().getPlayers().length).append(" more ...");
+                            }
+
+                            p_pingServer_2_.playerList = stringbuilder.toString();
+                        }
+                    }
+                    else
+                    {
+                        p_pingServer_2_.playerList = "";
                     }
 
                     networkmanager.sendPacket(new C01PacketPing(Realms.currentTimeMillis()));
@@ -75,18 +106,16 @@ public class RealmsServerStatusPinger
             }
             catch (Throwable throwable)
             {
-                LOGGER.error(throwable);
+                LOGGER.error((Object)throwable);
             }
         }
     }
 
     public void tick()
     {
-        List list = this.connections;
-
         synchronized (this.connections)
         {
-            Iterator iterator = this.connections.iterator();
+            Iterator<NetworkManager> iterator = this.connections.iterator();
 
             while (iterator.hasNext())
             {
@@ -107,11 +136,9 @@ public class RealmsServerStatusPinger
 
     public void removeAll()
     {
-        List list = this.connections;
-
         synchronized (this.connections)
         {
-            Iterator iterator = this.connections.iterator();
+            Iterator<NetworkManager> iterator = this.connections.iterator();
 
             while (iterator.hasNext())
             {

@@ -18,8 +18,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockSign extends BlockContainer
 {
-    private static final String __OBFID = "CL_00000306";
-
     protected BlockSign()
     {
         super(Material.wood);
@@ -50,9 +48,17 @@ public class BlockSign extends BlockContainer
         return true;
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
+    }
+
+    public boolean func_181623_g()
+    {
+        return true;
     }
 
     /**
@@ -65,8 +71,6 @@ public class BlockSign extends BlockContainer
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -82,7 +86,7 @@ public class BlockSign extends BlockContainer
         else
         {
             TileEntity tileentity = worldIn.getTileEntity(pos);
-            return tileentity instanceof TileEntitySign ? ((TileEntitySign)tileentity).func_174882_b(playerIn) : false;
+            return tileentity instanceof TileEntitySign ? ((TileEntitySign)tileentity).executeCommand(playerIn) : false;
         }
     }
 
@@ -90,5 +94,10 @@ public class BlockSign extends BlockContainer
     public Item getItem(World worldIn, BlockPos pos)
     {
         return Items.sign;
+    }
+
+    public boolean canPlaceBlockAt(World worldIn, BlockPos pos)
+    {
+        return !this.func_181087_e(worldIn, pos) && super.canPlaceBlockAt(worldIn, pos);
     }
 }

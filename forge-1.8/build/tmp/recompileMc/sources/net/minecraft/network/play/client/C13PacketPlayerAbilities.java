@@ -2,12 +2,11 @@ package net.minecraft.network.play.client;
 
 import java.io.IOException;
 import net.minecraft.entity.player.PlayerCapabilities;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
 
-public class C13PacketPlayerAbilities implements Packet
+public class C13PacketPlayerAbilities implements Packet<INetHandlerPlayServer>
 {
     private boolean invulnerable;
     private boolean flying;
@@ -15,9 +14,10 @@ public class C13PacketPlayerAbilities implements Packet
     private boolean creativeMode;
     private float flySpeed;
     private float walkSpeed;
-    private static final String __OBFID = "CL_00001364";
 
-    public C13PacketPlayerAbilities() {}
+    public C13PacketPlayerAbilities()
+    {
+    }
 
     public C13PacketPlayerAbilities(PlayerCapabilities capabilities)
     {
@@ -75,6 +75,9 @@ public class C13PacketPlayerAbilities implements Packet
         buf.writeFloat(this.walkSpeed);
     }
 
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
     public void processPacket(INetHandlerPlayServer handler)
     {
         handler.processPlayerAbilities(this);
@@ -128,13 +131,5 @@ public class C13PacketPlayerAbilities implements Packet
     public void setWalkSpeed(float walkSpeedIn)
     {
         this.walkSpeed = walkSpeedIn;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayServer)handler);
     }
 }

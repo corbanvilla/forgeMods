@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import javax.crypto.SecretKey;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.login.INetHandlerLoginServer;
@@ -12,13 +11,14 @@ import net.minecraft.util.CryptManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class C01PacketEncryptionResponse implements Packet
+public class C01PacketEncryptionResponse implements Packet<INetHandlerLoginServer>
 {
     private byte[] secretKeyEncrypted = new byte[0];
     private byte[] verifyTokenEncrypted = new byte[0];
-    private static final String __OBFID = "CL_00001380";
 
-    public C01PacketEncryptionResponse() {}
+    public C01PacketEncryptionResponse()
+    {
+    }
 
     @SideOnly(Side.CLIENT)
     public C01PacketEncryptionResponse(SecretKey secretKey, PublicKey publicKey, byte[] verifyToken)
@@ -61,13 +61,5 @@ public class C01PacketEncryptionResponse implements Packet
     public byte[] getVerifyToken(PrivateKey key)
     {
         return key == null ? this.verifyTokenEncrypted : CryptManager.decryptData(key, this.verifyTokenEncrypted);
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerLoginServer)handler);
     }
 }

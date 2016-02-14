@@ -15,7 +15,6 @@ public class ItemSlab extends ItemBlock
 {
     private final BlockSlab singleSlab;
     private final BlockSlab doubleSlab;
-    private static final String __OBFID = "CL_00000071";
 
     public ItemSlab(Block block, BlockSlab singleSlab, BlockSlab doubleSlab)
     {
@@ -46,9 +45,6 @@ public class ItemSlab extends ItemBlock
 
     /**
      * Called when a Block is right-clicked with this Item
-     *  
-     * @param pos The block being right-clicked
-     * @param side The side being right-clicked
      */
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
@@ -69,9 +65,9 @@ public class ItemSlab extends ItemBlock
             {
                 IProperty iproperty = this.singleSlab.getVariantProperty();
                 Comparable comparable = iblockstate.getValue(iproperty);
-                BlockSlab.EnumBlockHalf enumblockhalf = (BlockSlab.EnumBlockHalf)iblockstate.getValue(BlockSlab.HALF);
+                BlockSlab.EnumBlockHalf blockslab$enumblockhalf = (BlockSlab.EnumBlockHalf)iblockstate.getValue(BlockSlab.HALF);
 
-                if ((side == EnumFacing.UP && enumblockhalf == BlockSlab.EnumBlockHalf.BOTTOM || side == EnumFacing.DOWN && enumblockhalf == BlockSlab.EnumBlockHalf.TOP) && comparable == object)
+                if ((side == EnumFacing.UP && blockslab$enumblockhalf == BlockSlab.EnumBlockHalf.BOTTOM || side == EnumFacing.DOWN && blockslab$enumblockhalf == BlockSlab.EnumBlockHalf.TOP) && comparable == object)
                 {
                     IBlockState iblockstate1 = this.doubleSlab.getDefaultState().withProperty(iproperty, comparable);
 
@@ -92,7 +88,7 @@ public class ItemSlab extends ItemBlock
     @SideOnly(Side.CLIENT)
     public boolean canPlaceBlockOnSide(World worldIn, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack)
     {
-        BlockPos blockpos1 = pos;
+        BlockPos blockpos = pos;
         IProperty iproperty = this.singleSlab.getVariantProperty();
         Object object = this.singleSlab.getVariant(stack);
         IBlockState iblockstate = worldIn.getBlockState(pos);
@@ -109,7 +105,7 @@ public class ItemSlab extends ItemBlock
 
         pos = pos.offset(side);
         IBlockState iblockstate1 = worldIn.getBlockState(pos);
-        return iblockstate1.getBlock() == this.singleSlab && object == iblockstate1.getValue(iproperty) ? true : super.canPlaceBlockOnSide(worldIn, blockpos1, side, player, stack);
+        return iblockstate1.getBlock() == this.singleSlab && object == iblockstate1.getValue(iproperty) ? true : super.canPlaceBlockOnSide(worldIn, blockpos, side, player, stack);
     }
 
     private boolean tryPlace(ItemStack stack, World worldIn, BlockPos pos, Object variantInStack)
@@ -122,7 +118,7 @@ public class ItemSlab extends ItemBlock
 
             if (comparable == variantInStack)
             {
-                IBlockState iblockstate1 = this.doubleSlab.getDefaultState().withProperty(this.singleSlab.getVariantProperty(), comparable);
+                IBlockState iblockstate1 = this.doubleSlab.getDefaultState().withProperty((IProperty)this.singleSlab.getVariantProperty(), comparable);
 
                 if (worldIn.checkNoEntityCollision(this.doubleSlab.getCollisionBoundingBox(worldIn, pos, iblockstate1)) && worldIn.setBlockState(pos, iblockstate1, 3))
                 {

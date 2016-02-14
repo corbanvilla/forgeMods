@@ -31,8 +31,7 @@ public class TileEntitySign extends TileEntity
     public int lineBeingEdited = -1;
     private boolean isEditable = true;
     private EntityPlayer player;
-    private final CommandResultStats field_174883_i = new CommandResultStats();
-    private static final String __OBFID = "CL_00000363";
+    private final CommandResultStats stats = new CommandResultStats();
 
     public void writeToNBT(NBTTagCompound compound)
     {
@@ -44,7 +43,7 @@ public class TileEntitySign extends TileEntity
             compound.setString("Text" + (i + 1), s);
         }
 
-        this.field_174883_i.func_179670_b(compound);
+        this.stats.writeStatsToNBT(compound);
     }
 
     public void readFromNBT(NBTTagCompound compound)
@@ -53,43 +52,53 @@ public class TileEntitySign extends TileEntity
         super.readFromNBT(compound);
         ICommandSender icommandsender = new ICommandSender()
         {
-            private static final String __OBFID = "CL_00002039";
             /**
-             * Gets the name of this command sender (usually username, but possibly "Rcon")
+             * Get the name of this object. For players this returns their username
              */
             public String getName()
             {
                 return "Sign";
             }
+            /**
+             * Get the formatted ChatComponent that will be used for the sender's username in chat
+             */
             public IChatComponent getDisplayName()
             {
                 return new ChatComponentText(this.getName());
             }
             /**
-             * Notifies this sender of some sort of information.  This is for messages intended to display to the user.
-             * Used for typical output (like "you asked for whether or not this game rule is set, so here's your
-             * answer"), warnings (like "I fetched this block for you by ID, but I'd like you to know that every time
-             * you do this, I die a little inside"), and errors (like "it's not called iron_pixacke, silly").
+             * Send a chat message to the CommandSender
              */
-            public void addChatMessage(IChatComponent message) {}
-            /**
-             * Returns true if the CommandSender may execute the given command
-             *  
-             * @param permLevel The permission level required to execute the command
-             * @param commandName The name of the command
-             */
-            public boolean canUseCommand(int permLevel, String commandName)
+            public void addChatMessage(IChatComponent component)
             {
-                return true;
             }
+            /**
+             * Returns {@code true} if the CommandSender is allowed to execute the command, {@code false} if not
+             */
+            public boolean canCommandSenderUseCommand(int permLevel, String commandName)
+            {
+                return permLevel <= 2; //Forge: Fixes  MC-75630 - Exploit with signs and command blocks
+            }
+            /**
+             * Get the position in the world. <b>{@code null} is not allowed!</b> If you are not an entity in the world,
+             * return the coordinates 0, 0, 0
+             */
             public BlockPos getPosition()
             {
                 return TileEntitySign.this.pos;
             }
+            /**
+             * Get the position vector. <b>{@code null} is not allowed!</b> If you are not an entity in the world,
+             * return 0.0D, 0.0D, 0.0D
+             */
             public Vec3 getPositionVector()
             {
                 return new Vec3((double)TileEntitySign.this.pos.getX() + 0.5D, (double)TileEntitySign.this.pos.getY() + 0.5D, (double)TileEntitySign.this.pos.getZ() + 0.5D);
             }
+            /**
+             * Get the world, if available. <b>{@code null} is not allowed!</b> If you are not an entity in the world,
+             * return the overworld
+             */
             public World getEntityWorld()
             {
                 return TileEntitySign.this.worldObj;
@@ -108,7 +117,9 @@ public class TileEntitySign extends TileEntity
             {
                 return false;
             }
-            public void setCommandStat(CommandResultStats.Type type, int amount) {}
+            public void setCommandStat(CommandResultStats.Type type, int amount)
+            {
+            }
         };
 
         for (int i = 0; i < 4; ++i)
@@ -121,20 +132,20 @@ public class TileEntitySign extends TileEntity
 
                 try
                 {
-                    this.signText[i] = ChatComponentProcessor.func_179985_a(icommandsender, ichatcomponent, (Entity)null);
+                    this.signText[i] = ChatComponentProcessor.processComponent(icommandsender, ichatcomponent, (Entity)null);
                 }
-                catch (CommandException commandexception)
+                catch (CommandException var7)
                 {
                     this.signText[i] = ichatcomponent;
                 }
             }
-            catch (JsonParseException jsonparseexception)
+            catch (JsonParseException var8)
             {
                 this.signText[i] = new ChatComponentText(s);
             }
         }
 
-        this.field_174883_i.func_179668_a(compound);
+        this.stats.readStatsFromNBT(compound);
     }
 
     /**
@@ -146,6 +157,11 @@ public class TileEntitySign extends TileEntity
         IChatComponent[] aichatcomponent = new IChatComponent[4];
         System.arraycopy(this.signText, 0, aichatcomponent, 0, 4);
         return new S33PacketUpdateSign(this.worldObj, this.pos, aichatcomponent);
+    }
+
+    public boolean func_183000_F()
+    {
+        return true;
     }
 
     public boolean getIsEditable()
@@ -177,47 +193,57 @@ public class TileEntitySign extends TileEntity
         return this.player;
     }
 
-    public boolean func_174882_b(final EntityPlayer playerIn)
+    public boolean executeCommand(final EntityPlayer playerIn)
     {
         ICommandSender icommandsender = new ICommandSender()
         {
-            private static final String __OBFID = "CL_00002038";
             /**
-             * Gets the name of this command sender (usually username, but possibly "Rcon")
+             * Get the name of this object. For players this returns their username
              */
             public String getName()
             {
                 return playerIn.getName();
             }
+            /**
+             * Get the formatted ChatComponent that will be used for the sender's username in chat
+             */
             public IChatComponent getDisplayName()
             {
                 return playerIn.getDisplayName();
             }
             /**
-             * Notifies this sender of some sort of information.  This is for messages intended to display to the user.
-             * Used for typical output (like "you asked for whether or not this game rule is set, so here's your
-             * answer"), warnings (like "I fetched this block for you by ID, but I'd like you to know that every time
-             * you do this, I die a little inside"), and errors (like "it's not called iron_pixacke, silly").
+             * Send a chat message to the CommandSender
              */
-            public void addChatMessage(IChatComponent message) {}
-            /**
-             * Returns true if the CommandSender may execute the given command
-             *  
-             * @param permLevel The permission level required to execute the command
-             * @param commandName The name of the command
-             */
-            public boolean canUseCommand(int permLevel, String commandName)
+            public void addChatMessage(IChatComponent component)
             {
-                return permLevel <= 2; //Forge: Fixes  MC-75630 - Exploit with signs and command blocks
             }
+            /**
+             * Returns {@code true} if the CommandSender is allowed to execute the command, {@code false} if not
+             */
+            public boolean canCommandSenderUseCommand(int permLevel, String commandName)
+            {
+                return permLevel <= 2;
+            }
+            /**
+             * Get the position in the world. <b>{@code null} is not allowed!</b> If you are not an entity in the world,
+             * return the coordinates 0, 0, 0
+             */
             public BlockPos getPosition()
             {
                 return TileEntitySign.this.pos;
             }
+            /**
+             * Get the position vector. <b>{@code null} is not allowed!</b> If you are not an entity in the world,
+             * return 0.0D, 0.0D, 0.0D
+             */
             public Vec3 getPositionVector()
             {
                 return new Vec3((double)TileEntitySign.this.pos.getX() + 0.5D, (double)TileEntitySign.this.pos.getY() + 0.5D, (double)TileEntitySign.this.pos.getZ() + 0.5D);
             }
+            /**
+             * Get the world, if available. <b>{@code null} is not allowed!</b> If you are not an entity in the world,
+             * return the overworld
+             */
             public World getEntityWorld()
             {
                 return playerIn.getEntityWorld();
@@ -238,7 +264,7 @@ public class TileEntitySign extends TileEntity
             }
             public void setCommandStat(CommandResultStats.Type type, int amount)
             {
-                TileEntitySign.this.field_174883_i.func_179672_a(this, type, amount);
+                TileEntitySign.this.stats.func_179672_a(this, type, amount);
             }
         };
 
@@ -260,8 +286,8 @@ public class TileEntitySign extends TileEntity
         return true;
     }
 
-    public CommandResultStats func_174880_d()
+    public CommandResultStats getStats()
     {
-        return this.field_174883_i;
+        return this.stats;
     }
 }

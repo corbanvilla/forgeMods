@@ -20,18 +20,18 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockStainedGlass extends BlockBreakable
 {
-    public static final PropertyEnum COLOR = PropertyEnum.create("color", EnumDyeColor.class);
-    private static final String __OBFID = "CL_00000312";
+    public static final PropertyEnum<EnumDyeColor> COLOR = PropertyEnum.<EnumDyeColor>create("color", EnumDyeColor.class);
 
-    public BlockStainedGlass(Material p_i45427_1_)
+    public BlockStainedGlass(Material materialIn)
     {
-        super(p_i45427_1_, false);
+        super(materialIn, false);
         this.setDefaultState(this.blockState.getBaseState().withProperty(COLOR, EnumDyeColor.WHITE));
         this.setCreativeTab(CreativeTabs.tabBlock);
     }
 
     /**
-     * Get the damage value that this Block should drop
+     * Gets the metadata of the item this Block can drop. This method is called when the block gets destroyed. It
+     * returns the metadata of the dropped item based on the old metadata of the block.
      */
     public int damageDropped(IBlockState state)
     {
@@ -42,14 +42,10 @@ public class BlockStainedGlass extends BlockBreakable
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
     {
-        EnumDyeColor[] aenumdyecolor = EnumDyeColor.values();
-        int i = aenumdyecolor.length;
-
-        for (int j = 0; j < i; ++j)
+        for (EnumDyeColor enumdyecolor : EnumDyeColor.values())
         {
-            EnumDyeColor enumdyecolor = aenumdyecolor[j];
             list.add(new ItemStack(itemIn, 1, enumdyecolor.getMetadata()));
         }
     }

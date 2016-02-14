@@ -11,32 +11,31 @@ import net.minecraft.world.World;
 
 public class WorldGenTallGrass extends WorldGenerator
 {
-    private final IBlockState field_175907_a;
-    private static final String __OBFID = "CL_00000437";
+    private final IBlockState tallGrassState;
 
     public WorldGenTallGrass(BlockTallGrass.EnumType p_i45629_1_)
     {
-        this.field_175907_a = Blocks.tallgrass.getDefaultState().withProperty(BlockTallGrass.TYPE, p_i45629_1_);
+        this.tallGrassState = Blocks.tallgrass.getDefaultState().withProperty(BlockTallGrass.TYPE, p_i45629_1_);
     }
 
-    public boolean generate(World worldIn, Random p_180709_2_, BlockPos p_180709_3_)
+    public boolean generate(World worldIn, Random rand, BlockPos position)
     {
         Block block;
 
         do
         {
-            block = worldIn.getBlockState(p_180709_3_).getBlock();
-            if (!block.isAir(worldIn, p_180709_3_) && !block.isLeaves(worldIn, p_180709_3_)) break;
-            p_180709_3_ = p_180709_3_.down();
-        } while (p_180709_3_.getY() > 0);
+            block = worldIn.getBlockState(position).getBlock();
+            if (!block.isAir(worldIn, position) && !block.isLeaves(worldIn, position)) break;
+            position = position.down();
+        } while (position.getY() > 0);
 
         for (int i = 0; i < 128; ++i)
         {
-            BlockPos blockpos1 = p_180709_3_.add(p_180709_2_.nextInt(8) - p_180709_2_.nextInt(8), p_180709_2_.nextInt(4) - p_180709_2_.nextInt(4), p_180709_2_.nextInt(8) - p_180709_2_.nextInt(8));
+            BlockPos blockpos = position.add(rand.nextInt(8) - rand.nextInt(8), rand.nextInt(4) - rand.nextInt(4), rand.nextInt(8) - rand.nextInt(8));
 
-            if (worldIn.isAirBlock(blockpos1) && Blocks.tallgrass.canBlockStay(worldIn, blockpos1, this.field_175907_a))
+            if (worldIn.isAirBlock(blockpos) && Blocks.tallgrass.canBlockStay(worldIn, blockpos, this.tallGrassState))
             {
-                worldIn.setBlockState(blockpos1, this.field_175907_a, 2);
+                worldIn.setBlockState(blockpos, this.tallGrassState, 2);
             }
         }
 

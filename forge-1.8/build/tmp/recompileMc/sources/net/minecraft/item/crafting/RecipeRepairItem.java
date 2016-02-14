@@ -1,7 +1,7 @@
 package net.minecraft.item.crafting;
 
 import com.google.common.collect.Lists;
-import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -9,26 +9,24 @@ import net.minecraft.world.World;
 
 public class RecipeRepairItem implements IRecipe
 {
-    private static final String __OBFID = "CL_00002156";
-
     /**
      * Used to check if a recipe matches current crafting inventory
      */
-    public boolean matches(InventoryCrafting p_77569_1_, World worldIn)
+    public boolean matches(InventoryCrafting inv, World worldIn)
     {
-        ArrayList arraylist = Lists.newArrayList();
+        List<ItemStack> list = Lists.<ItemStack>newArrayList();
 
-        for (int i = 0; i < p_77569_1_.getSizeInventory(); ++i)
+        for (int i = 0; i < inv.getSizeInventory(); ++i)
         {
-            ItemStack itemstack = p_77569_1_.getStackInSlot(i);
+            ItemStack itemstack = inv.getStackInSlot(i);
 
             if (itemstack != null)
             {
-                arraylist.add(itemstack);
+                list.add(itemstack);
 
-                if (arraylist.size() > 1)
+                if (list.size() > 1)
                 {
-                    ItemStack itemstack1 = (ItemStack)arraylist.get(0);
+                    ItemStack itemstack1 = (ItemStack)list.get(0);
 
                     if (itemstack.getItem() != itemstack1.getItem() || itemstack1.stackSize != 1 || itemstack.stackSize != 1 || !itemstack1.getItem().isRepairable())
                     {
@@ -38,28 +36,27 @@ public class RecipeRepairItem implements IRecipe
             }
         }
 
-        return arraylist.size() == 2;
+        return list.size() == 2;
     }
 
     /**
      * Returns an Item that is the result of this recipe
      */
-    public ItemStack getCraftingResult(InventoryCrafting p_77572_1_)
+    public ItemStack getCraftingResult(InventoryCrafting inv)
     {
-        ArrayList arraylist = Lists.newArrayList();
-        ItemStack itemstack;
+        List<ItemStack> list = Lists.<ItemStack>newArrayList();
 
-        for (int i = 0; i < p_77572_1_.getSizeInventory(); ++i)
+        for (int i = 0; i < inv.getSizeInventory(); ++i)
         {
-            itemstack = p_77572_1_.getStackInSlot(i);
+            ItemStack itemstack = inv.getStackInSlot(i);
 
             if (itemstack != null)
             {
-                arraylist.add(itemstack);
+                list.add(itemstack);
 
-                if (arraylist.size() > 1)
+                if (list.size() > 1)
                 {
-                    ItemStack itemstack1 = (ItemStack)arraylist.get(0);
+                    ItemStack itemstack1 = (ItemStack)list.get(0);
 
                     if (itemstack.getItem() != itemstack1.getItem() || itemstack1.stackSize != 1 || itemstack.stackSize != 1 || !itemstack1.getItem().isRepairable())
                     {
@@ -69,16 +66,16 @@ public class RecipeRepairItem implements IRecipe
             }
         }
 
-        if (arraylist.size() == 2)
+        if (list.size() == 2)
         {
-            ItemStack itemstack2 = (ItemStack)arraylist.get(0);
-            itemstack = (ItemStack)arraylist.get(1);
+            ItemStack itemstack2 = (ItemStack)list.get(0);
+            ItemStack itemstack3 = (ItemStack)list.get(1);
 
-            if (itemstack2.getItem() == itemstack.getItem() && itemstack2.stackSize == 1 && itemstack.stackSize == 1 && itemstack2.getItem().isRepairable())
+            if (itemstack2.getItem() == itemstack3.getItem() && itemstack2.stackSize == 1 && itemstack3.stackSize == 1 && itemstack2.getItem().isRepairable())
             {
                 Item item = itemstack2.getItem();
                 int j = item.getMaxDamage() - itemstack2.getItemDamage();
-                int k = item.getMaxDamage() - itemstack.getItemDamage();
+                int k = item.getMaxDamage() - itemstack3.getItemDamage();
                 int l = j + k + item.getMaxDamage() * 5 / 100;
                 int i1 = item.getMaxDamage() - l;
 
@@ -107,13 +104,13 @@ public class RecipeRepairItem implements IRecipe
         return null;
     }
 
-    public ItemStack[] getRemainingItems(InventoryCrafting p_179532_1_)
+    public ItemStack[] getRemainingItems(InventoryCrafting inv)
     {
-        ItemStack[] aitemstack = new ItemStack[p_179532_1_.getSizeInventory()];
+        ItemStack[] aitemstack = new ItemStack[inv.getSizeInventory()];
 
         for (int i = 0; i < aitemstack.length; ++i)
         {
-            ItemStack itemstack = p_179532_1_.getStackInSlot(i);
+            ItemStack itemstack = inv.getStackInSlot(i);
             aitemstack[i] = net.minecraftforge.common.ForgeHooks.getContainerItem(itemstack);
         }
 

@@ -8,7 +8,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class MovementInputFromOptions extends MovementInput
 {
     private final GameSettings gameSettings;
-    private static final String __OBFID = "CL_00000937";
 
     public MovementInputFromOptions(GameSettings gameSettingsIn)
     {

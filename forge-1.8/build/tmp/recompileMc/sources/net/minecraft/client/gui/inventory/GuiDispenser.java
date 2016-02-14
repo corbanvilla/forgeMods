@@ -16,7 +16,6 @@ public class GuiDispenser extends GuiContainer
     private final InventoryPlayer playerInventory;
     /** The inventory contained within the corresponding Dispenser. */
     public IInventory dispenserInventory;
-    private static final String __OBFID = "CL_00000765";
 
     public GuiDispenser(InventoryPlayer playerInv, IInventory dispenserInv)
     {
@@ -42,8 +41,8 @@ public class GuiDispenser extends GuiContainer
     {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(dispenserGuiTextures);
-        int k = (this.width - this.xSize) / 2;
-        int l = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(k, l, 0, 0, this.xSize, this.ySize);
+        int i = (this.width - this.xSize) / 2;
+        int j = (this.height - this.ySize) / 2;
+        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
     }
 }

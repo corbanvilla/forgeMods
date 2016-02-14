@@ -17,17 +17,15 @@ public interface ISaveFormat
     /**
      * Returns back a loader for the specified save directory
      */
-    ISaveHandler getSaveLoader(String p_75804_1_, boolean p_75804_2_);
+    ISaveHandler getSaveLoader(String saveName, boolean storePlayerdata);
 
     @SideOnly(Side.CLIENT)
-    List getSaveList() throws AnvilConverterException;
+    List<SaveFormatComparator> getSaveList() throws AnvilConverterException;
 
     void flushCache();
 
     /**
      * Returns the world's WorldInfo object
-     *  
-     * @param saveName The name of the directory containing the world
      */
     @SideOnly(Side.CLIENT)
     WorldInfo getWorldInfo(String saveName);
@@ -44,9 +42,6 @@ public interface ISaveFormat
     /**
      * Renames the world by storing the new name in level.dat. It does *not* rename the directory containing the world
      * data.
-     *  
-     * @param dirName The name of the directory containing the world.
-     * @param newName The new name for the world.
      */
     @SideOnly(Side.CLIENT)
     void renameWorld(String dirName, String newName);
@@ -56,17 +51,13 @@ public interface ISaveFormat
 
     /**
      * gets if the map is old chunk saving (true) or McRegion (false)
-     *  
-     * @param saveName The name of the directory containing the world
      */
     boolean isOldMapFormat(String saveName);
 
     /**
      * converts the map to mcRegion
-     *  
-     * @param filename Filename for the level.dat_mcr backup
      */
-    boolean convertMapFormat(String filename, IProgressUpdate p_75805_2_);
+    boolean convertMapFormat(String filename, IProgressUpdate progressCallback);
 
     /**
      * Return whether the given world can be loaded.

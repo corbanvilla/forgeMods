@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.AnvilConverterException;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -20,7 +19,6 @@ public class SaveFormatOld implements ISaveFormat
     private static final Logger logger = LogManager.getLogger();
     /** Reference to the File object representing the directory for the world saves */
     public final File savesDirectory;
-    private static final String __OBFID = "CL_00000586";
 
     public SaveFormatOld(File p_i2147_1_)
     {
@@ -42,9 +40,9 @@ public class SaveFormatOld implements ISaveFormat
     }
 
     @SideOnly(Side.CLIENT)
-    public List getSaveList() throws AnvilConverterException
+    public List<SaveFormatComparator> getSaveList() throws AnvilConverterException
     {
-        ArrayList arraylist = Lists.newArrayList();
+        List<SaveFormatComparator> list = Lists.<SaveFormatComparator>newArrayList();
 
         for (int i = 0; i < 5; ++i)
         {
@@ -53,19 +51,19 @@ public class SaveFormatOld implements ISaveFormat
 
             if (worldinfo != null)
             {
-                arraylist.add(new SaveFormatComparator(s, "", worldinfo.getLastTimePlayed(), worldinfo.getSizeOnDisk(), worldinfo.getGameType(), false, worldinfo.isHardcoreModeEnabled(), worldinfo.areCommandsAllowed()));
+                list.add(new SaveFormatComparator(s, "", worldinfo.getLastTimePlayed(), worldinfo.getSizeOnDisk(), worldinfo.getGameType(), false, worldinfo.isHardcoreModeEnabled(), worldinfo.areCommandsAllowed()));
             }
         }
 
-        return arraylist;
+        return list;
     }
 
-    public void flushCache() {}
+    public void flushCache()
+    {
+    }
 
     /**
      * Returns the world's WorldInfo object
-     *  
-     * @param saveName The name of the directory containing the world
      */
     public WorldInfo getWorldInfo(String saveName)
     {
@@ -78,20 +76,18 @@ public class SaveFormatOld implements ISaveFormat
         else
         {
             File file2 = new File(file1, "level.dat");
-            NBTTagCompound nbttagcompound;
-            NBTTagCompound nbttagcompound1;
 
             if (file2.exists())
             {
                 try
                 {
-                    nbttagcompound = CompressedStreamTools.readCompressed(new FileInputStream(file2));
-                    nbttagcompound1 = nbttagcompound.getCompoundTag("Data");
-                    return new WorldInfo(nbttagcompound1);
+                    NBTTagCompound nbttagcompound2 = CompressedStreamTools.readCompressed(new FileInputStream(file2));
+                    NBTTagCompound nbttagcompound3 = nbttagcompound2.getCompoundTag("Data");
+                    return new WorldInfo(nbttagcompound3);
                 }
                 catch (Exception exception1)
                 {
-                    logger.error("Exception reading " + file2, exception1);
+                    logger.error((String)("Exception reading " + file2), (Throwable)exception1);
                 }
             }
 
@@ -101,13 +97,13 @@ public class SaveFormatOld implements ISaveFormat
             {
                 try
                 {
-                    nbttagcompound = CompressedStreamTools.readCompressed(new FileInputStream(file2));
-                    nbttagcompound1 = nbttagcompound.getCompoundTag("Data");
+                    NBTTagCompound nbttagcompound = CompressedStreamTools.readCompressed(new FileInputStream(file2));
+                    NBTTagCompound nbttagcompound1 = nbttagcompound.getCompoundTag("Data");
                     return new WorldInfo(nbttagcompound1);
                 }
                 catch (Exception exception)
                 {
-                    logger.error("Exception reading " + file2, exception);
+                    logger.error((String)("Exception reading " + file2), (Throwable)exception);
                 }
             }
 
@@ -118,9 +114,6 @@ public class SaveFormatOld implements ISaveFormat
     /**
      * Renames the world by storing the new name in level.dat. It does *not* rename the directory containing the world
      * data.
-     *  
-     * @param dirName The name of the directory containing the world.
-     * @param newName The new name for the world.
      */
     @SideOnly(Side.CLIENT)
     public void renameWorld(String dirName, String newName)
@@ -206,7 +199,7 @@ public class SaveFormatOld implements ISaveFormat
                     {
                         Thread.sleep(500L);
                     }
-                    catch (InterruptedException interruptedexception)
+                    catch (InterruptedException var5)
                     {
                         ;
                     }
@@ -221,11 +214,11 @@ public class SaveFormatOld implements ISaveFormat
      * @args: Takes one argument - the list of files and directories to delete. @desc: Deletes the files and directory
      * listed in the list recursively.
      */
-    protected static boolean deleteFiles(File[] p_75807_0_)
+    protected static boolean deleteFiles(File[] files)
     {
-        for (int i = 0; i < p_75807_0_.length; ++i)
+        for (int i = 0; i < files.length; ++i)
         {
-            File file1 = p_75807_0_[i];
+            File file1 = files[i];
             logger.debug("Deleting " + file1);
 
             if (file1.isDirectory() && !deleteFiles(file1.listFiles()))
@@ -247,9 +240,9 @@ public class SaveFormatOld implements ISaveFormat
     /**
      * Returns back a loader for the specified save directory
      */
-    public ISaveHandler getSaveLoader(String p_75804_1_, boolean p_75804_2_)
+    public ISaveHandler getSaveLoader(String saveName, boolean storePlayerdata)
     {
-        return new SaveHandler(this.savesDirectory, p_75804_1_, p_75804_2_);
+        return new SaveHandler(this.savesDirectory, saveName, storePlayerdata);
     }
 
     @SideOnly(Side.CLIENT)
@@ -260,8 +253,6 @@ public class SaveFormatOld implements ISaveFormat
 
     /**
      * gets if the map is old chunk saving (true) or McRegion (false)
-     *  
-     * @param saveName The name of the directory containing the world
      */
     public boolean isOldMapFormat(String saveName)
     {
@@ -270,10 +261,8 @@ public class SaveFormatOld implements ISaveFormat
 
     /**
      * converts the map to mcRegion
-     *  
-     * @param filename Filename for the level.dat_mcr backup
      */
-    public boolean convertMapFormat(String filename, IProgressUpdate p_75805_2_)
+    public boolean convertMapFormat(String filename, IProgressUpdate progressCallback)
     {
         return false;
     }

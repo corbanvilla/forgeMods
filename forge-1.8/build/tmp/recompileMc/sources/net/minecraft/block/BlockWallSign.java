@@ -12,13 +12,13 @@ import net.minecraft.world.World;
 public class BlockWallSign extends BlockSign
 {
     public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
-    private static final String __OBFID = "CL_00002047";
 
     public BlockWallSign()
     {
         this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
     }
 
+    @SuppressWarnings("incomplete-switch")
     public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
     {
         EnumFacing enumfacing = (EnumFacing)worldIn.getBlockState(pos).getValue(FACING);
@@ -29,18 +29,18 @@ public class BlockWallSign extends BlockSign
         float f4 = 0.125F;
         this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 
-        switch (BlockWallSign.SwitchEnumFacing.FACING_LOOKUP[enumfacing.ordinal()])
+        switch (enumfacing)
         {
-            case 1:
+            case NORTH:
                 this.setBlockBounds(f2, f, 1.0F - f4, f3, f1, 1.0F);
                 break;
-            case 2:
+            case SOUTH:
                 this.setBlockBounds(f2, f, 0.0F, f3, f1, f4);
                 break;
-            case 3:
+            case WEST:
                 this.setBlockBounds(1.0F - f4, f, f2, 1.0F, f1, f3);
                 break;
-            case 4:
+            case EAST:
                 this.setBlockBounds(0.0F, f, f2, f4, f1, f3);
         }
     }
@@ -88,49 +88,4 @@ public class BlockWallSign extends BlockSign
     {
         return new BlockState(this, new IProperty[] {FACING});
     }
-
-    static final class SwitchEnumFacing
-        {
-            static final int[] FACING_LOOKUP = new int[EnumFacing.values().length];
-            private static final String __OBFID = "CL_00002046";
-
-            static
-            {
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.NORTH.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var4)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.SOUTH.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var3)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.WEST.ordinal()] = 3;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.EAST.ordinal()] = 4;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
-            }
-        }
 }

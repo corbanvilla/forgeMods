@@ -20,14 +20,13 @@ public class MessageDeserializer extends ByteToMessageDecoder
     private static final Logger logger = LogManager.getLogger();
     private static final Marker RECEIVED_PACKET_MARKER = MarkerManager.getMarker("PACKET_RECEIVED", NetworkManager.logMarkerPackets);
     private final EnumPacketDirection direction;
-    private static final String __OBFID = "CL_00001252";
 
     public MessageDeserializer(EnumPacketDirection direction)
     {
         this.direction = direction;
     }
 
-    protected void decode(ChannelHandlerContext p_decode_1_, ByteBuf p_decode_2_, List p_decode_3_) throws IOException, InstantiationException, IllegalAccessException
+    protected void decode(ChannelHandlerContext p_decode_1_, ByteBuf p_decode_2_, List<Object> p_decode_3_) throws IOException, InstantiationException, IllegalAccessException, Exception
     {
         if (p_decode_2_.readableBytes() != 0)
         {

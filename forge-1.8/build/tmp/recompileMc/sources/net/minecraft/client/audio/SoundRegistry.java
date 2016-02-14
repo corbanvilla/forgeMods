@@ -3,22 +3,18 @@ package net.minecraft.client.audio;
 import com.google.common.collect.Maps;
 import java.util.Map;
 import net.minecraft.util.RegistrySimple;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class SoundRegistry extends RegistrySimple
+public class SoundRegistry extends RegistrySimple<ResourceLocation, SoundEventAccessorComposite>
 {
-    /** Contains all registered sound */
-    private Map soundRegistry;
-    private static final String __OBFID = "CL_00001151";
+    private Map<ResourceLocation, SoundEventAccessorComposite> soundRegistry;
 
-    /**
-     * Creates the Map we will use to map keys to their registered values.
-     */
-    protected Map createUnderlyingMap()
+    protected Map<ResourceLocation, SoundEventAccessorComposite> createUnderlyingMap()
     {
-        this.soundRegistry = Maps.newHashMap();
+        this.soundRegistry = Maps.<ResourceLocation, SoundEventAccessorComposite>newHashMap();
         return this.soundRegistry;
     }
 

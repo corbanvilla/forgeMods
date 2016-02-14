@@ -15,7 +15,6 @@ public class SlotMerchantResult extends Slot
     private int field_75231_g;
     /** "Instance" of the Merchant. */
     private final IMerchant theMerchant;
-    private static final String __OBFID = "CL_00001758";
 
     public SlotMerchantResult(EntityPlayer player, IMerchant merchant, InventoryMerchant merchantInventory, int slotIndex, int xPosition, int yPosition)
     {
@@ -73,47 +72,47 @@ public class SlotMerchantResult extends Slot
 
         if (merchantrecipe != null)
         {
-            ItemStack itemstack1 = this.theMerchantInventory.getStackInSlot(0);
-            ItemStack itemstack2 = this.theMerchantInventory.getStackInSlot(1);
+            ItemStack itemstack = this.theMerchantInventory.getStackInSlot(0);
+            ItemStack itemstack1 = this.theMerchantInventory.getStackInSlot(1);
 
-            if (this.doTrade(merchantrecipe, itemstack1, itemstack2) || this.doTrade(merchantrecipe, itemstack2, itemstack1))
+            if (this.doTrade(merchantrecipe, itemstack, itemstack1) || this.doTrade(merchantrecipe, itemstack1, itemstack))
             {
                 this.theMerchant.useRecipe(merchantrecipe);
                 playerIn.triggerAchievement(StatList.timesTradedWithVillagerStat);
+
+                if (itemstack != null && itemstack.stackSize <= 0)
+                {
+                    itemstack = null;
+                }
 
                 if (itemstack1 != null && itemstack1.stackSize <= 0)
                 {
                     itemstack1 = null;
                 }
 
-                if (itemstack2 != null && itemstack2.stackSize <= 0)
-                {
-                    itemstack2 = null;
-                }
-
-                this.theMerchantInventory.setInventorySlotContents(0, itemstack1);
-                this.theMerchantInventory.setInventorySlotContents(1, itemstack2);
+                this.theMerchantInventory.setInventorySlotContents(0, itemstack);
+                this.theMerchantInventory.setInventorySlotContents(1, itemstack1);
             }
         }
     }
 
     private boolean doTrade(MerchantRecipe trade, ItemStack firstItem, ItemStack secondItem)
     {
-        ItemStack itemstack2 = trade.getItemToBuy();
-        ItemStack itemstack3 = trade.getSecondItemToBuy();
+        ItemStack itemstack = trade.getItemToBuy();
+        ItemStack itemstack1 = trade.getSecondItemToBuy();
 
-        if (firstItem != null && firstItem.getItem() == itemstack2.getItem())
+        if (firstItem != null && firstItem.getItem() == itemstack.getItem())
         {
-            if (itemstack3 != null && secondItem != null && itemstack3.getItem() == secondItem.getItem())
+            if (itemstack1 != null && secondItem != null && itemstack1.getItem() == secondItem.getItem())
             {
-                firstItem.stackSize -= itemstack2.stackSize;
-                secondItem.stackSize -= itemstack3.stackSize;
+                firstItem.stackSize -= itemstack.stackSize;
+                secondItem.stackSize -= itemstack1.stackSize;
                 return true;
             }
 
-            if (itemstack3 == null && secondItem == null)
+            if (itemstack1 == null && secondItem == null)
             {
-                firstItem.stackSize -= itemstack2.stackSize;
+                firstItem.stackSize -= itemstack.stackSize;
                 return true;
             }
         }

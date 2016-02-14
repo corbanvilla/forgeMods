@@ -8,25 +8,23 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.entity.RenderEnderman;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class LayerHeldBlock implements LayerRenderer
+public class LayerHeldBlock implements LayerRenderer<EntityEnderman>
 {
-    private final RenderEnderman field_177174_a;
-    private static final String __OBFID = "CL_00002424";
+    private final RenderEnderman endermanRenderer;
 
-    public LayerHeldBlock(RenderEnderman p_i46122_1_)
+    public LayerHeldBlock(RenderEnderman endermanRendererIn)
     {
-        this.field_177174_a = p_i46122_1_;
+        this.endermanRenderer = endermanRendererIn;
     }
 
-    public void func_177173_a(EntityEnderman p_177173_1_, float p_177173_2_, float p_177173_3_, float p_177173_4_, float p_177173_5_, float p_177173_6_, float p_177173_7_, float p_177173_8_)
+    public void doRenderLayer(EntityEnderman entitylivingbaseIn, float p_177141_2_, float p_177141_3_, float partialTicks, float p_177141_5_, float p_177141_6_, float p_177141_7_, float scale)
     {
-        IBlockState iblockstate = p_177173_1_.func_175489_ck();
+        IBlockState iblockstate = entitylivingbaseIn.getHeldBlockState();
 
         if (iblockstate.getBlock().getMaterial() != Material.air)
         {
@@ -37,14 +35,14 @@ public class LayerHeldBlock implements LayerRenderer
             GlStateManager.rotate(20.0F, 1.0F, 0.0F, 0.0F);
             GlStateManager.rotate(45.0F, 0.0F, 1.0F, 0.0F);
             GlStateManager.translate(0.25F, 0.1875F, 0.25F);
-            float f7 = 0.5F;
-            GlStateManager.scale(-f7, -f7, f7);
-            int i = p_177173_1_.getBrightnessForRender(p_177173_4_);
+            float f = 0.5F;
+            GlStateManager.scale(-f, -f, f);
+            int i = entitylivingbaseIn.getBrightnessForRender(partialTicks);
             int j = i % 65536;
             int k = i / 65536;
             OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)j / 1.0F, (float)k / 1.0F);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            this.field_177174_a.bindTexture(TextureMap.locationBlocksTexture);
+            this.endermanRenderer.bindTexture(TextureMap.locationBlocksTexture);
             blockrendererdispatcher.renderBlockBrightness(iblockstate, 1.0F);
             GlStateManager.popMatrix();
             GlStateManager.disableRescaleNormal();
@@ -54,10 +52,5 @@ public class LayerHeldBlock implements LayerRenderer
     public boolean shouldCombineTextures()
     {
         return false;
-    }
-
-    public void doRenderLayer(EntityLivingBase p_177141_1_, float p_177141_2_, float p_177141_3_, float p_177141_4_, float p_177141_5_, float p_177141_6_, float p_177141_7_, float p_177141_8_)
-    {
-        this.func_177173_a((EntityEnderman)p_177141_1_, p_177141_2_, p_177141_3_, p_177141_4_, p_177141_5_, p_177141_6_, p_177141_7_, p_177141_8_);
     }
 }

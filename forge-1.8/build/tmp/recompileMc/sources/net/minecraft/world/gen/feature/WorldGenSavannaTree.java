@@ -2,8 +2,12 @@ package net.minecraft.world.gen.feature;
 
 import java.util.Random;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockLeaves;
+import net.minecraft.block.BlockNewLeaf;
+import net.minecraft.block.BlockNewLog;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -11,44 +15,44 @@ import net.minecraft.world.World;
 
 public class WorldGenSavannaTree extends WorldGenAbstractTree
 {
-    private static final String __OBFID = "CL_00000432";
+    private static final IBlockState field_181643_a = Blocks.log2.getDefaultState().withProperty(BlockNewLog.VARIANT, BlockPlanks.EnumType.ACACIA);
+    private static final IBlockState field_181644_b = Blocks.leaves2.getDefaultState().withProperty(BlockNewLeaf.VARIANT, BlockPlanks.EnumType.ACACIA).withProperty(BlockLeaves.CHECK_DECAY, Boolean.valueOf(false));
 
     public WorldGenSavannaTree(boolean p_i45463_1_)
     {
         super(p_i45463_1_);
     }
 
-    public boolean generate(World worldIn, Random p_180709_2_, BlockPos p_180709_3_)
+    public boolean generate(World worldIn, Random rand, BlockPos position)
     {
-        int i = p_180709_2_.nextInt(3) + p_180709_2_.nextInt(3) + 5;
+        int i = rand.nextInt(3) + rand.nextInt(3) + 5;
         boolean flag = true;
 
-        if (p_180709_3_.getY() >= 1 && p_180709_3_.getY() + i + 1 <= 256)
+        if (position.getY() >= 1 && position.getY() + i + 1 <= 256)
         {
-            int k;
-            int l;
-
-            for (int j = p_180709_3_.getY(); j <= p_180709_3_.getY() + 1 + i; ++j)
+            for (int j = position.getY(); j <= position.getY() + 1 + i; ++j)
             {
-                byte b0 = 1;
+                int k = 1;
 
-                if (j == p_180709_3_.getY())
+                if (j == position.getY())
                 {
-                    b0 = 0;
+                    k = 0;
                 }
 
-                if (j >= p_180709_3_.getY() + 1 + i - 2)
+                if (j >= position.getY() + 1 + i - 2)
                 {
-                    b0 = 2;
+                    k = 2;
                 }
 
-                for (k = p_180709_3_.getX() - b0; k <= p_180709_3_.getX() + b0 && flag; ++k)
+                BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+
+                for (int l = position.getX() - k; l <= position.getX() + k && flag; ++l)
                 {
-                    for (l = p_180709_3_.getZ() - b0; l <= p_180709_3_.getZ() + b0 && flag; ++l)
+                    for (int i1 = position.getZ() - k; i1 <= position.getZ() + k && flag; ++i1)
                     {
                         if (j >= 0 && j < 256)
                         {
-                            if (!this.isReplaceable(worldIn, new BlockPos(k, j, l)))
+                            if (!this.isReplaceable(worldIn,blockpos$mutableblockpos.set(l, j, i1)))
                             {
                                 flag = false;
                             }
@@ -67,124 +71,120 @@ public class WorldGenSavannaTree extends WorldGenAbstractTree
             }
             else
             {
-                BlockPos down = p_180709_3_.down();
+                BlockPos down = position.down();
                 Block block = worldIn.getBlockState(down).getBlock();
                 boolean isSoil = block.canSustainPlant(worldIn, down, net.minecraft.util.EnumFacing.UP, ((net.minecraft.block.BlockSapling)Blocks.sapling));
 
-                if (isSoil && p_180709_3_.getY() < 256 - i - 1)
+                if (isSoil && position.getY() < 256 - i - 1)
                 {
-                    block.onPlantGrow(worldIn, down, p_180709_3_);
-                    EnumFacing enumfacing = EnumFacing.Plane.HORIZONTAL.random(p_180709_2_);
-                    k = i - p_180709_2_.nextInt(4) - 1;
-                    l = 3 - p_180709_2_.nextInt(3);
-                    int i1 = p_180709_3_.getX();
-                    int j1 = p_180709_3_.getZ();
+                    block.onPlantGrow(worldIn, down, position);
+                    EnumFacing enumfacing = EnumFacing.Plane.HORIZONTAL.random(rand);
+                    int k2 = i - rand.nextInt(4) - 1;
+                    int l2 = 3 - rand.nextInt(3);
+                    int i3 = position.getX();
+                    int j1 = position.getZ();
                     int k1 = 0;
-                    int i2;
 
                     for (int l1 = 0; l1 < i; ++l1)
                     {
-                        i2 = p_180709_3_.getY() + l1;
+                        int i2 = position.getY() + l1;
 
-                        if (l1 >= k && l > 0)
+                        if (l1 >= k2 && l2 > 0)
                         {
-                            i1 += enumfacing.getFrontOffsetX();
+                            i3 += enumfacing.getFrontOffsetX();
                             j1 += enumfacing.getFrontOffsetZ();
-                            --l;
+                            --l2;
                         }
 
-                        BlockPos blockpos1 = new BlockPos(i1, i2, j1);
-                        block = worldIn.getBlockState(blockpos1).getBlock();
+                        BlockPos blockpos = new BlockPos(i3, i2, j1);
+                        block = worldIn.getBlockState(blockpos).getBlock();
 
-                        if (block.isAir(worldIn, blockpos1) || block.isLeaves(worldIn, blockpos1))
+                        if (block.isAir(worldIn, blockpos) || block.isLeaves(worldIn, blockpos))
                         {
-                            this.func_175905_a(worldIn, blockpos1, Blocks.log2, BlockPlanks.EnumType.ACACIA.getMetadata() - 4);
+                            this.func_181642_b(worldIn, blockpos);
                             k1 = i2;
                         }
                     }
 
-                    BlockPos blockpos3 = new BlockPos(i1, k1, j1);
-                    int k2;
+                    BlockPos blockpos2 = new BlockPos(i3, k1, j1);
 
-                    for (i2 = -3; i2 <= 3; ++i2)
+                    for (int j3 = -3; j3 <= 3; ++j3)
                     {
-                        for (k2 = -3; k2 <= 3; ++k2)
+                        for (int i4 = -3; i4 <= 3; ++i4)
                         {
-                            if (Math.abs(i2) != 3 || Math.abs(k2) != 3)
+                            if (Math.abs(j3) != 3 || Math.abs(i4) != 3)
                             {
-                                this.func_175924_b(worldIn, blockpos3.add(i2, 0, k2));
+                                this.func_175924_b(worldIn, blockpos2.add(j3, 0, i4));
                             }
                         }
                     }
 
-                    blockpos3 = blockpos3.up();
+                    blockpos2 = blockpos2.up();
 
-                    for (i2 = -1; i2 <= 1; ++i2)
+                    for (int k3 = -1; k3 <= 1; ++k3)
                     {
-                        for (k2 = -1; k2 <= 1; ++k2)
+                        for (int j4 = -1; j4 <= 1; ++j4)
                         {
-                            this.func_175924_b(worldIn, blockpos3.add(i2, 0, k2));
+                            this.func_175924_b(worldIn, blockpos2.add(k3, 0, j4));
                         }
                     }
 
-                    this.func_175924_b(worldIn, blockpos3.east(2));
-                    this.func_175924_b(worldIn, blockpos3.west(2));
-                    this.func_175924_b(worldIn, blockpos3.south(2));
-                    this.func_175924_b(worldIn, blockpos3.north(2));
-                    i1 = p_180709_3_.getX();
-                    j1 = p_180709_3_.getZ();
-                    EnumFacing enumfacing1 = EnumFacing.Plane.HORIZONTAL.random(p_180709_2_);
+                    this.func_175924_b(worldIn, blockpos2.east(2));
+                    this.func_175924_b(worldIn, blockpos2.west(2));
+                    this.func_175924_b(worldIn, blockpos2.south(2));
+                    this.func_175924_b(worldIn, blockpos2.north(2));
+                    i3 = position.getX();
+                    j1 = position.getZ();
+                    EnumFacing enumfacing1 = EnumFacing.Plane.HORIZONTAL.random(rand);
 
                     if (enumfacing1 != enumfacing)
                     {
-                        i2 = k - p_180709_2_.nextInt(2) - 1;
-                        k2 = 1 + p_180709_2_.nextInt(3);
+                        int l3 = k2 - rand.nextInt(2) - 1;
+                        int k4 = 1 + rand.nextInt(3);
                         k1 = 0;
-                        int j2;
 
-                        for (int l2 = i2; l2 < i && k2 > 0; --k2)
+                        for (int l4 = l3; l4 < i && k4 > 0; --k4)
                         {
-                            if (l2 >= 1)
+                            if (l4 >= 1)
                             {
-                                j2 = p_180709_3_.getY() + l2;
-                                i1 += enumfacing1.getFrontOffsetX();
+                                int j2 = position.getY() + l4;
+                                i3 += enumfacing1.getFrontOffsetX();
                                 j1 += enumfacing1.getFrontOffsetZ();
-                                BlockPos blockpos2 = new BlockPos(i1, j2, j1);
-                                block = worldIn.getBlockState(blockpos2).getBlock();
+                                BlockPos blockpos1 = new BlockPos(i3, j2, j1);
+                                block = worldIn.getBlockState(blockpos1).getBlock();
 
                                 if (block.isAir(worldIn, blockpos2) || block.isLeaves(worldIn, blockpos2))
                                 {
-                                    this.func_175905_a(worldIn, blockpos2, Blocks.log2, BlockPlanks.EnumType.ACACIA.getMetadata() - 4);
+                                    this.func_181642_b(worldIn, blockpos1);
                                     k1 = j2;
                                 }
                             }
 
-                            ++l2;
+                            ++l4;
                         }
 
                         if (k1 > 0)
                         {
-                            BlockPos blockpos4 = new BlockPos(i1, k1, j1);
-                            int i3;
+                            BlockPos blockpos3 = new BlockPos(i3, k1, j1);
 
-                            for (j2 = -2; j2 <= 2; ++j2)
+                            for (int i5 = -2; i5 <= 2; ++i5)
                             {
-                                for (i3 = -2; i3 <= 2; ++i3)
+                                for (int k5 = -2; k5 <= 2; ++k5)
                                 {
-                                    if (Math.abs(j2) != 2 || Math.abs(i3) != 2)
+                                    if (Math.abs(i5) != 2 || Math.abs(k5) != 2)
                                     {
-                                        this.func_175924_b(worldIn, blockpos4.add(j2, 0, i3));
+                                        this.func_175924_b(worldIn, blockpos3.add(i5, 0, k5));
                                     }
                                 }
                             }
 
-                            blockpos4 = blockpos4.up();
+                            blockpos3 = blockpos3.up();
 
-                            for (j2 = -1; j2 <= 1; ++j2)
+                            for (int j5 = -1; j5 <= 1; ++j5)
                             {
-                                for (i3 = -1; i3 <= 1; ++i3)
+                                for (int l5 = -1; l5 <= 1; ++l5)
                                 {
-                                    this.func_175924_b(worldIn, blockpos4.add(j2, 0, i3));
+                                    this.func_175924_b(worldIn, blockpos3.add(j5, 0, l5));
                                 }
                             }
                         }
@@ -204,13 +204,18 @@ public class WorldGenSavannaTree extends WorldGenAbstractTree
         }
     }
 
+    private void func_181642_b(World p_181642_1_, BlockPos p_181642_2_)
+    {
+        this.setBlockAndNotifyAdequately(p_181642_1_, p_181642_2_, field_181643_a);
+    }
+
     private void func_175924_b(World worldIn, BlockPos p_175924_2_)
     {
         Block block = worldIn.getBlockState(p_175924_2_).getBlock();
 
         if (block.isAir(worldIn, p_175924_2_) || block.isLeaves(worldIn, p_175924_2_))
         {
-            this.func_175905_a(worldIn, p_175924_2_, Blocks.leaves2, 0);
+            this.setBlockAndNotifyAdequately(worldIn, p_175924_2_, field_181644_b);
         }
     }
 }

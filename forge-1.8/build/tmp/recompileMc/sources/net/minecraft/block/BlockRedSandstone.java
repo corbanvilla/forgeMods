@@ -15,18 +15,18 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockRedSandstone extends Block
 {
-    public static final PropertyEnum TYPE = PropertyEnum.create("type", BlockRedSandstone.EnumType.class);
-    private static final String __OBFID = "CL_00002072";
+    public static final PropertyEnum<BlockRedSandstone.EnumType> TYPE = PropertyEnum.<BlockRedSandstone.EnumType>create("type", BlockRedSandstone.EnumType.class);
 
     public BlockRedSandstone()
     {
-        super(Material.rock);
+        super(Material.rock, BlockSand.EnumType.RED_SAND.getMapColor());
         this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, BlockRedSandstone.EnumType.DEFAULT));
         this.setCreativeTab(CreativeTabs.tabBlock);
     }
 
     /**
-     * Get the damage value that this Block should drop
+     * Gets the metadata of the item this Block can drop. This method is called when the block gets destroyed. It
+     * returns the metadata of the dropped item based on the old metadata of the block.
      */
     public int damageDropped(IBlockState state)
     {
@@ -37,15 +37,11 @@ public class BlockRedSandstone extends Block
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
     {
-        BlockRedSandstone.EnumType[] aenumtype = BlockRedSandstone.EnumType.values();
-        int i = aenumtype.length;
-
-        for (int j = 0; j < i; ++j)
+        for (BlockRedSandstone.EnumType blockredsandstone$enumtype : BlockRedSandstone.EnumType.values())
         {
-            BlockRedSandstone.EnumType enumtype = aenumtype[j];
-            list.add(new ItemStack(itemIn, 1, enumtype.getMetadata()));
+            list.add(new ItemStack(itemIn, 1, blockredsandstone$enumtype.getMetadata()));
         }
     }
 
@@ -75,12 +71,11 @@ public class BlockRedSandstone extends Block
         DEFAULT(0, "red_sandstone", "default"),
         CHISELED(1, "chiseled_red_sandstone", "chiseled"),
         SMOOTH(2, "smooth_red_sandstone", "smooth");
+
         private static final BlockRedSandstone.EnumType[] META_LOOKUP = new BlockRedSandstone.EnumType[values().length];
         private final int meta;
         private final String name;
         private final String unlocalizedName;
-
-        private static final String __OBFID = "CL_00002071";
 
         private EnumType(int meta, String name, String unlocalizedName)
         {
@@ -121,13 +116,9 @@ public class BlockRedSandstone extends Block
 
         static
         {
-            BlockRedSandstone.EnumType[] var0 = values();
-            int var1 = var0.length;
-
-            for (int var2 = 0; var2 < var1; ++var2)
+            for (BlockRedSandstone.EnumType blockredsandstone$enumtype : values())
             {
-                BlockRedSandstone.EnumType var3 = var0[var2];
-                META_LOOKUP[var3.getMetadata()] = var3;
+                META_LOOKUP[blockredsandstone$enumtype.getMetadata()] = blockredsandstone$enumtype;
             }
         }
     }

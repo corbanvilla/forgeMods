@@ -7,8 +7,6 @@ import net.minecraft.util.ResourceLocation;
 
 public class EnchantmentDurability extends Enchantment
 {
-    private static final String __OBFID = "CL_00000103";
-
     protected EnchantmentDurability(int enchID, ResourceLocation enchName, int enchWeight)
     {
         super(enchID, enchName, enchWeight, EnumEnchantmentType.BREAKABLE);
@@ -41,8 +39,6 @@ public class EnchantmentDurability extends Enchantment
 
     /**
      * Determines if this enchantment can be applied to a specific ItemStack.
-     *  
-     * @param stack The ItemStack that is attempting to become enchanted with with enchantment.
      */
     public boolean canApply(ItemStack stack)
     {

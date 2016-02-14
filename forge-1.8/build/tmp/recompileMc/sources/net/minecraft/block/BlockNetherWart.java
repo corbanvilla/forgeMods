@@ -1,6 +1,8 @@
 package net.minecraft.block;
 
 import java.util.Random;
+import net.minecraft.block.material.MapColor;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockState;
@@ -18,10 +20,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BlockNetherWart extends BlockBush
 {
     public static final PropertyInteger AGE = PropertyInteger.create("age", 0, 3);
-    private static final String __OBFID = "CL_00000274";
 
     protected BlockNetherWart()
     {
+        super(Material.plants, MapColor.redColor);
         this.setDefaultState(this.blockState.getBaseState().withProperty(AGE, Integer.valueOf(0)));
         this.setTickRandomly(true);
         float f = 0.5F;
@@ -57,9 +59,6 @@ public class BlockNetherWart extends BlockBush
 
     /**
      * Spawns this Block's drops into the World as EntityItems.
-     *  
-     * @param chance The chance that each Item is actually spawned (1.0 = always, 0.0 = never)
-     * @param fortune The player's fortune level
      */
     @SuppressWarnings("unused")
     public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune)
@@ -67,19 +66,19 @@ public class BlockNetherWart extends BlockBush
         super.dropBlockAsItemWithChance(worldIn, pos, state, chance, fortune);
         if (false && !worldIn.isRemote)
         {
-            int j = 1;
+            int i = 1;
 
             if (((Integer)state.getValue(AGE)).intValue() >= 3)
             {
-                j = 2 + worldIn.rand.nextInt(3);
+                i = 2 + worldIn.rand.nextInt(3);
 
                 if (fortune > 0)
                 {
-                    j += worldIn.rand.nextInt(fortune + 1);
+                    i += worldIn.rand.nextInt(fortune + 1);
                 }
             }
 
-            for (int k = 0; k < j; ++k)
+            for (int j = 0; j < i; ++j)
             {
                 spawnAsEntity(worldIn, pos, new ItemStack(Items.nether_wart));
             }
@@ -88,8 +87,6 @@ public class BlockNetherWart extends BlockBush
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {

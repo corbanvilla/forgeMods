@@ -2,7 +2,6 @@ package net.minecraft.client.renderer.entity;
 
 import com.google.common.collect.Lists;
 import java.nio.FloatBuffer;
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -15,7 +14,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EnumPlayerModelParts;
@@ -30,34 +29,33 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
-public abstract class RendererLivingEntity extends Render
+public abstract class RendererLivingEntity<T extends EntityLivingBase> extends Render<T>
 {
     private static final Logger logger = LogManager.getLogger();
     private static final DynamicTexture field_177096_e = new DynamicTexture(16, 16);
     protected ModelBase mainModel;
-    protected FloatBuffer field_177095_g = GLAllocation.createDirectFloatBuffer(4);
-    protected List layerRenderers = Lists.newArrayList();
+    protected FloatBuffer brightnessBuffer = GLAllocation.createDirectFloatBuffer(4);
+    protected List<LayerRenderer<T>> layerRenderers = Lists.<LayerRenderer<T>>newArrayList();
     protected boolean renderOutlines = false;
-    private static final String __OBFID = "CL_00001012";
 
     public static float NAME_TAG_RANGE = 64.0f;
     public static float NAME_TAG_RANGE_SNEAK = 32.0f;
 
-    public RendererLivingEntity(RenderManager p_i46156_1_, ModelBase p_i46156_2_, float p_i46156_3_)
+    public RendererLivingEntity(RenderManager renderManagerIn, ModelBase modelBaseIn, float shadowSizeIn)
     {
-        super(p_i46156_1_);
-        this.mainModel = p_i46156_2_;
-        this.shadowSize = p_i46156_3_;
+        super(renderManagerIn);
+        this.mainModel = modelBaseIn;
+        this.shadowSize = shadowSizeIn;
     }
 
-    public boolean addLayer(LayerRenderer p_177094_1_)
+    public <V extends EntityLivingBase, U extends LayerRenderer<V>> boolean addLayer(U layer)
     {
-        return this.layerRenderers.add(p_177094_1_);
+        return this.layerRenderers.add((LayerRenderer<T>)layer);
     }
 
-    protected boolean removeLayer(LayerRenderer p_177089_1_)
+    protected <V extends EntityLivingBase, U extends LayerRenderer<V>> boolean removeLayer(U layer)
     {
-        return this.layerRenderers.remove(p_177089_1_);
+        return this.layerRenderers.remove(layer);
     }
 
     public ModelBase getMainModel()
@@ -70,24 +68,26 @@ public abstract class RendererLivingEntity extends Render
      * to interpolate, par3 is probably a float between 0.0 and 1.0 that tells us where "between" the two angles we are.
      * Example: par1 = 30, par2 = 50, par3 = 0.5, then return = 40
      */
-    protected float interpolateRotation(float p_77034_1_, float p_77034_2_, float p_77034_3_)
+    protected float interpolateRotation(float par1, float par2, float par3)
     {
-        float f3;
+        float f;
 
-        for (f3 = p_77034_2_ - p_77034_1_; f3 < -180.0F; f3 += 360.0F)
+        for (f = par2 - par1; f < -180.0F; f += 360.0F)
         {
             ;
         }
 
-        while (f3 >= 180.0F)
+        while (f >= 180.0F)
         {
-            f3 -= 360.0F;
+            f -= 360.0F;
         }
 
-        return p_77034_1_ + p_77034_3_ * f3;
+        return par1 + par3 * f;
     }
 
-    public void func_82422_c() {}
+    public void transformHeldFull3DItemLayer()
+    {
+    }
 
     /**
      * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
@@ -95,99 +95,98 @@ public abstract class RendererLivingEntity extends Render
      * (Render<T extends Entity>) and this method has signature public void func_76986_a(T entity, double d, double d1,
      * double d2, float f, float f1). But JAD is pre 1.5 so doe
      */
-    public void doRender(EntityLivingBase entity, double x, double y, double z, float p_76986_8_, float partialTicks)
+    public void doRender(T entity, double x, double y, double z, float entityYaw, float partialTicks)
     {
         if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderLivingEvent.Pre(entity, this, x, y, z))) return;
         GlStateManager.pushMatrix();
         GlStateManager.disableCull();
         this.mainModel.swingProgress = this.getSwingProgress(entity, partialTicks);
-        this.mainModel.isRiding = entity.isRiding();
+        boolean shouldSit = entity.isRiding() && (entity.ridingEntity != null && entity.ridingEntity.shouldRiderSit());
+        this.mainModel.isRiding = shouldSit;
         this.mainModel.isChild = entity.isChild();
 
         try
         {
-            float f2 = this.interpolateRotation(entity.prevRenderYawOffset, entity.renderYawOffset, partialTicks);
-            float f3 = this.interpolateRotation(entity.prevRotationYawHead, entity.rotationYawHead, partialTicks);
-            float f4 = f3 - f2;
-            float f5;
+            float f = this.interpolateRotation(entity.prevRenderYawOffset, entity.renderYawOffset, partialTicks);
+            float f1 = this.interpolateRotation(entity.prevRotationYawHead, entity.rotationYawHead, partialTicks);
+            float f2 = f1 - f;
 
-            if (entity.isRiding() && entity.ridingEntity instanceof EntityLivingBase)
+            if (shouldSit && entity.ridingEntity instanceof EntityLivingBase)
             {
-                EntityLivingBase entitylivingbase1 = (EntityLivingBase)entity.ridingEntity;
-                f2 = this.interpolateRotation(entitylivingbase1.prevRenderYawOffset, entitylivingbase1.renderYawOffset, partialTicks);
-                f4 = f3 - f2;
-                f5 = MathHelper.wrapAngleTo180_float(f4);
+                EntityLivingBase entitylivingbase = (EntityLivingBase)entity.ridingEntity;
+                f = this.interpolateRotation(entitylivingbase.prevRenderYawOffset, entitylivingbase.renderYawOffset, partialTicks);
+                f2 = f1 - f;
+                float f3 = MathHelper.wrapAngleTo180_float(f2);
 
-                if (f5 < -85.0F)
+                if (f3 < -85.0F)
                 {
-                    f5 = -85.0F;
+                    f3 = -85.0F;
                 }
 
-                if (f5 >= 85.0F)
+                if (f3 >= 85.0F)
                 {
-                    f5 = 85.0F;
+                    f3 = 85.0F;
                 }
 
-                f2 = f3 - f5;
+                f = f1 - f3;
 
-                if (f5 * f5 > 2500.0F)
+                if (f3 * f3 > 2500.0F)
                 {
-                    f2 += f5 * 0.2F;
+                    f += f3 * 0.2F;
                 }
             }
 
-            float f9 = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks;
+            float f7 = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks;
             this.renderLivingAt(entity, x, y, z);
-            f5 = this.handleRotationFloat(entity, partialTicks);
-            this.rotateCorpse(entity, f5, f2, partialTicks);
+            float f8 = this.handleRotationFloat(entity, partialTicks);
+            this.rotateCorpse(entity, f8, f, partialTicks);
             GlStateManager.enableRescaleNormal();
             GlStateManager.scale(-1.0F, -1.0F, 1.0F);
             this.preRenderCallback(entity, partialTicks);
-            float f6 = 0.0625F;
+            float f4 = 0.0625F;
             GlStateManager.translate(0.0F, -1.5078125F, 0.0F);
-            float f7 = entity.prevLimbSwingAmount + (entity.limbSwingAmount - entity.prevLimbSwingAmount) * partialTicks;
-            float f8 = entity.limbSwing - entity.limbSwingAmount * (1.0F - partialTicks);
+            float f5 = entity.prevLimbSwingAmount + (entity.limbSwingAmount - entity.prevLimbSwingAmount) * partialTicks;
+            float f6 = entity.limbSwing - entity.limbSwingAmount * (1.0F - partialTicks);
 
             if (entity.isChild())
             {
-                f8 *= 3.0F;
+                f6 *= 3.0F;
             }
 
-            if (f7 > 1.0F)
+            if (f5 > 1.0F)
             {
-                f7 = 1.0F;
+                f5 = 1.0F;
             }
 
             GlStateManager.enableAlpha();
-            this.mainModel.setLivingAnimations(entity, f8, f7, partialTicks);
-            this.mainModel.setRotationAngles(f8, f7, f5, f4, f9, 0.0625F, entity);
-            boolean flag;
+            this.mainModel.setLivingAnimations(entity, f6, f5, partialTicks);
+            this.mainModel.setRotationAngles(f6, f5, f8, f2, f7, 0.0625F, entity);
 
             if (this.renderOutlines)
             {
-                flag = this.func_177088_c(entity);
-                this.renderModel(entity, f8, f7, f5, f4, f9, 0.0625F);
+                boolean flag1 = this.setScoreTeamColor(entity);
+                this.renderModel(entity, f6, f5, f8, f2, f7, 0.0625F);
 
-                if (flag)
+                if (flag1)
                 {
-                    this.func_180565_e();
+                    this.unsetScoreTeamColor();
                 }
             }
             else
             {
-                flag = this.func_177090_c(entity, partialTicks);
-                this.renderModel(entity, f8, f7, f5, f4, f9, 0.0625F);
+                boolean flag = this.setDoRenderBrightness(entity, partialTicks);
+                this.renderModel(entity, f6, f5, f8, f2, f7, 0.0625F);
 
                 if (flag)
                 {
-                    this.func_177091_f();
+                    this.unsetBrightness();
                 }
 
                 GlStateManager.depthMask(true);
 
                 if (!(entity instanceof EntityPlayer) || !((EntityPlayer)entity).isSpectator())
                 {
-                    this.func_177093_a(entity, f8, f7, partialTicks, f5, f4, f9, 0.0625F);
+                    this.renderLayers(entity, f6, f5, partialTicks, f8, f2, f7, 0.0625F);
                 }
             }
 
@@ -195,7 +194,7 @@ public abstract class RendererLivingEntity extends Render
         }
         catch (Exception exception)
         {
-            logger.error("Couldn\'t render entity", exception);
+            logger.error((String)"Couldn\'t render entity", (Throwable)exception);
         }
 
         GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
@@ -206,18 +205,18 @@ public abstract class RendererLivingEntity extends Render
 
         if (!this.renderOutlines)
         {
-            super.doRender(entity, x, y, z, p_76986_8_, partialTicks);
+            super.doRender(entity, x, y, z, entityYaw, partialTicks);
         }
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderLivingEvent.Post(entity, this, x, y, z));
     }
 
-    protected boolean func_177088_c(EntityLivingBase p_177088_1_)
+    protected boolean setScoreTeamColor(T entityLivingBaseIn)
     {
         int i = 16777215;
 
-        if (p_177088_1_ instanceof EntityPlayer)
+        if (entityLivingBaseIn instanceof EntityPlayer)
         {
-            ScorePlayerTeam scoreplayerteam = (ScorePlayerTeam)p_177088_1_.getTeam();
+            ScorePlayerTeam scoreplayerteam = (ScorePlayerTeam)entityLivingBaseIn.getTeam();
 
             if (scoreplayerteam != null)
             {
@@ -243,7 +242,7 @@ public abstract class RendererLivingEntity extends Render
         return true;
     }
 
-    protected void func_180565_e()
+    protected void unsetScoreTeamColor()
     {
         GlStateManager.enableLighting();
         GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
@@ -256,14 +255,14 @@ public abstract class RendererLivingEntity extends Render
     /**
      * Renders the model in RenderLiving
      */
-    protected void renderModel(EntityLivingBase p_77036_1_, float p_77036_2_, float p_77036_3_, float p_77036_4_, float p_77036_5_, float p_77036_6_, float p_77036_7_)
+    protected void renderModel(T entitylivingbaseIn, float p_77036_2_, float p_77036_3_, float p_77036_4_, float p_77036_5_, float p_77036_6_, float p_77036_7_)
     {
-        boolean flag = !p_77036_1_.isInvisible();
-        boolean flag1 = !flag && !p_77036_1_.isInvisibleToPlayer(Minecraft.getMinecraft().thePlayer);
+        boolean flag = !entitylivingbaseIn.isInvisible();
+        boolean flag1 = !flag && !entitylivingbaseIn.isInvisibleToPlayer(Minecraft.getMinecraft().thePlayer);
 
         if (flag || flag1)
         {
-            if (!this.bindEntityTexture(p_77036_1_))
+            if (!this.bindEntityTexture(entitylivingbaseIn))
             {
                 return;
             }
@@ -278,7 +277,7 @@ public abstract class RendererLivingEntity extends Render
                 GlStateManager.alphaFunc(516, 0.003921569F);
             }
 
-            this.mainModel.render(p_77036_1_, p_77036_2_, p_77036_3_, p_77036_4_, p_77036_5_, p_77036_6_, p_77036_7_);
+            this.mainModel.render(entitylivingbaseIn, p_77036_2_, p_77036_3_, p_77036_4_, p_77036_5_, p_77036_6_, p_77036_7_);
 
             if (flag1)
             {
@@ -290,23 +289,23 @@ public abstract class RendererLivingEntity extends Render
         }
     }
 
-    protected boolean func_177090_c(EntityLivingBase p_177090_1_, float p_177090_2_)
+    protected boolean setDoRenderBrightness(T entityLivingBaseIn, float partialTicks)
     {
-        return this.func_177092_a(p_177090_1_, p_177090_2_, true);
+        return this.setBrightness(entityLivingBaseIn, partialTicks, true);
     }
 
-    protected boolean func_177092_a(EntityLivingBase p_177092_1_, float p_177092_2_, boolean p_177092_3_)
+    protected boolean setBrightness(T entitylivingbaseIn, float partialTicks, boolean combineTextures)
     {
-        float f1 = p_177092_1_.getBrightness(p_177092_2_);
-        int i = this.getColorMultiplier(p_177092_1_, f1, p_177092_2_);
-        boolean flag1 = (i >> 24 & 255) > 0;
-        boolean flag2 = p_177092_1_.hurtTime > 0 || p_177092_1_.deathTime > 0;
+        float f = entitylivingbaseIn.getBrightness(partialTicks);
+        int i = this.getColorMultiplier(entitylivingbaseIn, f, partialTicks);
+        boolean flag = (i >> 24 & 255) > 0;
+        boolean flag1 = entitylivingbaseIn.hurtTime > 0 || entitylivingbaseIn.deathTime > 0;
 
-        if (!flag1 && !flag2)
+        if (!flag && !flag1)
         {
             return false;
         }
-        else if (!flag1 && !p_177092_3_)
+        else if (!flag && !combineTextures)
         {
             return false;
         }
@@ -336,29 +335,29 @@ public abstract class RendererLivingEntity extends Render
             GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, OpenGlHelper.GL_COMBINE_ALPHA, GL11.GL_REPLACE);
             GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, OpenGlHelper.GL_SOURCE0_ALPHA, OpenGlHelper.GL_PREVIOUS);
             GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, OpenGlHelper.GL_OPERAND0_ALPHA, GL11.GL_SRC_ALPHA);
-            this.field_177095_g.position(0);
+            this.brightnessBuffer.position(0);
 
-            if (flag2)
+            if (flag1)
             {
-                this.field_177095_g.put(1.0F);
-                this.field_177095_g.put(0.0F);
-                this.field_177095_g.put(0.0F);
-                this.field_177095_g.put(0.3F);
+                this.brightnessBuffer.put(1.0F);
+                this.brightnessBuffer.put(0.0F);
+                this.brightnessBuffer.put(0.0F);
+                this.brightnessBuffer.put(0.3F);
             }
             else
             {
-                float f2 = (float)(i >> 24 & 255) / 255.0F;
-                float f3 = (float)(i >> 16 & 255) / 255.0F;
-                float f4 = (float)(i >> 8 & 255) / 255.0F;
-                float f5 = (float)(i & 255) / 255.0F;
-                this.field_177095_g.put(f3);
-                this.field_177095_g.put(f4);
-                this.field_177095_g.put(f5);
-                this.field_177095_g.put(1.0F - f2);
+                float f1 = (float)(i >> 24 & 255) / 255.0F;
+                float f2 = (float)(i >> 16 & 255) / 255.0F;
+                float f3 = (float)(i >> 8 & 255) / 255.0F;
+                float f4 = (float)(i & 255) / 255.0F;
+                this.brightnessBuffer.put(f2);
+                this.brightnessBuffer.put(f3);
+                this.brightnessBuffer.put(f4);
+                this.brightnessBuffer.put(1.0F - f1);
             }
 
-            this.field_177095_g.flip();
-            GL11.glTexEnv(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_COLOR, this.field_177095_g);
+            this.brightnessBuffer.flip();
+            GL11.glTexEnv(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_COLOR, (FloatBuffer)this.brightnessBuffer);
             GlStateManager.setActiveTexture(OpenGlHelper.GL_TEXTURE2);
             GlStateManager.enableTexture2D();
             GlStateManager.bindTexture(field_177096_e.getGlTextureId());
@@ -376,7 +375,7 @@ public abstract class RendererLivingEntity extends Render
         }
     }
 
-    protected void func_177091_f()
+    protected void unsetBrightness()
     {
         GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
         GlStateManager.enableTexture2D();
@@ -420,34 +419,34 @@ public abstract class RendererLivingEntity extends Render
     /**
      * Sets a simple glTranslate on a LivingEntity.
      */
-    protected void renderLivingAt(EntityLivingBase p_77039_1_, double p_77039_2_, double p_77039_4_, double p_77039_6_)
+    protected void renderLivingAt(T entityLivingBaseIn, double x, double y, double z)
     {
-        GlStateManager.translate((float)p_77039_2_, (float)p_77039_4_, (float)p_77039_6_);
+        GlStateManager.translate((float)x, (float)y, (float)z);
     }
 
-    protected void rotateCorpse(EntityLivingBase p_77043_1_, float p_77043_2_, float p_77043_3_, float p_77043_4_)
+    protected void rotateCorpse(T bat, float p_77043_2_, float p_77043_3_, float partialTicks)
     {
         GlStateManager.rotate(180.0F - p_77043_3_, 0.0F, 1.0F, 0.0F);
 
-        if (p_77043_1_.deathTime > 0)
+        if (bat.deathTime > 0)
         {
-            float f3 = ((float)p_77043_1_.deathTime + p_77043_4_ - 1.0F) / 20.0F * 1.6F;
-            f3 = MathHelper.sqrt_float(f3);
+            float f = ((float)bat.deathTime + partialTicks - 1.0F) / 20.0F * 1.6F;
+            f = MathHelper.sqrt_float(f);
 
-            if (f3 > 1.0F)
+            if (f > 1.0F)
             {
-                f3 = 1.0F;
+                f = 1.0F;
             }
 
-            GlStateManager.rotate(f3 * this.getDeathMaxRotation(p_77043_1_), 0.0F, 0.0F, 1.0F);
+            GlStateManager.rotate(f * this.getDeathMaxRotation(bat), 0.0F, 0.0F, 1.0F);
         }
         else
         {
-            String s = EnumChatFormatting.getTextWithoutFormattingCodes(p_77043_1_.getName());
+            String s = EnumChatFormatting.getTextWithoutFormattingCodes(bat.getName());
 
-            if (s != null && (s.equals("Dinnerbone") || s.equals("Grumm")) && (!(p_77043_1_ instanceof EntityPlayer) || ((EntityPlayer)p_77043_1_).func_175148_a(EnumPlayerModelParts.CAPE)))
+            if (s != null && (s.equals("Dinnerbone") || s.equals("Grumm")) && (!(bat instanceof EntityPlayer) || ((EntityPlayer)bat).isWearing(EnumPlayerModelParts.CAPE)))
             {
-                GlStateManager.translate(0.0F, p_77043_1_.height + 0.1F, 0.0F);
+                GlStateManager.translate(0.0F, bat.height + 0.1F, 0.0F);
                 GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);
             }
         }
@@ -456,37 +455,34 @@ public abstract class RendererLivingEntity extends Render
     /**
      * Returns where in the swing animation the living entity is (from 0 to 1).  Args : entity, partialTickTime
      */
-    protected float getSwingProgress(EntityLivingBase p_77040_1_, float p_77040_2_)
+    protected float getSwingProgress(T livingBase, float partialTickTime)
     {
-        return p_77040_1_.getSwingProgress(p_77040_2_);
+        return livingBase.getSwingProgress(partialTickTime);
     }
 
     /**
      * Defines what float the third param in setRotationAngles of ModelBase is
      */
-    protected float handleRotationFloat(EntityLivingBase p_77044_1_, float p_77044_2_)
+    protected float handleRotationFloat(T livingBase, float partialTicks)
     {
-        return (float)p_77044_1_.ticksExisted + p_77044_2_;
+        return (float)livingBase.ticksExisted + partialTicks;
     }
 
-    protected void func_177093_a(EntityLivingBase p_177093_1_, float p_177093_2_, float p_177093_3_, float p_177093_4_, float p_177093_5_, float p_177093_6_, float p_177093_7_, float p_177093_8_)
+    protected void renderLayers(T entitylivingbaseIn, float p_177093_2_, float p_177093_3_, float partialTicks, float p_177093_5_, float p_177093_6_, float p_177093_7_, float p_177093_8_)
     {
-        Iterator iterator = this.layerRenderers.iterator();
-
-        while (iterator.hasNext())
+        for (LayerRenderer<T> layerrenderer : this.layerRenderers)
         {
-            LayerRenderer layerrenderer = (LayerRenderer)iterator.next();
-            boolean flag = this.func_177092_a(p_177093_1_, p_177093_4_, layerrenderer.shouldCombineTextures());
-            layerrenderer.doRenderLayer(p_177093_1_, p_177093_2_, p_177093_3_, p_177093_4_, p_177093_5_, p_177093_6_, p_177093_7_, p_177093_8_);
+            boolean flag = this.setBrightness(entitylivingbaseIn, partialTicks, layerrenderer.shouldCombineTextures());
+            layerrenderer.doRenderLayer(entitylivingbaseIn, p_177093_2_, p_177093_3_, partialTicks, p_177093_5_, p_177093_6_, p_177093_7_, p_177093_8_);
 
             if (flag)
             {
-                this.func_177091_f();
+                this.unsetBrightness();
             }
         }
     }
 
-    protected float getDeathMaxRotation(EntityLivingBase p_77037_1_)
+    protected float getDeathMaxRotation(T entityLivingBaseIn)
     {
         return 90.0F;
     }
@@ -494,7 +490,7 @@ public abstract class RendererLivingEntity extends Render
     /**
      * Returns an ARGB int color back. Args: entityLiving, lightBrightness, partialTickTime
      */
-    protected int getColorMultiplier(EntityLivingBase p_77030_1_, float p_77030_2_, float p_77030_3_)
+    protected int getColorMultiplier(T entitylivingbaseIn, float lightBrightness, float partialTickTime)
     {
         return 0;
     }
@@ -503,30 +499,29 @@ public abstract class RendererLivingEntity extends Render
      * Allows the render to do any OpenGL state modifications necessary before the model is rendered. Args:
      * entityLiving, partialTickTime
      */
-    protected void preRenderCallback(EntityLivingBase p_77041_1_, float p_77041_2_) {}
-
-    /**
-     * Passes the specialRender and renders it
-     */
-    public void passSpecialRender(EntityLivingBase p_77033_1_, double p_77033_2_, double p_77033_4_, double p_77033_6_)
+    protected void preRenderCallback(T entitylivingbaseIn, float partialTickTime)
     {
-        if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderLivingEvent.Specials.Pre(p_77033_1_, this, p_77033_2_, p_77033_4_, p_77033_6_))) return;
-        if (this.canRenderName(p_77033_1_))
-        {
-            double d3 = p_77033_1_.getDistanceSqToEntity(this.renderManager.livingPlayer);
-            float f = p_77033_1_.isSneaking() ? NAME_TAG_RANGE_SNEAK : NAME_TAG_RANGE;
+    }
 
-            if (d3 < (double)(f * f))
+    public void renderName(T entity, double x, double y, double z)
+    {
+        if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderLivingEvent.Specials.Pre(entity, this, x, y, z))) return;
+        if (this.canRenderName(entity))
+        {
+            double d0 = entity.getDistanceSqToEntity(this.renderManager.livingPlayer);
+            float f = entity.isSneaking() ? NAME_TAG_RANGE_SNEAK : NAME_TAG_RANGE;
+
+            if (d0 < (double)(f * f))
             {
-                String s = p_77033_1_.getDisplayName().getFormattedText();
+                String s = entity.getDisplayName().getFormattedText();
                 float f1 = 0.02666667F;
                 GlStateManager.alphaFunc(516, 0.1F);
 
-                if (p_77033_1_.isSneaking())
+                if (entity.isSneaking())
                 {
                     FontRenderer fontrenderer = this.getFontRendererFromRenderManager();
                     GlStateManager.pushMatrix();
-                    GlStateManager.translate((float)p_77033_2_, (float)p_77033_4_ + p_77033_1_.height + 0.5F - (p_77033_1_.isChild() ? p_77033_1_.height / 2.0F : 0.0F), (float)p_77033_6_);
+                    GlStateManager.translate((float)x, (float)y + entity.height + 0.5F - (entity.isChild() ? entity.height / 2.0F : 0.0F), (float)z);
                     GL11.glNormal3f(0.0F, 1.0F, 0.0F);
                     GlStateManager.rotate(-this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
                     GlStateManager.rotate(this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
@@ -537,15 +532,14 @@ public abstract class RendererLivingEntity extends Render
                     GlStateManager.enableBlend();
                     GlStateManager.disableTexture2D();
                     GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+                    int i = fontrenderer.getStringWidth(s) / 2;
                     Tessellator tessellator = Tessellator.getInstance();
                     WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-                    worldrenderer.startDrawingQuads();
-                    int i = fontrenderer.getStringWidth(s) / 2;
-                    worldrenderer.setColorRGBA_F(0.0F, 0.0F, 0.0F, 0.25F);
-                    worldrenderer.addVertex((double)(-i - 1), -1.0D, 0.0D);
-                    worldrenderer.addVertex((double)(-i - 1), 8.0D, 0.0D);
-                    worldrenderer.addVertex((double)(i + 1), 8.0D, 0.0D);
-                    worldrenderer.addVertex((double)(i + 1), -1.0D, 0.0D);
+                    worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
+                    worldrenderer.pos((double)(-i - 1), -1.0D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
+                    worldrenderer.pos((double)(-i - 1), 8.0D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
+                    worldrenderer.pos((double)(i + 1), 8.0D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
+                    worldrenderer.pos((double)(i + 1), -1.0D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
                     tessellator.draw();
                     GlStateManager.enableTexture2D();
                     GlStateManager.depthMask(true);
@@ -557,38 +551,35 @@ public abstract class RendererLivingEntity extends Render
                 }
                 else
                 {
-                    this.func_177069_a(p_77033_1_, p_77033_2_, p_77033_4_ - (p_77033_1_.isChild() ? (double)(p_77033_1_.height / 2.0F) : 0.0D), p_77033_6_, s, 0.02666667F, d3);
+                    this.renderOffsetLivingLabel(entity, x, y - (entity.isChild() ? (double)(entity.height / 2.0F) : 0.0D), z, s, 0.02666667F, d0);
                 }
             }
         }
-        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderLivingEvent.Specials.Post(p_77033_1_, this, p_77033_2_, p_77033_4_, p_77033_6_));
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderLivingEvent.Specials.Post(entity, this, x, y, z));
     }
 
-    /**
-     * Test if the entity name must be rendered
-     */
-    protected boolean canRenderName(EntityLivingBase targetEntity)
+    protected boolean canRenderName(T entity)
     {
         EntityPlayerSP entityplayersp = Minecraft.getMinecraft().thePlayer;
 
-        if (targetEntity instanceof EntityPlayer && targetEntity != entityplayersp)
+        if (entity instanceof EntityPlayer && entity != entityplayersp)
         {
-            Team team = targetEntity.getTeam();
+            Team team = entity.getTeam();
             Team team1 = entityplayersp.getTeam();
 
             if (team != null)
             {
-                Team.EnumVisible enumvisible = team.func_178770_i();
+                Team.EnumVisible team$enumvisible = team.getNameTagVisibility();
 
-                switch (RendererLivingEntity.SwitchEnumVisible.field_178679_a[enumvisible.ordinal()])
+                switch (team$enumvisible)
                 {
-                    case 1:
+                    case ALWAYS:
                         return true;
-                    case 2:
+                    case NEVER:
                         return false;
-                    case 3:
+                    case HIDE_FOR_OTHER_TEAMS:
                         return team1 == null || team.isSameTeam(team1);
-                    case 4:
+                    case HIDE_FOR_OWN_TEAM:
                         return team1 == null || !team.isSameTeam(team1);
                     default:
                         return true;
@@ -596,91 +587,23 @@ public abstract class RendererLivingEntity extends Render
             }
         }
 
-        return Minecraft.isGuiEnabled() && targetEntity != this.renderManager.livingPlayer && !targetEntity.isInvisibleToPlayer(entityplayersp) && targetEntity.riddenByEntity == null;
+        return Minecraft.isGuiEnabled() && entity != this.renderManager.livingPlayer && !entity.isInvisibleToPlayer(entityplayersp) && entity.riddenByEntity == null;
     }
 
-    public void setRenderOutlines(boolean p_177086_1_)
+    public void setRenderOutlines(boolean renderOutlinesIn)
     {
-        this.renderOutlines = p_177086_1_;
-    }
-
-    protected boolean canRenderName(Entity entity)
-    {
-        return this.canRenderName((EntityLivingBase)entity);
-    }
-
-    public void renderName(Entity entity, double x, double y, double z)
-    {
-        this.passSpecialRender((EntityLivingBase)entity, x, y, z);
-    }
-
-    /**
-     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
-     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
-     * (Render<T extends Entity>) and this method has signature public void func_76986_a(T entity, double d, double d1,
-     * double d2, float f, float f1). But JAD is pre 1.5 so doe
-     */
-    public void doRender(Entity entity, double x, double y, double z, float p_76986_8_, float partialTicks)
-    {
-        this.doRender((EntityLivingBase)entity, x, y, z, p_76986_8_, partialTicks);
+        this.renderOutlines = renderOutlinesIn;
     }
 
     static
     {
-        int[] var0 = field_177096_e.getTextureData();
+        int[] aint = field_177096_e.getTextureData();
 
-        for (int var1 = 0; var1 < 256; ++var1)
+        for (int i = 0; i < 256; ++i)
         {
-            var0[var1] = -1;
+            aint[i] = -1;
         }
 
         field_177096_e.updateDynamicTexture();
     }
-
-    @SideOnly(Side.CLIENT)
-
-    static final class SwitchEnumVisible
-        {
-            static final int[] field_178679_a = new int[Team.EnumVisible.values().length];
-            private static final String __OBFID = "CL_00002435";
-
-            static
-            {
-                try
-                {
-                    field_178679_a[Team.EnumVisible.ALWAYS.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var4)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_178679_a[Team.EnumVisible.NEVER.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var3)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_178679_a[Team.EnumVisible.HIDE_FOR_OTHER_TEAMS.ordinal()] = 3;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_178679_a[Team.EnumVisible.HIDE_FOR_OWN_TEAM.ordinal()] = 4;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
-            }
-        }
 }

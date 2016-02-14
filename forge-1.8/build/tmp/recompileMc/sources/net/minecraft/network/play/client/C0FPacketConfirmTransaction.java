@@ -1,21 +1,21 @@
 package net.minecraft.network.play.client;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class C0FPacketConfirmTransaction implements Packet
+public class C0FPacketConfirmTransaction implements Packet<INetHandlerPlayServer>
 {
     private int windowId;
     private short uid;
     private boolean accepted;
-    private static final String __OBFID = "CL_00001351";
 
-    public C0FPacketConfirmTransaction() {}
+    public C0FPacketConfirmTransaction()
+    {
+    }
 
     @SideOnly(Side.CLIENT)
     public C0FPacketConfirmTransaction(int windowId, short uid, boolean accepted)
@@ -61,13 +61,5 @@ public class C0FPacketConfirmTransaction implements Packet
     public short getUid()
     {
         return this.uid;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayServer)handler);
     }
 }

@@ -9,17 +9,16 @@ import net.minecraft.entity.Entity;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockPos;
 
 public class CommandTestFor extends CommandBase
 {
-    private static final String __OBFID = "CL_00001182";
-
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
-    public String getName()
+    public String getCommandName()
     {
         return "testfor";
     }
@@ -32,15 +31,23 @@ public class CommandTestFor extends CommandBase
         return 2;
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.testfor.usage";
     }
 
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
-    public void execute(ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 1)
         {
@@ -55,7 +62,7 @@ public class CommandTestFor extends CommandBase
             {
                 try
                 {
-                    nbttagcompound = JsonToNBT.func_180713_a(func_180529_a(args, 1));
+                    nbttagcompound = JsonToNBT.getTagFromJson(buildString(args, 1));
                 }
                 catch (NBTException nbtexception)
                 {
@@ -68,7 +75,7 @@ public class CommandTestFor extends CommandBase
                 NBTTagCompound nbttagcompound1 = new NBTTagCompound();
                 entity.writeToNBT(nbttagcompound1);
 
-                if (!CommandTestForBlock.func_175775_a(nbttagcompound, nbttagcompound1, true))
+                if (!NBTUtil.func_181123_a(nbttagcompound, nbttagcompound1, true))
                 {
                     throw new CommandException("commands.testfor.failure", new Object[] {entity.getName()});
                 }
@@ -80,13 +87,15 @@ public class CommandTestFor extends CommandBase
 
     /**
      * Return whether the specified command parameter index is a username parameter.
+     *  
+     * @param args The arguments that were passed
      */
     public boolean isUsernameIndex(String[] args, int index)
     {
         return index == 0;
     }
 
-    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
         return args.length == 1 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames()) : null;
     }

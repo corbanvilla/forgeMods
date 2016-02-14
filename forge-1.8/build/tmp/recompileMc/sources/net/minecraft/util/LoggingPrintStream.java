@@ -9,7 +9,6 @@ public class LoggingPrintStream extends PrintStream
 {
     private static final Logger LOGGER = LogManager.getLogger();
     private final String domain;
-    private static final String __OBFID = "CL_00002275";
 
     public LoggingPrintStream(String domainIn, OutputStream outStream)
     {

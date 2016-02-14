@@ -16,146 +16,161 @@ import net.minecraft.world.IBlockAccess;
 
 public class WalkNodeProcessor extends NodeProcessor
 {
-    private boolean field_176180_f;
-    private boolean field_176181_g;
-    private boolean field_176183_h;
-    private boolean field_176184_i;
-    private boolean field_176182_j;
-    private static final String __OBFID = "CL_00001965";
+    private boolean canEnterDoors;
+    private boolean canBreakDoors;
+    private boolean avoidsWater;
+    private boolean canSwim;
+    private boolean shouldAvoidWater;
 
-    public void func_176162_a(IBlockAccess p_176162_1_, Entity p_176162_2_)
+    public void initProcessor(IBlockAccess iblockaccessIn, Entity entityIn)
     {
-        super.func_176162_a(p_176162_1_, p_176162_2_);
-        this.field_176182_j = this.field_176183_h;
+        super.initProcessor(iblockaccessIn, entityIn);
+        this.shouldAvoidWater = this.avoidsWater;
     }
 
-    public void func_176163_a()
+    /**
+     * This method is called when all nodes have been processed and PathEntity is created.
+     * {@link net.minecraft.world.pathfinder.WalkNodeProcessor WalkNodeProcessor} uses this to change its field {@link
+     * net.minecraft.world.pathfinder.WalkNodeProcessor#avoidsWater avoidsWater}
+     */
+    public void postProcess()
     {
-        super.func_176163_a();
-        this.field_176183_h = this.field_176182_j;
+        super.postProcess();
+        this.avoidsWater = this.shouldAvoidWater;
     }
 
-    public PathPoint func_176161_a(Entity p_176161_1_)
+    /**
+     * Returns given entity's position as PathPoint
+     */
+    public PathPoint getPathPointTo(Entity entityIn)
     {
         int i;
 
-        if (this.field_176184_i && p_176161_1_.isInWater())
+        if (this.canSwim && entityIn.isInWater())
         {
-            i = (int)p_176161_1_.getEntityBoundingBox().minY;
+            i = (int)entityIn.getEntityBoundingBox().minY;
+            BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos(MathHelper.floor_double(entityIn.posX), i, MathHelper.floor_double(entityIn.posZ));
 
-            for (Block block = this.field_176169_a.getBlockState(new BlockPos(MathHelper.floor_double(p_176161_1_.posX), i, MathHelper.floor_double(p_176161_1_.posZ))).getBlock(); block == Blocks.flowing_water || block == Blocks.water; block = this.field_176169_a.getBlockState(new BlockPos(MathHelper.floor_double(p_176161_1_.posX), i, MathHelper.floor_double(p_176161_1_.posZ))).getBlock())
+            for (Block block = this.blockaccess.getBlockState(blockpos$mutableblockpos).getBlock(); block == Blocks.flowing_water || block == Blocks.water; block = this.blockaccess.getBlockState(blockpos$mutableblockpos).getBlock())
             {
                 ++i;
+                blockpos$mutableblockpos.set(MathHelper.floor_double(entityIn.posX), i, MathHelper.floor_double(entityIn.posZ));
             }
 
-            this.field_176183_h = false;
+            this.avoidsWater = false;
         }
         else
         {
-            i = MathHelper.floor_double(p_176161_1_.getEntityBoundingBox().minY + 0.5D);
+            i = MathHelper.floor_double(entityIn.getEntityBoundingBox().minY + 0.5D);
         }
 
-        return this.func_176159_a(MathHelper.floor_double(p_176161_1_.getEntityBoundingBox().minX), i, MathHelper.floor_double(p_176161_1_.getEntityBoundingBox().minZ));
+        return this.openPoint(MathHelper.floor_double(entityIn.getEntityBoundingBox().minX), i, MathHelper.floor_double(entityIn.getEntityBoundingBox().minZ));
     }
 
-    public PathPoint func_176160_a(Entity p_176160_1_, double p_176160_2_, double p_176160_4_, double p_176160_6_)
+    /**
+     * Returns PathPoint for given coordinates
+     */
+    public PathPoint getPathPointToCoords(Entity entityIn, double x, double y, double target)
     {
-        return this.func_176159_a(MathHelper.floor_double(p_176160_2_ - (double)(p_176160_1_.width / 2.0F)), MathHelper.floor_double(p_176160_4_), MathHelper.floor_double(p_176160_6_ - (double)(p_176160_1_.width / 2.0F)));
+        return this.openPoint(MathHelper.floor_double(x - (double)(entityIn.width / 2.0F)), MathHelper.floor_double(y), MathHelper.floor_double(target - (double)(entityIn.width / 2.0F)));
     }
 
-    public int func_176164_a(PathPoint[] p_176164_1_, Entity p_176164_2_, PathPoint p_176164_3_, PathPoint p_176164_4_, float p_176164_5_)
+    public int findPathOptions(PathPoint[] pathOptions, Entity entityIn, PathPoint currentPoint, PathPoint targetPoint, float maxDistance)
     {
         int i = 0;
-        byte b0 = 0;
+        int j = 0;
 
-        if (this.func_176177_a(p_176164_2_, p_176164_3_.xCoord, p_176164_3_.yCoord + 1, p_176164_3_.zCoord) == 1)
+        if (this.getVerticalOffset(entityIn, currentPoint.xCoord, currentPoint.yCoord + 1, currentPoint.zCoord) == 1)
         {
-            b0 = 1;
+            j = 1;
         }
 
-        PathPoint pathpoint2 = this.func_176171_a(p_176164_2_, p_176164_3_.xCoord, p_176164_3_.yCoord, p_176164_3_.zCoord + 1, b0);
-        PathPoint pathpoint3 = this.func_176171_a(p_176164_2_, p_176164_3_.xCoord - 1, p_176164_3_.yCoord, p_176164_3_.zCoord, b0);
-        PathPoint pathpoint4 = this.func_176171_a(p_176164_2_, p_176164_3_.xCoord + 1, p_176164_3_.yCoord, p_176164_3_.zCoord, b0);
-        PathPoint pathpoint5 = this.func_176171_a(p_176164_2_, p_176164_3_.xCoord, p_176164_3_.yCoord, p_176164_3_.zCoord - 1, b0);
+        PathPoint pathpoint = this.getSafePoint(entityIn, currentPoint.xCoord, currentPoint.yCoord, currentPoint.zCoord + 1, j);
+        PathPoint pathpoint1 = this.getSafePoint(entityIn, currentPoint.xCoord - 1, currentPoint.yCoord, currentPoint.zCoord, j);
+        PathPoint pathpoint2 = this.getSafePoint(entityIn, currentPoint.xCoord + 1, currentPoint.yCoord, currentPoint.zCoord, j);
+        PathPoint pathpoint3 = this.getSafePoint(entityIn, currentPoint.xCoord, currentPoint.yCoord, currentPoint.zCoord - 1, j);
 
-        if (pathpoint2 != null && !pathpoint2.visited && pathpoint2.distanceTo(p_176164_4_) < p_176164_5_)
+        if (pathpoint != null && !pathpoint.visited && pathpoint.distanceTo(targetPoint) < maxDistance)
         {
-            p_176164_1_[i++] = pathpoint2;
+            pathOptions[i++] = pathpoint;
         }
 
-        if (pathpoint3 != null && !pathpoint3.visited && pathpoint3.distanceTo(p_176164_4_) < p_176164_5_)
+        if (pathpoint1 != null && !pathpoint1.visited && pathpoint1.distanceTo(targetPoint) < maxDistance)
         {
-            p_176164_1_[i++] = pathpoint3;
+            pathOptions[i++] = pathpoint1;
         }
 
-        if (pathpoint4 != null && !pathpoint4.visited && pathpoint4.distanceTo(p_176164_4_) < p_176164_5_)
+        if (pathpoint2 != null && !pathpoint2.visited && pathpoint2.distanceTo(targetPoint) < maxDistance)
         {
-            p_176164_1_[i++] = pathpoint4;
+            pathOptions[i++] = pathpoint2;
         }
 
-        if (pathpoint5 != null && !pathpoint5.visited && pathpoint5.distanceTo(p_176164_4_) < p_176164_5_)
+        if (pathpoint3 != null && !pathpoint3.visited && pathpoint3.distanceTo(targetPoint) < maxDistance)
         {
-            p_176164_1_[i++] = pathpoint5;
+            pathOptions[i++] = pathpoint3;
         }
 
         return i;
     }
 
-    private PathPoint func_176171_a(Entity p_176171_1_, int p_176171_2_, int p_176171_3_, int p_176171_4_, int p_176171_5_)
+    /**
+     * Returns a point that the entity can safely move to
+     */
+    private PathPoint getSafePoint(Entity entityIn, int x, int y, int z, int p_176171_5_)
     {
         PathPoint pathpoint = null;
-        int i1 = this.func_176177_a(p_176171_1_, p_176171_2_, p_176171_3_, p_176171_4_);
+        int i = this.getVerticalOffset(entityIn, x, y, z);
 
-        if (i1 == 2)
+        if (i == 2)
         {
-            return this.func_176159_a(p_176171_2_, p_176171_3_, p_176171_4_);
+            return this.openPoint(x, y, z);
         }
         else
         {
-            if (i1 == 1)
+            if (i == 1)
             {
-                pathpoint = this.func_176159_a(p_176171_2_, p_176171_3_, p_176171_4_);
+                pathpoint = this.openPoint(x, y, z);
             }
 
-            if (pathpoint == null && p_176171_5_ > 0 && i1 != -3 && i1 != -4 && this.func_176177_a(p_176171_1_, p_176171_2_, p_176171_3_ + p_176171_5_, p_176171_4_) == 1)
+            if (pathpoint == null && p_176171_5_ > 0 && i != -3 && i != -4 && this.getVerticalOffset(entityIn, x, y + p_176171_5_, z) == 1)
             {
-                pathpoint = this.func_176159_a(p_176171_2_, p_176171_3_ + p_176171_5_, p_176171_4_);
-                p_176171_3_ += p_176171_5_;
+                pathpoint = this.openPoint(x, y + p_176171_5_, z);
+                y += p_176171_5_;
             }
 
             if (pathpoint != null)
             {
-                int j1 = 0;
-                int k1;
+                int j = 0;
+                int k;
 
-                for (k1 = 0; p_176171_3_ > 0; pathpoint = this.func_176159_a(p_176171_2_, p_176171_3_, p_176171_4_))
+                for (k = 0; y > 0; pathpoint = this.openPoint(x, y, z))
                 {
-                    k1 = this.func_176177_a(p_176171_1_, p_176171_2_, p_176171_3_ - 1, p_176171_4_);
+                    k = this.getVerticalOffset(entityIn, x, y - 1, z);
 
-                    if (this.field_176183_h && k1 == -1)
+                    if (this.avoidsWater && k == -1)
                     {
                         return null;
                     }
 
-                    if (k1 != 1)
+                    if (k != 1)
                     {
                         break;
                     }
 
-                    if (j1++ >= p_176171_1_.getMaxFallHeight())
+                    if (j++ >= entityIn.getMaxFallHeight())
                     {
                         return null;
                     }
 
-                    --p_176171_3_;
+                    --y;
 
-                    if (p_176171_3_ <= 0)
+                    if (y <= 0)
                     {
                         return null;
                     }
                 }
 
-                if (k1 == -2)
+                if (k == -2)
                 {
                     return null;
                 }
@@ -165,24 +180,31 @@ public class WalkNodeProcessor extends NodeProcessor
         }
     }
 
-    private int func_176177_a(Entity p_176177_1_, int p_176177_2_, int p_176177_3_, int p_176177_4_)
+    /**
+     * Checks if an entity collides with blocks at a position.
+     * Returns 1 if clear, 0 for colliding with any solid block, -1 for water(if avoids water),
+     * -2 for lava, -3 for fence and wall, -4 for closed trapdoor, 2 if otherwise clear except for open trapdoor or
+     * water(if not avoiding)
+     */
+    private int getVerticalOffset(Entity entityIn, int x, int y, int z)
     {
-        return func_176170_a(this.field_176169_a, p_176177_1_, p_176177_2_, p_176177_3_, p_176177_4_, this.field_176168_c, this.field_176165_d, this.field_176166_e, this.field_176183_h, this.field_176181_g, this.field_176180_f);
+        return func_176170_a(this.blockaccess, entityIn, x, y, z, this.entitySizeX, this.entitySizeY, this.entitySizeZ, this.avoidsWater, this.canBreakDoors, this.canEnterDoors);
     }
 
-    public static int func_176170_a(IBlockAccess p_176170_0_, Entity p_176170_1_, int p_176170_2_, int p_176170_3_, int p_176170_4_, int p_176170_5_, int p_176170_6_, int p_176170_7_, boolean p_176170_8_, boolean p_176170_9_, boolean p_176170_10_)
+    public static int func_176170_a(IBlockAccess blockaccessIn, Entity entityIn, int x, int y, int z, int sizeX, int sizeY, int sizeZ, boolean avoidWater, boolean breakDoors, boolean enterDoors)
     {
-        boolean flag3 = false;
-        BlockPos blockpos = new BlockPos(p_176170_1_);
+        boolean flag = false;
+        BlockPos blockpos = new BlockPos(entityIn);
+        BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
 
-        for (int k1 = p_176170_2_; k1 < p_176170_2_ + p_176170_5_; ++k1)
+        for (int i = x; i < x + sizeX; ++i)
         {
-            for (int l1 = p_176170_3_; l1 < p_176170_3_ + p_176170_6_; ++l1)
+            for (int j = y; j < y + sizeY; ++j)
             {
-                for (int i2 = p_176170_4_; i2 < p_176170_4_ + p_176170_7_; ++i2)
+                for (int k = z; k < z + sizeZ; ++k)
                 {
-                    BlockPos blockpos1 = new BlockPos(k1, l1, i2);
-                    Block block = p_176170_0_.getBlockState(blockpos1).getBlock();
+                    blockpos$mutableblockpos.set(i, j, k);
+                    Block block = blockaccessIn.getBlockState(blockpos$mutableblockpos).getBlock();
 
                     if (block.getMaterial() != Material.air)
                     {
@@ -190,34 +212,34 @@ public class WalkNodeProcessor extends NodeProcessor
                         {
                             if (block != Blocks.flowing_water && block != Blocks.water)
                             {
-                                if (!p_176170_10_ && block instanceof BlockDoor && block.getMaterial() == Material.wood)
+                                if (!enterDoors && block instanceof BlockDoor && block.getMaterial() == Material.wood)
                                 {
                                     return 0;
                                 }
                             }
                             else
                             {
-                                if (p_176170_8_)
+                                if (avoidWater)
                                 {
                                     return -1;
                                 }
 
-                                flag3 = true;
+                                flag = true;
                             }
                         }
                         else
                         {
-                            flag3 = true;
+                            flag = true;
                         }
 
-                        if (p_176170_1_.worldObj.getBlockState(blockpos1).getBlock() instanceof BlockRailBase)
+                        if (entityIn.worldObj.getBlockState(blockpos$mutableblockpos).getBlock() instanceof BlockRailBase)
                         {
-                            if (!(p_176170_1_.worldObj.getBlockState(blockpos).getBlock() instanceof BlockRailBase) && !(p_176170_1_.worldObj.getBlockState(blockpos.down()).getBlock() instanceof BlockRailBase))
+                            if (!(entityIn.worldObj.getBlockState(blockpos).getBlock() instanceof BlockRailBase) && !(entityIn.worldObj.getBlockState(blockpos.down()).getBlock() instanceof BlockRailBase))
                             {
                                 return -3;
                             }
                         }
-                        else if (!block.isPassable(p_176170_0_, blockpos1) && (!p_176170_9_ || !(block instanceof BlockDoor) || block.getMaterial() != Material.wood))
+                        else if (!block.isPassable(blockaccessIn, blockpos$mutableblockpos) && (!breakDoors || !(block instanceof BlockDoor) || block.getMaterial() != Material.wood))
                         {
                             if (block instanceof BlockFence || block instanceof BlockFenceGate || block instanceof BlockWall)
                             {
@@ -236,7 +258,7 @@ public class WalkNodeProcessor extends NodeProcessor
                                 return 0;
                             }
 
-                            if (!p_176170_1_.isInLava())
+                            if (!entityIn.isInLava())
                             {
                                 return -2;
                             }
@@ -246,41 +268,41 @@ public class WalkNodeProcessor extends NodeProcessor
             }
         }
 
-        return flag3 ? 2 : 1;
+        return flag ? 2 : 1;
     }
 
-    public void func_176175_a(boolean p_176175_1_)
+    public void setEnterDoors(boolean canEnterDoorsIn)
     {
-        this.field_176180_f = p_176175_1_;
+        this.canEnterDoors = canEnterDoorsIn;
     }
 
-    public void func_176172_b(boolean p_176172_1_)
+    public void setBreakDoors(boolean canBreakDoorsIn)
     {
-        this.field_176181_g = p_176172_1_;
+        this.canBreakDoors = canBreakDoorsIn;
     }
 
-    public void func_176176_c(boolean p_176176_1_)
+    public void setAvoidsWater(boolean avoidsWaterIn)
     {
-        this.field_176183_h = p_176176_1_;
+        this.avoidsWater = avoidsWaterIn;
     }
 
-    public void func_176178_d(boolean p_176178_1_)
+    public void setCanSwim(boolean canSwimIn)
     {
-        this.field_176184_i = p_176178_1_;
+        this.canSwim = canSwimIn;
     }
 
-    public boolean func_176179_b()
+    public boolean getEnterDoors()
     {
-        return this.field_176180_f;
+        return this.canEnterDoors;
     }
 
-    public boolean func_176174_d()
+    public boolean getCanSwim()
     {
-        return this.field_176184_i;
+        return this.canSwim;
     }
 
-    public boolean func_176173_e()
+    public boolean getAvoidsWater()
     {
-        return this.field_176183_h;
+        return this.avoidsWater;
     }
 }

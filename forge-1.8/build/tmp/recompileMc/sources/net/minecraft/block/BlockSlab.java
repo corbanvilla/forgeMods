@@ -21,8 +21,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public abstract class BlockSlab extends Block
 {
-    public static final PropertyEnum HALF = PropertyEnum.create("half", BlockSlab.EnumBlockHalf.class);
-    private static final String __OBFID = "CL_00000253";
+    public static final PropertyEnum<BlockSlab.EnumBlockHalf> HALF = PropertyEnum.<BlockSlab.EnumBlockHalf>create("half", BlockSlab.EnumBlockHalf.class);
 
     public BlockSlab(Material materialIn)
     {
@@ -86,20 +85,36 @@ public abstract class BlockSlab extends Block
 
     /**
      * Add all collision boxes of this Block to the list that intersect with the given mask.
-     *  
-     * @param collidingEntity the Entity colliding with this Block
      */
-    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List list, Entity collidingEntity)
+    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity)
     {
         this.setBlockBoundsBasedOnState(worldIn, pos);
         super.addCollisionBoxesToList(worldIn, pos, state, mask, list, collidingEntity);
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return this.isDouble();
     }
 
+    @Override
+    public boolean doesSideBlockRendering(IBlockAccess world, BlockPos pos, EnumFacing face)
+	{
+        if ( isOpaqueCube() )
+            return true;
+        
+        // face is on the block being rendered, not this block.
+        EnumBlockHalf side = world.getBlockState(pos).getValue(HALF);
+        return (side == EnumBlockHalf.TOP && face == EnumFacing.DOWN) || (side == EnumBlockHalf.BOTTOM && face == EnumFacing.UP);
+    }
+
+    /**
+     * Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the
+     * IBlockstate
+     */
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
         IBlockState iblockstate = super.onBlockPlaced(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer).withProperty(HALF, BlockSlab.EnumBlockHalf.BOTTOM);
@@ -130,15 +145,8 @@ public abstract class BlockSlab extends Block
         {
             return false;
         }
-        else
-        {
-            BlockPos blockpos1 = pos.offset(side.getOpposite());
-            IBlockState iblockstate = worldIn.getBlockState(pos);
-            IBlockState iblockstate1 = worldIn.getBlockState(blockpos1);
-            boolean flag = isSlab(iblockstate.getBlock()) && iblockstate.getValue(HALF) == BlockSlab.EnumBlockHalf.TOP;
-            boolean flag1 = isSlab(iblockstate1.getBlock()) && iblockstate1.getValue(HALF) == BlockSlab.EnumBlockHalf.TOP;
-            return flag1 ? (side == EnumFacing.DOWN ? true : (side == EnumFacing.UP && super.shouldSideBeRendered(worldIn, pos, side) ? true : !isSlab(iblockstate.getBlock()) || !flag)) : (side == EnumFacing.UP ? true : (side == EnumFacing.DOWN && super.shouldSideBeRendered(worldIn, pos, side) ? true : !isSlab(iblockstate.getBlock()) || flag));
-        }
+        // additional logic breaks doesSideBlockRendering and is no longer useful.
+        return super.shouldSideBeRendered(worldIn, pos, side);
     }
 
     @SideOnly(Side.CLIENT)
@@ -159,7 +167,7 @@ public abstract class BlockSlab extends Block
 
     public abstract boolean isDouble();
 
-    public abstract IProperty getVariantProperty();
+    public abstract IProperty<?> getVariantProperty();
 
     public abstract Object getVariant(ItemStack stack);
 
@@ -167,9 +175,8 @@ public abstract class BlockSlab extends Block
     {
         TOP("top"),
         BOTTOM("bottom");
-        private final String name;
 
-        private static final String __OBFID = "CL_00002109";
+        private final String name;
 
         private EnumBlockHalf(String name)
         {

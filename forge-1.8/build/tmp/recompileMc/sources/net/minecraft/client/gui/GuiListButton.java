@@ -13,7 +13,6 @@ public class GuiListButton extends GuiButton
     private String localizationStr;
     /** The GuiResponder Object reference. */
     private final GuiPageButtonList.GuiResponder guiResponder;
-    private static final String __OBFID = "CL_00001953";
 
     public GuiListButton(GuiPageButtonList.GuiResponder responder, int p_i45539_2_, int p_i45539_3_, int p_i45539_4_, String p_i45539_5_, boolean p_i45539_6_)
     {

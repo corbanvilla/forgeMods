@@ -10,7 +10,6 @@ public class TextureClock extends TextureAtlasSprite
 {
     private double field_94239_h;
     private double field_94240_i;
-    private static final String __OBFID = "CL_00001070";
 
     public TextureClock(String iconName)
     {
@@ -26,8 +25,7 @@ public class TextureClock extends TextureAtlasSprite
 
             if (minecraft.theWorld != null && minecraft.thePlayer != null)
             {
-                float f = minecraft.theWorld.getCelestialAngle(1.0F);
-                d0 = (double)f;
+                d0 = (double)minecraft.theWorld.getCelestialAngle(1.0F);
 
                 if (!minecraft.theWorld.provider.isSurfaceWorld())
                 {

@@ -7,7 +7,6 @@ public class ContainerChest extends Container
 {
     private IInventory lowerChestInventory;
     private int numRows;
-    private static final String __OBFID = "CL_00001742";
 
     public ContainerChest(IInventory playerInventory, IInventory chestInventory, EntityPlayer player)
     {
@@ -15,28 +14,26 @@ public class ContainerChest extends Container
         this.numRows = chestInventory.getSizeInventory() / 9;
         chestInventory.openInventory(player);
         int i = (this.numRows - 4) * 18;
-        int j;
-        int k;
 
-        for (j = 0; j < this.numRows; ++j)
+        for (int j = 0; j < this.numRows; ++j)
         {
-            for (k = 0; k < 9; ++k)
+            for (int k = 0; k < 9; ++k)
             {
                 this.addSlotToContainer(new Slot(chestInventory, k + j * 9, 8 + k * 18, 18 + j * 18));
             }
         }
 
-        for (j = 0; j < 3; ++j)
+        for (int l = 0; l < 3; ++l)
         {
-            for (k = 0; k < 9; ++k)
+            for (int j1 = 0; j1 < 9; ++j1)
             {
-                this.addSlotToContainer(new Slot(playerInventory, k + j * 9 + 9, 8 + k * 18, 103 + j * 18 + i));
+                this.addSlotToContainer(new Slot(playerInventory, j1 + l * 9 + 9, 8 + j1 * 18, 103 + l * 18 + i));
             }
         }
 
-        for (j = 0; j < 9; ++j)
+        for (int i1 = 0; i1 < 9; ++i1)
         {
-            this.addSlotToContainer(new Slot(playerInventory, j, 8 + j * 18, 161 + i));
+            this.addSlotToContainer(new Slot(playerInventory, i1, 8 + i1 * 18, 161 + i));
         }
     }
 

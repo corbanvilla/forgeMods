@@ -6,42 +6,21 @@
 package net.minecraftforge.client;
 
 import java.util.BitSet;
-import java.util.IdentityHashMap;
+import java.util.concurrent.TimeUnit;
 
-import com.google.common.collect.Maps;
-
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.renderer.RegionRenderCache;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumWorldBlockLayer;
-import net.minecraftforge.client.IItemRenderer.ItemRenderType;
+import net.minecraft.world.World;
+
+import org.apache.commons.lang3.tuple.Pair;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 public class MinecraftForgeClient
 {
-    private static IdentityHashMap<Item, IItemRenderer> customItemRenderers = Maps.newIdentityHashMap();
-
-    /**
-     * Register a custom renderer for a specific item. This can be used to
-     * render the item in-world as an EntityItem, when the item is equipped, or
-     * when the item is in an inventory slot.
-     * @param itemID The item ID (shifted index) to handle rendering.
-     * @param renderer The IItemRenderer interface that handles rendering for
-     * this item.
-     */
-    public static void registerItemRenderer(Item item, IItemRenderer renderer)
-    {
-        customItemRenderers.put(item, renderer);
-    }
-
-    public static IItemRenderer getItemRenderer(ItemStack item, ItemRenderType type)
-    {
-        IItemRenderer renderer = customItemRenderers.get(item.getItem());
-        if (renderer != null && renderer.handleRenderType(item, type))
-        {
-            return renderer;
-        }
-        return null;
-    }
-
     public static int getRenderPass()
     {
         return ForgeHooksClient.renderPass;
@@ -87,5 +66,30 @@ public class MinecraftForgeClient
         {
             stencilBits.set(bit);
         }
+    }
+
+    private static final LoadingCache<Pair<World, BlockPos>, RegionRenderCache> regionCache = CacheBuilder.newBuilder()
+        .maximumSize(500)
+        .concurrencyLevel(5)
+        .expireAfterAccess(1, TimeUnit.SECONDS)
+        .build(new CacheLoader<Pair<World, BlockPos>, RegionRenderCache>()
+        {
+            public RegionRenderCache load(Pair<World, BlockPos> key) throws Exception
+            {
+                return new RegionRenderCache(key.getLeft(), key.getRight().add(-1, -1, -1), key.getRight().add(16, 16, 16), 1);
+            }
+        });
+
+    public static void onRebuildChunk(World world, BlockPos position, RegionRenderCache cache)
+    {
+        regionCache.put(Pair.of(world, position), cache);
+    }
+
+    public static RegionRenderCache getRegionRenderCache(World world, BlockPos pos)
+    {
+        int x = pos.getX() & ~0xF;
+        int y = pos.getY() & ~0xF;
+        int z = pos.getZ() & ~0xF;
+        return regionCache.getUnchecked(Pair.of(world, new BlockPos(x, y, z)));
     }
 }

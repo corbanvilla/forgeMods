@@ -15,6 +15,7 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityBrewingStand;
 import net.minecraft.util.AxisAlignedBB;
@@ -22,6 +23,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.EnumWorldBlockLayer;
+import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -29,8 +31,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BlockBrewingStand extends BlockContainer
 {
     public static final PropertyBool[] HAS_BOTTLE = new PropertyBool[] {PropertyBool.create("has_bottle_0"), PropertyBool.create("has_bottle_1"), PropertyBool.create("has_bottle_2")};
-    private final Random rand = new Random();
-    private static final String __OBFID = "CL_00000207";
 
     public BlockBrewingStand()
     {
@@ -38,13 +38,24 @@ public class BlockBrewingStand extends BlockContainer
         this.setDefaultState(this.blockState.getBaseState().withProperty(HAS_BOTTLE[0], Boolean.valueOf(false)).withProperty(HAS_BOTTLE[1], Boolean.valueOf(false)).withProperty(HAS_BOTTLE[2], Boolean.valueOf(false)));
     }
 
+    /**
+     * Gets the localized name of this block. Used for the statistics page.
+     */
+    public String getLocalizedName()
+    {
+        return StatCollector.translateToLocal("item.brewingStand.name");
+    }
+
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
     }
 
     /**
-     * The type of render function that is called for this block
+     * The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render
      */
     public int getRenderType()
     {
@@ -66,10 +77,8 @@ public class BlockBrewingStand extends BlockContainer
 
     /**
      * Add all collision boxes of this Block to the list that intersect with the given mask.
-     *  
-     * @param collidingEntity the Entity colliding with this Block
      */
-    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List list, Entity collidingEntity)
+    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity)
     {
         this.setBlockBounds(0.4375F, 0.0F, 0.4375F, 0.5625F, 0.875F, 0.5625F);
         super.addCollisionBoxesToList(worldIn, pos, state, mask, list, collidingEntity);
@@ -98,12 +107,16 @@ public class BlockBrewingStand extends BlockContainer
             if (tileentity instanceof TileEntityBrewingStand)
             {
                 playerIn.displayGUIChest((TileEntityBrewingStand)tileentity);
+                playerIn.triggerAchievement(StatList.field_181729_M);
             }
 
             return true;
         }
     }
 
+    /**
+     * Called by ItemBlocks after a block is set in the world, to allow post-place logic
+     */
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
     {
         if (stack.hasDisplayName())
@@ -112,7 +125,7 @@ public class BlockBrewingStand extends BlockContainer
 
             if (tileentity instanceof TileEntityBrewingStand)
             {
-                ((TileEntityBrewingStand)tileentity).func_145937_a(stack.getDisplayName());
+                ((TileEntityBrewingStand)tileentity).setName(stack.getDisplayName());
             }
         }
     }
@@ -140,8 +153,6 @@ public class BlockBrewingStand extends BlockContainer
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -177,9 +188,9 @@ public class BlockBrewingStand extends BlockContainer
     {
         IBlockState iblockstate = this.getDefaultState();
 
-        for (int j = 0; j < 3; ++j)
+        for (int i = 0; i < 3; ++i)
         {
-            iblockstate = iblockstate.withProperty(HAS_BOTTLE[j], Boolean.valueOf((meta & 1 << j) > 0));
+            iblockstate = iblockstate.withProperty(HAS_BOTTLE[i], Boolean.valueOf((meta & 1 << i) > 0));
         }
 
         return iblockstate;

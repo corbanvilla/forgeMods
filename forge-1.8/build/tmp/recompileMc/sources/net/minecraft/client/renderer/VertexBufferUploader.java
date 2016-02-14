@@ -8,17 +8,15 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class VertexBufferUploader extends WorldVertexBufferUploader
 {
     private VertexBuffer vertexBuffer = null;
-    private static final String __OBFID = "CL_00002532";
 
-    public int draw(WorldRenderer p_178177_1_, int p_178177_2_)
+    public void draw(WorldRenderer p_181679_1_)
     {
-        p_178177_1_.reset();
-        this.vertexBuffer.bufferData(p_178177_1_.getByteBuffer(), p_178177_1_.getByteIndex());
-        return p_178177_2_;
+        p_181679_1_.reset();
+        this.vertexBuffer.bufferData(p_181679_1_.getByteBuffer());
     }
 
-    public void setVertexBuffer(VertexBuffer p_178178_1_)
+    public void setVertexBuffer(VertexBuffer vertexBufferIn)
     {
-        this.vertexBuffer = p_178178_1_;
+        this.vertexBuffer = vertexBufferIn;
     }
 }

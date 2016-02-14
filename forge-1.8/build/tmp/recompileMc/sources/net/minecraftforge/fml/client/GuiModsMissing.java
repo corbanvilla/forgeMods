@@ -29,7 +29,8 @@ public class GuiModsMissing extends GuiErrorScreen
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
     @Override
     public void initGui()

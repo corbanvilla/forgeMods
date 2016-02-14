@@ -3,6 +3,8 @@ package net.minecraft.server;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Properties;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -16,7 +18,6 @@ public class ServerEula
     private static final Logger LOG = LogManager.getLogger();
     private final File eulaFile;
     private final boolean acceptedEULA;
-    private static final String __OBFID = "CL_00001911";
 
     public ServerEula(File eulaFile)
     {
@@ -33,17 +34,17 @@ public class ServerEula
         {
             Properties properties = new Properties();
             fileinputstream = new FileInputStream(inFile);
-            properties.load(fileinputstream);
+            properties.load((InputStream)fileinputstream);
             flag = Boolean.parseBoolean(properties.getProperty("eula", "false"));
         }
-        catch (Exception exception)
+        catch (Exception var8)
         {
             LOG.warn("Failed to load " + inFile);
             this.createEULAFile();
         }
         finally
         {
-            IOUtils.closeQuietly(fileinputstream);
+            IOUtils.closeQuietly((InputStream)fileinputstream);
         }
 
         return flag;
@@ -63,15 +64,15 @@ public class ServerEula
             Properties properties = new Properties();
             fileoutputstream = new FileOutputStream(this.eulaFile);
             properties.setProperty("eula", "false");
-            properties.store(fileoutputstream, "By changing the setting below to TRUE you are indicating your agreement to our EULA (https://account.mojang.com/documents/minecraft_eula).");
+            properties.store((OutputStream)fileoutputstream, "By changing the setting below to TRUE you are indicating your agreement to our EULA (https://account.mojang.com/documents/minecraft_eula).");
         }
         catch (Exception exception)
         {
-            LOG.warn("Failed to save " + this.eulaFile, exception);
+            LOG.warn((String)("Failed to save " + this.eulaFile), (Throwable)exception);
         }
         finally
         {
-            IOUtils.closeQuietly(fileoutputstream);
+            IOUtils.closeQuietly((OutputStream)fileoutputstream);
         }
     }
 }

@@ -9,7 +9,6 @@ public class MouseFilter
     private float field_76336_a;
     private float field_76334_b;
     private float field_76335_c;
-    private static final String __OBFID = "CL_00001500";
 
     /**
      * Smooths mouse input

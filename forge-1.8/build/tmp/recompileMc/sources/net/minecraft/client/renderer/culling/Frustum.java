@@ -11,7 +11,6 @@ public class Frustum implements ICamera
     private double xPosition;
     private double yPosition;
     private double zPosition;
-    private static final String __OBFID = "CL_00000976";
 
     public Frustum()
     {

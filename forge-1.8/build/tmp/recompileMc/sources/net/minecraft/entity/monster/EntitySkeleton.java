@@ -1,6 +1,5 @@
 package net.minecraft.entity.monster;
 
-import com.google.common.base.Predicate;
 import java.util.Calendar;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
@@ -44,27 +43,14 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob
 {
     private EntityAIArrowAttack aiArrowAttack = new EntityAIArrowAttack(this, 1.0D, 20, 60, 15.0F);
     private EntityAIAttackOnCollide aiAttackOnCollide = new EntityAIAttackOnCollide(this, EntityPlayer.class, 1.2D, false);
-    private static final String __OBFID = "CL_00001697";
 
     public EntitySkeleton(World worldIn)
     {
         super(worldIn);
         this.tasks.addTask(1, new EntityAISwimming(this));
         this.tasks.addTask(2, new EntityAIRestrictSun(this));
-        this.tasks.addTask(2, this.field_175455_a);
         this.tasks.addTask(3, new EntityAIFleeSun(this, 1.0D));
-        this.tasks.addTask(3, new EntityAIAvoidEntity(this, new Predicate()
-        {
-            private static final String __OBFID = "CL_00002203";
-            public boolean func_179945_a(Entity p_179945_1_)
-            {
-                return p_179945_1_ instanceof EntityWolf;
-            }
-            public boolean apply(Object p_apply_1_)
-            {
-                return this.func_179945_a((Entity)p_apply_1_);
-            }
-        }, 6.0F, 1.0D, 1.2D));
+        this.tasks.addTask(3, new EntityAIAvoidEntity(this, EntityWolf.class, 6.0F, 1.0D, 1.2D));
         this.tasks.addTask(4, new EntityAIWander(this, 1.0D));
         this.tasks.addTask(6, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
         this.tasks.addTask(6, new EntityAILookIdle(this));
@@ -114,18 +100,18 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob
         return "mob.skeleton.death";
     }
 
-    protected void playStepSound(BlockPos p_180429_1_, Block p_180429_2_)
+    protected void playStepSound(BlockPos pos, Block blockIn)
     {
         this.playSound("mob.skeleton.step", 0.15F, 1.0F);
     }
 
-    public boolean attackEntityAsMob(Entity p_70652_1_)
+    public boolean attackEntityAsMob(Entity entityIn)
     {
-        if (super.attackEntityAsMob(p_70652_1_))
+        if (super.attackEntityAsMob(entityIn))
         {
-            if (this.getSkeletonType() == 1 && p_70652_1_ instanceof EntityLivingBase)
+            if (this.getSkeletonType() == 1 && entityIn instanceof EntityLivingBase)
             {
-                ((EntityLivingBase)p_70652_1_).addPotionEffect(new PotionEffect(Potion.wither.id, 200));
+                ((EntityLivingBase)entityIn).addPotionEffect(new PotionEffect(Potion.wither.id, 200));
             }
 
             return true;
@@ -240,40 +226,37 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob
      */
     protected void dropFewItems(boolean p_70628_1_, int p_70628_2_)
     {
-        int j;
-        int k;
-
         if (this.getSkeletonType() == 1)
         {
-            j = this.rand.nextInt(3 + p_70628_2_) - 1;
+            int i = this.rand.nextInt(3 + p_70628_2_) - 1;
 
-            for (k = 0; k < j; ++k)
+            for (int j = 0; j < i; ++j)
             {
                 this.dropItem(Items.coal, 1);
             }
         }
         else
         {
-            j = this.rand.nextInt(3 + p_70628_2_);
+            int k = this.rand.nextInt(3 + p_70628_2_);
 
-            for (k = 0; k < j; ++k)
+            for (int i1 = 0; i1 < k; ++i1)
             {
                 this.dropItem(Items.arrow, 1);
             }
         }
 
-        j = this.rand.nextInt(3 + p_70628_2_);
+        int l = this.rand.nextInt(3 + p_70628_2_);
 
-        for (k = 0; k < j; ++k)
+        for (int j1 = 0; j1 < l; ++j1)
         {
             this.dropItem(Items.bone, 1);
         }
     }
 
     /**
-     * Makes entity wear random armor based on difficulty
+     * Causes this Entity to drop a random item.
      */
-    protected void addRandomArmor()
+    protected void addRandomDrop()
     {
         if (this.getSkeletonType() == 1)
         {
@@ -281,15 +264,22 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob
         }
     }
 
-    protected void func_180481_a(DifficultyInstance p_180481_1_)
+    /**
+     * Gives armor or weapon for entity based on given DifficultyInstance
+     */
+    protected void setEquipmentBasedOnDifficulty(DifficultyInstance difficulty)
     {
-        super.func_180481_a(p_180481_1_);
+        super.setEquipmentBasedOnDifficulty(difficulty);
         this.setCurrentItemOrArmor(0, new ItemStack(Items.bow));
     }
 
-    public IEntityLivingData func_180482_a(DifficultyInstance p_180482_1_, IEntityLivingData p_180482_2_)
+    /**
+     * Called only once on an entity when first time spawned, via egg, mob spawner, natural spawning etc, but not called
+     * when entity is reloaded from nbt. Mainly used for initializing attributes and inventory
+     */
+    public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, IEntityLivingData livingdata)
     {
-        p_180482_2_ = super.func_180482_a(p_180482_1_, p_180482_2_);
+        livingdata = super.onInitialSpawn(difficulty, livingdata);
 
         if (this.worldObj.provider instanceof WorldProviderHell && this.getRNG().nextInt(5) > 0)
         {
@@ -301,11 +291,11 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob
         else
         {
             this.tasks.addTask(4, this.aiArrowAttack);
-            this.func_180481_a(p_180482_1_);
-            this.func_180483_b(p_180482_1_);
+            this.setEquipmentBasedOnDifficulty(difficulty);
+            this.setEnchantmentBasedOnDifficulty(difficulty);
         }
 
-        this.setCanPickUpLoot(this.rand.nextFloat() < 0.55F * p_180482_1_.getClampedAdditionalDifficulty());
+        this.setCanPickUpLoot(this.rand.nextFloat() < 0.55F * difficulty.getClampedAdditionalDifficulty());
 
         if (this.getEquipmentInSlot(4) == null)
         {
@@ -318,7 +308,7 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob
             }
         }
 
-        return p_180482_2_;
+        return livingdata;
     }
 
     /**
@@ -404,8 +394,8 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob
 
         if (tagCompund.hasKey("SkeletonType", 99))
         {
-            byte b0 = tagCompund.getByte("SkeletonType");
-            this.setSkeletonType(b0);
+            int i = tagCompund.getByte("SkeletonType");
+            this.setSkeletonType(i);
         }
 
         this.setCombatTask();
@@ -443,6 +433,6 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob
      */
     public double getYOffset()
     {
-        return super.getYOffset() - 0.5D;
+        return this.isChild() ? 0.0D : -0.35D;
     }
 }

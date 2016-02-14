@@ -9,7 +9,6 @@ import net.minecraft.tileentity.TileEntityEnderChest;
 public class InventoryEnderChest extends InventoryBasic
 {
     private TileEntityEnderChest associatedChest;
-    private static final String __OBFID = "CL_00001759";
 
     public InventoryEnderChest()
     {
@@ -23,16 +22,14 @@ public class InventoryEnderChest extends InventoryBasic
 
     public void loadInventoryFromNBT(NBTTagList p_70486_1_)
     {
-        int i;
-
-        for (i = 0; i < this.getSizeInventory(); ++i)
+        for (int i = 0; i < this.getSizeInventory(); ++i)
         {
             this.setInventorySlotContents(i, (ItemStack)null);
         }
 
-        for (i = 0; i < p_70486_1_.tagCount(); ++i)
+        for (int k = 0; k < p_70486_1_.tagCount(); ++k)
         {
-            NBTTagCompound nbttagcompound = p_70486_1_.getCompoundTagAt(i);
+            NBTTagCompound nbttagcompound = p_70486_1_.getCompoundTagAt(k);
             int j = nbttagcompound.getByte("Slot") & 255;
 
             if (j >= 0 && j < this.getSizeInventory())
@@ -67,14 +64,14 @@ public class InventoryEnderChest extends InventoryBasic
      */
     public boolean isUseableByPlayer(EntityPlayer player)
     {
-        return this.associatedChest != null && !this.associatedChest.func_145971_a(player) ? false : super.isUseableByPlayer(player);
+        return this.associatedChest != null && !this.associatedChest.canBeUsed(player) ? false : super.isUseableByPlayer(player);
     }
 
     public void openInventory(EntityPlayer player)
     {
         if (this.associatedChest != null)
         {
-            this.associatedChest.func_145969_a();
+            this.associatedChest.openChest();
         }
 
         super.openInventory(player);
@@ -84,7 +81,7 @@ public class InventoryEnderChest extends InventoryBasic
     {
         if (this.associatedChest != null)
         {
-            this.associatedChest.func_145970_b();
+            this.associatedChest.closeChest();
         }
 
         super.closeInventory(player);

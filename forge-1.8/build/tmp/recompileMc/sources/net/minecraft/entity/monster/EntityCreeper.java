@@ -1,6 +1,5 @@
 package net.minecraft.entity.monster;
 
-import com.google.common.base.Predicate;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIAttackOnCollide;
@@ -37,26 +36,13 @@ public class EntityCreeper extends EntityMob
     /** Explosion radius for this creeper. */
     private int explosionRadius = 3;
     private int field_175494_bm = 0;
-    private static final String __OBFID = "CL_00001684";
 
     public EntityCreeper(World worldIn)
     {
         super(worldIn);
         this.tasks.addTask(1, new EntityAISwimming(this));
         this.tasks.addTask(2, new EntityAICreeperSwell(this));
-        this.tasks.addTask(2, this.field_175455_a);
-        this.tasks.addTask(3, new EntityAIAvoidEntity(this, new Predicate()
-        {
-            private static final String __OBFID = "CL_00002224";
-            public boolean func_179958_a(Entity p_179958_1_)
-            {
-                return p_179958_1_ instanceof EntityOcelot;
-            }
-            public boolean apply(Object p_apply_1_)
-            {
-                return this.func_179958_a((Entity)p_apply_1_);
-            }
-        }, 6.0F, 1.0D, 1.2D));
+        this.tasks.addTask(3, new EntityAIAvoidEntity(this, EntityOcelot.class, 6.0F, 1.0D, 1.2D));
         this.tasks.addTask(4, new EntityAIAttackOnCollide(this, 1.0D, false));
         this.tasks.addTask(5, new EntityAIWander(this, 0.8D));
         this.tasks.addTask(6, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
@@ -112,7 +98,7 @@ public class EntityCreeper extends EntityMob
 
         tagCompound.setShort("Fuse", (short)this.fuseTime);
         tagCompound.setByte("ExplosionRadius", (byte)this.explosionRadius);
-        tagCompound.setBoolean("ignited", this.func_146078_ca());
+        tagCompound.setBoolean("ignited", this.hasIgnited());
     }
 
     /**
@@ -135,7 +121,7 @@ public class EntityCreeper extends EntityMob
 
         if (tagCompund.getBoolean("ignited"))
         {
-            this.func_146079_cb();
+            this.ignite();
         }
     }
 
@@ -148,7 +134,7 @@ public class EntityCreeper extends EntityMob
         {
             this.lastActiveTime = this.timeSinceIgnited;
 
-            if (this.func_146078_ca())
+            if (this.hasIgnited())
             {
                 this.setCreeperState(1);
             }
@@ -214,7 +200,7 @@ public class EntityCreeper extends EntityMob
         }
     }
 
-    public boolean attackEntityAsMob(Entity p_70652_1_)
+    public boolean attackEntityAsMob(Entity entityIn)
     {
         return true;
     }
@@ -252,9 +238,9 @@ public class EntityCreeper extends EntityMob
     /**
      * Sets the state of creeper, -1 to idle and 1 to be 'in fuse'
      */
-    public void setCreeperState(int p_70829_1_)
+    public void setCreeperState(int state)
     {
-        this.dataWatcher.updateObject(16, Byte.valueOf((byte)p_70829_1_));
+        this.dataWatcher.updateObject(16, Byte.valueOf((byte)state));
     }
 
     /**
@@ -280,7 +266,7 @@ public class EntityCreeper extends EntityMob
 
             if (!this.worldObj.isRemote)
             {
-                this.func_146079_cb();
+                this.ignite();
                 itemstack.damageItem(1, player);
                 return true;
             }
@@ -296,19 +282,19 @@ public class EntityCreeper extends EntityMob
     {
         if (!this.worldObj.isRemote)
         {
-            boolean flag = this.worldObj.getGameRules().getGameRuleBooleanValue("mobGriefing");
+            boolean flag = this.worldObj.getGameRules().getBoolean("mobGriefing");
             float f = this.getPowered() ? 2.0F : 1.0F;
             this.worldObj.createExplosion(this, this.posX, this.posY, this.posZ, (float)this.explosionRadius * f, flag);
             this.setDead();
         }
     }
 
-    public boolean func_146078_ca()
+    public boolean hasIgnited()
     {
         return this.dataWatcher.getWatchableObjectByte(18) != 0;
     }
 
-    public void func_146079_cb()
+    public void ignite()
     {
         this.dataWatcher.updateObject(18, Byte.valueOf((byte)1));
     }
@@ -318,7 +304,7 @@ public class EntityCreeper extends EntityMob
      */
     public boolean isAIEnabled()
     {
-        return this.field_175494_bm < 1 && this.worldObj.getGameRules().getGameRuleBooleanValue("doMobLoot");
+        return this.field_175494_bm < 1 && this.worldObj.getGameRules().getBoolean("doMobLoot");
     }
 
     public void func_175493_co()

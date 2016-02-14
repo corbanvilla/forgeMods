@@ -1,7 +1,6 @@
 package net.minecraft.client.audio;
 
 import com.google.common.collect.Lists;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import net.minecraft.util.ResourceLocation;
@@ -9,16 +8,14 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class SoundEventAccessorComposite implements ISoundEventAccessor
+public class SoundEventAccessorComposite implements ISoundEventAccessor<SoundPoolEntry>
 {
-    /** A composite (List) of ISoundEventAccessors */
-    private final List soundPool = Lists.newArrayList();
+    private final List<ISoundEventAccessor<SoundPoolEntry>> soundPool = Lists.<ISoundEventAccessor<SoundPoolEntry>>newArrayList();
     private final Random rnd = new Random();
     private final ResourceLocation soundLocation;
     private final SoundCategory category;
     private double eventPitch;
     private double eventVolume;
-    private static final String __OBFID = "CL_00001146";
 
     public SoundEventAccessorComposite(ResourceLocation soundLocation, double pitch, double volume, SoundCategory category)
     {
@@ -31,11 +28,10 @@ public class SoundEventAccessorComposite implements ISoundEventAccessor
     public int getWeight()
     {
         int i = 0;
-        ISoundEventAccessor isoundeventaccessor;
 
-        for (Iterator iterator = this.soundPool.iterator(); iterator.hasNext(); i += isoundeventaccessor.getWeight())
+        for (ISoundEventAccessor<SoundPoolEntry> isoundeventaccessor : this.soundPool)
         {
-            isoundeventaccessor = (ISoundEventAccessor)iterator.next();
+            i += isoundeventaccessor.getWeight();
         }
 
         return i;
@@ -48,25 +44,21 @@ public class SoundEventAccessorComposite implements ISoundEventAccessor
         if (!this.soundPool.isEmpty() && i != 0)
         {
             int j = this.rnd.nextInt(i);
-            Iterator iterator = this.soundPool.iterator();
-            ISoundEventAccessor isoundeventaccessor;
 
-            do
+            for (ISoundEventAccessor<SoundPoolEntry> isoundeventaccessor : this.soundPool)
             {
-                if (!iterator.hasNext())
-                {
-                    return SoundHandler.missing_sound;
-                }
-
-                isoundeventaccessor = (ISoundEventAccessor)iterator.next();
                 j -= isoundeventaccessor.getWeight();
-            }
-            while (j >= 0);
 
-            SoundPoolEntry soundpoolentry = (SoundPoolEntry)isoundeventaccessor.cloneEntry();
-            soundpoolentry.setPitch(soundpoolentry.getPitch() * this.eventPitch);
-            soundpoolentry.setVolume(soundpoolentry.getVolume() * this.eventVolume);
-            return soundpoolentry;
+                if (j < 0)
+                {
+                    SoundPoolEntry soundpoolentry = (SoundPoolEntry)isoundeventaccessor.cloneEntry();
+                    soundpoolentry.setPitch(soundpoolentry.getPitch() * this.eventPitch);
+                    soundpoolentry.setVolume(soundpoolentry.getVolume() * this.eventVolume);
+                    return soundpoolentry;
+                }
+            }
+
+            return SoundHandler.missing_sound;
         }
         else
         {
@@ -74,9 +66,9 @@ public class SoundEventAccessorComposite implements ISoundEventAccessor
         }
     }
 
-    public void addSoundToEventPool(ISoundEventAccessor p_148727_1_)
+    public void addSoundToEventPool(ISoundEventAccessor<SoundPoolEntry> sound)
     {
-        this.soundPool.add(p_148727_1_);
+        this.soundPool.add(sound);
     }
 
     public ResourceLocation getSoundEventLocation()

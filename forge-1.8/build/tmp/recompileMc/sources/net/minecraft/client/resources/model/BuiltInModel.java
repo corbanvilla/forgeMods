@@ -1,6 +1,7 @@
 package net.minecraft.client.resources.model;
 
 import java.util.List;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
@@ -11,19 +12,18 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BuiltInModel implements IBakedModel
 {
     private ItemCameraTransforms cameraTransforms;
-    private static final String __OBFID = "CL_00002392";
 
     public BuiltInModel(ItemCameraTransforms p_i46086_1_)
     {
         this.cameraTransforms = p_i46086_1_;
     }
 
-    public List getFaceQuads(EnumFacing p_177551_1_)
+    public List<BakedQuad> getFaceQuads(EnumFacing p_177551_1_)
     {
         return null;
     }
 
-    public List getGeneralQuads()
+    public List<BakedQuad> getGeneralQuads()
     {
         return null;
     }
@@ -43,7 +43,7 @@ public class BuiltInModel implements IBakedModel
         return true;
     }
 
-    public TextureAtlasSprite getTexture()
+    public TextureAtlasSprite getParticleTexture()
     {
         return null;
     }

@@ -3,19 +3,19 @@ package net.minecraft.network.login.server;
 import com.mojang.authlib.GameProfile;
 import java.io.IOException;
 import java.util.UUID;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.login.INetHandlerLoginClient;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S02PacketLoginSuccess implements Packet
+public class S02PacketLoginSuccess implements Packet<INetHandlerLoginClient>
 {
     private GameProfile profile;
-    private static final String __OBFID = "CL_00001375";
 
-    public S02PacketLoginSuccess() {}
+    public S02PacketLoginSuccess()
+    {
+    }
 
     public S02PacketLoginSuccess(GameProfile profileIn)
     {
@@ -43,6 +43,9 @@ public class S02PacketLoginSuccess implements Packet
         buf.writeString(this.profile.getName());
     }
 
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
     public void processPacket(INetHandlerLoginClient handler)
     {
         handler.handleLoginSuccess(this);
@@ -52,13 +55,5 @@ public class S02PacketLoginSuccess implements Packet
     public GameProfile getProfile()
     {
         return this.profile;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerLoginClient)handler);
     }
 }

@@ -1,14 +1,5 @@
 package net.minecraft.world;
 
-import java.util.Arrays;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiCreateFlatWorld;
-import net.minecraft.client.gui.GuiCreateWorld;
-import net.minecraft.client.gui.GuiCustomizeWorldScreen;
-import net.minecraft.world.gen.layer.GenLayer;
-import net.minecraft.world.gen.layer.GenLayerBiome;
-import net.minecraft.world.gen.layer.GenLayerBiomeEdge;
-import net.minecraft.world.gen.layer.GenLayerZoom;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -38,7 +29,6 @@ public class WorldType
     /** Whether this WorldType has a version or not. */
     private boolean isWorldTypeVersioned;
     private boolean hasNotificationData;
-    private static final String __OBFID = "CL_00000150";
 
     private WorldType(int id, String name)
     {
@@ -216,7 +206,7 @@ public class WorldType
         }
 
         int oldLen = worldTypes.length;
-        worldTypes = Arrays.copyOf(worldTypes, oldLen + 16);
+        worldTypes = java.util.Arrays.copyOf(worldTypes, oldLen + 16);
         return oldLen;
     }
 
@@ -251,15 +241,15 @@ public class WorldType
      * @param guiCreateWorld the createworld GUI
      */
     @SideOnly(Side.CLIENT)
-    public void onCustomizeButton(Minecraft mc, GuiCreateWorld guiCreateWorld)
+    public void onCustomizeButton(net.minecraft.client.Minecraft mc, net.minecraft.client.gui.GuiCreateWorld guiCreateWorld)
     {
         if (this == WorldType.FLAT)
         {
-            mc.displayGuiScreen(new GuiCreateFlatWorld(guiCreateWorld, guiCreateWorld.chunkProviderSettingsJson));
+            mc.displayGuiScreen(new net.minecraft.client.gui.GuiCreateFlatWorld(guiCreateWorld, guiCreateWorld.chunkProviderSettingsJson));
         }
         else if (this == WorldType.CUSTOMIZED)
         {
-            mc.displayGuiScreen(new GuiCustomizeWorldScreen(guiCreateWorld, guiCreateWorld.chunkProviderSettingsJson));
+            mc.displayGuiScreen(new net.minecraft.client.gui.GuiCustomizeWorldScreen(guiCreateWorld, guiCreateWorld.chunkProviderSettingsJson));
         }
     }
 
@@ -292,11 +282,11 @@ public class WorldType
      * @param chunkProviderSettingsJson The JSON string to use when initializing ChunkProviderSettings.Factory
      * @return A GenLayer that will return ints representing the Biomes to be generated, see GenLayerBiome
      */
-    public GenLayer getBiomeLayer(long worldSeed, GenLayer parentLayer, String chunkProviderSettingsJson)
+    public net.minecraft.world.gen.layer.GenLayer getBiomeLayer(long worldSeed, net.minecraft.world.gen.layer.GenLayer parentLayer, String chunkProviderSettingsJson)
     {
-        GenLayer ret = new GenLayerBiome(200L, parentLayer, this, chunkProviderSettingsJson);
-        ret = GenLayerZoom.magnify(1000L, ret, 2);
-        ret = new GenLayerBiomeEdge(1000L, ret);
+        net.minecraft.world.gen.layer.GenLayer ret = new net.minecraft.world.gen.layer.GenLayerBiome(200L, parentLayer, this, chunkProviderSettingsJson);
+        ret = net.minecraft.world.gen.layer.GenLayerZoom.magnify(1000L, ret, 2);
+        ret = new net.minecraft.world.gen.layer.GenLayerBiomeEdge(1000L, ret);
         return ret;
     }
 }

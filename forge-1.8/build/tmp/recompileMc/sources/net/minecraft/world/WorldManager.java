@@ -1,6 +1,5 @@
 package net.minecraft.world;
 
-import java.util.Iterator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -16,7 +15,6 @@ public class WorldManager implements IWorldAccess
     private MinecraftServer mcServer;
     /** The WorldServer object. */
     private WorldServer theWorldServer;
-    private static final String __OBFID = "CL_00001433";
 
     public WorldManager(MinecraftServer p_i1517_1_, WorldServer p_i1517_2_)
     {
@@ -24,7 +22,9 @@ public class WorldManager implements IWorldAccess
         this.theWorldServer = p_i1517_2_;
     }
 
-    public void spawnParticle(int p_180442_1_, boolean p_180442_2_, double p_180442_3_, double p_180442_5_, double p_180442_7_, double p_180442_9_, double p_180442_11_, double p_180442_13_, int ... p_180442_15_) {}
+    public void spawnParticle(int particleID, boolean ignoreRange, double xCoord, double yCoord, double zCoord, double xOffset, double yOffset, double zOffset, int... p_180442_15_)
+    {
+    }
 
     /**
      * Called on all IWorldAccesses when an entity is created or loaded. On client worlds, starts downloading any
@@ -42,6 +42,7 @@ public class WorldManager implements IWorldAccess
     public void onEntityRemoved(Entity entityIn)
     {
         this.theWorldServer.getEntityTracker().untrackEntity(entityIn);
+        this.theWorldServer.getScoreboard().func_181140_a(entityIn);
     }
 
     /**
@@ -64,20 +65,26 @@ public class WorldManager implements IWorldAccess
      * On the client, re-renders all blocks in this range, inclusive. On the server, does nothing. Args: min x, min y,
      * min z, max x, max y, max z
      */
-    public void markBlockRangeForRenderUpdate(int x1, int y1, int z1, int x2, int y2, int z2) {}
+    public void markBlockRangeForRenderUpdate(int x1, int y1, int z1, int x2, int y2, int z2)
+    {
+    }
 
     public void markBlockForUpdate(BlockPos pos)
     {
         this.theWorldServer.getPlayerManager().markBlockForUpdate(pos);
     }
 
-    public void notifyLightSet(BlockPos pos) {}
-
-    public void playRecord(String recordName, BlockPos blockPosIn) {}
-
-    public void playAusSFX(EntityPlayer p_180439_1_, int p_180439_2_, BlockPos blockPosIn, int p_180439_4_)
+    public void notifyLightSet(BlockPos pos)
     {
-        this.mcServer.getConfigurationManager().sendToAllNearExcept(p_180439_1_, (double)blockPosIn.getX(), (double)blockPosIn.getY(), (double)blockPosIn.getZ(), 64.0D, this.theWorldServer.provider.getDimensionId(), new S28PacketEffect(p_180439_2_, blockPosIn, p_180439_4_, false));
+    }
+
+    public void playRecord(String recordName, BlockPos blockPosIn)
+    {
+    }
+
+    public void playAuxSFX(EntityPlayer player, int sfxType, BlockPos blockPosIn, int p_180439_4_)
+    {
+        this.mcServer.getConfigurationManager().sendToAllNearExcept(player, (double)blockPosIn.getX(), (double)blockPosIn.getY(), (double)blockPosIn.getZ(), 64.0D, this.theWorldServer.provider.getDimensionId(), new S28PacketEffect(sfxType, blockPosIn, p_180439_4_, false));
     }
 
     public void broadcastSound(int p_180440_1_, BlockPos p_180440_2_, int p_180440_3_)
@@ -87,12 +94,8 @@ public class WorldManager implements IWorldAccess
 
     public void sendBlockBreakProgress(int breakerId, BlockPos pos, int progress)
     {
-        Iterator iterator = this.mcServer.getConfigurationManager().playerEntityList.iterator();
-
-        while (iterator.hasNext())
+        for (EntityPlayerMP entityplayermp : this.mcServer.getConfigurationManager().getPlayerList())
         {
-            EntityPlayerMP entityplayermp = (EntityPlayerMP)iterator.next();
-
             if (entityplayermp != null && entityplayermp.worldObj == this.theWorldServer && entityplayermp.getEntityId() != breakerId)
             {
                 double d0 = (double)pos.getX() - entityplayermp.posX;

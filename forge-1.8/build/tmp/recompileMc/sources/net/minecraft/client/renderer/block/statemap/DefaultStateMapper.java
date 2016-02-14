@@ -10,10 +10,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class DefaultStateMapper extends StateMapperBase
 {
-    private static final String __OBFID = "CL_00002477";
-
-    protected ModelResourceLocation getModelResourceLocation(IBlockState p_178132_1_)
+    protected ModelResourceLocation getModelResourceLocation(IBlockState state)
     {
-        return new ModelResourceLocation((ResourceLocation)Block.blockRegistry.getNameForObject(p_178132_1_.getBlock()), this.getPropertyString(p_178132_1_.getProperties()));
+        return new ModelResourceLocation((ResourceLocation)Block.blockRegistry.getNameForObject(state.getBlock()), this.getPropertyString(state.getProperties()));
     }
 }

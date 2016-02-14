@@ -1,11 +1,8 @@
 package net.minecraft.util;
 
-import java.util.Iterator;
-
 public class ChatComponentText extends ChatComponentStyle
 {
     private final String text;
-    private static final String __OBFID = "CL_00001269";
 
     public ChatComponentText(String msg)
     {
@@ -37,11 +34,9 @@ public class ChatComponentText extends ChatComponentStyle
     {
         ChatComponentText chatcomponenttext = new ChatComponentText(this.text);
         chatcomponenttext.setChatStyle(this.getChatStyle().createShallowCopy());
-        Iterator iterator = this.getSiblings().iterator();
 
-        while (iterator.hasNext())
+        for (IChatComponent ichatcomponent : this.getSiblings())
         {
-            IChatComponent ichatcomponent = (IChatComponent)iterator.next();
             chatcomponenttext.appendSibling(ichatcomponent.createCopy());
         }
 

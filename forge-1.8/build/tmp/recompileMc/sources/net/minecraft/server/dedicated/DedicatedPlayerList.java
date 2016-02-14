@@ -2,7 +2,6 @@ package net.minecraft.server.dedicated;
 
 import com.mojang.authlib.GameProfile;
 import java.io.IOException;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -13,7 +12,6 @@ import org.apache.logging.log4j.Logger;
 public class DedicatedPlayerList extends ServerConfigurationManager
 {
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final String __OBFID = "CL_00001783";
 
     public DedicatedPlayerList(DedicatedServer server)
     {
@@ -89,7 +87,7 @@ public class DedicatedPlayerList extends ServerConfigurationManager
         }
         catch (IOException ioexception)
         {
-            LOGGER.warn("Failed to save ip banlist: ", ioexception);
+            LOGGER.warn((String)"Failed to save ip banlist: ", (Throwable)ioexception);
         }
     }
 
@@ -101,7 +99,7 @@ public class DedicatedPlayerList extends ServerConfigurationManager
         }
         catch (IOException ioexception)
         {
-            LOGGER.warn("Failed to save user banlist: ", ioexception);
+            LOGGER.warn((String)"Failed to save user banlist: ", (Throwable)ioexception);
         }
     }
 
@@ -113,7 +111,7 @@ public class DedicatedPlayerList extends ServerConfigurationManager
         }
         catch (IOException ioexception)
         {
-            LOGGER.warn("Failed to load ip banlist: ", ioexception);
+            LOGGER.warn((String)"Failed to load ip banlist: ", (Throwable)ioexception);
         }
     }
 
@@ -125,7 +123,7 @@ public class DedicatedPlayerList extends ServerConfigurationManager
         }
         catch (IOException ioexception)
         {
-            LOGGER.warn("Failed to load user banlist: ", ioexception);
+            LOGGER.warn((String)"Failed to load user banlist: ", (Throwable)ioexception);
         }
     }
 
@@ -137,7 +135,7 @@ public class DedicatedPlayerList extends ServerConfigurationManager
         }
         catch (Exception exception)
         {
-            LOGGER.warn("Failed to load operators list: ", exception);
+            LOGGER.warn((String)"Failed to load operators list: ", (Throwable)exception);
         }
     }
 
@@ -149,7 +147,7 @@ public class DedicatedPlayerList extends ServerConfigurationManager
         }
         catch (Exception exception)
         {
-            LOGGER.warn("Failed to save operators list: ", exception);
+            LOGGER.warn((String)"Failed to save operators list: ", (Throwable)exception);
         }
     }
 
@@ -161,7 +159,7 @@ public class DedicatedPlayerList extends ServerConfigurationManager
         }
         catch (Exception exception)
         {
-            LOGGER.warn("Failed to load white-list: ", exception);
+            LOGGER.warn((String)"Failed to load white-list: ", (Throwable)exception);
         }
     }
 
@@ -173,17 +171,22 @@ public class DedicatedPlayerList extends ServerConfigurationManager
         }
         catch (Exception exception)
         {
-            LOGGER.warn("Failed to save white-list: ", exception);
+            LOGGER.warn((String)"Failed to save white-list: ", (Throwable)exception);
         }
     }
 
     public boolean canJoin(GameProfile profile)
     {
-        return !this.isWhiteListEnabled() || this.canSendCommands(profile) || this.getWhitelistedPlayers().func_152705_a(profile);
+        return !this.isWhiteListEnabled() || this.canSendCommands(profile) || this.getWhitelistedPlayers().isWhitelisted(profile);
     }
 
     public DedicatedServer getServerInstance()
     {
         return (DedicatedServer)super.getServerInstance();
+    }
+
+    public boolean func_183023_f(GameProfile p_183023_1_)
+    {
+        return this.getOppedPlayers().func_183026_b(p_183023_1_);
     }
 }

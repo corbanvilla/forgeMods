@@ -3,8 +3,6 @@ package net.minecraft.util;
 import com.google.common.collect.AbstractIterator;
 import java.util.Iterator;
 import net.minecraft.entity.Entity;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockPos extends Vec3i
 {
@@ -18,7 +16,6 @@ public class BlockPos extends Vec3i
     private static final long X_MASK = (1L << NUM_X_BITS) - 1L;
     private static final long Y_MASK = (1L << NUM_Y_BITS) - 1L;
     private static final long Z_MASK = (1L << NUM_Z_BITS) - 1L;
-    private static final String __OBFID = "CL_00002334";
 
     public BlockPos(int x, int y, int z)
     {
@@ -47,26 +44,18 @@ public class BlockPos extends Vec3i
 
     /**
      * Add the given coordinates to the coordinates of this BlockPos
-     *  
-     * @param x X coordinate
-     * @param y Y coordinate
-     * @param z Z coordinate
      */
     public BlockPos add(double x, double y, double z)
     {
-        return new BlockPos((double)this.getX() + x, (double)this.getY() + y, (double)this.getZ() + z);
+        return x == 0.0D && y == 0.0D && z == 0.0D ? this : new BlockPos((double)this.getX() + x, (double)this.getY() + y, (double)this.getZ() + z);
     }
 
     /**
      * Add the given coordinates to the coordinates of this BlockPos
-     *  
-     * @param x X coordinate
-     * @param y Y coordinate
-     * @param z Z coordinate
      */
     public BlockPos add(int x, int y, int z)
     {
-        return new BlockPos(this.getX() + x, this.getY() + y, this.getZ() + z);
+        return x == 0 && y == 0 && z == 0 ? this : new BlockPos(this.getX() + x, this.getY() + y, this.getZ() + z);
     }
 
     /**
@@ -74,15 +63,15 @@ public class BlockPos extends Vec3i
      */
     public BlockPos add(Vec3i vec)
     {
-        return new BlockPos(this.getX() + vec.getX(), this.getY() + vec.getY(), this.getZ() + vec.getZ());
+        return vec.getX() == 0 && vec.getY() == 0 && vec.getZ() == 0 ? this : new BlockPos(this.getX() + vec.getX(), this.getY() + vec.getY(), this.getZ() + vec.getZ());
     }
 
     /**
-     * Multiply every coordinate by the given factor
+     * Subtract the given Vector from this BlockPos
      */
-    public BlockPos multiply(int factor)
+    public BlockPos subtract(Vec3i vec)
     {
-        return new BlockPos(this.getX() * factor, this.getY() * factor, this.getZ() * factor);
+        return vec.getX() == 0 && vec.getY() == 0 && vec.getZ() == 0 ? this : new BlockPos(this.getX() - vec.getX(), this.getY() - vec.getY(), this.getZ() - vec.getZ());
     }
 
     /**
@@ -91,15 +80,6 @@ public class BlockPos extends Vec3i
     public BlockPos up()
     {
         return this.up(1);
-    }
-
-    /**
-     * Subtract the given Vector from this BlockPos
-     */
-    @SideOnly(Side.CLIENT)
-    public BlockPos subtract(Vec3i vec)
-    {
-        return new BlockPos(this.getX() - vec.getX(), this.getY() - vec.getY(), this.getZ() - vec.getZ());
     }
 
     /**
@@ -200,20 +180,16 @@ public class BlockPos extends Vec3i
 
     /**
      * Offsets this BlockPos n blocks in the given direction
-     *  
-     * @param facing The direction of the offset
-     * @param n The number of blocks to offset by
      */
     public BlockPos offset(EnumFacing facing, int n)
     {
-        return new BlockPos(this.getX() + facing.getFrontOffsetX() * n, this.getY() + facing.getFrontOffsetY() * n, this.getZ() + facing.getFrontOffsetZ() * n);
+        return n == 0 ? this : new BlockPos(this.getX() + facing.getFrontOffsetX() * n, this.getY() + facing.getFrontOffsetY() * n, this.getZ() + facing.getFrontOffsetZ() * n);
     }
 
     /**
-     * Calculate the cross product of this BlockPos and the given Vector. Version of crossProduct that returns a
-     * BlockPos instead of a Vec3i
+     * Calculate the cross product of this and the given Vector
      */
-    public BlockPos crossProductBP(Vec3i vec)
+    public BlockPos crossProduct(Vec3i vec)
     {
         return new BlockPos(this.getY() * vec.getZ() - this.getZ() * vec.getY(), this.getZ() * vec.getX() - this.getX() * vec.getZ(), this.getX() * vec.getY() - this.getY() * vec.getX());
     }
@@ -231,42 +207,31 @@ public class BlockPos extends Vec3i
      */
     public static BlockPos fromLong(long serialized)
     {
-        int j = (int)(serialized << 64 - X_SHIFT - NUM_X_BITS >> 64 - NUM_X_BITS);
-        int k = (int)(serialized << 64 - Y_SHIFT - NUM_Y_BITS >> 64 - NUM_Y_BITS);
-        int l = (int)(serialized << 64 - NUM_Z_BITS >> 64 - NUM_Z_BITS);
-        return new BlockPos(j, k, l);
+        int i = (int)(serialized << 64 - X_SHIFT - NUM_X_BITS >> 64 - NUM_X_BITS);
+        int j = (int)(serialized << 64 - Y_SHIFT - NUM_Y_BITS >> 64 - NUM_Y_BITS);
+        int k = (int)(serialized << 64 - NUM_Z_BITS >> 64 - NUM_Z_BITS);
+        return new BlockPos(i, j, k);
     }
 
-    /**
-     * Create an Iterable that returns all positions in the box specified by the given corners
-     *  
-     * @param from The first corner (inclusive)
-     * @param to the second corner (exclusive)
-     */
-    public static Iterable getAllInBox(BlockPos from, BlockPos to)
+    public static Iterable<BlockPos> getAllInBox(BlockPos from, BlockPos to)
     {
-        final BlockPos blockpos2 = new BlockPos(Math.min(from.getX(), to.getX()), Math.min(from.getY(), to.getY()), Math.min(from.getZ(), to.getZ()));
-        final BlockPos blockpos3 = new BlockPos(Math.max(from.getX(), to.getX()), Math.max(from.getY(), to.getY()), Math.max(from.getZ(), to.getZ()));
-        return new Iterable()
+        final BlockPos blockpos = new BlockPos(Math.min(from.getX(), to.getX()), Math.min(from.getY(), to.getY()), Math.min(from.getZ(), to.getZ()));
+        final BlockPos blockpos1 = new BlockPos(Math.max(from.getX(), to.getX()), Math.max(from.getY(), to.getY()), Math.max(from.getZ(), to.getZ()));
+        return new Iterable<BlockPos>()
         {
-            private static final String __OBFID = "CL_00002333";
-            public Iterator iterator()
+            public Iterator<BlockPos> iterator()
             {
-                return new AbstractIterator()
+                return new AbstractIterator<BlockPos>()
                 {
                     private BlockPos lastReturned = null;
-                    private static final String __OBFID = "CL_00002332";
-                    /**
-                     * Synthetic method called by computeNext
-                     */
-                    protected BlockPos computeNext0()
+                    protected BlockPos computeNext()
                     {
                         if (this.lastReturned == null)
                         {
-                            this.lastReturned = blockpos2;
+                            this.lastReturned = blockpos;
                             return this.lastReturned;
                         }
-                        else if (this.lastReturned.equals(blockpos3))
+                        else if (this.lastReturned.equals(blockpos1))
                         {
                             return (BlockPos)this.endOfData();
                         }
@@ -276,19 +241,19 @@ public class BlockPos extends Vec3i
                             int j = this.lastReturned.getY();
                             int k = this.lastReturned.getZ();
 
-                            if (i < blockpos3.getX())
+                            if (i < blockpos1.getX())
                             {
                                 ++i;
                             }
-                            else if (j < blockpos3.getY())
+                            else if (j < blockpos1.getY())
                             {
-                                i = blockpos2.getX();
+                                i = blockpos.getX();
                                 ++j;
                             }
-                            else if (k < blockpos3.getZ())
+                            else if (k < blockpos1.getZ())
                             {
-                                i = blockpos2.getX();
-                                j = blockpos2.getY();
+                                i = blockpos.getX();
+                                j = blockpos.getY();
                                 ++k;
                             }
 
@@ -296,80 +261,60 @@ public class BlockPos extends Vec3i
                             return this.lastReturned;
                         }
                     }
-                    protected Object computeNext()
-                    {
-                        return this.computeNext0();
-                    }
                 };
             }
         };
     }
 
-    /**
-     * Like getAllInBox but reuses a single MutableBlockPos instead. If this method is used, the resulting BlockPos
-     * instances can only be used inside the iteration loop.
-     *  
-     * @param from The first corner (inclusive)
-     * @param to the second corner (exclusive)
-     */
-    public static Iterable getAllInBoxMutable(BlockPos from, BlockPos to)
+    public static Iterable<BlockPos.MutableBlockPos> getAllInBoxMutable(BlockPos from, BlockPos to)
     {
-        final BlockPos blockpos2 = new BlockPos(Math.min(from.getX(), to.getX()), Math.min(from.getY(), to.getY()), Math.min(from.getZ(), to.getZ()));
-        final BlockPos blockpos3 = new BlockPos(Math.max(from.getX(), to.getX()), Math.max(from.getY(), to.getY()), Math.max(from.getZ(), to.getZ()));
-        return new Iterable()
+        final BlockPos blockpos = new BlockPos(Math.min(from.getX(), to.getX()), Math.min(from.getY(), to.getY()), Math.min(from.getZ(), to.getZ()));
+        final BlockPos blockpos1 = new BlockPos(Math.max(from.getX(), to.getX()), Math.max(from.getY(), to.getY()), Math.max(from.getZ(), to.getZ()));
+        return new Iterable<BlockPos.MutableBlockPos>()
         {
-            private static final String __OBFID = "CL_00002331";
-            public Iterator iterator()
+            public Iterator<BlockPos.MutableBlockPos> iterator()
             {
-                return new AbstractIterator()
+                return new AbstractIterator<BlockPos.MutableBlockPos>()
                 {
                     private BlockPos.MutableBlockPos theBlockPos = null;
-                    private static final String __OBFID = "CL_00002330";
-                    /**
-                     * Synthetic method called by computeNext
-                     */
-                    protected BlockPos.MutableBlockPos computeNext0()
+                    protected BlockPos.MutableBlockPos computeNext()
                     {
                         if (this.theBlockPos == null)
                         {
-                            this.theBlockPos = new BlockPos.MutableBlockPos(blockpos2.getX(), blockpos2.getY(), blockpos2.getZ(), null);
+                            this.theBlockPos = new BlockPos.MutableBlockPos(blockpos.getX(), blockpos.getY(), blockpos.getZ());
                             return this.theBlockPos;
                         }
-                        else if (this.theBlockPos.equals(blockpos3))
+                        else if (this.theBlockPos.equals(blockpos1))
                         {
                             return (BlockPos.MutableBlockPos)this.endOfData();
                         }
                         else
                         {
                             int i = this.theBlockPos.getX();
-                            int k = this.theBlockPos.getY();
-                            int j = this.theBlockPos.getZ();
+                            int j = this.theBlockPos.getY();
+                            int k = this.theBlockPos.getZ();
 
-                            if (i < blockpos3.getX())
+                            if (i < blockpos1.getX())
                             {
                                 ++i;
                             }
-                            else if (k < blockpos3.getY())
+                            else if (j < blockpos1.getY())
                             {
-                                i = blockpos2.getX();
-                                ++k;
-                            }
-                            else if (j < blockpos3.getZ())
-                            {
-                                i = blockpos2.getX();
-                                k = blockpos2.getY();
+                                i = blockpos.getX();
                                 ++j;
+                            }
+                            else if (k < blockpos1.getZ())
+                            {
+                                i = blockpos.getX();
+                                j = blockpos.getY();
+                                ++k;
                             }
 
                             this.theBlockPos.x = i;
-                            this.theBlockPos.y = k;
-                            this.theBlockPos.z = j;
+                            this.theBlockPos.y = j;
+                            this.theBlockPos.z = k;
                             return this.theBlockPos;
                         }
-                    }
-                    protected Object computeNext()
-                    {
-                        return this.computeNext0();
                     }
                 };
             }
@@ -377,24 +322,35 @@ public class BlockPos extends Vec3i
     }
 
     /**
-     * Calculate the cross product of this and the given Vector
+     * Returns a version of this BlockPos that is guaranteed to be Immutable.
+     * In most cases this will return 'this', but if 'this' is an instance of
+     * MutableBlockPos it will return a new instance of BlockPos with the same values.
+     *
+     * When storing a parameter given to you for an extended period of time, make sure you
+     * use this in case the value is changed internally.
+     *
+     * @return An immutable BlockPos.
      */
-    public Vec3i crossProduct(Vec3i vec)
+    public BlockPos getImmutable()
     {
-        return this.crossProductBP(vec);
+        return this;
     }
 
     public static final class MutableBlockPos extends BlockPos
         {
             /** Mutable X Coordinate */
-            public int x;
+            private int x;
             /** Mutable Y Coordinate */
-            public int y;
+            private int y;
             /** Mutable Z Coordinate */
-            public int z;
-            private static final String __OBFID = "CL_00002329";
+            private int z;
 
-            private MutableBlockPos(int x_, int y_, int z_)
+            public MutableBlockPos()
+            {
+                this(0, 0, 0);
+            }
+
+            public MutableBlockPos(int x_, int y_, int z_)
             {
                 super(0, 0, 0);
                 this.x = x_;
@@ -427,16 +383,20 @@ public class BlockPos extends Vec3i
             }
 
             /**
-             * Calculate the cross product of this and the given Vector
+             * Set the values
+             *  
+             * @param xIn The X value
+             * @param yIn The Y value
+             * @param zIn The Z value
              */
-            public Vec3i crossProduct(Vec3i vec)
+            public BlockPos.MutableBlockPos set(int xIn, int yIn, int zIn)
             {
-                return super.crossProductBP(vec);
+                this.x = xIn;
+                this.y = yIn;
+                this.z = zIn;
+                return this;
             }
 
-            MutableBlockPos(int p_i46025_1_, int p_i46025_2_, int p_i46025_3_, Object p_i46025_4_)
-            {
-                this(p_i46025_1_, p_i46025_2_, p_i46025_3_);
-            }
+            @Override public BlockPos getImmutable() { return new BlockPos(this); }
         }
 }

@@ -1,6 +1,5 @@
 package net.minecraft.creativetab;
 
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.enchantment.Enchantment;
@@ -18,7 +17,6 @@ public abstract class CreativeTabs
     public static CreativeTabs[] creativeTabArray = new CreativeTabs[12];
     public static final CreativeTabs tabBlock = new CreativeTabs(0, "buildingBlocks")
     {
-        private static final String __OBFID = "CL_00000006";
         @SideOnly(Side.CLIENT)
         public Item getTabIconItem()
         {
@@ -27,7 +25,6 @@ public abstract class CreativeTabs
     };
     public static final CreativeTabs tabDecorations = new CreativeTabs(1, "decorations")
     {
-        private static final String __OBFID = "CL_00000010";
         @SideOnly(Side.CLIENT)
         public Item getTabIconItem()
         {
@@ -41,7 +38,6 @@ public abstract class CreativeTabs
     };
     public static final CreativeTabs tabRedstone = new CreativeTabs(2, "redstone")
     {
-        private static final String __OBFID = "CL_00000011";
         @SideOnly(Side.CLIENT)
         public Item getTabIconItem()
         {
@@ -50,7 +46,6 @@ public abstract class CreativeTabs
     };
     public static final CreativeTabs tabTransport = new CreativeTabs(3, "transportation")
     {
-        private static final String __OBFID = "CL_00000012";
         @SideOnly(Side.CLIENT)
         public Item getTabIconItem()
         {
@@ -59,7 +54,6 @@ public abstract class CreativeTabs
     };
     public static final CreativeTabs tabMisc = (new CreativeTabs(4, "misc")
     {
-        private static final String __OBFID = "CL_00000014";
         @SideOnly(Side.CLIENT)
         public Item getTabIconItem()
         {
@@ -68,7 +62,6 @@ public abstract class CreativeTabs
     }).setRelevantEnchantmentTypes(new EnumEnchantmentType[] {EnumEnchantmentType.ALL});
     public static final CreativeTabs tabAllSearch = (new CreativeTabs(5, "search")
     {
-        private static final String __OBFID = "CL_00000015";
         @SideOnly(Side.CLIENT)
         public Item getTabIconItem()
         {
@@ -77,7 +70,6 @@ public abstract class CreativeTabs
     }).setBackgroundImageName("item_search.png");
     public static final CreativeTabs tabFood = new CreativeTabs(6, "food")
     {
-        private static final String __OBFID = "CL_00000016";
         @SideOnly(Side.CLIENT)
         public Item getTabIconItem()
         {
@@ -86,7 +78,6 @@ public abstract class CreativeTabs
     };
     public static final CreativeTabs tabTools = (new CreativeTabs(7, "tools")
     {
-        private static final String __OBFID = "CL_00000017";
         @SideOnly(Side.CLIENT)
         public Item getTabIconItem()
         {
@@ -95,7 +86,6 @@ public abstract class CreativeTabs
     }).setRelevantEnchantmentTypes(new EnumEnchantmentType[] {EnumEnchantmentType.DIGGER, EnumEnchantmentType.FISHING_ROD, EnumEnchantmentType.BREAKABLE});
     public static final CreativeTabs tabCombat = (new CreativeTabs(8, "combat")
     {
-        private static final String __OBFID = "CL_00000018";
         @SideOnly(Side.CLIENT)
         public Item getTabIconItem()
         {
@@ -104,7 +94,6 @@ public abstract class CreativeTabs
     }).setRelevantEnchantmentTypes(new EnumEnchantmentType[] {EnumEnchantmentType.ARMOR, EnumEnchantmentType.ARMOR_FEET, EnumEnchantmentType.ARMOR_HEAD, EnumEnchantmentType.ARMOR_LEGS, EnumEnchantmentType.ARMOR_TORSO, EnumEnchantmentType.BOW, EnumEnchantmentType.WEAPON});
     public static final CreativeTabs tabBrewing = new CreativeTabs(9, "brewing")
     {
-        private static final String __OBFID = "CL_00000007";
         @SideOnly(Side.CLIENT)
         public Item getTabIconItem()
         {
@@ -113,7 +102,6 @@ public abstract class CreativeTabs
     };
     public static final CreativeTabs tabMaterials = new CreativeTabs(10, "materials")
     {
-        private static final String __OBFID = "CL_00000008";
         @SideOnly(Side.CLIENT)
         public Item getTabIconItem()
         {
@@ -122,7 +110,6 @@ public abstract class CreativeTabs
     };
     public static final CreativeTabs tabInventory = (new CreativeTabs(11, "inventory")
     {
-        private static final String __OBFID = "CL_00000009";
         @SideOnly(Side.CLIENT)
         public Item getTabIconItem()
         {
@@ -139,7 +126,6 @@ public abstract class CreativeTabs
     private EnumEnchantmentType[] enchantmentTypes;
     @SideOnly(Side.CLIENT)
     private ItemStack iconItemStack;
-    private static final String __OBFID = "CL_00000005";
 
     public CreativeTabs(String label)
     {
@@ -277,7 +263,7 @@ public abstract class CreativeTabs
     /**
      * Sets the enchantment types for populating this tab with enchanting books
      */
-    public CreativeTabs setRelevantEnchantmentTypes(EnumEnchantmentType ... types)
+    public CreativeTabs setRelevantEnchantmentTypes(EnumEnchantmentType... types)
     {
         this.enchantmentTypes = types;
         return this;
@@ -292,14 +278,9 @@ public abstract class CreativeTabs
         }
         else
         {
-            EnumEnchantmentType[] aenumenchantmenttype = this.enchantmentTypes;
-            int i = aenumenchantmenttype.length;
-
-            for (int j = 0; j < i; ++j)
+            for (EnumEnchantmentType enumenchantmenttype : this.enchantmentTypes)
             {
-                EnumEnchantmentType enumenchantmenttype1 = aenumenchantmenttype[j];
-
-                if (enumenchantmenttype1 == enchantmentType)
+                if (enumenchantmenttype == enchantmentType)
                 {
                     return true;
                 }
@@ -313,18 +294,14 @@ public abstract class CreativeTabs
      * only shows items which have tabToDisplayOn == this
      */
     @SideOnly(Side.CLIENT)
-    public void displayAllReleventItems(List p_78018_1_)
+    public void displayAllReleventItems(List<ItemStack> p_78018_1_)
     {
-        Iterator iterator = Item.itemRegistry.iterator();
-
-        while (iterator.hasNext())
+        for (Item item : Item.itemRegistry)
         {
-            Item item = (Item)iterator.next();
             if (item == null)
             {
                 continue;
             }
-
             for (CreativeTabs tab : item.getCreativeTabs())
             {
                 if (tab == this)
@@ -342,26 +319,19 @@ public abstract class CreativeTabs
 
     /**
      * Adds the enchantment books from the supplied EnumEnchantmentType to the given list.
-     *  
-     * @param itemList A list of ItemStacks that contains every item/block in the creative tab.
      */
     @SideOnly(Side.CLIENT)
-    public void addEnchantmentBooksToList(List itemList, EnumEnchantmentType ... enchantmentType)
+    public void addEnchantmentBooksToList(List<ItemStack> itemList, EnumEnchantmentType... enchantmentType)
     {
-        Enchantment[] aenchantment = Enchantment.enchantmentsBookList;
-        int i = aenchantment.length;
-
-        for (int j = 0; j < i; ++j)
+        for (Enchantment enchantment : Enchantment.enchantmentsBookList)
         {
-            Enchantment enchantment = aenchantment[j];
-
             if (enchantment != null && enchantment.type != null)
             {
                 boolean flag = false;
 
-                for (int k = 0; k < enchantmentType.length && !flag; ++k)
+                for (int i = 0; i < enchantmentType.length && !flag; ++i)
                 {
-                    if (enchantment.type == enchantmentType[k])
+                    if (enchantment.type == enchantmentType[i])
                     {
                         flag = true;
                     }

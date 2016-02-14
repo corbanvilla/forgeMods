@@ -19,7 +19,6 @@ public class SlotCrafting extends Slot
     private final EntityPlayer thePlayer;
     /** The number of items that have been crafted so far. Gets passed to ItemStack.onCrafting before being reset. */
     private int amountCrafted;
-    private static final String __OBFID = "CL_00001761";
 
     public SlotCrafting(EntityPlayer player, InventoryCrafting craftingInventory, IInventory p_i45790_3_, int slotIndex, int xPosition, int yPosition)
     {
@@ -138,23 +137,23 @@ public class SlotCrafting extends Slot
 
         for (int i = 0; i < aitemstack.length; ++i)
         {
-            ItemStack itemstack1 = this.craftMatrix.getStackInSlot(i);
-            ItemStack itemstack2 = aitemstack[i];
+            ItemStack itemstack = this.craftMatrix.getStackInSlot(i);
+            ItemStack itemstack1 = aitemstack[i];
 
-            if (itemstack1 != null)
+            if (itemstack != null)
             {
                 this.craftMatrix.decrStackSize(i, 1);
             }
 
-            if (itemstack2 != null)
+            if (itemstack1 != null)
             {
                 if (this.craftMatrix.getStackInSlot(i) == null)
                 {
-                    this.craftMatrix.setInventorySlotContents(i, itemstack2);
+                    this.craftMatrix.setInventorySlotContents(i, itemstack1);
                 }
-                else if (!this.thePlayer.inventory.addItemStackToInventory(itemstack2))
+                else if (!this.thePlayer.inventory.addItemStackToInventory(itemstack1))
                 {
-                    this.thePlayer.dropPlayerItemWithRandomChoice(itemstack2, false);
+                    this.thePlayer.dropPlayerItemWithRandomChoice(itemstack1, false);
                 }
             }
         }

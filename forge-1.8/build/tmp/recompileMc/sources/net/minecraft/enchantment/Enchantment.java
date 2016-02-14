@@ -2,9 +2,9 @@ package net.minecraft.enchantment;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureAttribute;
@@ -17,7 +17,7 @@ public abstract class Enchantment
 {
     private static final Enchantment[] enchantmentsList = new Enchantment[256];
     public static final Enchantment[] enchantmentsBookList;
-    private static final Map locationEnchantments = Maps.newHashMap();
+    private static final Map<ResourceLocation, Enchantment> locationEnchantments = Maps.<ResourceLocation, Enchantment>newHashMap();
     public static final Enchantment protection = new EnchantmentProtection(0, new ResourceLocation("protection"), 10, 0);
     /** Protection against fire */
     public static final Enchantment fireProtection = new EnchantmentProtection(1, new ResourceLocation("fire_protection"), 5, 1);
@@ -68,12 +68,9 @@ public abstract class Enchantment
     public EnumEnchantmentType type;
     /** Used in localisation and stats. */
     protected String name;
-    private static final String __OBFID = "CL_00000105";
 
     /**
      * Retrieves an Enchantment from the enchantmentsList
-     *  
-     * @param enchID The numeric ID, used to represent an enchantment.
      */
     public static Enchantment getEnchantmentById(int enchID)
     {
@@ -105,21 +102,9 @@ public abstract class Enchantment
         return (Enchantment)locationEnchantments.get(new ResourceLocation(location));
     }
 
-    /**
-     * Generates an array of strings, which represent a list of all the enchantment ResourceLocation's.
-     */
-    public static String[] getLocationNames()
+    public static Set<ResourceLocation> func_181077_c()
     {
-        String[] astring = new String[locationEnchantments.size()];
-        int i = 0;
-        ResourceLocation resourcelocation;
-
-        for (Iterator iterator = locationEnchantments.keySet().iterator(); iterator.hasNext(); astring[i++] = resourcelocation.toString())
-        {
-            resourcelocation = (ResourceLocation)iterator.next();
-        }
-
-        return astring;
+        return locationEnchantments.keySet();
     }
 
     /**
@@ -165,9 +150,6 @@ public abstract class Enchantment
 
     /**
      * Calculates the damage protection of the enchantment based on level and damage source passed.
-     *  
-     * @param level The level of this enchantment.
-     * @param source The source of the damage.
      */
     public int calcModifierDamage(int level, DamageSource source)
     {
@@ -177,10 +159,6 @@ public abstract class Enchantment
     /**
      * Calculates the additional damage that will be dealt by an item with this enchantment. This alternative to
      * calcModifierDamage is sensitive to the targets EnumCreatureAttribute.
-     *  
-     * @param level The level of this specific enchantment.
-     * @param creatureType The EnumCreatureAttribute which represents the target entity. This can be used to have an
-     * effect only apply to a specific group of creatures such as Undead or Arthropods.
      */
     public float calcDamageByCreature(int level, EnumCreatureAttribute creatureType)
     {
@@ -189,8 +167,6 @@ public abstract class Enchantment
 
     /**
      * Determines if the enchantment passed can be applyied together with this enchantment.
-     *  
-     * @param ench A possible enchantment that may be applied along side this enchantment, depending on the results.
      */
     public boolean canApplyTogether(Enchantment ench)
     {
@@ -199,8 +175,6 @@ public abstract class Enchantment
 
     /**
      * Sets the enchantment name
-     *  
-     * @param enchName The simple name for this enchantment.
      */
     public Enchantment setName(String enchName)
     {
@@ -218,9 +192,6 @@ public abstract class Enchantment
 
     /**
      * Returns the correct traslated name of the enchantment and the level in roman numbers.
-     *  
-     * @param level The level of this enchantment, used to create a roman numeral representation of the enchantments
-     * tier.
      */
     public String getTranslatedName(int level)
     {
@@ -230,8 +201,6 @@ public abstract class Enchantment
 
     /**
      * Determines if this enchantment can be applied to a specific ItemStack.
-     *  
-     * @param stack The ItemStack that is attempting to become enchanted with with enchantment.
      */
     public boolean canApply(ItemStack stack)
     {
@@ -240,22 +209,18 @@ public abstract class Enchantment
 
     /**
      * Called whenever a mob is damaged with an item that has this enchantment on it.
-     *  
-     * @param user An instance of the entity which used the enchantment. This is normally an EntityPlayer.
-     * @param target An instance of the damaged entity.
-     * @param level The level of the enchantment used.
      */
-    public void onEntityDamaged(EntityLivingBase user, Entity target, int level) {}
+    public void onEntityDamaged(EntityLivingBase user, Entity target, int level)
+    {
+    }
 
     /**
      * Whenever an entity that has this enchantment on one of its associated items is damaged this method will be
      * called.
-     *  
-     * @param user An instance of the entity that is associated with this enchantment.
-     * @param attacker An instance of the entity that has attacked the using entity.
-     * @param level The level of the enchantment used.
      */
-    public void onUserHurt(EntityLivingBase user, Entity attacker, int level) {}
+    public void onUserHurt(EntityLivingBase user, Entity attacker, int level)
+    {
+    }
 
     /**
      * This applies specifically to applying at the enchanting table. The other method {@link #canApply(ItemStack)}
@@ -298,20 +263,16 @@ public abstract class Enchantment
 
     static
     {
-        ArrayList var0 = Lists.newArrayList();
-        Enchantment[] var1 = enchantmentsList;
-        int var2 = var1.length;
+        List<Enchantment> list = Lists.<Enchantment>newArrayList();
 
-        for (int var3 = 0; var3 < var2; ++var3)
+        for (Enchantment enchantment : enchantmentsList)
         {
-            Enchantment var4 = var1[var3];
-
-            if (var4 != null)
+            if (enchantment != null)
             {
-                var0.add(var4);
+                list.add(enchantment);
             }
         }
 
-        enchantmentsBookList = (Enchantment[])var0.toArray(new Enchantment[var0.size()]);
+        enchantmentsBookList = (Enchantment[])list.toArray(new Enchantment[list.size()]);
     }
 }

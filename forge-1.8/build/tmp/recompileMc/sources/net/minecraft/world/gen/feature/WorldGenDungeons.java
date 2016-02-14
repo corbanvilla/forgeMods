@@ -1,7 +1,6 @@
 package net.minecraft.world.gen.feature;
 
 import com.google.common.collect.Lists;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import net.minecraft.block.material.Material;
@@ -16,73 +15,65 @@ import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import net.minecraftforge.common.ChestGenHooks;
-import net.minecraftforge.common.DungeonHooks;
-import static net.minecraftforge.common.ChestGenHooks.DUNGEON_CHEST;
 
 public class WorldGenDungeons extends WorldGenerator
 {
     private static final Logger field_175918_a = LogManager.getLogger();
     private static final String[] SPAWNERTYPES = new String[] {"Skeleton", "Zombie", "Zombie", "Spider"};
-    private static final List CHESTCONTENT = Lists.newArrayList(new WeightedRandomChestContent[] {new WeightedRandomChestContent(Items.saddle, 0, 1, 1, 10), new WeightedRandomChestContent(Items.iron_ingot, 0, 1, 4, 10), new WeightedRandomChestContent(Items.bread, 0, 1, 1, 10), new WeightedRandomChestContent(Items.wheat, 0, 1, 4, 10), new WeightedRandomChestContent(Items.gunpowder, 0, 1, 4, 10), new WeightedRandomChestContent(Items.string, 0, 1, 4, 10), new WeightedRandomChestContent(Items.bucket, 0, 1, 1, 10), new WeightedRandomChestContent(Items.golden_apple, 0, 1, 1, 1), new WeightedRandomChestContent(Items.redstone, 0, 1, 4, 10), new WeightedRandomChestContent(Items.record_13, 0, 1, 1, 4), new WeightedRandomChestContent(Items.record_cat, 0, 1, 1, 4), new WeightedRandomChestContent(Items.name_tag, 0, 1, 1, 10), new WeightedRandomChestContent(Items.golden_horse_armor, 0, 1, 1, 2), new WeightedRandomChestContent(Items.iron_horse_armor, 0, 1, 1, 5), new WeightedRandomChestContent(Items.diamond_horse_armor, 0, 1, 1, 1)});
-    private static final String __OBFID = "CL_00000425";
+    private static final List<WeightedRandomChestContent> CHESTCONTENT = Lists.newArrayList(new WeightedRandomChestContent[] {new WeightedRandomChestContent(Items.saddle, 0, 1, 1, 10), new WeightedRandomChestContent(Items.iron_ingot, 0, 1, 4, 10), new WeightedRandomChestContent(Items.bread, 0, 1, 1, 10), new WeightedRandomChestContent(Items.wheat, 0, 1, 4, 10), new WeightedRandomChestContent(Items.gunpowder, 0, 1, 4, 10), new WeightedRandomChestContent(Items.string, 0, 1, 4, 10), new WeightedRandomChestContent(Items.bucket, 0, 1, 1, 10), new WeightedRandomChestContent(Items.golden_apple, 0, 1, 1, 1), new WeightedRandomChestContent(Items.redstone, 0, 1, 4, 10), new WeightedRandomChestContent(Items.record_13, 0, 1, 1, 4), new WeightedRandomChestContent(Items.record_cat, 0, 1, 1, 4), new WeightedRandomChestContent(Items.name_tag, 0, 1, 1, 10), new WeightedRandomChestContent(Items.golden_horse_armor, 0, 1, 1, 2), new WeightedRandomChestContent(Items.iron_horse_armor, 0, 1, 1, 5), new WeightedRandomChestContent(Items.diamond_horse_armor, 0, 1, 1, 1)});
 
-    public boolean generate(World worldIn, Random p_180709_2_, BlockPos p_180709_3_)
+    public boolean generate(World worldIn, Random rand, BlockPos position)
     {
-        boolean flag = true;
-        int i = p_180709_2_.nextInt(2) + 2;
-        int j = -i - 1;
-        int k = i + 1;
-        boolean flag1 = true;
-        boolean flag2 = true;
-        int l = p_180709_2_.nextInt(2) + 2;
-        int i1 = -l - 1;
-        int j1 = l + 1;
-        int k1 = 0;
-        int l1;
-        int i2;
-        int j2;
-        BlockPos blockpos1;
+        int i = 3;
+        int j = rand.nextInt(2) + 2;
+        int k = -j - 1;
+        int l = j + 1;
+        int i1 = -1;
+        int j1 = 4;
+        int k1 = rand.nextInt(2) + 2;
+        int l1 = -k1 - 1;
+        int i2 = k1 + 1;
+        int j2 = 0;
 
-        for (l1 = j; l1 <= k; ++l1)
+        for (int k2 = k; k2 <= l; ++k2)
         {
-            for (i2 = -1; i2 <= 4; ++i2)
+            for (int l2 = -1; l2 <= 4; ++l2)
             {
-                for (j2 = i1; j2 <= j1; ++j2)
+                for (int i3 = l1; i3 <= i2; ++i3)
                 {
-                    blockpos1 = p_180709_3_.add(l1, i2, j2);
-                    Material material = worldIn.getBlockState(blockpos1).getBlock().getMaterial();
-                    boolean flag3 = material.isSolid();
+                    BlockPos blockpos = position.add(k2, l2, i3);
+                    Material material = worldIn.getBlockState(blockpos).getBlock().getMaterial();
+                    boolean flag = material.isSolid();
 
-                    if (i2 == -1 && !flag3)
+                    if (l2 == -1 && !flag)
                     {
                         return false;
                     }
 
-                    if (i2 == 4 && !flag3)
+                    if (l2 == 4 && !flag)
                     {
                         return false;
                     }
 
-                    if ((l1 == j || l1 == k || j2 == i1 || j2 == j1) && i2 == 0 && worldIn.isAirBlock(blockpos1) && worldIn.isAirBlock(blockpos1.up()))
+                    if ((k2 == k || k2 == l || i3 == l1 || i3 == i2) && l2 == 0 && worldIn.isAirBlock(blockpos) && worldIn.isAirBlock(blockpos.up()))
                     {
-                        ++k1;
+                        ++j2;
                     }
                 }
             }
         }
 
-        if (k1 >= 1 && k1 <= 5)
+        if (j2 >= 1 && j2 <= 5)
         {
-            for (l1 = j; l1 <= k; ++l1)
+            for (int k3 = k; k3 <= l; ++k3)
             {
-                for (i2 = 3; i2 >= -1; --i2)
+                for (int i4 = 3; i4 >= -1; --i4)
                 {
-                    for (j2 = i1; j2 <= j1; ++j2)
+                    for (int k4 = l1; k4 <= i2; ++k4)
                     {
-                        blockpos1 = p_180709_3_.add(l1, i2, j2);
+                        BlockPos blockpos1 = position.add(k3, i4, k4);
 
-                        if (l1 != j && i2 != -1 && j2 != i1 && l1 != k && i2 != 4 && j2 != j1)
+                        if (k3 != k && i4 != -1 && k4 != l1 && k3 != l && i4 != 4 && k4 != i2)
                         {
                             if (worldIn.getBlockState(blockpos1).getBlock() != Blocks.chest)
                             {
@@ -95,7 +86,7 @@ public class WorldGenDungeons extends WorldGenerator
                         }
                         else if (worldIn.getBlockState(blockpos1).getBlock().getMaterial().isSolid() && worldIn.getBlockState(blockpos1).getBlock() != Blocks.chest)
                         {
-                            if (i2 == -1 && p_180709_2_.nextInt(4) != 0)
+                            if (i4 == -1 && rand.nextInt(4) != 0)
                             {
                                 worldIn.setBlockState(blockpos1, Blocks.mossy_cobblestone.getDefaultState(), 2);
                             }
@@ -108,72 +99,53 @@ public class WorldGenDungeons extends WorldGenerator
                 }
             }
 
-            l1 = 0;
-
-            while (l1 < 2)
+            for (int l3 = 0; l3 < 2; ++l3)
             {
-                i2 = 0;
-
-                while (true)
+                for (int j4 = 0; j4 < 3; ++j4)
                 {
-                    if (i2 < 3)
+                    int l4 = position.getX() + rand.nextInt(j * 2 + 1) - j;
+                    int i5 = position.getY();
+                    int j5 = position.getZ() + rand.nextInt(k1 * 2 + 1) - k1;
+                    BlockPos blockpos2 = new BlockPos(l4, i5, j5);
+
+                    if (worldIn.isAirBlock(blockpos2))
                     {
-                        label197:
+                        int j3 = 0;
+
+                        for (EnumFacing enumfacing : EnumFacing.Plane.HORIZONTAL)
                         {
-                            j2 = p_180709_3_.getX() + p_180709_2_.nextInt(i * 2 + 1) - i;
-                            int l2 = p_180709_3_.getY();
-                            int i3 = p_180709_3_.getZ() + p_180709_2_.nextInt(l * 2 + 1) - l;
-                            BlockPos blockpos2 = new BlockPos(j2, l2, i3);
-
-                            if (worldIn.isAirBlock(blockpos2))
+                            if (worldIn.getBlockState(blockpos2.offset(enumfacing)).getBlock().getMaterial().isSolid())
                             {
-                                int k2 = 0;
-                                Iterator iterator = EnumFacing.Plane.HORIZONTAL.iterator();
+                                ++j3;
+                            }
+                        }
 
-                                while (iterator.hasNext())
-                                {
-                                    EnumFacing enumfacing = (EnumFacing)iterator.next();
+                        if (j3 == 1)
+                        {
+                            worldIn.setBlockState(blockpos2, Blocks.chest.correctFacing(worldIn, blockpos2, Blocks.chest.getDefaultState()), 2);
+                            TileEntity tileentity1 = worldIn.getTileEntity(blockpos2);
 
-                                    if (worldIn.getBlockState(blockpos2.offset(enumfacing)).getBlock().getMaterial().isSolid())
-                                    {
-                                        ++k2;
-                                    }
-                                }
-
-                                if (k2 == 1)
-                                {
-                                    worldIn.setBlockState(blockpos2, Blocks.chest.correctFacing(worldIn, blockpos2, Blocks.chest.getDefaultState()), 2);
-                                    TileEntity tileentity1 = worldIn.getTileEntity(blockpos2);
-
-                                    if (tileentity1 instanceof TileEntityChest)
-                                    {
-                                        WeightedRandomChestContent.generateChestContents(p_180709_2_, ChestGenHooks.getItems(DUNGEON_CHEST, p_180709_2_), (TileEntityChest)tileentity1, ChestGenHooks.getCount(DUNGEON_CHEST, p_180709_2_));
-                                    }
-
-                                    break label197;
-                                }
+                            if (tileentity1 instanceof TileEntityChest)
+                            {
+                                WeightedRandomChestContent.generateChestContents(rand, net.minecraftforge.common.ChestGenHooks.getItems(net.minecraftforge.common.ChestGenHooks.DUNGEON_CHEST, rand), (TileEntityChest)tileentity1, 8);
                             }
 
-                            ++i2;
-                            continue;
+                            break;
                         }
                     }
-
-                    ++l1;
-                    break;
                 }
             }
 
-            worldIn.setBlockState(p_180709_3_, Blocks.mob_spawner.getDefaultState(), 2);
-            TileEntity tileentity = worldIn.getTileEntity(p_180709_3_);
+            worldIn.setBlockState(position, Blocks.mob_spawner.getDefaultState(), 2);
+            TileEntity tileentity = worldIn.getTileEntity(position);
 
             if (tileentity instanceof TileEntityMobSpawner)
             {
-                ((TileEntityMobSpawner)tileentity).getSpawnerBaseLogic().setEntityName(this.pickMobSpawner(p_180709_2_));
+                ((TileEntityMobSpawner)tileentity).getSpawnerBaseLogic().setEntityName(this.pickMobSpawner(rand));
             }
             else
             {
-                field_175918_a.error("Failed to fetch mob spawner entity at (" + p_180709_3_.getX() + ", " + p_180709_3_.getY() + ", " + p_180709_3_.getZ() + ")");
+                field_175918_a.error("Failed to fetch mob spawner entity at (" + position.getX() + ", " + position.getY() + ", " + position.getZ() + ")");
             }
 
             return true;
@@ -189,12 +161,12 @@ public class WorldGenDungeons extends WorldGenerator
      */
     private String pickMobSpawner(Random p_76543_1_)
     {
-        return DungeonHooks.getRandomDungeonMob(p_76543_1_);
+        return net.minecraftforge.common.DungeonHooks.getRandomDungeonMob(p_76543_1_);
     }
 
     static
     {
-        ChestGenHooks.init(DUNGEON_CHEST, CHESTCONTENT, 8, 8);
-        ChestGenHooks.addItem(DUNGEON_CHEST, new WeightedRandomChestContent(new net.minecraft.item.ItemStack(Items.enchanted_book, 1, 0), 1, 1, 1));
+        net.minecraftforge.common.ChestGenHooks.init(net.minecraftforge.common.ChestGenHooks.DUNGEON_CHEST, CHESTCONTENT, 8, 8);
+        net.minecraftforge.common.ChestGenHooks.addItem(net.minecraftforge.common.ChestGenHooks.DUNGEON_CHEST, new WeightedRandomChestContent(new net.minecraft.item.ItemStack(Items.enchanted_book, 1, 0), 1, 1, 1));
     }
 }

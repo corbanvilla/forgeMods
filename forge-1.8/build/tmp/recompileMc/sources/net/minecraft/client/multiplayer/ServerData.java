@@ -25,18 +25,18 @@ public class ServerData
     public long pingToServer;
     public int version = 47;
     /** Game version for this server. */
-    public String gameVersion = "1.8";
+    public String gameVersion = "1.8.9";
     public boolean field_78841_f;
     public String playerList;
-    private ServerData.ServerResourceMode resourceMode;
+    private ServerData.ServerResourceMode resourceMode = ServerData.ServerResourceMode.PROMPT;
     private String serverIcon;
-    private static final String __OBFID = "CL_00000890";
+    private boolean field_181042_l;
 
-    public ServerData(String p_i1193_1_, String p_i1193_2_)
+    public ServerData(String p_i46420_1_, String p_i46420_2_, boolean p_i46420_3_)
     {
-        this.resourceMode = ServerData.ServerResourceMode.PROMPT;
-        this.serverName = p_i1193_1_;
-        this.serverIP = p_i1193_2_;
+        this.serverName = p_i46420_1_;
+        this.serverIP = p_i46420_2_;
+        this.field_181042_l = p_i46420_3_;
     }
 
     /**
@@ -80,7 +80,7 @@ public class ServerData
      */
     public static ServerData getServerDataFromNBTCompound(NBTTagCompound nbtCompound)
     {
-        ServerData serverdata = new ServerData(nbtCompound.getString("name"), nbtCompound.getString("ip"));
+        ServerData serverdata = new ServerData(nbtCompound.getString("name"), nbtCompound.getString("ip"), false);
 
         if (nbtCompound.hasKey("icon", 8))
         {
@@ -119,12 +119,18 @@ public class ServerData
         this.serverIcon = icon;
     }
 
+    public boolean func_181041_d()
+    {
+        return this.field_181042_l;
+    }
+
     public void copyFrom(ServerData serverDataIn)
     {
         this.serverIP = serverDataIn.serverIP;
         this.serverName = serverDataIn.serverName;
         this.setResourceMode(serverDataIn.getResourceMode());
         this.serverIcon = serverDataIn.serverIcon;
+        this.field_181042_l = serverDataIn.field_181042_l;
     }
 
     @SideOnly(Side.CLIENT)
@@ -133,9 +139,8 @@ public class ServerData
         ENABLED("enabled"),
         DISABLED("disabled"),
         PROMPT("prompt");
-        private final IChatComponent motd;
 
-        private static final String __OBFID = "CL_00001833";
+        private final IChatComponent motd;
 
         private ServerResourceMode(String p_i1053_3_)
         {

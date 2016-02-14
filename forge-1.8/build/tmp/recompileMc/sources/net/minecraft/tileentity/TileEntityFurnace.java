@@ -21,13 +21,13 @@ import net.minecraft.item.ItemTool;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class TileEntityFurnace extends TileEntityLockable implements IUpdatePlayerListBox, ISidedInventory
+public class TileEntityFurnace extends TileEntityLockable implements ITickable, ISidedInventory
 {
     private static final int[] slotsTop = new int[] {0};
     private static final int[] slotsBottom = new int[] {2, 1};
@@ -41,7 +41,6 @@ public class TileEntityFurnace extends TileEntityLockable implements IUpdatePlay
     private int cookTime;
     private int totalCookTime;
     private String furnaceCustomName;
-    private static final String __OBFID = "CL_00000357";
 
     /**
      * Returns the number of slots in the inventory.
@@ -52,7 +51,7 @@ public class TileEntityFurnace extends TileEntityLockable implements IUpdatePlay
     }
 
     /**
-     * Returns the stack in slot i
+     * Returns the stack in the given slot.
      */
     public ItemStack getStackInSlot(int index)
     {
@@ -60,24 +59,21 @@ public class TileEntityFurnace extends TileEntityLockable implements IUpdatePlay
     }
 
     /**
-     * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a
-     * new stack.
+     * Removes up to a specified number of items from an inventory slot and returns them in a new stack.
      */
     public ItemStack decrStackSize(int index, int count)
     {
         if (this.furnaceItemStacks[index] != null)
         {
-            ItemStack itemstack;
-
             if (this.furnaceItemStacks[index].stackSize <= count)
             {
-                itemstack = this.furnaceItemStacks[index];
+                ItemStack itemstack1 = this.furnaceItemStacks[index];
                 this.furnaceItemStacks[index] = null;
-                return itemstack;
+                return itemstack1;
             }
             else
             {
-                itemstack = this.furnaceItemStacks[index].splitStack(count);
+                ItemStack itemstack = this.furnaceItemStacks[index].splitStack(count);
 
                 if (this.furnaceItemStacks[index].stackSize == 0)
                 {
@@ -94,10 +90,9 @@ public class TileEntityFurnace extends TileEntityLockable implements IUpdatePlay
     }
 
     /**
-     * When some containers are closed they call this on each slot, then drop whatever it returns as an EntityItem -
-     * like when you close a workbench GUI.
+     * Removes a stack from the given slot and returns it.
      */
-    public ItemStack getStackInSlotOnClosing(int index)
+    public ItemStack removeStackFromSlot(int index)
     {
         if (this.furnaceItemStacks[index] != null)
         {
@@ -126,14 +121,14 @@ public class TileEntityFurnace extends TileEntityLockable implements IUpdatePlay
 
         if (index == 0 && !flag)
         {
-            this.totalCookTime = this.func_174904_a(stack);
+            this.totalCookTime = this.getCookTime(stack);
             this.cookTime = 0;
             this.markDirty();
         }
     }
 
     /**
-     * Gets the name of this command sender (usually username, but possibly "Rcon")
+     * Get the name of this object. For players this returns their username
      */
     public String getName()
     {
@@ -161,12 +156,12 @@ public class TileEntityFurnace extends TileEntityLockable implements IUpdatePlay
 
         for (int i = 0; i < nbttaglist.tagCount(); ++i)
         {
-            NBTTagCompound nbttagcompound1 = nbttaglist.getCompoundTagAt(i);
-            byte b0 = nbttagcompound1.getByte("Slot");
+            NBTTagCompound nbttagcompound = nbttaglist.getCompoundTagAt(i);
+            int j = nbttagcompound.getByte("Slot");
 
-            if (b0 >= 0 && b0 < this.furnaceItemStacks.length)
+            if (j >= 0 && j < this.furnaceItemStacks.length)
             {
-                this.furnaceItemStacks[b0] = ItemStack.loadItemStackFromNBT(nbttagcompound1);
+                this.furnaceItemStacks[j] = ItemStack.loadItemStackFromNBT(nbttagcompound);
             }
         }
 
@@ -193,10 +188,10 @@ public class TileEntityFurnace extends TileEntityLockable implements IUpdatePlay
         {
             if (this.furnaceItemStacks[i] != null)
             {
-                NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-                nbttagcompound1.setByte("Slot", (byte)i);
-                this.furnaceItemStacks[i].writeToNBT(nbttagcompound1);
-                nbttaglist.appendTag(nbttagcompound1);
+                NBTTagCompound nbttagcompound = new NBTTagCompound();
+                nbttagcompound.setByte("Slot", (byte)i);
+                this.furnaceItemStacks[i].writeToNBT(nbttagcompound);
+                nbttaglist.appendTag(nbttagcompound);
             }
         }
 
@@ -209,8 +204,7 @@ public class TileEntityFurnace extends TileEntityLockable implements IUpdatePlay
     }
 
     /**
-     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended. *Isn't
-     * this more of a set than a get?*
+     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended.
      */
     public int getInventoryStackLimit()
     {
@@ -232,7 +226,7 @@ public class TileEntityFurnace extends TileEntityLockable implements IUpdatePlay
     }
 
     /**
-     * Updates the JList with a new model.
+     * Like the old updateEntity(), except more generic.
      */
     public void update()
     {
@@ -246,14 +240,7 @@ public class TileEntityFurnace extends TileEntityLockable implements IUpdatePlay
 
         if (!this.worldObj.isRemote)
         {
-            if (!this.isBurning() && (this.furnaceItemStacks[1] == null || this.furnaceItemStacks[0] == null))
-            {
-                if (!this.isBurning() && this.cookTime > 0)
-                {
-                    this.cookTime = MathHelper.clamp_int(this.cookTime - 2, 0, this.totalCookTime);
-                }
-            }
-            else
+            if (this.isBurning() || this.furnaceItemStacks[1] != null && this.furnaceItemStacks[0] != null)
             {
                 if (!this.isBurning() && this.canSmelt())
                 {
@@ -282,7 +269,7 @@ public class TileEntityFurnace extends TileEntityLockable implements IUpdatePlay
                     if (this.cookTime == this.totalCookTime)
                     {
                         this.cookTime = 0;
-                        this.totalCookTime = this.func_174904_a(this.furnaceItemStacks[0]);
+                        this.totalCookTime = this.getCookTime(this.furnaceItemStacks[0]);
                         this.smeltItem();
                         flag1 = true;
                     }
@@ -291,6 +278,10 @@ public class TileEntityFurnace extends TileEntityLockable implements IUpdatePlay
                 {
                     this.cookTime = 0;
                 }
+            }
+            else if (!this.isBurning() && this.cookTime > 0)
+            {
+                this.cookTime = MathHelper.clamp_int(this.cookTime - 2, 0, this.totalCookTime);
             }
 
             if (flag != this.isBurning())
@@ -306,7 +297,7 @@ public class TileEntityFurnace extends TileEntityLockable implements IUpdatePlay
         }
     }
 
-    public int func_174904_a(ItemStack p_174904_1_)
+    public int getCookTime(ItemStack stack)
     {
         return 200;
     }
@@ -426,9 +417,13 @@ public class TileEntityFurnace extends TileEntityLockable implements IUpdatePlay
         return this.worldObj.getTileEntity(this.pos) != this ? false : player.getDistanceSq((double)this.pos.getX() + 0.5D, (double)this.pos.getY() + 0.5D, (double)this.pos.getZ() + 0.5D) <= 64.0D;
     }
 
-    public void openInventory(EntityPlayer player) {}
+    public void openInventory(EntityPlayer player)
+    {
+    }
 
-    public void closeInventory(EntityPlayer player) {}
+    public void closeInventory(EntityPlayer player)
+    {
+    }
 
     /**
      * Returns true if automation is allowed to insert the given stack (ignoring stack size) into the given slot.
@@ -527,5 +522,22 @@ public class TileEntityFurnace extends TileEntityLockable implements IUpdatePlay
         {
             this.furnaceItemStacks[i] = null;
         }
+    }
+
+    net.minecraftforge.items.IItemHandler handlerTop = new net.minecraftforge.items.wrapper.SidedInvWrapper(this, net.minecraft.util.EnumFacing.UP);
+    net.minecraftforge.items.IItemHandler handlerBottom = new net.minecraftforge.items.wrapper.SidedInvWrapper(this, net.minecraft.util.EnumFacing.DOWN);
+    net.minecraftforge.items.IItemHandler handlerSide = new net.minecraftforge.items.wrapper.SidedInvWrapper(this, net.minecraft.util.EnumFacing.WEST);
+
+    @Override
+    public <T> T getCapability(net.minecraftforge.common.capabilities.Capability<T> capability, net.minecraft.util.EnumFacing facing)
+    {
+        if (facing != null && capability == net.minecraftforge.items.CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+            if (facing == EnumFacing.DOWN)
+                return (T) handlerBottom;
+            else if (facing == EnumFacing.UP)
+                return (T) handlerTop;
+            else
+                return (T) handlerSide;
+        return super.getCapability(capability, facing);
     }
 }

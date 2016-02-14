@@ -19,7 +19,6 @@ public class FoodStats
     /** The player's food timer value. */
     private int foodTimer;
     private int prevFoodLevel = 20;
-    private static final String __OBFID = "CL_00001729";
 
     /**
      * Add food stats.
@@ -30,9 +29,9 @@ public class FoodStats
         this.foodSaturationLevel = Math.min(this.foodSaturationLevel + (float)foodLevelIn * foodSaturationModifier * 2.0F, (float)this.foodLevel);
     }
 
-    public void addStats(ItemFood p_151686_1_, ItemStack p_151686_2_)
+    public void addStats(ItemFood foodItem, ItemStack p_151686_2_)
     {
-        this.addStats(p_151686_1_.getHealAmount(p_151686_2_), p_151686_1_.getSaturationModifier(p_151686_2_));
+        this.addStats(foodItem.getHealAmount(p_151686_2_), foodItem.getSaturationModifier(p_151686_2_));
     }
 
     /**
@@ -57,7 +56,7 @@ public class FoodStats
             }
         }
 
-        if (player.worldObj.getGameRules().getGameRuleBooleanValue("naturalRegeneration") && this.foodLevel >= 18 && player.shouldHeal())
+        if (player.worldObj.getGameRules().getBoolean("naturalRegeneration") && this.foodLevel >= 18 && player.shouldHeal())
         {
             ++this.foodTimer;
 

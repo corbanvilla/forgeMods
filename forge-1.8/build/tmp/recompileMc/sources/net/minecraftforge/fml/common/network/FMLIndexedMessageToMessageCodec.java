@@ -27,7 +27,7 @@ public abstract class FMLIndexedMessageToMessageCodec<A> extends MessageToMessag
      * Make this accessible to subclasses
      */
 
-    public static final AttributeKey<ThreadLocal<WeakReference<FMLProxyPacket>>> INBOUNDPACKETTRACKER = new AttributeKey<ThreadLocal<WeakReference<FMLProxyPacket>>>("fml:inboundpacket");
+    public static final AttributeKey<ThreadLocal<WeakReference<FMLProxyPacket>>> INBOUNDPACKETTRACKER = AttributeKey.valueOf("fml:inboundpacket");
 
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception
@@ -69,7 +69,7 @@ public abstract class FMLIndexedMessageToMessageCodec<A> extends MessageToMessag
     protected final void decode(ChannelHandlerContext ctx, FMLProxyPacket msg, List<Object> out) throws Exception
     {
         testMessageValidity(msg);
-        ByteBuf payload = msg.payload();
+        ByteBuf payload = msg.payload().copy();
         byte discriminator = payload.readByte();
         Class<? extends A> clazz = discriminators.get(discriminator);
         if(clazz == null)

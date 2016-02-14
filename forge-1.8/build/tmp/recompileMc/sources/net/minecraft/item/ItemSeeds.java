@@ -12,7 +12,6 @@ public class ItemSeeds extends Item implements net.minecraftforge.common.IPlanta
     private Block crops;
     /** BlockID of the block the seeds can be planted on. */
     private Block soilBlockID;
-    private static final String __OBFID = "CL_00000061";
 
     public ItemSeeds(Block crops, Block soil)
     {
@@ -23,9 +22,6 @@ public class ItemSeeds extends Item implements net.minecraftforge.common.IPlanta
 
     /**
      * Called when a Block is right-clicked with this Item
-     *  
-     * @param pos The block being right-clicked
-     * @param side The side being right-clicked
      */
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {

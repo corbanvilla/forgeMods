@@ -1,18 +1,16 @@
 package net.minecraft.command;
 
 import java.util.List;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockPos;
 
 public class CommandXP extends CommandBase
 {
-    private static final String __OBFID = "CL_00000398";
-
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
-    public String getName()
+    public String getCommandName()
     {
         return "xp";
     }
@@ -25,15 +23,23 @@ public class CommandXP extends CommandBase
         return 2;
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.xp.usage";
     }
 
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
-    public void execute(ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length <= 0)
         {
@@ -57,39 +63,39 @@ public class CommandXP extends CommandBase
                 i *= -1;
             }
 
-            EntityPlayerMP entityplayermp = args.length > 1 ? getPlayer(sender, args[1]) : getCommandSenderAsPlayer(sender);
+            EntityPlayer entityplayer = args.length > 1 ? getPlayer(sender, args[1]) : getCommandSenderAsPlayer(sender);
 
             if (flag)
             {
-                sender.setCommandStat(CommandResultStats.Type.QUERY_RESULT, entityplayermp.experienceLevel);
+                sender.setCommandStat(CommandResultStats.Type.QUERY_RESULT, entityplayer.experienceLevel);
 
                 if (flag1)
                 {
-                    entityplayermp.addExperienceLevel(-i);
-                    notifyOperators(sender, this, "commands.xp.success.negative.levels", new Object[] {Integer.valueOf(i), entityplayermp.getName()});
+                    entityplayer.addExperienceLevel(-i);
+                    notifyOperators(sender, this, "commands.xp.success.negative.levels", new Object[] {Integer.valueOf(i), entityplayer.getName()});
                 }
                 else
                 {
-                    entityplayermp.addExperienceLevel(i);
-                    notifyOperators(sender, this, "commands.xp.success.levels", new Object[] {Integer.valueOf(i), entityplayermp.getName()});
+                    entityplayer.addExperienceLevel(i);
+                    notifyOperators(sender, this, "commands.xp.success.levels", new Object[] {Integer.valueOf(i), entityplayer.getName()});
                 }
             }
             else
             {
-                sender.setCommandStat(CommandResultStats.Type.QUERY_RESULT, entityplayermp.experienceTotal);
+                sender.setCommandStat(CommandResultStats.Type.QUERY_RESULT, entityplayer.experienceTotal);
 
                 if (flag1)
                 {
                     throw new CommandException("commands.xp.failure.widthdrawXp", new Object[0]);
                 }
 
-                entityplayermp.addExperience(i);
-                notifyOperators(sender, this, "commands.xp.success", new Object[] {Integer.valueOf(i), entityplayermp.getName()});
+                entityplayer.addExperience(i);
+                notifyOperators(sender, this, "commands.xp.success", new Object[] {Integer.valueOf(i), entityplayer.getName()});
             }
         }
     }
 
-    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
         return args.length == 2 ? getListOfStringsMatchingLastWord(args, this.getAllUsernames()) : null;
     }
@@ -101,6 +107,8 @@ public class CommandXP extends CommandBase
 
     /**
      * Return whether the specified command parameter index is a username parameter.
+     *  
+     * @param args The arguments that were passed
      */
     public boolean isUsernameIndex(String[] args, int index)
     {

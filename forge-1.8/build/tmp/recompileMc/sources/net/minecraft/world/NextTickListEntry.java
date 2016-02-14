@@ -3,7 +3,7 @@ package net.minecraft.world;
 import net.minecraft.block.Block;
 import net.minecraft.util.BlockPos;
 
-public class NextTickListEntry implements Comparable
+public class NextTickListEntry implements Comparable<NextTickListEntry>
 {
     /** The id number for the next tick entry */
     private static long nextTickEntryID;
@@ -14,7 +14,6 @@ public class NextTickListEntry implements Comparable
     public int priority;
     /** The id of the tick entry */
     private long tickEntryID;
-    private static final String __OBFID = "CL_00000156";
 
     public NextTickListEntry(BlockPos p_i45745_1_, Block p_i45745_2_)
     {
@@ -68,10 +67,5 @@ public class NextTickListEntry implements Comparable
     public Block getBlock()
     {
         return this.block;
-    }
-
-    public int compareTo(Object p_compareTo_1_)
-    {
-        return this.compareTo((NextTickListEntry)p_compareTo_1_);
     }
 }

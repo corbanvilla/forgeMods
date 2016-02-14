@@ -6,9 +6,8 @@ public enum EnumWorldBlockLayer
     CUTOUT_MIPPED("Mipped Cutout"),
     CUTOUT("Cutout"),
     TRANSLUCENT("Translucent");
-    private final String layerName;
 
-    private static final String __OBFID = "CL_00002152";
+    private final String layerName;
 
     private EnumWorldBlockLayer(String layerNameIn)
     {

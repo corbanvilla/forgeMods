@@ -15,15 +15,14 @@ public class GameConfiguration
     public final GameConfiguration.FolderInformation folderInfo;
     public final GameConfiguration.GameInformation gameInfo;
     public final GameConfiguration.ServerInformation serverInfo;
-    private static final String __OBFID = "CL_00001918";
 
-    public GameConfiguration(GameConfiguration.UserInformation p_i45491_1_, GameConfiguration.DisplayInformation p_i45491_2_, GameConfiguration.FolderInformation p_i45491_3_, GameConfiguration.GameInformation p_i45491_4_, GameConfiguration.ServerInformation p_i45491_5_)
+    public GameConfiguration(GameConfiguration.UserInformation userInfoIn, GameConfiguration.DisplayInformation displayInfoIn, GameConfiguration.FolderInformation folderInfoIn, GameConfiguration.GameInformation gameInfoIn, GameConfiguration.ServerInformation serverInfoIn)
     {
-        this.userInfo = p_i45491_1_;
-        this.displayInfo = p_i45491_2_;
-        this.folderInfo = p_i45491_3_;
-        this.gameInfo = p_i45491_4_;
-        this.serverInfo = p_i45491_5_;
+        this.userInfo = userInfoIn;
+        this.displayInfo = displayInfoIn;
+        this.folderInfo = folderInfoIn;
+        this.gameInfo = gameInfoIn;
+        this.serverInfo = serverInfoIn;
     }
 
     @SideOnly(Side.CLIENT)
@@ -33,14 +32,13 @@ public class GameConfiguration
             public final int height;
             public final boolean fullscreen;
             public final boolean checkGlErrors;
-            private static final String __OBFID = "CL_00001917";
 
-            public DisplayInformation(int p_i45490_1_, int p_i45490_2_, boolean p_i45490_3_, boolean p_i45490_4_)
+            public DisplayInformation(int widthIn, int heightIn, boolean fullscreenIn, boolean checkGlErrorsIn)
             {
-                this.width = p_i45490_1_;
-                this.height = p_i45490_2_;
-                this.fullscreen = p_i45490_3_;
-                this.checkGlErrors = p_i45490_4_;
+                this.width = widthIn;
+                this.height = heightIn;
+                this.fullscreen = fullscreenIn;
+                this.checkGlErrors = checkGlErrorsIn;
             }
         }
 
@@ -51,14 +49,13 @@ public class GameConfiguration
             public final File resourcePacksDir;
             public final File assetsDir;
             public final String assetIndex;
-            private static final String __OBFID = "CL_00001916";
 
-            public FolderInformation(File p_i45489_1_, File p_i45489_2_, File p_i45489_3_, String p_i45489_4_)
+            public FolderInformation(File mcDataDirIn, File resourcePacksDirIn, File assetsDirIn, String assetIndexIn)
             {
-                this.mcDataDir = p_i45489_1_;
-                this.resourcePacksDir = p_i45489_2_;
-                this.assetsDir = p_i45489_3_;
-                this.assetIndex = p_i45489_4_;
+                this.mcDataDir = mcDataDirIn;
+                this.resourcePacksDir = resourcePacksDirIn;
+                this.assetsDir = assetsDirIn;
+                this.assetIndex = assetIndexIn;
             }
         }
 
@@ -67,12 +64,11 @@ public class GameConfiguration
         {
             public final boolean isDemo;
             public final String version;
-            private static final String __OBFID = "CL_00001915";
 
-            public GameInformation(boolean p_i45488_1_, String p_i45488_2_)
+            public GameInformation(boolean isDemoIn, String versionIn)
             {
-                this.isDemo = p_i45488_1_;
-                this.version = p_i45488_2_;
+                this.isDemo = isDemoIn;
+                this.version = versionIn;
             }
         }
 
@@ -81,12 +77,11 @@ public class GameConfiguration
         {
             public final String serverName;
             public final int serverPort;
-            private static final String __OBFID = "CL_00001914";
 
-            public ServerInformation(String p_i45487_1_, int p_i45487_2_)
+            public ServerInformation(String serverNameIn, int serverPortIn)
             {
-                this.serverName = p_i45487_1_;
-                this.serverPort = p_i45487_2_;
+                this.serverName = serverNameIn;
+                this.serverPort = serverPortIn;
             }
         }
 
@@ -95,14 +90,15 @@ public class GameConfiguration
         {
             public final Session session;
             public final PropertyMap userProperties;
+            public final PropertyMap field_181172_c;
             public final Proxy proxy;
-            private static final String __OBFID = "CL_00001913";
 
-            public UserInformation(Session p_i45486_1_, PropertyMap p_i45486_2_, Proxy p_i45486_3_)
+            public UserInformation(Session p_i46375_1_, PropertyMap p_i46375_2_, PropertyMap p_i46375_3_, Proxy p_i46375_4_)
             {
-                this.session = p_i45486_1_;
-                this.userProperties = p_i45486_2_;
-                this.proxy = p_i45486_3_;
+                this.session = p_i46375_1_;
+                this.userProperties = p_i46375_2_;
+                this.field_181172_c = p_i46375_3_;
+                this.proxy = p_i46375_4_;
             }
         }
 }

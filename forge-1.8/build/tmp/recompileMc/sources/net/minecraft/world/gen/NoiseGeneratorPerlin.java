@@ -6,31 +6,30 @@ public class NoiseGeneratorPerlin extends NoiseGenerator
 {
     private NoiseGeneratorSimplex[] field_151603_a;
     private int field_151602_b;
-    private static final String __OBFID = "CL_00000536";
 
     public NoiseGeneratorPerlin(Random p_i45470_1_, int p_i45470_2_)
     {
         this.field_151602_b = p_i45470_2_;
         this.field_151603_a = new NoiseGeneratorSimplex[p_i45470_2_];
 
-        for (int j = 0; j < p_i45470_2_; ++j)
+        for (int i = 0; i < p_i45470_2_; ++i)
         {
-            this.field_151603_a[j] = new NoiseGeneratorSimplex(p_i45470_1_);
+            this.field_151603_a[i] = new NoiseGeneratorSimplex(p_i45470_1_);
         }
     }
 
     public double func_151601_a(double p_151601_1_, double p_151601_3_)
     {
-        double d2 = 0.0D;
-        double d3 = 1.0D;
+        double d0 = 0.0D;
+        double d1 = 1.0D;
 
         for (int i = 0; i < this.field_151602_b; ++i)
         {
-            d2 += this.field_151603_a[i].func_151605_a(p_151601_1_ * d3, p_151601_3_ * d3) / d3;
-            d3 /= 2.0D;
+            d0 += this.field_151603_a[i].func_151605_a(p_151601_1_ * d1, p_151601_3_ * d1) / d1;
+            d1 /= 2.0D;
         }
 
-        return d2;
+        return d0;
     }
 
     public double[] func_151599_a(double[] p_151599_1_, double p_151599_2_, double p_151599_4_, int p_151599_6_, int p_151599_7_, double p_151599_8_, double p_151599_10_, double p_151599_12_)
@@ -42,9 +41,9 @@ public class NoiseGeneratorPerlin extends NoiseGenerator
     {
         if (p_151600_1_ != null && p_151600_1_.length >= p_151600_6_ * p_151600_7_)
         {
-            for (int k = 0; k < p_151600_1_.length; ++k)
+            for (int i = 0; i < p_151600_1_.length; ++i)
             {
-                p_151600_1_[k] = 0.0D;
+                p_151600_1_[i] = 0.0D;
             }
         }
         else
@@ -52,14 +51,14 @@ public class NoiseGeneratorPerlin extends NoiseGenerator
             p_151600_1_ = new double[p_151600_6_ * p_151600_7_];
         }
 
-        double d7 = 1.0D;
-        double d6 = 1.0D;
+        double d1 = 1.0D;
+        double d0 = 1.0D;
 
-        for (int l = 0; l < this.field_151602_b; ++l)
+        for (int j = 0; j < this.field_151602_b; ++j)
         {
-            this.field_151603_a[l].func_151606_a(p_151600_1_, p_151600_2_, p_151600_4_, p_151600_6_, p_151600_7_, p_151600_8_ * d6 * d7, p_151600_10_ * d6 * d7, 0.55D / d7);
-            d6 *= p_151600_12_;
-            d7 *= p_151600_14_;
+            this.field_151603_a[j].func_151606_a(p_151600_1_, p_151600_2_, p_151600_4_, p_151600_6_, p_151600_7_, p_151600_8_ * d0 * d1, p_151600_10_ * d0 * d1, 0.55D / d1);
+            d0 *= p_151600_12_;
+            d1 *= p_151600_14_;
         }
 
         return p_151600_1_;

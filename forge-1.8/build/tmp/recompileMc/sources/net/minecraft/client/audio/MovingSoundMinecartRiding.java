@@ -12,12 +12,11 @@ public class MovingSoundMinecartRiding extends MovingSound
 {
     private final EntityPlayer player;
     private final EntityMinecart minecart;
-    private static final String __OBFID = "CL_00001119";
 
-    public MovingSoundMinecartRiding(EntityPlayer p_i45106_1_, EntityMinecart minecart)
+    public MovingSoundMinecartRiding(EntityPlayer playerRiding, EntityMinecart minecart)
     {
         super(new ResourceLocation("minecraft:minecart.inside"));
-        this.player = p_i45106_1_;
+        this.player = playerRiding;
         this.minecart = minecart;
         this.attenuationType = ISound.AttenuationType.NONE;
         this.repeat = true;
@@ -25,7 +24,7 @@ public class MovingSoundMinecartRiding extends MovingSound
     }
 
     /**
-     * Updates the JList with a new model.
+     * Like the old updateEntity(), except more generic.
      */
     public void update()
     {

@@ -15,8 +15,7 @@ public class ShapedRecipes implements IRecipe
     public final ItemStack[] recipeItems;
     /** Is the ItemStack that you get when craft the recipe. */
     private final ItemStack recipeOutput;
-    private boolean field_92101_f;
-    private static final String __OBFID = "CL_00000093";
+    private boolean copyIngredientNBT;
 
     public ShapedRecipes(int width, int height, ItemStack[] p_i1917_3_, ItemStack output)
     {
@@ -31,13 +30,13 @@ public class ShapedRecipes implements IRecipe
         return this.recipeOutput;
     }
 
-    public ItemStack[] getRemainingItems(InventoryCrafting p_179532_1_)
+    public ItemStack[] getRemainingItems(InventoryCrafting inv)
     {
-        ItemStack[] aitemstack = new ItemStack[p_179532_1_.getSizeInventory()];
+        ItemStack[] aitemstack = new ItemStack[inv.getSizeInventory()];
 
         for (int i = 0; i < aitemstack.length; ++i)
         {
-            ItemStack itemstack = p_179532_1_.getStackInSlot(i);
+            ItemStack itemstack = inv.getStackInSlot(i);
             aitemstack[i] = net.minecraftforge.common.ForgeHooks.getContainerItem(itemstack);
         }
 
@@ -47,18 +46,18 @@ public class ShapedRecipes implements IRecipe
     /**
      * Used to check if a recipe matches current crafting inventory
      */
-    public boolean matches(InventoryCrafting p_77569_1_, World worldIn)
+    public boolean matches(InventoryCrafting inv, World worldIn)
     {
         for (int i = 0; i <= 3 - this.recipeWidth; ++i)
         {
             for (int j = 0; j <= 3 - this.recipeHeight; ++j)
             {
-                if (this.checkMatch(p_77569_1_, i, j, true))
+                if (this.checkMatch(inv, i, j, true))
                 {
                     return true;
                 }
 
-                if (this.checkMatch(p_77569_1_, i, j, false))
+                if (this.checkMatch(inv, i, j, false))
                 {
                     return true;
                 }
@@ -73,27 +72,27 @@ public class ShapedRecipes implements IRecipe
      */
     private boolean checkMatch(InventoryCrafting p_77573_1_, int p_77573_2_, int p_77573_3_, boolean p_77573_4_)
     {
-        for (int k = 0; k < 3; ++k)
+        for (int i = 0; i < 3; ++i)
         {
-            for (int l = 0; l < 3; ++l)
+            for (int j = 0; j < 3; ++j)
             {
-                int i1 = k - p_77573_2_;
-                int j1 = l - p_77573_3_;
+                int k = i - p_77573_2_;
+                int l = j - p_77573_3_;
                 ItemStack itemstack = null;
 
-                if (i1 >= 0 && j1 >= 0 && i1 < this.recipeWidth && j1 < this.recipeHeight)
+                if (k >= 0 && l >= 0 && k < this.recipeWidth && l < this.recipeHeight)
                 {
                     if (p_77573_4_)
                     {
-                        itemstack = this.recipeItems[this.recipeWidth - i1 - 1 + j1 * this.recipeWidth];
+                        itemstack = this.recipeItems[this.recipeWidth - k - 1 + l * this.recipeWidth];
                     }
                     else
                     {
-                        itemstack = this.recipeItems[i1 + j1 * this.recipeWidth];
+                        itemstack = this.recipeItems[k + l * this.recipeWidth];
                     }
                 }
 
-                ItemStack itemstack1 = p_77573_1_.getStackInRowAndColumn(k, l);
+                ItemStack itemstack1 = p_77573_1_.getStackInRowAndColumn(i, j);
 
                 if (itemstack1 != null || itemstack != null)
                 {
@@ -121,15 +120,15 @@ public class ShapedRecipes implements IRecipe
     /**
      * Returns an Item that is the result of this recipe
      */
-    public ItemStack getCraftingResult(InventoryCrafting p_77572_1_)
+    public ItemStack getCraftingResult(InventoryCrafting inv)
     {
         ItemStack itemstack = this.getRecipeOutput().copy();
 
-        if (this.field_92101_f)
+        if (this.copyIngredientNBT)
         {
-            for (int i = 0; i < p_77572_1_.getSizeInventory(); ++i)
+            for (int i = 0; i < inv.getSizeInventory(); ++i)
             {
-                ItemStack itemstack1 = p_77572_1_.getStackInSlot(i);
+                ItemStack itemstack1 = inv.getStackInSlot(i);
 
                 if (itemstack1 != null && itemstack1.hasTagCompound())
                 {
@@ -147,11 +146,5 @@ public class ShapedRecipes implements IRecipe
     public int getRecipeSize()
     {
         return this.recipeWidth * this.recipeHeight;
-    }
-
-    public ShapedRecipes func_92100_c()
-    {
-        this.field_92101_f = true;
-        return this;
     }
 }

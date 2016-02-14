@@ -2,27 +2,27 @@ package net.minecraft.network.play.server;
 
 import java.io.IOException;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S04PacketEntityEquipment implements Packet
+public class S04PacketEntityEquipment implements Packet<INetHandlerPlayClient>
 {
-    private int field_149394_a;
-    private int field_149392_b;
-    private ItemStack field_149393_c;
-    private static final String __OBFID = "CL_00001330";
+    private int entityID;
+    private int equipmentSlot;
+    private ItemStack itemStack;
 
-    public S04PacketEntityEquipment() {}
-
-    public S04PacketEntityEquipment(int p_i45221_1_, int p_i45221_2_, ItemStack p_i45221_3_)
+    public S04PacketEntityEquipment()
     {
-        this.field_149394_a = p_i45221_1_;
-        this.field_149392_b = p_i45221_2_;
-        this.field_149393_c = p_i45221_3_ == null ? null : p_i45221_3_.copy();
+    }
+
+    public S04PacketEntityEquipment(int entityIDIn, int p_i45221_2_, ItemStack itemStackIn)
+    {
+        this.entityID = entityIDIn;
+        this.equipmentSlot = p_i45221_2_;
+        this.itemStack = itemStackIn == null ? null : itemStackIn.copy();
     }
 
     /**
@@ -30,9 +30,9 @@ public class S04PacketEntityEquipment implements Packet
      */
     public void readPacketData(PacketBuffer buf) throws IOException
     {
-        this.field_149394_a = buf.readVarIntFromBuffer();
-        this.field_149392_b = buf.readShort();
-        this.field_149393_c = buf.readItemStackFromBuffer();
+        this.entityID = buf.readVarIntFromBuffer();
+        this.equipmentSlot = buf.readShort();
+        this.itemStack = buf.readItemStackFromBuffer();
     }
 
     /**
@@ -40,9 +40,9 @@ public class S04PacketEntityEquipment implements Packet
      */
     public void writePacketData(PacketBuffer buf) throws IOException
     {
-        buf.writeVarIntToBuffer(this.field_149394_a);
-        buf.writeShort(this.field_149392_b);
-        buf.writeItemStackToBuffer(this.field_149393_c);
+        buf.writeVarIntToBuffer(this.entityID);
+        buf.writeShort(this.equipmentSlot);
+        buf.writeItemStackToBuffer(this.itemStack);
     }
 
     /**
@@ -54,28 +54,20 @@ public class S04PacketEntityEquipment implements Packet
     }
 
     @SideOnly(Side.CLIENT)
-    public ItemStack func_149390_c()
+    public ItemStack getItemStack()
     {
-        return this.field_149393_c;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayClient)handler);
+        return this.itemStack;
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_149389_d()
+    public int getEntityID()
     {
-        return this.field_149394_a;
+        return this.entityID;
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_149388_e()
+    public int getEquipmentSlot()
     {
-        return this.field_149392_b;
+        return this.equipmentSlot;
     }
 }

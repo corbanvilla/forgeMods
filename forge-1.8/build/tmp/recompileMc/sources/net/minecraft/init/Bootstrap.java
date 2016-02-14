@@ -5,7 +5,6 @@ import java.io.PrintStream;
 import java.util.Random;
 import java.util.UUID;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockCommandBlock;
 import net.minecraft.block.BlockDispenser;
 import net.minecraft.block.BlockFire;
 import net.minecraft.block.BlockLiquid;
@@ -34,7 +33,6 @@ import net.minecraft.entity.projectile.EntitySmallFireball;
 import net.minecraft.entity.projectile.EntitySnowball;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemBucket;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemMonsterPlacer;
@@ -49,6 +47,7 @@ import net.minecraft.tileentity.TileEntitySkull;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.LoggingPrintStream;
+import net.minecraft.util.StringUtils;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -61,7 +60,6 @@ public class Bootstrap
     /** Whether the blocks, items, etc have already been registered */
     private static boolean alreadyRegistered = false;
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final String __OBFID = "CL_00001397";
 
     /**
      * Is Bootstrap registration already done?
@@ -77,7 +75,6 @@ public class Bootstrap
     {
         BlockDispenser.dispenseBehaviorRegistry.putObject(Items.arrow, new BehaviorProjectileDispense()
         {
-            private static final String __OBFID = "CL_00001398";
             /**
              * Return the projectile entity spawned by this dispense behavior.
              */
@@ -90,7 +87,6 @@ public class Bootstrap
         });
         BlockDispenser.dispenseBehaviorRegistry.putObject(Items.egg, new BehaviorProjectileDispense()
         {
-            private static final String __OBFID = "CL_00001404";
             /**
              * Return the projectile entity spawned by this dispense behavior.
              */
@@ -101,7 +97,6 @@ public class Bootstrap
         });
         BlockDispenser.dispenseBehaviorRegistry.putObject(Items.snowball, new BehaviorProjectileDispense()
         {
-            private static final String __OBFID = "CL_00001405";
             /**
              * Return the projectile entity spawned by this dispense behavior.
              */
@@ -112,7 +107,6 @@ public class Bootstrap
         });
         BlockDispenser.dispenseBehaviorRegistry.putObject(Items.experience_bottle, new BehaviorProjectileDispense()
         {
-            private static final String __OBFID = "CL_00001406";
             /**
              * Return the projectile entity spawned by this dispense behavior.
              */
@@ -132,7 +126,6 @@ public class Bootstrap
         BlockDispenser.dispenseBehaviorRegistry.putObject(Items.potionitem, new IBehaviorDispenseItem()
         {
             private final BehaviorDefaultDispenseItem field_150843_b = new BehaviorDefaultDispenseItem();
-            private static final String __OBFID = "CL_00001407";
             /**
              * Dispenses the specified ItemStack from a dispenser.
              */
@@ -140,7 +133,6 @@ public class Bootstrap
             {
                 return ItemPotion.isSplash(stack.getMetadata()) ? (new BehaviorProjectileDispense()
                 {
-                    private static final String __OBFID = "CL_00001408";
                     /**
                      * Return the projectile entity spawned by this dispense behavior.
                      */
@@ -161,7 +153,6 @@ public class Bootstrap
         });
         BlockDispenser.dispenseBehaviorRegistry.putObject(Items.spawn_egg, new BehaviorDefaultDispenseItem()
         {
-            private static final String __OBFID = "CL_00001410";
             /**
              * Dispense the specified stack, play the dispense sound and spawn particles.
              */
@@ -184,7 +175,6 @@ public class Bootstrap
         });
         BlockDispenser.dispenseBehaviorRegistry.putObject(Items.fireworks, new BehaviorDefaultDispenseItem()
         {
-            private static final String __OBFID = "CL_00001411";
             /**
              * Dispense the specified stack, play the dispense sound and spawn particles.
              */
@@ -209,7 +199,6 @@ public class Bootstrap
         });
         BlockDispenser.dispenseBehaviorRegistry.putObject(Items.fire_charge, new BehaviorDefaultDispenseItem()
         {
-            private static final String __OBFID = "CL_00001412";
             /**
              * Dispense the specified stack, play the dispense sound and spawn particles.
              */
@@ -218,7 +207,7 @@ public class Bootstrap
                 EnumFacing enumfacing = BlockDispenser.getFacing(source.getBlockMetadata());
                 IPosition iposition = BlockDispenser.getDispensePosition(source);
                 double d0 = iposition.getX() + (double)((float)enumfacing.getFrontOffsetX() * 0.3F);
-                double d1 = iposition.getY() + (double)((float)enumfacing.getFrontOffsetX() * 0.3F);
+                double d1 = iposition.getY() + (double)((float)enumfacing.getFrontOffsetY() * 0.3F);
                 double d2 = iposition.getZ() + (double)((float)enumfacing.getFrontOffsetZ() * 0.3F);
                 World world = source.getWorld();
                 Random random = world.rand;
@@ -240,7 +229,6 @@ public class Bootstrap
         BlockDispenser.dispenseBehaviorRegistry.putObject(Items.boat, new BehaviorDefaultDispenseItem()
         {
             private final BehaviorDefaultDispenseItem field_150842_b = new BehaviorDefaultDispenseItem();
-            private static final String __OBFID = "CL_00001413";
             /**
              * Dispense the specified stack, play the dispense sound and spawn particles.
              */
@@ -282,10 +270,9 @@ public class Bootstrap
                 source.getWorld().playAuxSFX(1000, source.getBlockPos(), 0);
             }
         });
-        BehaviorDefaultDispenseItem behaviordefaultdispenseitem = new BehaviorDefaultDispenseItem()
+        IBehaviorDispenseItem ibehaviordispenseitem = new BehaviorDefaultDispenseItem()
         {
             private final BehaviorDefaultDispenseItem field_150841_b = new BehaviorDefaultDispenseItem();
-            private static final String __OBFID = "CL_00001399";
             /**
              * Dispense the specified stack, play the dispense sound and spawn particles.
              */
@@ -306,12 +293,11 @@ public class Bootstrap
                 }
             }
         };
-        BlockDispenser.dispenseBehaviorRegistry.putObject(Items.lava_bucket, behaviordefaultdispenseitem);
-        BlockDispenser.dispenseBehaviorRegistry.putObject(Items.water_bucket, behaviordefaultdispenseitem);
+        BlockDispenser.dispenseBehaviorRegistry.putObject(Items.lava_bucket, ibehaviordispenseitem);
+        BlockDispenser.dispenseBehaviorRegistry.putObject(Items.water_bucket, ibehaviordispenseitem);
         BlockDispenser.dispenseBehaviorRegistry.putObject(Items.bucket, new BehaviorDefaultDispenseItem()
         {
             private final BehaviorDefaultDispenseItem field_150840_b = new BehaviorDefaultDispenseItem();
-            private static final String __OBFID = "CL_00001400";
             /**
              * Dispense the specified stack, play the dispense sound and spawn particles.
              */
@@ -356,7 +342,6 @@ public class Bootstrap
         BlockDispenser.dispenseBehaviorRegistry.putObject(Items.flint_and_steel, new BehaviorDefaultDispenseItem()
         {
             private boolean field_150839_b = true;
-            private static final String __OBFID = "CL_00001401";
             /**
              * Dispense the specified stack, play the dispense sound and spawn particles.
              */
@@ -404,7 +389,6 @@ public class Bootstrap
         BlockDispenser.dispenseBehaviorRegistry.putObject(Items.dye, new BehaviorDefaultDispenseItem()
         {
             private boolean field_150838_b = true;
-            private static final String __OBFID = "CL_00001402";
             /**
              * Dispense the specified stack, play the dispense sound and spawn particles.
              */
@@ -451,7 +435,6 @@ public class Bootstrap
         });
         BlockDispenser.dispenseBehaviorRegistry.putObject(Item.getItemFromBlock(Blocks.tnt), new BehaviorDefaultDispenseItem()
         {
-            private static final String __OBFID = "CL_00001403";
             /**
              * Dispense the specified stack, play the dispense sound and spawn particles.
              */
@@ -469,7 +452,6 @@ public class Bootstrap
         BlockDispenser.dispenseBehaviorRegistry.putObject(Items.skull, new BehaviorDefaultDispenseItem()
         {
             private boolean field_179240_b = true;
-            private static final String __OBFID = "CL_00002278";
             /**
              * Dispense the specified stack, play the dispense sound and spawn particles.
              */
@@ -503,7 +485,12 @@ public class Bootstrap
                                     }
                                     else if (nbttagcompound.hasKey("SkullOwner", 8))
                                     {
-                                        gameprofile = new GameProfile((UUID)null, nbttagcompound.getString("SkullOwner"));
+                                        String s = nbttagcompound.getString("SkullOwner");
+
+                                        if (!StringUtils.isNullOrEmpty(s))
+                                        {
+                                            gameprofile = new GameProfile((UUID)null, s);
+                                        }
                                     }
                                 }
 
@@ -546,7 +533,6 @@ public class Bootstrap
         BlockDispenser.dispenseBehaviorRegistry.putObject(Item.getItemFromBlock(Blocks.pumpkin), new BehaviorDefaultDispenseItem()
         {
             private boolean field_179241_b = true;
-            private static final String __OBFID = "CL_00002277";
             /**
              * Dispense the specified stack, play the dispense sound and spawn particles.
              */
@@ -587,43 +573,6 @@ public class Bootstrap
                 }
             }
         });
-        if (false){ //Forge: Removed, Fixes  MC-75630 - Exploit with signs and command blocks
-        BlockDispenser.dispenseBehaviorRegistry.putObject(Item.getItemFromBlock(Blocks.command_block), new BehaviorDefaultDispenseItem()
-        {
-            private static final String __OBFID = "CL_00002276";
-            /**
-             * Dispense the specified stack, play the dispense sound and spawn particles.
-             */
-            protected ItemStack dispenseStack(IBlockSource source, ItemStack stack)
-            {
-                World world = source.getWorld();
-                BlockPos blockpos = source.getBlockPos().offset(BlockDispenser.getFacing(source.getBlockMetadata()));
-
-                if (world.isAirBlock(blockpos))
-                {
-                    if (!world.isRemote)
-                    {
-                        IBlockState iblockstate = Blocks.command_block.getDefaultState().withProperty(BlockCommandBlock.TRIGGERED, Boolean.valueOf(false));
-                        world.setBlockState(blockpos, iblockstate, 3);
-                        ItemBlock.setTileEntityNBT(world, blockpos, stack);
-                        world.notifyNeighborsOfStateChange(source.getBlockPos(), source.getBlock());
-                    }
-
-                    --stack.stackSize;
-                }
-
-                return stack;
-            }
-            /**
-             * Play the dispense sound from the specified block.
-             */
-            protected void playDispenseSound(IBlockSource source) {}
-            /**
-             * Order clients to display dispense particles from the specified block and facing.
-             */
-            protected void spawnDispenseParticles(IBlockSource source, EnumFacing facingIn) {}
-        });
-        }
     }
 
     /**
@@ -643,7 +592,7 @@ public class Bootstrap
             Block.registerBlocks();
             BlockFire.init();
             Item.registerItems();
-            StatList.func_151178_a();
+            StatList.init();
             registerDispenserBehaviors();
         }
     }

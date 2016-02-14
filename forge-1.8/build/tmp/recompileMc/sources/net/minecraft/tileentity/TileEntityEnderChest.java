@@ -2,71 +2,69 @@ package net.minecraft.tileentity;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.server.gui.IUpdatePlayerListBox;
+import net.minecraft.util.ITickable;
 
-public class TileEntityEnderChest extends TileEntity implements IUpdatePlayerListBox
+public class TileEntityEnderChest extends TileEntity implements ITickable
 {
-    public float field_145972_a;
+    public float lidAngle;
     /** The angle of the ender chest lid last tick */
     public float prevLidAngle;
-    public int field_145973_j;
-    private int field_145974_k;
-    private static final String __OBFID = "CL_00000355";
+    public int numPlayersUsing;
+    private int ticksSinceSync;
 
     /**
-     * Updates the JList with a new model.
+     * Like the old updateEntity(), except more generic.
      */
     public void update()
     {
-        if (++this.field_145974_k % 20 * 4 == 0)
+        if (++this.ticksSinceSync % 20 * 4 == 0)
         {
-            this.worldObj.addBlockEvent(this.pos, Blocks.ender_chest, 1, this.field_145973_j);
+            this.worldObj.addBlockEvent(this.pos, Blocks.ender_chest, 1, this.numPlayersUsing);
         }
 
-        this.prevLidAngle = this.field_145972_a;
+        this.prevLidAngle = this.lidAngle;
         int i = this.pos.getX();
         int j = this.pos.getY();
         int k = this.pos.getZ();
         float f = 0.1F;
-        double d1;
 
-        if (this.field_145973_j > 0 && this.field_145972_a == 0.0F)
+        if (this.numPlayersUsing > 0 && this.lidAngle == 0.0F)
         {
             double d0 = (double)i + 0.5D;
-            d1 = (double)k + 0.5D;
+            double d1 = (double)k + 0.5D;
             this.worldObj.playSoundEffect(d0, (double)j + 0.5D, d1, "random.chestopen", 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
         }
 
-        if (this.field_145973_j == 0 && this.field_145972_a > 0.0F || this.field_145973_j > 0 && this.field_145972_a < 1.0F)
+        if (this.numPlayersUsing == 0 && this.lidAngle > 0.0F || this.numPlayersUsing > 0 && this.lidAngle < 1.0F)
         {
-            float f2 = this.field_145972_a;
+            float f2 = this.lidAngle;
 
-            if (this.field_145973_j > 0)
+            if (this.numPlayersUsing > 0)
             {
-                this.field_145972_a += f;
+                this.lidAngle += f;
             }
             else
             {
-                this.field_145972_a -= f;
+                this.lidAngle -= f;
             }
 
-            if (this.field_145972_a > 1.0F)
+            if (this.lidAngle > 1.0F)
             {
-                this.field_145972_a = 1.0F;
+                this.lidAngle = 1.0F;
             }
 
             float f1 = 0.5F;
 
-            if (this.field_145972_a < f1 && f2 >= f1)
+            if (this.lidAngle < f1 && f2 >= f1)
             {
-                d1 = (double)i + 0.5D;
+                double d3 = (double)i + 0.5D;
                 double d2 = (double)k + 0.5D;
-                this.worldObj.playSoundEffect(d1, (double)j + 0.5D, d2, "random.chestclosed", 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
+                this.worldObj.playSoundEffect(d3, (double)j + 0.5D, d2, "random.chestclosed", 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
             }
 
-            if (this.field_145972_a < 0.0F)
+            if (this.lidAngle < 0.0F)
             {
-                this.field_145972_a = 0.0F;
+                this.lidAngle = 0.0F;
             }
         }
     }
@@ -75,7 +73,7 @@ public class TileEntityEnderChest extends TileEntity implements IUpdatePlayerLis
     {
         if (id == 1)
         {
-            this.field_145973_j = type;
+            this.numPlayersUsing = type;
             return true;
         }
         else
@@ -93,19 +91,19 @@ public class TileEntityEnderChest extends TileEntity implements IUpdatePlayerLis
         super.invalidate();
     }
 
-    public void func_145969_a()
+    public void openChest()
     {
-        ++this.field_145973_j;
-        this.worldObj.addBlockEvent(this.pos, Blocks.ender_chest, 1, this.field_145973_j);
+        ++this.numPlayersUsing;
+        this.worldObj.addBlockEvent(this.pos, Blocks.ender_chest, 1, this.numPlayersUsing);
     }
 
-    public void func_145970_b()
+    public void closeChest()
     {
-        --this.field_145973_j;
-        this.worldObj.addBlockEvent(this.pos, Blocks.ender_chest, 1, this.field_145973_j);
+        --this.numPlayersUsing;
+        this.worldObj.addBlockEvent(this.pos, Blocks.ender_chest, 1, this.numPlayersUsing);
     }
 
-    public boolean func_145971_a(EntityPlayer p_145971_1_)
+    public boolean canBeUsed(EntityPlayer p_145971_1_)
     {
         return this.worldObj.getTileEntity(this.pos) != this ? false : p_145971_1_.getDistanceSq((double)this.pos.getX() + 0.5D, (double)this.pos.getY() + 0.5D, (double)this.pos.getZ() + 0.5D) <= 64.0D;
     }

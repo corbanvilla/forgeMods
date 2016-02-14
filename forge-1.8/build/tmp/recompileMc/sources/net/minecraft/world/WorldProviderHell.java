@@ -11,8 +11,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class WorldProviderHell extends WorldProvider
 {
-    private static final String __OBFID = "CL_00000387";
-
     /**
      * creates a new world chunk manager for WorldProvider
      */
@@ -113,7 +111,6 @@ public class WorldProviderHell extends WorldProvider
     {
         return new WorldBorder()
         {
-            private static final String __OBFID = "CL_00002008";
             public double getCenterX()
             {
                 return super.getCenterX() / 8.0D;

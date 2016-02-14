@@ -16,8 +16,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockLilyPad extends BlockBush
 {
-    private static final String __OBFID = "CL_00000332";
-
     protected BlockLilyPad()
     {
         float f = 0.5F;
@@ -28,10 +26,8 @@ public class BlockLilyPad extends BlockBush
 
     /**
      * Add all collision boxes of this Block to the list that intersect with the given mask.
-     *  
-     * @param collidingEntity the Entity colliding with this Block
      */
-    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List list, Entity collidingEntity)
+    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity)
     {
         if (collidingEntity == null || !(collidingEntity instanceof EntityBoat))
         {
@@ -74,8 +70,8 @@ public class BlockLilyPad extends BlockBush
     {
         if (pos.getY() >= 0 && pos.getY() < 256)
         {
-            IBlockState iblockstate1 = worldIn.getBlockState(pos.down());
-            return iblockstate1.getBlock().getMaterial() == Material.water && ((Integer)iblockstate1.getValue(BlockLiquid.LEVEL)).intValue() == 0;
+            IBlockState iblockstate = worldIn.getBlockState(pos.down());
+            return iblockstate.getBlock().getMaterial() == Material.water && ((Integer)iblockstate.getValue(BlockLiquid.LEVEL)).intValue() == 0;
         }
         else
         {

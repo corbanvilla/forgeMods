@@ -8,7 +8,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,65 +23,63 @@ public class SimpleReloadableResourceManager implements IReloadableResourceManag
 {
     private static final Logger logger = LogManager.getLogger();
     private static final Joiner joinerResourcePacks = Joiner.on(", ");
-    private final Map domainResourceManagers = Maps.newHashMap();
-    private final List reloadListeners = Lists.newArrayList();
-    private final Set setResourceDomains = Sets.newLinkedHashSet();
+    private final Map<String, FallbackResourceManager> domainResourceManagers = Maps.<String, FallbackResourceManager>newHashMap();
+    private final List<IResourceManagerReloadListener> reloadListeners = Lists.<IResourceManagerReloadListener>newArrayList();
+    private final Set<String> setResourceDomains = Sets.<String>newLinkedHashSet();
     private final IMetadataSerializer rmMetadataSerializer;
-    private static final String __OBFID = "CL_00001091";
 
-    public SimpleReloadableResourceManager(IMetadataSerializer p_i1299_1_)
+    public SimpleReloadableResourceManager(IMetadataSerializer rmMetadataSerializerIn)
     {
-        this.rmMetadataSerializer = p_i1299_1_;
+        this.rmMetadataSerializer = rmMetadataSerializerIn;
     }
 
-    public void reloadResourcePack(IResourcePack p_110545_1_)
+    public void reloadResourcePack(IResourcePack resourcePack)
     {
-        FallbackResourceManager fallbackresourcemanager;
-
-        for (Iterator iterator = p_110545_1_.getResourceDomains().iterator(); iterator.hasNext(); fallbackresourcemanager.addResourcePack(p_110545_1_))
+        for (String s : resourcePack.getResourceDomains())
         {
-            String s = (String)iterator.next();
             this.setResourceDomains.add(s);
-            fallbackresourcemanager = (FallbackResourceManager)this.domainResourceManagers.get(s);
+            FallbackResourceManager fallbackresourcemanager = (FallbackResourceManager)this.domainResourceManagers.get(s);
 
             if (fallbackresourcemanager == null)
             {
                 fallbackresourcemanager = new FallbackResourceManager(this.rmMetadataSerializer);
                 this.domainResourceManagers.put(s, fallbackresourcemanager);
             }
+
+            fallbackresourcemanager.addResourcePack(resourcePack);
         }
     }
 
-    public Set getResourceDomains()
+    public Set<String> getResourceDomains()
     {
         return this.setResourceDomains;
     }
 
-    public IResource getResource(ResourceLocation p_110536_1_) throws IOException
+    public IResource getResource(ResourceLocation location) throws IOException
     {
-        IResourceManager iresourcemanager = (IResourceManager)this.domainResourceManagers.get(p_110536_1_.getResourceDomain());
+        IResourceManager iresourcemanager = (IResourceManager)this.domainResourceManagers.get(location.getResourceDomain());
 
         if (iresourcemanager != null)
         {
-            return iresourcemanager.getResource(p_110536_1_);
+            return iresourcemanager.getResource(location);
         }
         else
         {
-            throw new FileNotFoundException(p_110536_1_.toString());
+            throw new FileNotFoundException(location.toString());
         }
     }
 
-    public List getAllResources(ResourceLocation p_135056_1_) throws IOException
+    public List<IResource> getAllResources(ResourceLocation location) throws IOException
     {
-        IResourceManager iresourcemanager = (IResourceManager)this.domainResourceManagers.get(p_135056_1_.getResourceDomain());
+        IResourceManager iresourcemanager = (IResourceManager)this.domainResourceManagers.get(location.getResourceDomain());
 
         if (iresourcemanager != null)
         {
-            return iresourcemanager.getAllResources(p_135056_1_);
+            return iresourcemanager.getAllResources(location);
         }
         else
         {
-            throw new FileNotFoundException(p_135056_1_.toString());
+            throw new FileNotFoundException(location.toString());
         }
     }
 
@@ -92,27 +89,20 @@ public class SimpleReloadableResourceManager implements IReloadableResourceManag
         this.setResourceDomains.clear();
     }
 
-    public void reloadResources(List p_110541_1_)
+    public void reloadResources(List<IResourcePack> p_110541_1_)
     {
         this.clearResources();
         net.minecraftforge.fml.common.ProgressManager.ProgressBar resReload = net.minecraftforge.fml.common.ProgressManager.push("Loading Resources", p_110541_1_.size()+1, true);
-        logger.info("Reloading ResourceManager: " + joinerResourcePacks.join(Iterables.transform(p_110541_1_, new Function()
+        logger.info("Reloading ResourceManager: " + joinerResourcePacks.join(Iterables.transform(p_110541_1_, new Function<IResourcePack, String>()
         {
-            private static final String __OBFID = "CL_00001092";
             public String apply(IResourcePack p_apply_1_)
             {
                 return p_apply_1_.getPackName();
             }
-            public Object apply(Object p_apply_1_)
-            {
-                return this.apply((IResourcePack)p_apply_1_);
-            }
         })));
-        Iterator iterator = p_110541_1_.iterator();
 
-        while (iterator.hasNext())
+        for (IResourcePack iresourcepack : p_110541_1_)
         {
-            IResourcePack iresourcepack = (IResourcePack)iterator.next();
             resReload.step(iresourcepack.getPackName());
             this.reloadResourcePack(iresourcepack);
         }
@@ -122,23 +112,20 @@ public class SimpleReloadableResourceManager implements IReloadableResourceManag
         net.minecraftforge.fml.common.ProgressManager.pop(resReload);
     }
 
-    public void registerReloadListener(IResourceManagerReloadListener p_110542_1_)
+    public void registerReloadListener(IResourceManagerReloadListener reloadListener)
     {
-        this.reloadListeners.add(p_110542_1_);
         net.minecraftforge.fml.common.ProgressManager.ProgressBar resReload = net.minecraftforge.fml.common.ProgressManager.push("Loading Resource", 1);
-        resReload.step(p_110542_1_.getClass());
-        p_110542_1_.onResourceManagerReload(this);
+        resReload.step(reloadListener.getClass());
+        this.reloadListeners.add(reloadListener);
+        reloadListener.onResourceManagerReload(this);
         net.minecraftforge.fml.common.ProgressManager.pop(resReload);
     }
 
     private void notifyReloadListeners()
     {
-        Iterator iterator = this.reloadListeners.iterator();
-
         net.minecraftforge.fml.common.ProgressManager.ProgressBar resReload = net.minecraftforge.fml.common.ProgressManager.push("Reloading", this.reloadListeners.size());
-        while (iterator.hasNext())
+        for (IResourceManagerReloadListener iresourcemanagerreloadlistener : this.reloadListeners)
         {
-            IResourceManagerReloadListener iresourcemanagerreloadlistener = (IResourceManagerReloadListener)iterator.next();
             resReload.step(iresourcemanagerreloadlistener.getClass());
             iresourcemanagerreloadlistener.onResourceManagerReload(this);
         }

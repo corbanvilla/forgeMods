@@ -2,20 +2,20 @@ package net.minecraft.network.play.server;
 
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S3FPacketCustomPayload implements Packet
+public class S3FPacketCustomPayload implements Packet<INetHandlerPlayClient>
 {
     private String channel;
     private PacketBuffer data;
-    private static final String __OBFID = "CL_00001297";
 
-    public S3FPacketCustomPayload() {}
+    public S3FPacketCustomPayload()
+    {
+    }
 
     public S3FPacketCustomPayload(String channelName, PacketBuffer dataIn)
     {
@@ -59,23 +59,18 @@ public class S3FPacketCustomPayload implements Packet
         }
     }
 
-    public void process(INetHandlerPlayClient p_180734_1_)
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
+    public void processPacket(INetHandlerPlayClient handler)
     {
-        p_180734_1_.handleCustomPayload(this);
+        handler.handleCustomPayload(this);
     }
 
     @SideOnly(Side.CLIENT)
     public String getChannelName()
     {
         return this.channel;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.process((INetHandlerPlayClient)handler);
     }
 
     @SideOnly(Side.CLIENT)

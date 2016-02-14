@@ -13,20 +13,19 @@ public class ModelPlayer extends ModelBiped
     public ModelRenderer bipedLeftLegwear;
     public ModelRenderer bipedRightLegwear;
     public ModelRenderer bipedBodyWear;
-    private ModelRenderer field_178729_w;
-    private ModelRenderer field_178736_x;
-    private boolean field_178735_y;
-    private static final String __OBFID = "CL_00002626";
+    private ModelRenderer bipedCape;
+    private ModelRenderer bipedDeadmau5Head;
+    private boolean smallArms;
 
     public ModelPlayer(float p_i46304_1_, boolean p_i46304_2_)
     {
         super(p_i46304_1_, 0.0F, 64, 64);
-        this.field_178735_y = p_i46304_2_;
-        this.field_178736_x = new ModelRenderer(this, 24, 0);
-        this.field_178736_x.addBox(-3.0F, -6.0F, -1.0F, 6, 6, 1, p_i46304_1_);
-        this.field_178729_w = new ModelRenderer(this, 0, 0);
-        this.field_178729_w.setTextureSize(64, 32);
-        this.field_178729_w.addBox(-5.0F, 0.0F, -1.0F, 10, 16, 1, p_i46304_1_);
+        this.smallArms = p_i46304_2_;
+        this.bipedDeadmau5Head = new ModelRenderer(this, 24, 0);
+        this.bipedDeadmau5Head.addBox(-3.0F, -6.0F, -1.0F, 6, 6, 1, p_i46304_1_);
+        this.bipedCape = new ModelRenderer(this, 0, 0);
+        this.bipedCape.setTextureSize(64, 32);
+        this.bipedCape.addBox(-5.0F, 0.0F, -1.0F, 10, 16, 1, p_i46304_1_);
 
         if (p_i46304_2_)
         {
@@ -73,50 +72,50 @@ public class ModelPlayer extends ModelBiped
     /**
      * Sets the models various rotation angles then renders the model.
      */
-    public void render(Entity p_78088_1_, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float p_78088_7_)
+    public void render(Entity entityIn, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float scale)
     {
-        super.render(p_78088_1_, p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, p_78088_7_);
+        super.render(entityIn, p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, scale);
         GlStateManager.pushMatrix();
 
         if (this.isChild)
         {
-            float f6 = 2.0F;
-            GlStateManager.scale(1.0F / f6, 1.0F / f6, 1.0F / f6);
-            GlStateManager.translate(0.0F, 24.0F * p_78088_7_, 0.0F);
-            this.bipedLeftLegwear.render(p_78088_7_);
-            this.bipedRightLegwear.render(p_78088_7_);
-            this.bipedLeftArmwear.render(p_78088_7_);
-            this.bipedRightArmwear.render(p_78088_7_);
-            this.bipedBodyWear.render(p_78088_7_);
+            float f = 2.0F;
+            GlStateManager.scale(1.0F / f, 1.0F / f, 1.0F / f);
+            GlStateManager.translate(0.0F, 24.0F * scale, 0.0F);
+            this.bipedLeftLegwear.render(scale);
+            this.bipedRightLegwear.render(scale);
+            this.bipedLeftArmwear.render(scale);
+            this.bipedRightArmwear.render(scale);
+            this.bipedBodyWear.render(scale);
         }
         else
         {
-            if (p_78088_1_.isSneaking())
+            if (entityIn.isSneaking())
             {
                 GlStateManager.translate(0.0F, 0.2F, 0.0F);
             }
 
-            this.bipedLeftLegwear.render(p_78088_7_);
-            this.bipedRightLegwear.render(p_78088_7_);
-            this.bipedLeftArmwear.render(p_78088_7_);
-            this.bipedRightArmwear.render(p_78088_7_);
-            this.bipedBodyWear.render(p_78088_7_);
+            this.bipedLeftLegwear.render(scale);
+            this.bipedRightLegwear.render(scale);
+            this.bipedLeftArmwear.render(scale);
+            this.bipedRightArmwear.render(scale);
+            this.bipedBodyWear.render(scale);
         }
 
         GlStateManager.popMatrix();
     }
 
-    public void func_178727_b(float p_178727_1_)
+    public void renderDeadmau5Head(float p_178727_1_)
     {
-        copyModelAngles(this.bipedHead, this.field_178736_x);
-        this.field_178736_x.rotationPointX = 0.0F;
-        this.field_178736_x.rotationPointY = 0.0F;
-        this.field_178736_x.render(p_178727_1_);
+        copyModelAngles(this.bipedHead, this.bipedDeadmau5Head);
+        this.bipedDeadmau5Head.rotationPointX = 0.0F;
+        this.bipedDeadmau5Head.rotationPointY = 0.0F;
+        this.bipedDeadmau5Head.render(p_178727_1_);
     }
 
-    public void func_178728_c(float p_178728_1_)
+    public void renderCape(float p_178728_1_)
     {
-        this.field_178729_w.render(p_178728_1_);
+        this.bipedCape.render(p_178728_1_);
     }
 
     /**
@@ -124,32 +123,32 @@ public class ModelPlayer extends ModelBiped
      * and legs, where par1 represents the time(so that arms and legs swing back and forth) and par2 represents how
      * "far" arms and legs can swing at most.
      */
-    public void setRotationAngles(float p_78087_1_, float p_78087_2_, float p_78087_3_, float p_78087_4_, float p_78087_5_, float p_78087_6_, Entity p_78087_7_)
+    public void setRotationAngles(float p_78087_1_, float p_78087_2_, float p_78087_3_, float p_78087_4_, float p_78087_5_, float p_78087_6_, Entity entityIn)
     {
-        super.setRotationAngles(p_78087_1_, p_78087_2_, p_78087_3_, p_78087_4_, p_78087_5_, p_78087_6_, p_78087_7_);
+        super.setRotationAngles(p_78087_1_, p_78087_2_, p_78087_3_, p_78087_4_, p_78087_5_, p_78087_6_, entityIn);
         copyModelAngles(this.bipedLeftLeg, this.bipedLeftLegwear);
         copyModelAngles(this.bipedRightLeg, this.bipedRightLegwear);
         copyModelAngles(this.bipedLeftArm, this.bipedLeftArmwear);
         copyModelAngles(this.bipedRightArm, this.bipedRightArmwear);
         copyModelAngles(this.bipedBody, this.bipedBodyWear);
 
-        if (p_78087_7_.isSneaking())
+        if (entityIn.isSneaking())
         {
-            this.field_178729_w.rotationPointY = 2.0F;
+            this.bipedCape.rotationPointY = 2.0F;
         }
         else
         {
-            this.field_178729_w.rotationPointY = 0.0F;
+            this.bipedCape.rotationPointY = 0.0F;
         }
     }
 
-    public void func_178725_a()
+    public void renderRightArm()
     {
         this.bipedRightArm.render(0.0625F);
         this.bipedRightArmwear.render(0.0625F);
     }
 
-    public void func_178726_b()
+    public void renderLeftArm()
     {
         this.bipedLeftArm.render(0.0625F);
         this.bipedLeftArmwear.render(0.0625F);
@@ -163,21 +162,21 @@ public class ModelPlayer extends ModelBiped
         this.bipedLeftLegwear.showModel = invisible;
         this.bipedRightLegwear.showModel = invisible;
         this.bipedBodyWear.showModel = invisible;
-        this.field_178729_w.showModel = invisible;
-        this.field_178736_x.showModel = invisible;
+        this.bipedCape.showModel = invisible;
+        this.bipedDeadmau5Head.showModel = invisible;
     }
 
-    public void postRenderArm(float p_178718_1_)
+    public void postRenderArm(float scale)
     {
-        if (this.field_178735_y)
+        if (this.smallArms)
         {
             ++this.bipedRightArm.rotationPointX;
-            this.bipedRightArm.postRender(p_178718_1_);
+            this.bipedRightArm.postRender(scale);
             --this.bipedRightArm.rotationPointX;
         }
         else
         {
-            this.bipedRightArm.postRender(p_178718_1_);
+            this.bipedRightArm.postRender(scale);
         }
     }
 }

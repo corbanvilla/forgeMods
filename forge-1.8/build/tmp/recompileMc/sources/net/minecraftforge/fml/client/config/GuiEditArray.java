@@ -46,11 +46,9 @@ public class GuiEditArray extends GuiScreen
     protected final Object[] beforeValues;
     protected Object[] currentValues;
     protected HoverChecker tooltipHoverChecker;
-    @SuppressWarnings("rawtypes")
-    protected List toolTip;
+    protected List<String> toolTip;
     protected boolean enabled;
 
-    @SuppressWarnings("rawtypes")
     public GuiEditArray(GuiScreen parentScreen, IConfigElement configElement, int slotIndex, Object[] currentValues, boolean enabled)
     {
         this.mc = Minecraft.getMinecraft();
@@ -59,7 +57,7 @@ public class GuiEditArray extends GuiScreen
         this.slotIndex = slotIndex;
         this.beforeValues = currentValues;
         this.currentValues = currentValues;
-        this.toolTip = new ArrayList();
+        this.toolTip = new ArrayList<String>();
         this.enabled = enabled;
         String propName = I18n.format(configElement.getLanguageKey());
         String comment;
@@ -97,9 +95,9 @@ public class GuiEditArray extends GuiScreen
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
-    @SuppressWarnings("unchecked")
     @Override
     public void initGui()
     {
@@ -118,6 +116,9 @@ public class GuiEditArray extends GuiScreen
                 this.height - 29, undoWidth, 20, " " + I18n.format("fml.configgui.tooltip.undoChanges"), UNDO_CHAR, 2.0F));
     }
 
+    /**
+     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
+     */
     @Override
     protected void actionPerformed(GuiButton button)
     {
@@ -180,7 +181,7 @@ public class GuiEditArray extends GuiScreen
     }
 
     /**
-     * Fired when a key is typed (except F11 who toggle full screen). This is the equivalent of
+     * Fired when a key is typed (except F11 which toggles full screen). This is the equivalent of
      * KeyListener.keyTyped(KeyEvent e). Args : character (character on the key), keyCode (lwjgl Keyboard key code)
      */
     @Override
@@ -228,8 +229,7 @@ public class GuiEditArray extends GuiScreen
             drawToolTip(this.toolTip, par1, par2);
     }
 
-    @SuppressWarnings("rawtypes")
-    public void drawToolTip(List stringList, int x, int y)
+    public void drawToolTip(List<String> stringList, int x, int y)
     {
         this.drawHoveringText(stringList, x, y);
     }

@@ -4,8 +4,6 @@ import net.minecraft.util.ResourceLocation;
 
 public class EnchantmentFireAspect extends Enchantment
 {
-    private static final String __OBFID = "CL_00000116";
-
     protected EnchantmentFireAspect(int enchID, ResourceLocation enchName, int enchWeight)
     {
         super(enchID, enchName, enchWeight, EnumEnchantmentType.WEAPON);

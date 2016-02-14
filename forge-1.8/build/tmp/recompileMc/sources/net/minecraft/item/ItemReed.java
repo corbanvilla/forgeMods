@@ -13,7 +13,6 @@ import net.minecraft.world.World;
 public class ItemReed extends Item
 {
     private Block block;
-    private static final String __OBFID = "CL_00001773";
 
     public ItemReed(Block block)
     {
@@ -22,9 +21,6 @@ public class ItemReed extends Item
 
     /**
      * Called when a Block is right-clicked with this Item
-     *  
-     * @param pos The block being right-clicked
-     * @param side The side being right-clicked
      */
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
@@ -60,7 +56,7 @@ public class ItemReed extends Item
 
                     if (iblockstate1.getBlock() == this.block)
                     {
-                        ItemBlock.setTileEntityNBT(worldIn, pos, stack, playerIn);
+                        ItemBlock.setTileEntityNBT(worldIn, playerIn, pos, stack);
                         iblockstate1.getBlock().onBlockPlacedBy(worldIn, pos, iblockstate1, playerIn, stack);
                     }
 

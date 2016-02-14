@@ -69,7 +69,7 @@ public class VertexLighterFlat extends QuadGatheringTransformer
         VertexFormat format = parent.getVertexFormat();
         if(format.hasNormal()) return format;
         format = new VertexFormat(format);
-        format.setElement(new VertexFormatElement(0, VertexFormatElement.EnumType.FLOAT, VertexFormatElement.EnumUsage.NORMAL, 4));
+        format.addElement(new VertexFormatElement(0, VertexFormatElement.EnumType.FLOAT, VertexFormatElement.EnumUsage.NORMAL, 4));
         return format;
     }
 
@@ -114,6 +114,9 @@ public class VertexLighterFlat extends QuadGatheringTransformer
             multiplier = blockInfo.getColorMultiplier(tint);
         }
 
+        VertexFormat format = parent.getVertexFormat();
+        int count = format.getElementCount();
+
         for(int v = 0; v < 4; v++)
         {
             position[v][0] += blockInfo.getShx();
@@ -131,7 +134,13 @@ public class VertexLighterFlat extends QuadGatheringTransformer
                 z += normal[v][2] * .5f;
             }
 
+            float blockLight = lightmap[v][0], skyLight = lightmap[v][1];
             updateLightmap(normal[v], lightmap[v], x, y, z);
+            if(dataLength[lightmapIndex] > 1)
+            {
+                if(blockLight > lightmap[v][0]) lightmap[v][0] = blockLight;
+                if(skyLight > lightmap[v][1]) lightmap[v][1] = skyLight;
+            }
             updateColor(normal[v], color[v], x, y, z, tint, multiplier);
             if(EntityRenderer.anaglyphEnable)
             {
@@ -139,17 +148,19 @@ public class VertexLighterFlat extends QuadGatheringTransformer
             }
 
             // no need for remapping cause all we could've done is add 1 element to the end
-            for(int e = 0; e < parent.getVertexFormat().getElementCount(); e++)
+            for(int e = 0; e < count; e++)
             {
-                switch(parent.getVertexFormat().getElement(e).getUsage())
+                VertexFormatElement element = format.getElement(e);
+                switch(element.getUsage())
                 {
                     case POSITION:
-                        float[] pos = new float[4];
+                        // position adding moved to WorldRendererConsumer due to x and z not fitting completely into a float
+                        /*float[] pos = new float[4];
                         System.arraycopy(position[v], 0, pos, 0, position[v].length);
                         pos[0] += blockInfo.getBlockPos().getX();
                         pos[1] += blockInfo.getBlockPos().getY();
-                        pos[2] += blockInfo.getBlockPos().getZ();
-                        parent.put(e, pos);
+                        pos[2] += blockInfo.getBlockPos().getZ();*/
+                        parent.put(e, position[v]);
                         break;
                     case NORMAL: if(normalIndex != -1)
                     {
@@ -159,7 +170,7 @@ public class VertexLighterFlat extends QuadGatheringTransformer
                     case COLOR:
                         parent.put(e, color[v]);
                         break;
-                    case UV: if(getVertexFormat().getElement(e).getIndex() == 1)
+                    case UV: if(element.getIndex() == 1)
                     {
                         parent.put(e, lightmap[v]);
                         break;
@@ -236,6 +247,6 @@ public class VertexLighterFlat extends QuadGatheringTransformer
 
     public void updateBlockInfo()
     {
-        blockInfo.updateShift();
+        blockInfo.updateShift(true);
     }
 }

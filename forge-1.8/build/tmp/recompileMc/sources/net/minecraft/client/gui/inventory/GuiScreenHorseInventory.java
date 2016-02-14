@@ -23,7 +23,6 @@ public class GuiScreenHorseInventory extends GuiContainer
     private float mousePosx;
     /** The mouse y-position recorded during the last renderered frame. */
     private float mousePosY;
-    private static final String __OBFID = "CL_00000760";
 
     public GuiScreenHorseInventory(IInventory playerInv, IInventory horseInv, EntityHorse horse)
     {
@@ -50,21 +49,21 @@ public class GuiScreenHorseInventory extends GuiContainer
     {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(horseGuiTextures);
-        int k = (this.width - this.xSize) / 2;
-        int l = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(k, l, 0, 0, this.xSize, this.ySize);
+        int i = (this.width - this.xSize) / 2;
+        int j = (this.height - this.ySize) / 2;
+        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
 
         if (this.horseEntity.isChested())
         {
-            this.drawTexturedModalRect(k + 79, l + 17, 0, this.ySize, 90, 54);
+            this.drawTexturedModalRect(i + 79, j + 17, 0, this.ySize, 90, 54);
         }
 
         if (this.horseEntity.canWearArmor())
         {
-            this.drawTexturedModalRect(k + 7, l + 35, 0, this.ySize + 54, 18, 18);
+            this.drawTexturedModalRect(i + 7, j + 35, 0, this.ySize + 54, 18, 18);
         }
 
-        GuiInventory.drawEntityOnScreen(k + 51, l + 60, 17, (float)(k + 51) - this.mousePosx, (float)(l + 75 - 50) - this.mousePosY, this.horseEntity);
+        GuiInventory.drawEntityOnScreen(i + 51, j + 60, 17, (float)(i + 51) - this.mousePosx, (float)(j + 75 - 50) - this.mousePosY, this.horseEntity);
     }
 
     /**

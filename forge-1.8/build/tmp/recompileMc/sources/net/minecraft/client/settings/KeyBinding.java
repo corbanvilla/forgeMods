@@ -2,7 +2,6 @@ package net.minecraft.client.settings;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import net.minecraft.client.resources.I18n;
@@ -11,11 +10,11 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class KeyBinding implements Comparable
+public class KeyBinding implements Comparable<KeyBinding>
 {
-    private static final List keybindArray = Lists.newArrayList();
-    private static final IntHashMap hash = new IntHashMap();
-    private static final Set keybindSet = Sets.newHashSet();
+    private static final List<KeyBinding> keybindArray = Lists.<KeyBinding>newArrayList();
+    private static final IntHashMap<KeyBinding> hash = new IntHashMap();
+    private static final Set<String> keybindSet = Sets.<String>newHashSet();
     private final String keyDescription;
     private final int keyCodeDefault;
     private final String keyCategory;
@@ -23,7 +22,6 @@ public class KeyBinding implements Comparable
     /** Is the key held down? */
     private boolean pressed;
     private int pressTime;
-    private static final String __OBFID = "CL_00000628";
 
     public static void onTick(int keyCode)
     {
@@ -53,11 +51,8 @@ public class KeyBinding implements Comparable
 
     public static void unPressAllKeys()
     {
-        Iterator iterator = keybindArray.iterator();
-
-        while (iterator.hasNext())
+        for (KeyBinding keybinding : keybindArray)
         {
-            KeyBinding keybinding = (KeyBinding)iterator.next();
             keybinding.unpressKey();
         }
     }
@@ -65,16 +60,14 @@ public class KeyBinding implements Comparable
     public static void resetKeyBindingArrayAndHash()
     {
         hash.clearMap();
-        Iterator iterator = keybindArray.iterator();
 
-        while (iterator.hasNext())
+        for (KeyBinding keybinding : keybindArray)
         {
-            KeyBinding keybinding = (KeyBinding)iterator.next();
             hash.addKey(keybinding.keyCode, keybinding);
         }
     }
 
-    public static Set getKeybinds()
+    public static Set<String> getKeybinds()
     {
         return keybindSet;
     }
@@ -156,10 +149,5 @@ public class KeyBinding implements Comparable
         }
 
         return i;
-    }
-
-    public int compareTo(Object p_compareTo_1_)
-    {
-        return this.compareTo((KeyBinding)p_compareTo_1_);
     }
 }

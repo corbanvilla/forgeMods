@@ -8,16 +8,15 @@ import net.minecraft.util.Vec3;
 public class EntityAIRunAroundLikeCrazy extends EntityAIBase
 {
     private EntityHorse horseHost;
-    private double field_111178_b;
-    private double field_111179_c;
-    private double field_111176_d;
-    private double field_111177_e;
-    private static final String __OBFID = "CL_00001612";
+    private double speed;
+    private double targetX;
+    private double targetY;
+    private double targetZ;
 
-    public EntityAIRunAroundLikeCrazy(EntityHorse p_i1653_1_, double p_i1653_2_)
+    public EntityAIRunAroundLikeCrazy(EntityHorse horse, double speedIn)
     {
-        this.horseHost = p_i1653_1_;
-        this.field_111178_b = p_i1653_2_;
+        this.horseHost = horse;
+        this.speed = speedIn;
         this.setMutexBits(1);
     }
 
@@ -36,9 +35,9 @@ public class EntityAIRunAroundLikeCrazy extends EntityAIBase
             }
             else
             {
-                this.field_111179_c = vec3.xCoord;
-                this.field_111176_d = vec3.yCoord;
-                this.field_111177_e = vec3.zCoord;
+                this.targetX = vec3.xCoord;
+                this.targetY = vec3.yCoord;
+                this.targetZ = vec3.zCoord;
                 return true;
             }
         }
@@ -53,7 +52,7 @@ public class EntityAIRunAroundLikeCrazy extends EntityAIBase
      */
     public void startExecuting()
     {
-        this.horseHost.getNavigator().tryMoveToXYZ(this.field_111179_c, this.field_111176_d, this.field_111177_e, this.field_111178_b);
+        this.horseHost.getNavigator().tryMoveToXYZ(this.targetX, this.targetY, this.targetZ, this.speed);
     }
 
     /**

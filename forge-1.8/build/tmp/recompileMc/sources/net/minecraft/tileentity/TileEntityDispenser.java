@@ -15,7 +15,6 @@ public class TileEntityDispenser extends TileEntityLockable implements IInventor
     private static final Random RNG = new Random();
     private ItemStack[] stacks = new ItemStack[9];
     protected String customName;
-    private static final String __OBFID = "CL_00000352";
 
     /**
      * Returns the number of slots in the inventory.
@@ -26,7 +25,7 @@ public class TileEntityDispenser extends TileEntityLockable implements IInventor
     }
 
     /**
-     * Returns the stack in slot i
+     * Returns the stack in the given slot.
      */
     public ItemStack getStackInSlot(int index)
     {
@@ -34,25 +33,22 @@ public class TileEntityDispenser extends TileEntityLockable implements IInventor
     }
 
     /**
-     * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a
-     * new stack.
+     * Removes up to a specified number of items from an inventory slot and returns them in a new stack.
      */
     public ItemStack decrStackSize(int index, int count)
     {
         if (this.stacks[index] != null)
         {
-            ItemStack itemstack;
-
             if (this.stacks[index].stackSize <= count)
             {
-                itemstack = this.stacks[index];
+                ItemStack itemstack1 = this.stacks[index];
                 this.stacks[index] = null;
                 this.markDirty();
-                return itemstack;
+                return itemstack1;
             }
             else
             {
-                itemstack = this.stacks[index].splitStack(count);
+                ItemStack itemstack = this.stacks[index].splitStack(count);
 
                 if (this.stacks[index].stackSize == 0)
                 {
@@ -70,10 +66,9 @@ public class TileEntityDispenser extends TileEntityLockable implements IInventor
     }
 
     /**
-     * When some containers are closed they call this on each slot, then drop whatever it returns as an EntityItem -
-     * like when you close a workbench GUI.
+     * Removes a stack from the given slot and returns it.
      */
-    public ItemStack getStackInSlotOnClosing(int index)
+    public ItemStack removeStackFromSlot(int index)
     {
         if (this.stacks[index] != null)
         {
@@ -137,7 +132,7 @@ public class TileEntityDispenser extends TileEntityLockable implements IInventor
     }
 
     /**
-     * Gets the name of this command sender (usually username, but possibly "Rcon")
+     * Get the name of this object. For players this returns their username
      */
     public String getName()
     {
@@ -165,12 +160,12 @@ public class TileEntityDispenser extends TileEntityLockable implements IInventor
 
         for (int i = 0; i < nbttaglist.tagCount(); ++i)
         {
-            NBTTagCompound nbttagcompound1 = nbttaglist.getCompoundTagAt(i);
-            int j = nbttagcompound1.getByte("Slot") & 255;
+            NBTTagCompound nbttagcompound = nbttaglist.getCompoundTagAt(i);
+            int j = nbttagcompound.getByte("Slot") & 255;
 
             if (j >= 0 && j < this.stacks.length)
             {
-                this.stacks[j] = ItemStack.loadItemStackFromNBT(nbttagcompound1);
+                this.stacks[j] = ItemStack.loadItemStackFromNBT(nbttagcompound);
             }
         }
 
@@ -189,10 +184,10 @@ public class TileEntityDispenser extends TileEntityLockable implements IInventor
         {
             if (this.stacks[i] != null)
             {
-                NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-                nbttagcompound1.setByte("Slot", (byte)i);
-                this.stacks[i].writeToNBT(nbttagcompound1);
-                nbttaglist.appendTag(nbttagcompound1);
+                NBTTagCompound nbttagcompound = new NBTTagCompound();
+                nbttagcompound.setByte("Slot", (byte)i);
+                this.stacks[i].writeToNBT(nbttagcompound);
+                nbttaglist.appendTag(nbttagcompound);
             }
         }
 
@@ -205,8 +200,7 @@ public class TileEntityDispenser extends TileEntityLockable implements IInventor
     }
 
     /**
-     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended. *Isn't
-     * this more of a set than a get?*
+     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended.
      */
     public int getInventoryStackLimit()
     {
@@ -221,9 +215,13 @@ public class TileEntityDispenser extends TileEntityLockable implements IInventor
         return this.worldObj.getTileEntity(this.pos) != this ? false : player.getDistanceSq((double)this.pos.getX() + 0.5D, (double)this.pos.getY() + 0.5D, (double)this.pos.getZ() + 0.5D) <= 64.0D;
     }
 
-    public void openInventory(EntityPlayer player) {}
+    public void openInventory(EntityPlayer player)
+    {
+    }
 
-    public void closeInventory(EntityPlayer player) {}
+    public void closeInventory(EntityPlayer player)
+    {
+    }
 
     /**
      * Returns true if automation is allowed to insert the given stack (ignoring stack size) into the given slot.
@@ -248,7 +246,9 @@ public class TileEntityDispenser extends TileEntityLockable implements IInventor
         return 0;
     }
 
-    public void setField(int id, int value) {}
+    public void setField(int id, int value)
+    {
+    }
 
     public int getFieldCount()
     {

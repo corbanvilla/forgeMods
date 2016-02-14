@@ -2,13 +2,12 @@ package net.minecraft.network.play.client;
 
 import java.io.IOException;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
 import net.minecraft.util.BlockPos;
 
-public class C08PacketPlayerBlockPlacement implements Packet
+public class C08PacketPlayerBlockPlacement implements Packet<INetHandlerPlayServer>
 {
     private static final BlockPos field_179726_a = new BlockPos(-1, -1, -1);
     private BlockPos position;
@@ -17,23 +16,24 @@ public class C08PacketPlayerBlockPlacement implements Packet
     private float facingX;
     private float facingY;
     private float facingZ;
-    private static final String __OBFID = "CL_00001371";
 
-    public C08PacketPlayerBlockPlacement() {}
-
-    public C08PacketPlayerBlockPlacement(ItemStack p_i45930_1_)
+    public C08PacketPlayerBlockPlacement()
     {
-        this(field_179726_a, 255, p_i45930_1_, 0.0F, 0.0F, 0.0F);
     }
 
-    public C08PacketPlayerBlockPlacement(BlockPos p_i45931_1_, int p_i45931_2_, ItemStack p_i45931_3_, float p_i45931_4_, float p_i45931_5_, float p_i45931_6_)
+    public C08PacketPlayerBlockPlacement(ItemStack stackIn)
     {
-        this.position = p_i45931_1_;
-        this.placedBlockDirection = p_i45931_2_;
-        this.stack = p_i45931_3_ != null ? p_i45931_3_.copy() : null;
-        this.facingX = p_i45931_4_;
-        this.facingY = p_i45931_5_;
-        this.facingZ = p_i45931_6_;
+        this(field_179726_a, 255, stackIn, 0.0F, 0.0F, 0.0F);
+    }
+
+    public C08PacketPlayerBlockPlacement(BlockPos positionIn, int placedBlockDirectionIn, ItemStack stackIn, float facingXIn, float facingYIn, float facingZIn)
+    {
+        this.position = positionIn;
+        this.placedBlockDirection = placedBlockDirectionIn;
+        this.stack = stackIn != null ? stackIn.copy() : null;
+        this.facingX = facingXIn;
+        this.facingY = facingYIn;
+        this.facingZ = facingZIn;
     }
 
     /**
@@ -62,9 +62,12 @@ public class C08PacketPlayerBlockPlacement implements Packet
         buf.writeByte((int)(this.facingZ * 16.0F));
     }
 
-    public void processPacket(INetHandlerPlayServer p_180769_1_)
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
+    public void processPacket(INetHandlerPlayServer handler)
     {
-        p_180769_1_.processPlayerBlockPlacement(this);
+        handler.processPlayerBlockPlacement(this);
     }
 
     public BlockPos getPosition()
@@ -104,13 +107,5 @@ public class C08PacketPlayerBlockPlacement implements Packet
     public float getPlacedBlockOffsetZ()
     {
         return this.facingZ;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayServer)handler);
     }
 }

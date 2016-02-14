@@ -6,8 +6,6 @@ import net.minecraft.world.World;
 
 public class ItemSoup extends ItemFood
 {
-    private static final String __OBFID = "CL_00001778";
-
     public ItemSoup(int healAmount)
     {
         super(healAmount, false);

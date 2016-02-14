@@ -4,8 +4,6 @@ import net.minecraft.util.ResourceLocation;
 
 public class EnchantmentOxygen extends Enchantment
 {
-    private static final String __OBFID = "CL_00000120";
-
     public EnchantmentOxygen(int enchID, ResourceLocation p_i45766_2_, int p_i45766_3_)
     {
         super(enchID, p_i45766_2_, p_i45766_3_, EnumEnchantmentType.ARMOR_HEAD);

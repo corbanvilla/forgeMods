@@ -1,5 +1,6 @@
 package net.minecraft.block;
 
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -12,14 +13,21 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BlockBreakable extends Block
 {
     private boolean ignoreSimilarity;
-    private static final String __OBFID = "CL_00000254";
 
     protected BlockBreakable(Material materialIn, boolean ignoreSimilarityIn)
     {
-        super(materialIn);
-        this.ignoreSimilarity = ignoreSimilarityIn;
+        this(materialIn, ignoreSimilarityIn, materialIn.getMaterialMapColor());
     }
 
+    protected BlockBreakable(Material p_i46393_1_, boolean p_i46393_2_, MapColor p_i46393_3_)
+    {
+        super(p_i46393_1_, p_i46393_3_);
+        this.ignoreSimilarity = p_i46393_2_;
+    }
+
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;

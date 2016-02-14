@@ -4,24 +4,23 @@ import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
-import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.ITickable;
 import net.minecraft.world.World;
 
-public class TileEntityMobSpawner extends TileEntity implements IUpdatePlayerListBox
+public class TileEntityMobSpawner extends TileEntity implements ITickable
 {
     private final MobSpawnerBaseLogic spawnerLogic = new MobSpawnerBaseLogic()
     {
-        private static final String __OBFID = "CL_00000361";
-        public void func_98267_a(int p_98267_1_)
+        public void func_98267_a(int id)
         {
-            TileEntityMobSpawner.this.worldObj.addBlockEvent(TileEntityMobSpawner.this.pos, Blocks.mob_spawner, p_98267_1_, 0);
+            TileEntityMobSpawner.this.worldObj.addBlockEvent(TileEntityMobSpawner.this.pos, Blocks.mob_spawner, id, 0);
         }
         public World getSpawnerWorld()
         {
             return TileEntityMobSpawner.this.worldObj;
         }
-        public BlockPos func_177221_b()
+        public BlockPos getSpawnerPosition()
         {
             return TileEntityMobSpawner.this.pos;
         }
@@ -35,7 +34,6 @@ public class TileEntityMobSpawner extends TileEntity implements IUpdatePlayerLis
             }
         }
     };
-    private static final String __OBFID = "CL_00000360";
 
     public void readFromNBT(NBTTagCompound compound)
     {
@@ -50,7 +48,7 @@ public class TileEntityMobSpawner extends TileEntity implements IUpdatePlayerLis
     }
 
     /**
-     * Updates the JList with a new model.
+     * Like the old updateEntity(), except more generic.
      */
     public void update()
     {
@@ -72,6 +70,11 @@ public class TileEntityMobSpawner extends TileEntity implements IUpdatePlayerLis
     public boolean receiveClientEvent(int id, int type)
     {
         return this.spawnerLogic.setDelayToMin(id) ? true : super.receiveClientEvent(id, type);
+    }
+
+    public boolean func_183000_F()
+    {
+        return true;
     }
 
     public MobSpawnerBaseLogic getSpawnerBaseLogic()

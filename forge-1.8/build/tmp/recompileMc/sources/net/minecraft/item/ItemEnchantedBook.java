@@ -15,8 +15,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemEnchantedBook extends Item
 {
-    private static final String __OBFID = "CL_00000025";
-
     @SideOnly(Side.CLIENT)
     public boolean hasEffect(ItemStack stack)
     {
@@ -47,12 +45,9 @@ public class ItemEnchantedBook extends Item
 
     /**
      * allows items to add custom lines of information to the mouseover description
-     *  
-     * @param tooltip All lines to display in the Item's tooltip. This is a List of Strings.
-     * @param advanced Whether the setting "Advanced tooltips" is enabled
      */
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced)
+    public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced)
     {
         super.addInformation(stack, playerIn, tooltip, advanced);
         NBTTagList nbttaglist = this.getEnchantments(stack);
@@ -61,12 +56,12 @@ public class ItemEnchantedBook extends Item
         {
             for (int i = 0; i < nbttaglist.tagCount(); ++i)
             {
-                short short1 = nbttaglist.getCompoundTagAt(i).getShort("id");
-                short short2 = nbttaglist.getCompoundTagAt(i).getShort("lvl");
+                int j = nbttaglist.getCompoundTagAt(i).getShort("id");
+                int k = nbttaglist.getCompoundTagAt(i).getShort("lvl");
 
-                if (Enchantment.getEnchantmentById(short1) != null)
+                if (Enchantment.getEnchantmentById(j) != null)
                 {
-                    tooltip.add(Enchantment.getEnchantmentById(short1).getTranslatedName(short2));
+                    tooltip.add(Enchantment.getEnchantmentById(j).getTranslatedName(k));
                 }
             }
         }
@@ -123,7 +118,7 @@ public class ItemEnchantedBook extends Item
     }
 
     @SideOnly(Side.CLIENT)
-    public void getAll(Enchantment enchantment, List list)
+    public void getAll(Enchantment enchantment, List<ItemStack> list)
     {
         for (int i = enchantment.getMinLevel(); i <= enchantment.getMaxLevel(); ++i)
         {

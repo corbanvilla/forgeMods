@@ -3,12 +3,11 @@ package net.minecraft.block.properties;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Set;
 
-public class PropertyInteger extends PropertyHelper
+public class PropertyInteger extends PropertyHelper<Integer>
 {
-    private final ImmutableSet allowedValues;
-    private static final String __OBFID = "CL_00002014";
+    private final ImmutableSet<Integer> allowedValues;
 
     protected PropertyInteger(String name, int min, int max)
     {
@@ -24,18 +23,18 @@ public class PropertyInteger extends PropertyHelper
         }
         else
         {
-            HashSet hashset = Sets.newHashSet();
+            Set<Integer> set = Sets.<Integer>newHashSet();
 
-            for (int k = min; k <= max; ++k)
+            for (int i = min; i <= max; ++i)
             {
-                hashset.add(Integer.valueOf(k));
+                set.add(Integer.valueOf(i));
             }
 
-            this.allowedValues = ImmutableSet.copyOf(hashset);
+            this.allowedValues = ImmutableSet.copyOf(set);
         }
     }
 
-    public Collection getAllowedValues()
+    public Collection<Integer> getAllowedValues()
     {
         return this.allowedValues;
     }
@@ -76,16 +75,11 @@ public class PropertyInteger extends PropertyHelper
         return new PropertyInteger(name, min, max);
     }
 
-    public String getName0(Integer value)
-    {
-        return value.toString();
-    }
-
     /**
      * Get the name for the given value.
      */
-    public String getName(Comparable value)
+    public String getName(Integer value)
     {
-        return this.getName0((Integer)value);
+        return value.toString();
     }
 }

@@ -2,6 +2,7 @@ package net.minecraft.entity.monster;
 
 import java.util.Random;
 import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureAttribute;
 import net.minecraft.entity.IEntityLivingData;
@@ -28,26 +29,34 @@ import net.minecraft.world.World;
 
 public class EntitySpider extends EntityMob
 {
-    private static final String __OBFID = "CL_00001699";
-
     public EntitySpider(World worldIn)
     {
         super(worldIn);
         this.setSize(1.4F, 0.9F);
         this.tasks.addTask(1, new EntityAISwimming(this));
-        this.tasks.addTask(2, this.field_175455_a);
         this.tasks.addTask(3, new EntityAILeapAtTarget(this, 0.4F));
-        this.tasks.addTask(4, new EntitySpider.AISpiderAttack(EntityPlayer.class));
-        this.tasks.addTask(4, new EntitySpider.AISpiderAttack(EntityIronGolem.class));
+        this.tasks.addTask(4, new EntitySpider.AISpiderAttack(this, EntityPlayer.class));
+        this.tasks.addTask(4, new EntitySpider.AISpiderAttack(this, EntityIronGolem.class));
         this.tasks.addTask(5, new EntityAIWander(this, 0.8D));
         this.tasks.addTask(6, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
         this.tasks.addTask(6, new EntityAILookIdle(this));
         this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, false, new Class[0]));
-        this.targetTasks.addTask(2, new EntitySpider.AISpiderTarget(EntityPlayer.class));
-        this.targetTasks.addTask(3, new EntitySpider.AISpiderTarget(EntityIronGolem.class));
+        this.targetTasks.addTask(2, new EntitySpider.AISpiderTarget(this, EntityPlayer.class));
+        this.targetTasks.addTask(3, new EntitySpider.AISpiderTarget(this, EntityIronGolem.class));
     }
 
-    protected PathNavigate func_175447_b(World worldIn)
+    /**
+     * Returns the Y offset from the entity's position for any entity riding this one.
+     */
+    public double getMountedYOffset()
+    {
+        return (double)(this.height * 0.5F);
+    }
+
+    /**
+     * Returns new PathNavigateGround instance
+     */
+    protected PathNavigate getNewNavigator(World worldIn)
     {
         return new PathNavigateClimber(this, worldIn);
     }
@@ -102,7 +111,7 @@ public class EntitySpider extends EntityMob
         return "mob.spider.death";
     }
 
-    protected void playStepSound(BlockPos p_180429_1_, Block p_180429_2_)
+    protected void playStepSound(BlockPos pos, Block blockIn)
     {
         this.playSound("mob.spider.step", 0.15F, 1.0F);
     }
@@ -136,7 +145,9 @@ public class EntitySpider extends EntityMob
     /**
      * Sets the Entity inside a web block.
      */
-    public void setInWeb() {}
+    public void setInWeb()
+    {
+    }
 
     /**
      * Get this Entity's EnumCreatureAttribute
@@ -146,9 +157,9 @@ public class EntitySpider extends EntityMob
         return EnumCreatureAttribute.ARTHROPOD;
     }
 
-    public boolean isPotionApplicable(PotionEffect p_70687_1_)
+    public boolean isPotionApplicable(PotionEffect potioneffectIn)
     {
-        return p_70687_1_.getPotionID() == Potion.poison.id ? false : super.isPotionApplicable(p_70687_1_);
+        return potioneffectIn.getPotionID() == Potion.poison.id ? false : super.isPotionApplicable(potioneffectIn);
     }
 
     /**
@@ -174,38 +185,42 @@ public class EntitySpider extends EntityMob
         }
         else
         {
-            b0 &= -2;
+            b0 = (byte)(b0 & -2);
         }
 
         this.dataWatcher.updateObject(16, Byte.valueOf(b0));
     }
 
-    public IEntityLivingData func_180482_a(DifficultyInstance p_180482_1_, IEntityLivingData p_180482_2_)
+    /**
+     * Called only once on an entity when first time spawned, via egg, mob spawner, natural spawning etc, but not called
+     * when entity is reloaded from nbt. Mainly used for initializing attributes and inventory
+     */
+    public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, IEntityLivingData livingdata)
     {
-        Object p_180482_2_1 = super.func_180482_a(p_180482_1_, p_180482_2_);
+        livingdata = super.onInitialSpawn(difficulty, livingdata);
 
         if (this.worldObj.rand.nextInt(100) == 0)
         {
             EntitySkeleton entityskeleton = new EntitySkeleton(this.worldObj);
             entityskeleton.setLocationAndAngles(this.posX, this.posY, this.posZ, this.rotationYaw, 0.0F);
-            entityskeleton.func_180482_a(p_180482_1_, (IEntityLivingData)null);
+            entityskeleton.onInitialSpawn(difficulty, (IEntityLivingData)null);
             this.worldObj.spawnEntityInWorld(entityskeleton);
             entityskeleton.mountEntity(this);
         }
 
-        if (p_180482_2_1 == null)
+        if (livingdata == null)
         {
-            p_180482_2_1 = new EntitySpider.GroupData();
+            livingdata = new EntitySpider.GroupData();
 
-            if (this.worldObj.getDifficulty() == EnumDifficulty.HARD && this.worldObj.rand.nextFloat() < 0.1F * p_180482_1_.getClampedAdditionalDifficulty())
+            if (this.worldObj.getDifficulty() == EnumDifficulty.HARD && this.worldObj.rand.nextFloat() < 0.1F * difficulty.getClampedAdditionalDifficulty())
             {
-                ((EntitySpider.GroupData)p_180482_2_1).func_111104_a(this.worldObj.rand);
+                ((EntitySpider.GroupData)livingdata).func_111104_a(this.worldObj.rand);
             }
         }
 
-        if (p_180482_2_1 instanceof EntitySpider.GroupData)
+        if (livingdata instanceof EntitySpider.GroupData)
         {
-            int i = ((EntitySpider.GroupData)p_180482_2_1).field_111105_a;
+            int i = ((EntitySpider.GroupData)livingdata).potionEffectId;
 
             if (i > 0 && Potion.potionTypes[i] != null)
             {
@@ -213,7 +228,7 @@ public class EntitySpider extends EntityMob
             }
         }
 
-        return (IEntityLivingData)p_180482_2_1;
+        return livingdata;
     }
 
     public float getEyeHeight()
@@ -221,82 +236,77 @@ public class EntitySpider extends EntityMob
         return 0.65F;
     }
 
-    class AISpiderAttack extends EntityAIAttackOnCollide
-    {
-        private static final String __OBFID = "CL_00002197";
-
-        public AISpiderAttack(Class p_i45819_2_)
+    static class AISpiderAttack extends EntityAIAttackOnCollide
         {
-            super(EntitySpider.this, p_i45819_2_, 1.0D, true);
-        }
-
-        /**
-         * Returns whether an in-progress EntityAIBase should continue executing
-         */
-        public boolean continueExecuting()
-        {
-            float f = this.attacker.getBrightness(1.0F);
-
-            if (f >= 0.5F && this.attacker.getRNG().nextInt(100) == 0)
+            public AISpiderAttack(EntitySpider p_i45819_1_, Class <? extends Entity > targetClass)
             {
-                this.attacker.setAttackTarget((EntityLivingBase)null);
-                return false;
+                super(p_i45819_1_, targetClass, 1.0D, true);
             }
-            else
+
+            /**
+             * Returns whether an in-progress EntityAIBase should continue executing
+             */
+            public boolean continueExecuting()
             {
-                return super.continueExecuting();
+                float f = this.attacker.getBrightness(1.0F);
+
+                if (f >= 0.5F && this.attacker.getRNG().nextInt(100) == 0)
+                {
+                    this.attacker.setAttackTarget((EntityLivingBase)null);
+                    return false;
+                }
+                else
+                {
+                    return super.continueExecuting();
+                }
+            }
+
+            protected double func_179512_a(EntityLivingBase attackTarget)
+            {
+                return (double)(4.0F + attackTarget.width);
             }
         }
 
-        protected double func_179512_a(EntityLivingBase p_179512_1_)
+    static class AISpiderTarget<T extends EntityLivingBase> extends EntityAINearestAttackableTarget
         {
-            return (double)(4.0F + p_179512_1_.width);
-        }
-    }
+            public AISpiderTarget(EntitySpider p_i45818_1_, Class<T> classTarget)
+            {
+                super(p_i45818_1_, classTarget, true);
+            }
 
-    class AISpiderTarget extends EntityAINearestAttackableTarget
-    {
-        private static final String __OBFID = "CL_00002196";
-
-        public AISpiderTarget(Class p_i45818_2_)
-        {
-            super(EntitySpider.this, p_i45818_2_, true);
+            /**
+             * Returns whether the EntityAIBase should begin execution.
+             */
+            public boolean shouldExecute()
+            {
+                float f = this.taskOwner.getBrightness(1.0F);
+                return f >= 0.5F ? false : super.shouldExecute();
+            }
         }
-
-        /**
-         * Returns whether the EntityAIBase should begin execution.
-         */
-        public boolean shouldExecute()
-        {
-            float f = this.taskOwner.getBrightness(1.0F);
-            return f >= 0.5F ? false : super.shouldExecute();
-        }
-    }
 
     public static class GroupData implements IEntityLivingData
         {
-            public int field_111105_a;
-            private static final String __OBFID = "CL_00001700";
+            public int potionEffectId;
 
-            public void func_111104_a(Random p_111104_1_)
+            public void func_111104_a(Random rand)
             {
-                int i = p_111104_1_.nextInt(5);
+                int i = rand.nextInt(5);
 
                 if (i <= 1)
                 {
-                    this.field_111105_a = Potion.moveSpeed.id;
+                    this.potionEffectId = Potion.moveSpeed.id;
                 }
                 else if (i <= 2)
                 {
-                    this.field_111105_a = Potion.damageBoost.id;
+                    this.potionEffectId = Potion.damageBoost.id;
                 }
                 else if (i <= 3)
                 {
-                    this.field_111105_a = Potion.regeneration.id;
+                    this.potionEffectId = Potion.regeneration.id;
                 }
                 else if (i <= 4)
                 {
-                    this.field_111105_a = Potion.invisibility.id;
+                    this.potionEffectId = Potion.invisibility.id;
                 }
             }
         }

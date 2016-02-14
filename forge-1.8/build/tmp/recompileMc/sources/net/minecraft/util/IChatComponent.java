@@ -12,13 +12,12 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import java.lang.reflect.Type;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public interface IChatComponent extends Iterable
+public interface IChatComponent extends Iterable<IChatComponent>
 {
     IChatComponent setChatStyle(ChatStyle style);
 
@@ -41,33 +40,27 @@ public interface IChatComponent extends Iterable
     String getUnformattedTextForChat();
 
     /**
-     * Gets the text of this component, without any special formatting codes added.  TODO: why is this two different
-     * methods?
+     * Get the text of this component, <em>and all child components</em>, with all special formatting codes removed.
      */
     String getUnformattedText();
 
     /**
      * Gets the text of this component, with formatting codes added for rendering.
      */
-    @SideOnly(Side.CLIENT)
     String getFormattedText();
 
-    /**
-     * Gets the sibling components of this one.
-     */
-    List getSiblings();
+    List<IChatComponent> getSiblings();
 
     /**
      * Creates a copy of this component.  Almost a deep copy, except the style is shallow-copied.
      */
     IChatComponent createCopy();
 
-    public static class Serializer implements JsonDeserializer, JsonSerializer
+    public static class Serializer implements JsonDeserializer<IChatComponent>, JsonSerializer<IChatComponent>
         {
             private static final Gson GSON;
-            private static final String __OBFID = "CL_00001263";
 
-            public IChatComponent deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_)
+            public IChatComponent deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_) throws JsonParseException
             {
                 if (p_deserialize_1_.isJsonPrimitive())
                 {
@@ -78,25 +71,23 @@ public interface IChatComponent extends Iterable
                     if (p_deserialize_1_.isJsonArray())
                     {
                         JsonArray jsonarray1 = p_deserialize_1_.getAsJsonArray();
-                        IChatComponent ichatcomponent = null;
-                        Iterator iterator = jsonarray1.iterator();
+                        IChatComponent ichatcomponent1 = null;
 
-                        while (iterator.hasNext())
+                        for (JsonElement jsonelement : jsonarray1)
                         {
-                            JsonElement jsonelement1 = (JsonElement)iterator.next();
-                            IChatComponent ichatcomponent1 = this.deserialize(jsonelement1, jsonelement1.getClass(), p_deserialize_3_);
+                            IChatComponent ichatcomponent2 = this.deserialize(jsonelement, jsonelement.getClass(), p_deserialize_3_);
 
-                            if (ichatcomponent == null)
+                            if (ichatcomponent1 == null)
                             {
-                                ichatcomponent = ichatcomponent1;
+                                ichatcomponent1 = ichatcomponent2;
                             }
                             else
                             {
-                                ichatcomponent.appendSibling(ichatcomponent1);
+                                ichatcomponent1.appendSibling(ichatcomponent2);
                             }
                         }
 
-                        return ichatcomponent;
+                        return ichatcomponent1;
                     }
                     else
                     {
@@ -106,11 +97,11 @@ public interface IChatComponent extends Iterable
                 else
                 {
                     JsonObject jsonobject = p_deserialize_1_.getAsJsonObject();
-                    Object object;
+                    IChatComponent ichatcomponent;
 
                     if (jsonobject.has("text"))
                     {
-                        object = new ChatComponentText(jsonobject.get("text").getAsString());
+                        ichatcomponent = new ChatComponentText(jsonobject.get("text").getAsString());
                     }
                     else if (jsonobject.has("translate"))
                     {
@@ -136,11 +127,11 @@ public interface IChatComponent extends Iterable
                                 }
                             }
 
-                            object = new ChatComponentTranslation(s, aobject);
+                            ichatcomponent = new ChatComponentTranslation(s, aobject);
                         }
                         else
                         {
-                            object = new ChatComponentTranslation(s, new Object[0]);
+                            ichatcomponent = new ChatComponentTranslation(s, new Object[0]);
                         }
                     }
                     else if (jsonobject.has("score"))
@@ -152,11 +143,11 @@ public interface IChatComponent extends Iterable
                             throw new JsonParseException("A score component needs a least a name and an objective");
                         }
 
-                        object = new ChatComponentScore(JsonUtils.getJsonObjectStringFieldValue(jsonobject1, "name"), JsonUtils.getJsonObjectStringFieldValue(jsonobject1, "objective"));
+                        ichatcomponent = new ChatComponentScore(JsonUtils.getString(jsonobject1, "name"), JsonUtils.getString(jsonobject1, "objective"));
 
                         if (jsonobject1.has("value"))
                         {
-                            ((ChatComponentScore)object).func_179997_b(JsonUtils.getJsonObjectStringFieldValue(jsonobject1, "value"));
+                            ((ChatComponentScore)ichatcomponent).setValue(JsonUtils.getString(jsonobject1, "value"));
                         }
                     }
                     else
@@ -166,7 +157,7 @@ public interface IChatComponent extends Iterable
                             throw new JsonParseException("Don\'t know how to turn " + p_deserialize_1_.toString() + " into a Component");
                         }
 
-                        object = new ChatComponentSelector(JsonUtils.getJsonObjectStringFieldValue(jsonobject, "selector"));
+                        ichatcomponent = new ChatComponentSelector(JsonUtils.getString(jsonobject, "selector"));
                     }
 
                     if (jsonobject.has("extra"))
@@ -180,12 +171,12 @@ public interface IChatComponent extends Iterable
 
                         for (int j = 0; j < jsonarray2.size(); ++j)
                         {
-                            ((IChatComponent)object).appendSibling(this.deserialize(jsonarray2.get(j), p_deserialize_2_, p_deserialize_3_));
+                            ichatcomponent.appendSibling(this.deserialize(jsonarray2.get(j), p_deserialize_2_, p_deserialize_3_));
                         }
                     }
 
-                    ((IChatComponent)object).setChatStyle((ChatStyle)p_deserialize_3_.deserialize(p_deserialize_1_, ChatStyle.class));
-                    return (IChatComponent)object;
+                    ichatcomponent.setChatStyle((ChatStyle)p_deserialize_3_.deserialize(p_deserialize_1_, ChatStyle.class));
+                    return ichatcomponent;
                 }
             }
 
@@ -195,12 +186,10 @@ public interface IChatComponent extends Iterable
 
                 if (jsonelement.isJsonObject())
                 {
-                    JsonObject jsonobject1 = (JsonObject)jsonelement;
-                    Iterator iterator = jsonobject1.entrySet().iterator();
+                    JsonObject jsonobject = (JsonObject)jsonelement;
 
-                    while (iterator.hasNext())
+                    for (Entry<String, JsonElement> entry : jsonobject.entrySet())
                     {
-                        Entry entry = (Entry)iterator.next();
                         object.add((String)entry.getKey(), (JsonElement)entry.getValue());
                     }
                 }
@@ -224,12 +213,10 @@ public interface IChatComponent extends Iterable
                     if (!p_serialize_1_.getSiblings().isEmpty())
                     {
                         JsonArray jsonarray = new JsonArray();
-                        Iterator iterator = p_serialize_1_.getSiblings().iterator();
 
-                        while (iterator.hasNext())
+                        for (IChatComponent ichatcomponent : p_serialize_1_.getSiblings())
                         {
-                            IChatComponent ichatcomponent1 = (IChatComponent)iterator.next();
-                            jsonarray.add(this.serialize(ichatcomponent1, ichatcomponent1.getClass(), p_serialize_3_));
+                            jsonarray.add(this.serialize((IChatComponent)ichatcomponent, ichatcomponent.getClass(), p_serialize_3_));
                         }
 
                         jsonobject.add("extra", jsonarray);
@@ -247,16 +234,12 @@ public interface IChatComponent extends Iterable
                         if (chatcomponenttranslation.getFormatArgs() != null && chatcomponenttranslation.getFormatArgs().length > 0)
                         {
                             JsonArray jsonarray1 = new JsonArray();
-                            Object[] aobject = chatcomponenttranslation.getFormatArgs();
-                            int i = aobject.length;
 
-                            for (int j = 0; j < i; ++j)
+                            for (Object object : chatcomponenttranslation.getFormatArgs())
                             {
-                                Object object = aobject[j];
-
                                 if (object instanceof IChatComponent)
                                 {
-                                    jsonarray1.add(this.serialize((IChatComponent)object, object.getClass(), p_serialize_3_));
+                                    jsonarray1.add(this.serialize((IChatComponent)((IChatComponent)object), object.getClass(), p_serialize_3_));
                                 }
                                 else
                                 {
@@ -271,8 +254,8 @@ public interface IChatComponent extends Iterable
                     {
                         ChatComponentScore chatcomponentscore = (ChatComponentScore)p_serialize_1_;
                         JsonObject jsonobject1 = new JsonObject();
-                        jsonobject1.addProperty("name", chatcomponentscore.func_179995_g());
-                        jsonobject1.addProperty("objective", chatcomponentscore.func_179994_h());
+                        jsonobject1.addProperty("name", chatcomponentscore.getName());
+                        jsonobject1.addProperty("objective", chatcomponentscore.getObjective());
                         jsonobject1.addProperty("value", chatcomponentscore.getUnformattedTextForChat());
                         jsonobject.add("score", jsonobject1);
                     }
@@ -284,7 +267,7 @@ public interface IChatComponent extends Iterable
                         }
 
                         ChatComponentSelector chatcomponentselector = (ChatComponentSelector)p_serialize_1_;
-                        jsonobject.addProperty("selector", chatcomponentselector.func_179992_g());
+                        jsonobject.addProperty("selector", chatcomponentselector.getSelector());
                     }
 
                     return jsonobject;
@@ -293,7 +276,7 @@ public interface IChatComponent extends Iterable
 
             public static String componentToJson(IChatComponent component)
             {
-                return GSON.toJson(component);
+                return GSON.toJson((Object)component);
             }
 
             public static IChatComponent jsonToComponent(String json)
@@ -301,18 +284,13 @@ public interface IChatComponent extends Iterable
                 return (IChatComponent)GSON.fromJson(json, IChatComponent.class);
             }
 
-            public JsonElement serialize(Object p_serialize_1_, Type p_serialize_2_, JsonSerializationContext p_serialize_3_)
-            {
-                return this.serialize((IChatComponent)p_serialize_1_, p_serialize_2_, p_serialize_3_);
-            }
-
             static
             {
-                GsonBuilder var0 = new GsonBuilder();
-                var0.registerTypeHierarchyAdapter(IChatComponent.class, new IChatComponent.Serializer());
-                var0.registerTypeHierarchyAdapter(ChatStyle.class, new ChatStyle.Serializer());
-                var0.registerTypeAdapterFactory(new EnumTypeAdapterFactory());
-                GSON = var0.create();
+                GsonBuilder gsonbuilder = new GsonBuilder();
+                gsonbuilder.registerTypeHierarchyAdapter(IChatComponent.class, new IChatComponent.Serializer());
+                gsonbuilder.registerTypeHierarchyAdapter(ChatStyle.class, new ChatStyle.Serializer());
+                gsonbuilder.registerTypeAdapterFactory(new EnumTypeAdapterFactory());
+                GSON = gsonbuilder.create();
             }
         }
 }

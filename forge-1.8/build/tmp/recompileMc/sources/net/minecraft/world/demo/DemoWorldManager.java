@@ -15,7 +15,6 @@ public class DemoWorldManager extends ItemInWorldManager
     private boolean demoTimeExpired;
     private int field_73104_e;
     private int field_73102_f;
-    private static final String __OBFID = "CL_00001429";
 
     public DemoWorldManager(World worldIn)
     {
@@ -85,9 +84,6 @@ public class DemoWorldManager extends ItemInWorldManager
     /**
      * If not creative, it calls sendBlockBreakProgress until the block is broken first. tryHarvestBlock can also be the
      * result of this call.
-     *  
-     * @param pos The block's coordinates
-     * @param side The specific side that is being hit
      */
     public void onBlockClicked(BlockPos pos, EnumFacing side)
     {
@@ -111,8 +107,6 @@ public class DemoWorldManager extends ItemInWorldManager
 
     /**
      * Attempts to harvest a block
-     *  
-     * @param pos The coordinates of the block
      */
     public boolean tryHarvestBlock(BlockPos pos)
     {
@@ -137,11 +131,8 @@ public class DemoWorldManager extends ItemInWorldManager
 
     /**
      * Activate the clicked on block, otherwise use the held item.
-     *  
-     * @param pos The block's coordinates
-     * @param side The side of the block that was clicked on
      */
-    public boolean activateBlockOrUseItem(EntityPlayer player, World worldIn, ItemStack stack, BlockPos pos, EnumFacing side, float p_180236_6_, float p_180236_7_, float p_180236_8_)
+    public boolean activateBlockOrUseItem(EntityPlayer player, World worldIn, ItemStack stack, BlockPos pos, EnumFacing side, float offsetX, float offsetY, float offsetZ)
     {
         if (this.demoTimeExpired)
         {
@@ -150,7 +141,7 @@ public class DemoWorldManager extends ItemInWorldManager
         }
         else
         {
-            return super.activateBlockOrUseItem(player, worldIn, stack, pos, side, p_180236_6_, p_180236_7_, p_180236_8_);
+            return super.activateBlockOrUseItem(player, worldIn, stack, pos, side, offsetX, offsetY, offsetZ);
         }
     }
 }

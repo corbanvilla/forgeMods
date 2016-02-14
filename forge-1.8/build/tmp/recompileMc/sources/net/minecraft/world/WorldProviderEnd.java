@@ -12,8 +12,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class WorldProviderEnd extends WorldProvider
 {
-    private static final String __OBFID = "CL_00000389";
-
     /**
      * creates a new world chunk manager for WorldProvider
      */
@@ -56,15 +54,15 @@ public class WorldProviderEnd extends WorldProvider
     public Vec3 getFogColor(float p_76562_1_, float p_76562_2_)
     {
         int i = 10518688;
-        float f2 = MathHelper.cos(p_76562_1_ * (float)Math.PI * 2.0F) * 2.0F + 0.5F;
-        f2 = MathHelper.clamp_float(f2, 0.0F, 1.0F);
-        float f3 = (float)(i >> 16 & 255) / 255.0F;
-        float f4 = (float)(i >> 8 & 255) / 255.0F;
-        float f5 = (float)(i & 255) / 255.0F;
-        f3 *= f2 * 0.0F + 0.15F;
-        f4 *= f2 * 0.0F + 0.15F;
-        f5 *= f2 * 0.0F + 0.15F;
-        return new Vec3((double)f3, (double)f4, (double)f5);
+        float f = MathHelper.cos(p_76562_1_ * (float)Math.PI * 2.0F) * 2.0F + 0.5F;
+        f = MathHelper.clamp_float(f, 0.0F, 1.0F);
+        float f1 = (float)(i >> 16 & 255) / 255.0F;
+        float f2 = (float)(i >> 8 & 255) / 255.0F;
+        float f3 = (float)(i & 255) / 255.0F;
+        f1 = f1 * (f * 0.0F + 0.15F);
+        f2 = f2 * (f * 0.0F + 0.15F);
+        f3 = f3 * (f * 0.0F + 0.15F);
+        return new Vec3((double)f1, (double)f2, (double)f3);
     }
 
     @SideOnly(Side.CLIENT)

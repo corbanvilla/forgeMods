@@ -14,7 +14,6 @@ public class BiomeGenSnow extends BiomeGenBase
     private boolean field_150615_aC;
     private WorldGenIceSpike field_150616_aD = new WorldGenIceSpike();
     private WorldGenIcePath field_150617_aE = new WorldGenIcePath(4);
-    private static final String __OBFID = "CL_00000174";
 
     public BiomeGenSnow(int p_i45378_1_, boolean p_i45378_2_)
     {
@@ -29,33 +28,29 @@ public class BiomeGenSnow extends BiomeGenBase
         this.spawnableCreatureList.clear();
     }
 
-    public void decorate(World worldIn, Random p_180624_2_, BlockPos p_180624_3_)
+    public void decorate(World worldIn, Random rand, BlockPos pos)
     {
         if (this.field_150615_aC)
         {
-            int i;
-            int j;
-            int k;
-
-            for (i = 0; i < 3; ++i)
+            for (int i = 0; i < 3; ++i)
             {
-                j = p_180624_2_.nextInt(16) + 8;
-                k = p_180624_2_.nextInt(16) + 8;
-                this.field_150616_aD.generate(worldIn, p_180624_2_, worldIn.getHorizon(p_180624_3_.add(j, 0, k)));
+                int j = rand.nextInt(16) + 8;
+                int k = rand.nextInt(16) + 8;
+                this.field_150616_aD.generate(worldIn, rand, worldIn.getHeight(pos.add(j, 0, k)));
             }
 
-            for (i = 0; i < 2; ++i)
+            for (int l = 0; l < 2; ++l)
             {
-                j = p_180624_2_.nextInt(16) + 8;
-                k = p_180624_2_.nextInt(16) + 8;
-                this.field_150617_aE.generate(worldIn, p_180624_2_, worldIn.getHorizon(p_180624_3_.add(j, 0, k)));
+                int i1 = rand.nextInt(16) + 8;
+                int j1 = rand.nextInt(16) + 8;
+                this.field_150617_aE.generate(worldIn, rand, worldIn.getHeight(pos.add(i1, 0, j1)));
             }
         }
 
-        super.decorate(worldIn, p_180624_2_, p_180624_3_);
+        super.decorate(worldIn, rand, pos);
     }
 
-    public WorldGenAbstractTree genBigTreeChance(Random p_150567_1_)
+    public WorldGenAbstractTree genBigTreeChance(Random rand)
     {
         return new WorldGenTaiga2(false);
     }

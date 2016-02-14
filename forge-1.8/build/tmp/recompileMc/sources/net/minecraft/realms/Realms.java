@@ -1,9 +1,12 @@
 package net.minecraft.realms;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.mojang.authlib.GameProfile;
 import com.mojang.util.UUIDTypeAdapter;
 import java.net.Proxy;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.client.settings.GameSettings;
 import net.minecraft.util.Session;
 import net.minecraft.world.WorldSettings;
 import net.minecraftforge.fml.relauncher.Side;
@@ -12,8 +15,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class Realms
 {
-    private static final String __OBFID = "CL_00001892";
-
     public static boolean isTouchScreen()
     {
         return Minecraft.getMinecraft().gameSettings.touchscreen;
@@ -44,6 +45,11 @@ public class Realms
     public static String getSessionId()
     {
         return Minecraft.getMinecraft().getSession().getSessionID();
+    }
+
+    public static String getUUID()
+    {
+        return Minecraft.getMinecraft().getSession().getPlayerID();
     }
 
     public static String getName()
@@ -79,5 +85,36 @@ public class Realms
     public static int adventureId()
     {
         return WorldSettings.GameType.ADVENTURE.getID();
+    }
+
+    public static int spectatorId()
+    {
+        return WorldSettings.GameType.SPECTATOR.getID();
+    }
+
+    public static void setConnectedToRealms(boolean p_setConnectedToRealms_0_)
+    {
+        Minecraft.getMinecraft().setConnectedToRealms(p_setConnectedToRealms_0_);
+    }
+
+    public static ListenableFuture<Object> downloadResourcePack(String p_downloadResourcePack_0_, String p_downloadResourcePack_1_)
+    {
+        ListenableFuture<Object> listenablefuture = Minecraft.getMinecraft().getResourcePackRepository().downloadResourcePack(p_downloadResourcePack_0_, p_downloadResourcePack_1_);
+        return listenablefuture;
+    }
+
+    public static void clearResourcePack()
+    {
+        Minecraft.getMinecraft().getResourcePackRepository().clearResourcePack();
+    }
+
+    public static boolean getRealmsNotificationsEnabled()
+    {
+        return Minecraft.getMinecraft().gameSettings.getOptionOrdinalValue(GameSettings.Options.REALMS_NOTIFICATIONS);
+    }
+
+    public static boolean inTitleScreen()
+    {
+        return Minecraft.getMinecraft().currentScreen != null && Minecraft.getMinecraft().currentScreen instanceof GuiMainMenu;
     }
 }

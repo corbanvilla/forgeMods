@@ -9,7 +9,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class RealmsEditBox
 {
     private final GuiTextField editBox;
-    private static final String __OBFID = "CL_00001858";
 
     public RealmsEditBox(int p_i45743_1_, int p_i45743_2_, int p_i45743_3_, int p_i45743_4_, int p_i45743_5_)
     {

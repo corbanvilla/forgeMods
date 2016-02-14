@@ -8,7 +8,6 @@ public class Vec3
     public final double yCoord;
     /** Z coordinate of Vec3D */
     public final double zCoord;
-    private static final String __OBFID = "CL_00000612";
 
     public Vec3(double x, double y, double z)
     {
@@ -30,6 +29,11 @@ public class Vec3
         this.xCoord = x;
         this.yCoord = y;
         this.zCoord = z;
+    }
+
+    public Vec3(Vec3i p_i46377_1_)
+    {
+        this((double)p_i46377_1_.getX(), (double)p_i46377_1_.getY(), (double)p_i46377_1_.getZ());
     }
 
     /**
@@ -122,18 +126,18 @@ public class Vec3
      */
     public Vec3 getIntermediateWithXValue(Vec3 vec, double x)
     {
-        double d1 = vec.xCoord - this.xCoord;
-        double d2 = vec.yCoord - this.yCoord;
-        double d3 = vec.zCoord - this.zCoord;
+        double d0 = vec.xCoord - this.xCoord;
+        double d1 = vec.yCoord - this.yCoord;
+        double d2 = vec.zCoord - this.zCoord;
 
-        if (d1 * d1 < 1.0000000116860974E-7D)
+        if (d0 * d0 < 1.0000000116860974E-7D)
         {
             return null;
         }
         else
         {
-            double d4 = (x - this.xCoord) / d1;
-            return d4 >= 0.0D && d4 <= 1.0D ? new Vec3(this.xCoord + d1 * d4, this.yCoord + d2 * d4, this.zCoord + d3 * d4) : null;
+            double d3 = (x - this.xCoord) / d0;
+            return d3 >= 0.0D && d3 <= 1.0D ? new Vec3(this.xCoord + d0 * d3, this.yCoord + d1 * d3, this.zCoord + d2 * d3) : null;
         }
     }
 
@@ -143,18 +147,18 @@ public class Vec3
      */
     public Vec3 getIntermediateWithYValue(Vec3 vec, double y)
     {
-        double d1 = vec.xCoord - this.xCoord;
-        double d2 = vec.yCoord - this.yCoord;
-        double d3 = vec.zCoord - this.zCoord;
+        double d0 = vec.xCoord - this.xCoord;
+        double d1 = vec.yCoord - this.yCoord;
+        double d2 = vec.zCoord - this.zCoord;
 
-        if (d2 * d2 < 1.0000000116860974E-7D)
+        if (d1 * d1 < 1.0000000116860974E-7D)
         {
             return null;
         }
         else
         {
-            double d4 = (y - this.yCoord) / d2;
-            return d4 >= 0.0D && d4 <= 1.0D ? new Vec3(this.xCoord + d1 * d4, this.yCoord + d2 * d4, this.zCoord + d3 * d4) : null;
+            double d3 = (y - this.yCoord) / d1;
+            return d3 >= 0.0D && d3 <= 1.0D ? new Vec3(this.xCoord + d0 * d3, this.yCoord + d1 * d3, this.zCoord + d2 * d3) : null;
         }
     }
 
@@ -164,18 +168,18 @@ public class Vec3
      */
     public Vec3 getIntermediateWithZValue(Vec3 vec, double z)
     {
-        double d1 = vec.xCoord - this.xCoord;
-        double d2 = vec.yCoord - this.yCoord;
-        double d3 = vec.zCoord - this.zCoord;
+        double d0 = vec.xCoord - this.xCoord;
+        double d1 = vec.yCoord - this.yCoord;
+        double d2 = vec.zCoord - this.zCoord;
 
-        if (d3 * d3 < 1.0000000116860974E-7D)
+        if (d2 * d2 < 1.0000000116860974E-7D)
         {
             return null;
         }
         else
         {
-            double d4 = (z - this.zCoord) / d3;
-            return d4 >= 0.0D && d4 <= 1.0D ? new Vec3(this.xCoord + d1 * d4, this.yCoord + d2 * d4, this.zCoord + d3 * d4) : null;
+            double d3 = (z - this.zCoord) / d2;
+            return d3 >= 0.0D && d3 <= 1.0D ? new Vec3(this.xCoord + d0 * d3, this.yCoord + d1 * d3, this.zCoord + d2 * d3) : null;
         }
     }
 
@@ -186,21 +190,21 @@ public class Vec3
 
     public Vec3 rotatePitch(float pitch)
     {
-        float f1 = MathHelper.cos(pitch);
-        float f2 = MathHelper.sin(pitch);
+        float f = MathHelper.cos(pitch);
+        float f1 = MathHelper.sin(pitch);
         double d0 = this.xCoord;
-        double d1 = this.yCoord * (double)f1 + this.zCoord * (double)f2;
-        double d2 = this.zCoord * (double)f1 - this.yCoord * (double)f2;
+        double d1 = this.yCoord * (double)f + this.zCoord * (double)f1;
+        double d2 = this.zCoord * (double)f - this.yCoord * (double)f1;
         return new Vec3(d0, d1, d2);
     }
 
     public Vec3 rotateYaw(float yaw)
     {
-        float f1 = MathHelper.cos(yaw);
-        float f2 = MathHelper.sin(yaw);
-        double d0 = this.xCoord * (double)f1 + this.zCoord * (double)f2;
+        float f = MathHelper.cos(yaw);
+        float f1 = MathHelper.sin(yaw);
+        double d0 = this.xCoord * (double)f + this.zCoord * (double)f1;
         double d1 = this.yCoord;
-        double d2 = this.zCoord * (double)f1 - this.xCoord * (double)f2;
+        double d2 = this.zCoord * (double)f - this.xCoord * (double)f1;
         return new Vec3(d0, d1, d2);
     }
 }

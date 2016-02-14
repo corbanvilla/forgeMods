@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.data.IMetadataSection;
 import net.minecraft.client.resources.data.IMetadataSerializer;
@@ -25,16 +26,15 @@ public abstract class AbstractResourcePack implements IResourcePack
 {
     private static final Logger resourceLog = LogManager.getLogger();
     protected final File resourcePackFile;
-    private static final String __OBFID = "CL_00001072";
 
-    public AbstractResourcePack(File p_i1287_1_)
+    public AbstractResourcePack(File resourcePackFileIn)
     {
-        this.resourcePackFile = p_i1287_1_;
+        this.resourcePackFile = resourcePackFileIn;
     }
 
-    private static String locationToName(ResourceLocation p_110592_0_)
+    private static String locationToName(ResourceLocation location)
     {
-        return String.format("%s/%s/%s", new Object[] {"assets", p_110592_0_.getResourceDomain(), p_110592_0_.getResourcePath()});
+        return String.format("%s/%s/%s", new Object[] {"assets", location.getResourceDomain(), location.getResourcePath()});
     }
 
     protected static String getRelativeName(File p_110595_0_, File p_110595_1_)
@@ -42,31 +42,31 @@ public abstract class AbstractResourcePack implements IResourcePack
         return p_110595_0_.toURI().relativize(p_110595_1_.toURI()).getPath();
     }
 
-    public InputStream getInputStream(ResourceLocation p_110590_1_) throws IOException
+    public InputStream getInputStream(ResourceLocation location) throws IOException
     {
-        return this.getInputStreamByName(locationToName(p_110590_1_));
+        return this.getInputStreamByName(locationToName(location));
     }
 
-    public boolean resourceExists(ResourceLocation p_110589_1_)
+    public boolean resourceExists(ResourceLocation location)
     {
-        return this.hasResourceName(locationToName(p_110589_1_));
+        return this.hasResourceName(locationToName(location));
     }
 
-    protected abstract InputStream getInputStreamByName(String p_110591_1_) throws IOException;
+    protected abstract InputStream getInputStreamByName(String name) throws IOException;
 
-    protected abstract boolean hasResourceName(String p_110593_1_);
+    protected abstract boolean hasResourceName(String name);
 
     protected void logNameNotLowercase(String p_110594_1_)
     {
         resourceLog.warn("ResourcePack: ignored non-lowercase namespace: {} in {}", new Object[] {p_110594_1_, this.resourcePackFile});
     }
 
-    public IMetadataSection getPackMetadata(IMetadataSerializer p_135058_1_, String p_135058_2_) throws IOException
+    public <T extends IMetadataSection> T getPackMetadata(IMetadataSerializer p_135058_1_, String p_135058_2_) throws IOException
     {
         return readMetadata(p_135058_1_, this.getInputStreamByName("pack.mcmeta"), p_135058_2_);
     }
 
-    static IMetadataSection readMetadata(IMetadataSerializer p_110596_0_, InputStream p_110596_1_, String p_110596_2_)
+    static <T extends IMetadataSection> T readMetadata(IMetadataSerializer p_110596_0_, InputStream p_110596_1_, String p_110596_2_)
     {
         JsonObject jsonobject = null;
         BufferedReader bufferedreader = null;
@@ -74,7 +74,7 @@ public abstract class AbstractResourcePack implements IResourcePack
         try
         {
             bufferedreader = new BufferedReader(new InputStreamReader(p_110596_1_, Charsets.UTF_8));
-            jsonobject = (new JsonParser()).parse(bufferedreader).getAsJsonObject();
+            jsonobject = (new JsonParser()).parse((Reader)bufferedreader).getAsJsonObject();
         }
         catch (RuntimeException runtimeexception)
         {
@@ -82,7 +82,7 @@ public abstract class AbstractResourcePack implements IResourcePack
         }
         finally
         {
-            IOUtils.closeQuietly(bufferedreader);
+            IOUtils.closeQuietly((Reader)bufferedreader);
         }
 
         return p_110596_0_.parseMetadataSection(p_110596_2_, jsonobject);

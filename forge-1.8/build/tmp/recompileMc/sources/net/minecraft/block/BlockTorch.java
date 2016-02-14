@@ -1,7 +1,6 @@
 package net.minecraft.block;
 
 import com.google.common.base.Predicate;
-import java.util.Iterator;
 import java.util.Random;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -24,19 +23,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockTorch extends Block
 {
-    public static final PropertyDirection FACING = PropertyDirection.create("facing", new Predicate()
+    public static final PropertyDirection FACING = PropertyDirection.create("facing", new Predicate<EnumFacing>()
     {
-        private static final String __OBFID = "CL_00002054";
-        public boolean apply(EnumFacing facing)
+        public boolean apply(EnumFacing p_apply_1_)
         {
-            return facing != EnumFacing.DOWN;
-        }
-        public boolean apply(Object p_apply_1_)
-        {
-            return this.apply((EnumFacing)p_apply_1_);
+            return p_apply_1_ != EnumFacing.DOWN;
         }
     });
-    private static final String __OBFID = "CL_00000325";
 
     protected BlockTorch()
     {
@@ -51,6 +44,9 @@ public class BlockTorch extends Block
         return null;
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -76,30 +72,28 @@ public class BlockTorch extends Block
 
     public boolean canPlaceBlockAt(World worldIn, BlockPos pos)
     {
-        Iterator iterator = FACING.getAllowedValues().iterator();
-        EnumFacing enumfacing;
-
-        do
+        for (EnumFacing enumfacing : FACING.getAllowedValues())
         {
-            if (!iterator.hasNext())
+            if (this.canPlaceAt(worldIn, pos, enumfacing))
             {
-                return false;
+                return true;
             }
-
-            enumfacing = (EnumFacing)iterator.next();
         }
-        while (!this.canPlaceAt(worldIn, pos, enumfacing));
 
-        return true;
+        return false;
     }
 
     private boolean canPlaceAt(World worldIn, BlockPos pos, EnumFacing facing)
     {
-        BlockPos blockpos1 = pos.offset(facing.getOpposite());
+        BlockPos blockpos = pos.offset(facing.getOpposite());
         boolean flag = facing.getAxis().isHorizontal();
-        return flag && worldIn.isSideSolid(blockpos1, facing, true) || facing.equals(EnumFacing.UP) && this.canPlaceOn(worldIn, blockpos1);
+        return flag && worldIn.isSideSolid(blockpos, facing, true) || facing.equals(EnumFacing.UP) && this.canPlaceOn(worldIn, blockpos);
     }
 
+    /**
+     * Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the
+     * IBlockstate
+     */
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
         if (this.canPlaceAt(worldIn, pos, facing))
@@ -108,21 +102,15 @@ public class BlockTorch extends Block
         }
         else
         {
-            Iterator iterator = EnumFacing.Plane.HORIZONTAL.iterator();
-            EnumFacing enumfacing1;
-
-            do
+            for (EnumFacing enumfacing : EnumFacing.Plane.HORIZONTAL)
             {
-                if (!iterator.hasNext())
+                if (worldIn.isSideSolid(pos.offset(enumfacing.getOpposite()), enumfacing, true))
                 {
-                    return this.getDefaultState();
+                    return this.getDefaultState().withProperty(FACING, enumfacing);
                 }
-
-                enumfacing1 = (EnumFacing)iterator.next();
             }
-            while (!worldIn.isSideSolid(pos.offset(enumfacing1.getOpposite()), enumfacing1, true));
 
-            return this.getDefaultState().withProperty(FACING, enumfacing1);
+            return this.getDefaultState();
         }
     }
 
@@ -148,15 +136,15 @@ public class BlockTorch extends Block
         else
         {
             EnumFacing enumfacing = (EnumFacing)state.getValue(FACING);
-            EnumFacing.Axis axis = enumfacing.getAxis();
+            EnumFacing.Axis enumfacing$axis = enumfacing.getAxis();
             EnumFacing enumfacing1 = enumfacing.getOpposite();
             boolean flag = false;
 
-            if (axis.isHorizontal() && !worldIn.isSideSolid(pos.offset(enumfacing1), enumfacing1, true))
+            if (enumfacing$axis.isHorizontal() && !worldIn.isSideSolid(pos.offset(enumfacing1), enumfacing, true))
             {
                 flag = true;
             }
-            else if (axis.isVertical() && !this.canPlaceOn(worldIn, pos.offset(enumfacing1)))
+            else if (enumfacing$axis.isVertical() && !this.canPlaceOn(worldIn, pos.offset(enumfacing1)))
             {
                 flag = true;
             }
@@ -194,9 +182,6 @@ public class BlockTorch extends Block
 
     /**
      * Ray traces through the blocks collision from start vector to end vector returning a ray trace hit.
-     *  
-     * @param start The start vector
-     * @param end The end vector
      */
     public MovingObjectPosition collisionRayTrace(World worldIn, BlockPos pos, Vec3 start, Vec3 end)
     {
@@ -285,27 +270,26 @@ public class BlockTorch extends Block
      */
     public int getMetaFromState(IBlockState state)
     {
-        byte b0 = 0;
-        int i;
+        int i = 0;
 
-        switch (BlockTorch.SwitchEnumFacing.FACING_LOOKUP[((EnumFacing)state.getValue(FACING)).ordinal()])
+        switch ((EnumFacing)state.getValue(FACING))
         {
-            case 1:
-                i = b0 | 1;
+            case EAST:
+                i = i | 1;
                 break;
-            case 2:
-                i = b0 | 2;
+            case WEST:
+                i = i | 2;
                 break;
-            case 3:
-                i = b0 | 3;
+            case SOUTH:
+                i = i | 3;
                 break;
-            case 4:
-                i = b0 | 4;
+            case NORTH:
+                i = i | 4;
                 break;
-            case 5:
-            case 6:
+            case DOWN:
+            case UP:
             default:
-                i = b0 | 5;
+                i = i | 5;
         }
 
         return i;
@@ -321,67 +305,4 @@ public class BlockTorch extends Block
     {
         return new BlockState(this, new IProperty[] {FACING});
     }
-
-    static final class SwitchEnumFacing
-        {
-            static final int[] FACING_LOOKUP = new int[EnumFacing.values().length];
-            private static final String __OBFID = "CL_00002053";
-
-            static
-            {
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.EAST.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var6)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.WEST.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var5)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.SOUTH.ordinal()] = 3;
-                }
-                catch (NoSuchFieldError var4)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.NORTH.ordinal()] = 4;
-                }
-                catch (NoSuchFieldError var3)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.DOWN.ordinal()] = 5;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
-
-                try
-                {
-                    FACING_LOOKUP[EnumFacing.UP.ordinal()] = 6;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
-            }
-        }
 }

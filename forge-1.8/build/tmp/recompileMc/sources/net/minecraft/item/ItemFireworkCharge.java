@@ -11,8 +11,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemFireworkCharge extends Item
 {
-    private static final String __OBFID = "CL_00000030";
-
     @SideOnly(Side.CLIENT)
     public int getColorFromItemStack(ItemStack stack, int renderPass)
     {
@@ -39,24 +37,21 @@ public class ItemFireworkCharge extends Item
                 }
                 else
                 {
+                    int i = 0;
                     int j = 0;
                     int k = 0;
-                    int l = 0;
-                    int[] aint1 = aint;
-                    int i1 = aint.length;
 
-                    for (int j1 = 0; j1 < i1; ++j1)
+                    for (int l : aint)
                     {
-                        int k1 = aint1[j1];
-                        j += (k1 & 16711680) >> 16;
-                        k += (k1 & 65280) >> 8;
-                        l += (k1 & 255) >> 0;
+                        i += (l & 16711680) >> 16;
+                        j += (l & 65280) >> 8;
+                        k += (l & 255) >> 0;
                     }
 
-                    j /= aint.length;
-                    k /= aint.length;
-                    l /= aint.length;
-                    return j << 16 | k << 8 | l;
+                    i = i / aint.length;
+                    j = j / aint.length;
+                    k = k / aint.length;
+                    return i << 16 | j << 8 | k;
                 }
             }
         }
@@ -80,12 +75,9 @@ public class ItemFireworkCharge extends Item
 
     /**
      * allows items to add custom lines of information to the mouseover description
-     *  
-     * @param tooltip All lines to display in the Item's tooltip. This is a List of Strings.
-     * @param advanced Whether the setting "Advanced tooltips" is enabled
      */
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced)
+    public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced)
     {
         if (stack.hasTagCompound())
         {
@@ -99,7 +91,7 @@ public class ItemFireworkCharge extends Item
     }
 
     @SideOnly(Side.CLIENT)
-    public static void addExplosionInfo(NBTTagCompound nbt, List tooltip)
+    public static void addExplosionInfo(NBTTagCompound nbt, List<String> tooltip)
     {
         byte b0 = nbt.getByte("Type");
 
@@ -113,20 +105,14 @@ public class ItemFireworkCharge extends Item
         }
 
         int[] aint = nbt.getIntArray("Colors");
-        int j;
-        int k;
 
         if (aint.length > 0)
         {
             boolean flag = true;
             String s = "";
-            int[] aint1 = aint;
-            int i = aint.length;
 
-            for (j = 0; j < i; ++j)
+            for (int i : aint)
             {
-                k = aint1[j];
-
                 if (!flag)
                 {
                     s = s + ", ";
@@ -135,12 +121,12 @@ public class ItemFireworkCharge extends Item
                 flag = false;
                 boolean flag1 = false;
 
-                for (int l = 0; l < ItemDye.dyeColors.length; ++l)
+                for (int j = 0; j < ItemDye.dyeColors.length; ++j)
                 {
-                    if (k == ItemDye.dyeColors[l])
+                    if (i == ItemDye.dyeColors[j])
                     {
                         flag1 = true;
-                        s = s + StatCollector.translateToLocal("item.fireworksCharge." + EnumDyeColor.byDyeDamage(l).getUnlocalizedName());
+                        s = s + StatCollector.translateToLocal("item.fireworksCharge." + EnumDyeColor.byDyeDamage(j).getUnlocalizedName());
                         break;
                     }
                 }
@@ -154,39 +140,34 @@ public class ItemFireworkCharge extends Item
             tooltip.add(s);
         }
 
-        int[] aint2 = nbt.getIntArray("FadeColors");
-        boolean flag2;
+        int[] aint1 = nbt.getIntArray("FadeColors");
 
-        if (aint2.length > 0)
+        if (aint1.length > 0)
         {
-            flag2 = true;
+            boolean flag2 = true;
             String s1 = StatCollector.translateToLocal("item.fireworksCharge.fadeTo") + " ";
-            int[] aint3 = aint2;
-            j = aint2.length;
 
-            for (k = 0; k < j; ++k)
+            for (int l : aint1)
             {
-                int j1 = aint3[k];
-
                 if (!flag2)
                 {
                     s1 = s1 + ", ";
                 }
 
                 flag2 = false;
-                boolean flag4 = false;
+                boolean flag5 = false;
 
-                for (int i1 = 0; i1 < 16; ++i1)
+                for (int k = 0; k < 16; ++k)
                 {
-                    if (j1 == ItemDye.dyeColors[i1])
+                    if (l == ItemDye.dyeColors[k])
                     {
-                        flag4 = true;
-                        s1 = s1 + StatCollector.translateToLocal("item.fireworksCharge." + EnumDyeColor.byDyeDamage(i1).getUnlocalizedName());
+                        flag5 = true;
+                        s1 = s1 + StatCollector.translateToLocal("item.fireworksCharge." + EnumDyeColor.byDyeDamage(k).getUnlocalizedName());
                         break;
                     }
                 }
 
-                if (!flag4)
+                if (!flag5)
                 {
                     s1 = s1 + StatCollector.translateToLocal("item.fireworksCharge.customColor");
                 }
@@ -195,16 +176,16 @@ public class ItemFireworkCharge extends Item
             tooltip.add(s1);
         }
 
-        flag2 = nbt.getBoolean("Trail");
+        boolean flag3 = nbt.getBoolean("Trail");
 
-        if (flag2)
+        if (flag3)
         {
             tooltip.add(StatCollector.translateToLocal("item.fireworksCharge.trail"));
         }
 
-        boolean flag3 = nbt.getBoolean("Flicker");
+        boolean flag4 = nbt.getBoolean("Flicker");
 
-        if (flag3)
+        if (flag4)
         {
             tooltip.add(StatCollector.translateToLocal("item.fireworksCharge.flicker"));
         }

@@ -1,7 +1,6 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -9,37 +8,38 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S2APacketParticles implements Packet
+public class S2APacketParticles implements Packet<INetHandlerPlayClient>
 {
     private EnumParticleTypes particleType;
     private float xCoord;
     private float yCoord;
     private float zCoord;
     private float xOffset;
-    private float field_149230_f;
-    private float field_149231_g;
+    private float yOffset;
+    private float zOffset;
     private float particleSpeed;
     private int particleCount;
-    private boolean field_179752_j;
+    private boolean longDistance;
     /** These are the block/item ids and possibly metaData ids that are used to color or texture the particle. */
     private int[] particleArguments;
-    private static final String __OBFID = "CL_00001308";
 
-    public S2APacketParticles() {}
-
-    public S2APacketParticles(EnumParticleTypes p_i45977_1_, boolean p_i45977_2_, float p_i45977_3_, float p_i45977_4_, float p_i45977_5_, float p_i45977_6_, float yOffset, float zOffset, float particleSpeedIn, int p_i45977_10_, int ... p_i45977_11_)
+    public S2APacketParticles()
     {
-        this.particleType = p_i45977_1_;
-        this.field_179752_j = p_i45977_2_;
-        this.xCoord = p_i45977_3_;
-        this.yCoord = p_i45977_4_;
-        this.zCoord = p_i45977_5_;
-        this.xOffset = p_i45977_6_;
-        this.field_149230_f = yOffset;
-        this.field_149231_g = zOffset;
+    }
+
+    public S2APacketParticles(EnumParticleTypes particleTypeIn, boolean longDistanceIn, float x, float y, float z, float xOffsetIn, float yOffset, float zOffset, float particleSpeedIn, int particleCountIn, int... particleArgumentsIn)
+    {
+        this.particleType = particleTypeIn;
+        this.longDistance = longDistanceIn;
+        this.xCoord = x;
+        this.yCoord = y;
+        this.zCoord = z;
+        this.xOffset = xOffsetIn;
+        this.yOffset = yOffset;
+        this.zOffset = zOffset;
         this.particleSpeed = particleSpeedIn;
-        this.particleCount = p_i45977_10_;
-        this.particleArguments = p_i45977_11_;
+        this.particleCount = particleCountIn;
+        this.particleArguments = particleArgumentsIn;
     }
 
     /**
@@ -54,13 +54,13 @@ public class S2APacketParticles implements Packet
             this.particleType = EnumParticleTypes.BARRIER;
         }
 
-        this.field_179752_j = buf.readBoolean();
+        this.longDistance = buf.readBoolean();
         this.xCoord = buf.readFloat();
         this.yCoord = buf.readFloat();
         this.zCoord = buf.readFloat();
         this.xOffset = buf.readFloat();
-        this.field_149230_f = buf.readFloat();
-        this.field_149231_g = buf.readFloat();
+        this.yOffset = buf.readFloat();
+        this.zOffset = buf.readFloat();
         this.particleSpeed = buf.readFloat();
         this.particleCount = buf.readInt();
         int i = this.particleType.getArgumentCount();
@@ -78,13 +78,13 @@ public class S2APacketParticles implements Packet
     public void writePacketData(PacketBuffer buf) throws IOException
     {
         buf.writeInt(this.particleType.getParticleID());
-        buf.writeBoolean(this.field_179752_j);
+        buf.writeBoolean(this.longDistance);
         buf.writeFloat(this.xCoord);
         buf.writeFloat(this.yCoord);
         buf.writeFloat(this.zCoord);
         buf.writeFloat(this.xOffset);
-        buf.writeFloat(this.field_149230_f);
-        buf.writeFloat(this.field_149231_g);
+        buf.writeFloat(this.yOffset);
+        buf.writeFloat(this.zOffset);
         buf.writeFloat(this.particleSpeed);
         buf.writeInt(this.particleCount);
         int i = this.particleType.getArgumentCount();
@@ -96,31 +96,23 @@ public class S2APacketParticles implements Packet
     }
 
     @SideOnly(Side.CLIENT)
-    public EnumParticleTypes func_179749_a()
+    public EnumParticleTypes getParticleType()
     {
         return this.particleType;
     }
 
     /**
-     * Tells the given net handler to handle this packet.
-     */
-    public void handleParticles(INetHandlerPlayClient netHandler)
-    {
-        netHandler.handleParticles(this);
-    }
-
-    /**
      * Passes this Packet on to the NetHandler for processing.
      */
-    public void processPacket(INetHandler handler)
+    public void processPacket(INetHandlerPlayClient handler)
     {
-        this.handleParticles((INetHandlerPlayClient)handler);
+        handler.handleParticles(this);
     }
 
     @SideOnly(Side.CLIENT)
-    public boolean func_179750_b()
+    public boolean isLongDistance()
     {
-        return this.field_179752_j;
+        return this.longDistance;
     }
 
     /**
@@ -165,7 +157,7 @@ public class S2APacketParticles implements Packet
     @SideOnly(Side.CLIENT)
     public float getYOffset()
     {
-        return this.field_149230_f;
+        return this.yOffset;
     }
 
     /**
@@ -174,7 +166,7 @@ public class S2APacketParticles implements Packet
     @SideOnly(Side.CLIENT)
     public float getZOffset()
     {
-        return this.field_149231_g;
+        return this.zOffset;
     }
 
     /**

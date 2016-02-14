@@ -2,8 +2,6 @@ package net.minecraft.world.gen.layer;
 
 public class GenLayerRiverInit extends GenLayer
 {
-    private static final String __OBFID = "CL_00000565";
-
     public GenLayerRiverInit(long p_i2127_1_, GenLayer p_i2127_3_)
     {
         super(p_i2127_1_);
@@ -19,12 +17,12 @@ public class GenLayerRiverInit extends GenLayer
         int[] aint = this.parent.getInts(areaX, areaY, areaWidth, areaHeight);
         int[] aint1 = IntCache.getIntCache(areaWidth * areaHeight);
 
-        for (int i1 = 0; i1 < areaHeight; ++i1)
+        for (int i = 0; i < areaHeight; ++i)
         {
-            for (int j1 = 0; j1 < areaWidth; ++j1)
+            for (int j = 0; j < areaWidth; ++j)
             {
-                this.initChunkSeed((long)(j1 + areaX), (long)(i1 + areaY));
-                aint1[j1 + i1 * areaWidth] = aint[j1 + i1 * areaWidth] > 0 ? this.nextInt(299999) + 2 : 0;
+                this.initChunkSeed((long)(j + areaX), (long)(i + areaY));
+                aint1[j + i * areaWidth] = aint[j + i * areaWidth] > 0 ? this.nextInt(299999) + 2 : 0;
             }
         }
 

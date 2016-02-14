@@ -9,12 +9,10 @@ import net.minecraft.util.Vec3;
 
 public class CommandPlaySound extends CommandBase
 {
-    private static final String __OBFID = "CL_00000774";
-
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
-    public String getName()
+    public String getCommandName()
     {
         return "playsound";
     }
@@ -27,15 +25,23 @@ public class CommandPlaySound extends CommandBase
         return 2;
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.playsound.usage";
     }
 
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
-    public void execute(ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 2)
         {
@@ -43,30 +49,29 @@ public class CommandPlaySound extends CommandBase
         }
         else
         {
-            byte b0 = 0;
-            int i = b0 + 1;
-            String s = args[b0];
+            int i = 0;
+            String s = args[i++];
             EntityPlayerMP entityplayermp = getPlayer(sender, args[i++]);
             Vec3 vec3 = sender.getPositionVector();
             double d0 = vec3.xCoord;
 
             if (args.length > i)
             {
-                d0 = func_175761_b(d0, args[i++], true);
+                d0 = parseDouble(d0, args[i++], true);
             }
 
             double d1 = vec3.yCoord;
 
             if (args.length > i)
             {
-                d1 = func_175769_b(d1, args[i++], 0, 0, false);
+                d1 = parseDouble(d1, args[i++], 0, 0, false);
             }
 
             double d2 = vec3.zCoord;
 
             if (args.length > i)
             {
-                d2 = func_175761_b(d2, args[i++], true);
+                d2 = parseDouble(d2, args[i++], true);
             }
 
             double d3 = 1.0D;
@@ -120,13 +125,15 @@ public class CommandPlaySound extends CommandBase
         }
     }
 
-    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
         return args.length == 2 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames()) : (args.length > 2 && args.length <= 5 ? func_175771_a(args, 2, pos) : null);
     }
 
     /**
      * Return whether the specified command parameter index is a username parameter.
+     *  
+     * @param args The arguments that were passed
      */
     public boolean isUsernameIndex(String[] args, int index)
     {

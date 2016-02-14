@@ -1,7 +1,6 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -9,25 +8,26 @@ import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S3DPacketDisplayScoreboard implements Packet
+public class S3DPacketDisplayScoreboard implements Packet<INetHandlerPlayClient>
 {
-    private int field_149374_a;
-    private String field_149373_b;
-    private static final String __OBFID = "CL_00001325";
+    private int position;
+    private String scoreName;
 
-    public S3DPacketDisplayScoreboard() {}
-
-    public S3DPacketDisplayScoreboard(int p_i45216_1_, ScoreObjective p_i45216_2_)
+    public S3DPacketDisplayScoreboard()
     {
-        this.field_149374_a = p_i45216_1_;
+    }
 
-        if (p_i45216_2_ == null)
+    public S3DPacketDisplayScoreboard(int positionIn, ScoreObjective scoreIn)
+    {
+        this.position = positionIn;
+
+        if (scoreIn == null)
         {
-            this.field_149373_b = "";
+            this.scoreName = "";
         }
         else
         {
-            this.field_149373_b = p_i45216_2_.getName();
+            this.scoreName = scoreIn.getName();
         }
     }
 
@@ -36,8 +36,8 @@ public class S3DPacketDisplayScoreboard implements Packet
      */
     public void readPacketData(PacketBuffer buf) throws IOException
     {
-        this.field_149374_a = buf.readByte();
-        this.field_149373_b = buf.readStringFromBuffer(16);
+        this.position = buf.readByte();
+        this.scoreName = buf.readStringFromBuffer(16);
     }
 
     /**
@@ -45,32 +45,27 @@ public class S3DPacketDisplayScoreboard implements Packet
      */
     public void writePacketData(PacketBuffer buf) throws IOException
     {
-        buf.writeByte(this.field_149374_a);
-        buf.writeString(this.field_149373_b);
-    }
-
-    public void func_180747_a(INetHandlerPlayClient p_180747_1_)
-    {
-        p_180747_1_.handleDisplayScoreboard(this);
-    }
-
-    @SideOnly(Side.CLIENT)
-    public int func_149371_c()
-    {
-        return this.field_149374_a;
+        buf.writeByte(this.position);
+        buf.writeString(this.scoreName);
     }
 
     /**
      * Passes this Packet on to the NetHandler for processing.
      */
-    public void processPacket(INetHandler handler)
+    public void processPacket(INetHandlerPlayClient handler)
     {
-        this.func_180747_a((INetHandlerPlayClient)handler);
+        handler.handleDisplayScoreboard(this);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public int func_149371_c()
+    {
+        return this.position;
     }
 
     @SideOnly(Side.CLIENT)
     public String func_149370_d()
     {
-        return this.field_149373_b;
+        return this.scoreName;
     }
 }

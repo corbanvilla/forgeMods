@@ -21,7 +21,6 @@ public final class WorldSettings
     /** True if the Bonus Chest is enabled. */
     private boolean bonusChestEnabled;
     private String worldName;
-    private static final String __OBFID = "CL_00000147";
 
     public WorldSettings(long seedIn, WorldSettings.GameType gameType, boolean enableMapFeatures, boolean hardcoreMode, WorldType worldTypeIn)
     {
@@ -136,10 +135,9 @@ public final class WorldSettings
         CREATIVE(1, "creative"),
         ADVENTURE(2, "adventure"),
         SPECTATOR(3, "spectator");
+
         int id;
         String name;
-
-        private static final String __OBFID = "CL_00000148";
 
         private GameType(int typeId, String nameIn)
         {
@@ -221,16 +219,11 @@ public final class WorldSettings
          */
         public static WorldSettings.GameType getByID(int idIn)
         {
-            WorldSettings.GameType[] agametype = values();
-            int j = agametype.length;
-
-            for (int k = 0; k < j; ++k)
+            for (WorldSettings.GameType worldsettings$gametype : values())
             {
-                WorldSettings.GameType gametype = agametype[k];
-
-                if (gametype.id == idIn)
+                if (worldsettings$gametype.id == idIn)
                 {
-                    return gametype;
+                    return worldsettings$gametype;
                 }
             }
 
@@ -243,16 +236,11 @@ public final class WorldSettings
         @SideOnly(Side.CLIENT)
         public static WorldSettings.GameType getByName(String p_77142_0_)
         {
-            WorldSettings.GameType[] agametype = values();
-            int i = agametype.length;
-
-            for (int j = 0; j < i; ++j)
+            for (WorldSettings.GameType worldsettings$gametype : values())
             {
-                WorldSettings.GameType gametype = agametype[j];
-
-                if (gametype.name.equals(p_77142_0_))
+                if (worldsettings$gametype.name.equals(p_77142_0_))
                 {
-                    return gametype;
+                    return worldsettings$gametype;
                 }
             }
 

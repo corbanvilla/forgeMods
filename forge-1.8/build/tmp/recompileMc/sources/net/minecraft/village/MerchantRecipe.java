@@ -19,36 +19,35 @@ public class MerchantRecipe
     /** Maximum times this trade can be used. */
     private int maxTradeUses;
     private boolean rewardsExp;
-    private static final String __OBFID = "CL_00000126";
 
-    public MerchantRecipe(NBTTagCompound p_i1940_1_)
+    public MerchantRecipe(NBTTagCompound tagCompound)
     {
-        this.readFromTags(p_i1940_1_);
+        this.readFromTags(tagCompound);
     }
 
-    public MerchantRecipe(ItemStack p_i1941_1_, ItemStack p_i1941_2_, ItemStack p_i1941_3_)
+    public MerchantRecipe(ItemStack buy1, ItemStack buy2, ItemStack sell)
     {
-        this(p_i1941_1_, p_i1941_2_, p_i1941_3_, 0, 7);
+        this(buy1, buy2, sell, 0, 7);
     }
 
-    public MerchantRecipe(ItemStack p_i45760_1_, ItemStack p_i45760_2_, ItemStack p_i45760_3_, int p_i45760_4_, int p_i45760_5_)
+    public MerchantRecipe(ItemStack buy1, ItemStack buy2, ItemStack sell, int toolUsesIn, int maxTradeUsesIn)
     {
-        this.itemToBuy = p_i45760_1_;
-        this.secondItemToBuy = p_i45760_2_;
-        this.itemToSell = p_i45760_3_;
-        this.toolUses = p_i45760_4_;
-        this.maxTradeUses = p_i45760_5_;
+        this.itemToBuy = buy1;
+        this.secondItemToBuy = buy2;
+        this.itemToSell = sell;
+        this.toolUses = toolUsesIn;
+        this.maxTradeUses = maxTradeUsesIn;
         this.rewardsExp = true;
     }
 
-    public MerchantRecipe(ItemStack p_i1942_1_, ItemStack p_i1942_2_)
+    public MerchantRecipe(ItemStack buy1, ItemStack sell)
     {
-        this(p_i1942_1_, (ItemStack)null, p_i1942_2_);
+        this(buy1, (ItemStack)null, sell);
     }
 
-    public MerchantRecipe(ItemStack p_i1943_1_, Item p_i1943_2_)
+    public MerchantRecipe(ItemStack buy1, Item sellItem)
     {
-        this(p_i1943_1_, new ItemStack(p_i1943_2_));
+        this(buy1, new ItemStack(sellItem));
     }
 
     /**
@@ -98,9 +97,9 @@ public class MerchantRecipe
         ++this.toolUses;
     }
 
-    public void increaseMaxTradeUses(int p_82783_1_)
+    public void increaseMaxTradeUses(int increment)
     {
-        this.maxTradeUses += p_82783_1_;
+        this.maxTradeUses += increment;
     }
 
     public boolean isRecipeDisabled()
@@ -108,8 +107,12 @@ public class MerchantRecipe
         return this.toolUses >= this.maxTradeUses;
     }
 
+    /**
+     * Compensates {@link net.minecraft.village.MerchantRecipe#toolUses toolUses} with {@link
+     * net.minecraft.village.MerchantRecipe#maxTradeUses maxTradeUses}
+     */
     @SideOnly(Side.CLIENT)
-    public void func_82785_h()
+    public void compensateToolUses()
     {
         this.toolUses = this.maxTradeUses;
     }
@@ -119,35 +122,35 @@ public class MerchantRecipe
         return this.rewardsExp;
     }
 
-    public void readFromTags(NBTTagCompound p_77390_1_)
+    public void readFromTags(NBTTagCompound tagCompound)
     {
-        NBTTagCompound nbttagcompound1 = p_77390_1_.getCompoundTag("buy");
-        this.itemToBuy = ItemStack.loadItemStackFromNBT(nbttagcompound1);
-        NBTTagCompound nbttagcompound2 = p_77390_1_.getCompoundTag("sell");
-        this.itemToSell = ItemStack.loadItemStackFromNBT(nbttagcompound2);
+        NBTTagCompound nbttagcompound = tagCompound.getCompoundTag("buy");
+        this.itemToBuy = ItemStack.loadItemStackFromNBT(nbttagcompound);
+        NBTTagCompound nbttagcompound1 = tagCompound.getCompoundTag("sell");
+        this.itemToSell = ItemStack.loadItemStackFromNBT(nbttagcompound1);
 
-        if (p_77390_1_.hasKey("buyB", 10))
+        if (tagCompound.hasKey("buyB", 10))
         {
-            this.secondItemToBuy = ItemStack.loadItemStackFromNBT(p_77390_1_.getCompoundTag("buyB"));
+            this.secondItemToBuy = ItemStack.loadItemStackFromNBT(tagCompound.getCompoundTag("buyB"));
         }
 
-        if (p_77390_1_.hasKey("uses", 99))
+        if (tagCompound.hasKey("uses", 99))
         {
-            this.toolUses = p_77390_1_.getInteger("uses");
+            this.toolUses = tagCompound.getInteger("uses");
         }
 
-        if (p_77390_1_.hasKey("maxUses", 99))
+        if (tagCompound.hasKey("maxUses", 99))
         {
-            this.maxTradeUses = p_77390_1_.getInteger("maxUses");
+            this.maxTradeUses = tagCompound.getInteger("maxUses");
         }
         else
         {
             this.maxTradeUses = 7;
         }
 
-        if (p_77390_1_.hasKey("rewardExp", 1))
+        if (tagCompound.hasKey("rewardExp", 1))
         {
-            this.rewardsExp = p_77390_1_.getBoolean("rewardExp");
+            this.rewardsExp = tagCompound.getBoolean("rewardExp");
         }
         else
         {

@@ -9,59 +9,54 @@ import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class RegistrySimple implements IRegistry
+public class RegistrySimple<K, V> implements IRegistry<K, V>
 {
     private static final Logger logger = LogManager.getLogger();
-    /** Objects registered on this registry. */
-    protected final Map registryObjects = this.createUnderlyingMap();
-    private static final String __OBFID = "CL_00001210";
+    protected final Map<K, V> registryObjects = this.createUnderlyingMap();
 
-    /**
-     * Creates the Map we will use to map keys to their registered values.
-     */
-    protected Map createUnderlyingMap()
+    protected Map<K, V> createUnderlyingMap()
     {
-        return Maps.newHashMap();
+        return Maps.<K, V>newHashMap();
     }
 
-    public Object getObject(Object p_82594_1_)
+    public V getObject(K name)
     {
-        return this.registryObjects.get(p_82594_1_);
+        return this.registryObjects.get(name);
     }
 
     /**
      * Register an object on this registry.
+     *  
+     * @param key The key of the registry entry
+     * @param value The value of the registry entry
      */
-    public void putObject(Object p_82595_1_, Object p_82595_2_)
+    public void putObject(K key, V value)
     {
-        Validate.notNull(p_82595_1_);
-        Validate.notNull(p_82595_2_);
+        Validate.notNull(key);
+        Validate.notNull(value);
 
-        if (this.registryObjects.containsKey(p_82595_1_))
+        if (this.registryObjects.containsKey(key))
         {
-            logger.debug("Adding duplicate key \'" + p_82595_1_ + "\' to registry");
+            logger.debug("Adding duplicate key \'" + key + "\' to registry");
         }
 
-        this.registryObjects.put(p_82595_1_, p_82595_2_);
+        this.registryObjects.put(key, value);
     }
 
-    /**
-     * Gets all the keys recognized by this registry.
-     */
-    public Set getKeys()
+    public Set<K> getKeys()
     {
-        return Collections.unmodifiableSet(this.registryObjects.keySet());
+        return Collections.<K>unmodifiableSet(this.registryObjects.keySet());
     }
 
     /**
      * Does this registry contain an entry for the given key?
      */
-    public boolean containsKey(Object p_148741_1_)
+    public boolean containsKey(K p_148741_1_)
     {
         return this.registryObjects.containsKey(p_148741_1_);
     }
 
-    public Iterator iterator()
+    public Iterator<V> iterator()
     {
         return this.registryObjects.values().iterator();
     }

@@ -1,6 +1,5 @@
 package net.minecraft.block;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import net.minecraft.block.material.MapColor;
@@ -40,9 +39,9 @@ public class Block
 {
     /** ResourceLocation for the Air block */
     private static final ResourceLocation AIR_ID = new ResourceLocation("air");
-    public static final RegistryNamespacedDefaultedByKey blockRegistry = net.minecraftforge.fml.common.registry.GameData.getBlockRegistry();
+    public static final RegistryNamespacedDefaultedByKey<ResourceLocation,Block> blockRegistry = net.minecraftforge.fml.common.registry.GameData.getBlockRegistry();
     @Deprecated //Modders: DO NOT use this! Use GameRegistry
-    public static final ObjectIntIdentityMap BLOCK_STATE_IDS = net.minecraftforge.fml.common.registry.GameData.getBlockStateIDMap();
+    public static final ObjectIntIdentityMap<IBlockState> BLOCK_STATE_IDS = net.minecraftforge.fml.common.registry.GameData.getBlockStateIDMap();
     private CreativeTabs displayOnCreativeTab;
     public static final Block.SoundType soundTypeStone = new Block.SoundType("stone", 1.0F, 1.0F);
     /** the wood sound type */
@@ -54,7 +53,6 @@ public class Block
     public static final Block.SoundType soundTypeMetal = new Block.SoundType("stone", 1.0F, 1.5F);
     public static final Block.SoundType soundTypeGlass = new Block.SoundType("stone", 1.0F, 1.0F)
     {
-        private static final String __OBFID = "CL_00000200";
         /**
          * Get the breaking sound for the Block
          */
@@ -72,7 +70,6 @@ public class Block
     public static final Block.SoundType soundTypeSnow = new Block.SoundType("snow", 1.0F, 1.0F);
     public static final Block.SoundType soundTypeLadder = new Block.SoundType("ladder", 1.0F, 1.0F)
     {
-        private static final String __OBFID = "CL_00000201";
         /**
          * Get the breaking sound for the Block
          */
@@ -83,7 +80,6 @@ public class Block
     };
     public static final Block.SoundType soundTypeAnvil = new Block.SoundType("anvil", 0.3F, 1.0F)
     {
-        private static final String __OBFID = "CL_00000202";
         /**
          * Get the breaking sound for the Block
          */
@@ -98,7 +94,6 @@ public class Block
     };
     public static final Block.SoundType SLIME_SOUND = new Block.SoundType("slime", 1.0F, 1.0F)
     {
-        private static final String __OBFID = "CL_00002133";
         /**
          * Get the breaking sound for the Block
          */
@@ -125,8 +120,9 @@ public class Block
     protected boolean useNeighborBrightness;
     /** Indicates how many hits it takes to break a block. */
     protected float blockHardness;
+    /** Indicates how much this block can resist explosions */
     protected float blockResistance;
-    protected boolean enableStats = true;
+    protected boolean enableStats;
     /**
      * Flags whether or not this block is of a type that needs random ticking. Ref-counted by ExtendedBlockStorage in
      * order to broadly cull a chunk from the random chunk update list for efficiency's sake.
@@ -144,12 +140,12 @@ public class Block
     public Block.SoundType stepSound;
     public float blockParticleGravity;
     protected final Material blockMaterial;
+    protected final MapColor field_181083_K;
     /** Determines how much velocity is maintained while moving on top of this block */
     public float slipperiness;
     protected final BlockState blockState;
     private IBlockState defaultBlockState;
     private String unlocalizedName;
-    private static final String __OBFID = "CL_00000199";
 
     public final net.minecraftforge.fml.common.registry.RegistryDelegate<Block> delegate =
             ((net.minecraftforge.fml.common.registry.FMLControlledNamespacedRegistry)blockRegistry).getDelegate(this, Block.class);
@@ -164,7 +160,8 @@ public class Block
      */
     public static int getStateId(IBlockState state)
     {
-        return getIdFromBlock(state.getBlock()) + (state.getBlock().getMetaFromState(state) << 12);
+        Block block = state.getBlock();
+        return getIdFromBlock(block) + (block.getMetaFromState(state) << 12);
     }
 
     public static Block getBlockById(int id)
@@ -178,9 +175,9 @@ public class Block
      */
     public static IBlockState getStateById(int id)
     {
-        int j = id & 4095;
-        int k = id >> 12 & 15;
-        return getBlockById(j).getStateFromMeta(k);
+        int i = id & 4095;
+        int j = id >> 12 & 15;
+        return getBlockById(i).getStateFromMeta(j);
     }
 
     public static Block getBlockFromItem(Item itemIn)
@@ -202,7 +199,7 @@ public class Block
             {
                 return (Block)blockRegistry.getObjectById(Integer.parseInt(name));
             }
-            catch (NumberFormatException numberformatexception)
+            catch (NumberFormatException var3)
             {
                 return null;
             }
@@ -219,6 +216,9 @@ public class Block
         return this.lightOpacity;
     }
 
+    /**
+     * Used in the renderer to apply ambient occlusion
+     */
     @SideOnly(Side.CLIENT)
     public boolean isTranslucent()
     {
@@ -251,7 +251,7 @@ public class Block
      */
     public MapColor getMapColor(IBlockState state)
     {
-        return this.getMaterial().getMaterialMapColor();
+        return this.field_181083_K;
     }
 
     /**
@@ -286,18 +286,25 @@ public class Block
         return state;
     }
 
-    public Block(Material materialIn)
+    public Block(Material p_i46399_1_, MapColor p_i46399_2_)
     {
+        this.enableStats = true;
         this.stepSound = soundTypeStone;
         this.blockParticleGravity = 1.0F;
         this.slipperiness = 0.6F;
-        this.blockMaterial = materialIn;
+        this.blockMaterial = p_i46399_1_;
+        this.field_181083_K = p_i46399_2_;
         this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
         this.fullBlock = this.isOpaqueCube();
         this.lightOpacity = this.isOpaqueCube() ? 255 : 0;
-        this.translucent = !materialIn.blocksLight();
+        this.translucent = !p_i46399_1_.blocksLight();
         this.blockState = this.createBlockState();
         this.setDefaultState(this.blockState.getBaseState());
+    }
+
+    public Block(Material materialIn)
+    {
+        this(materialIn, materialIn.getMaterialMapColor());
     }
 
     /**
@@ -340,11 +347,15 @@ public class Block
     /**
      * Indicate if a material is a normal solid opaque cube
      */
-    public boolean isSolidFullCube()
+    public boolean isBlockNormalCube()
     {
         return this.blockMaterial.blocksMovement() && this.isFullCube();
     }
 
+    /**
+     * Used for nearly all game logic (non-rendering) purposes. Use Forge-provided isNormalCube(IBlockAccess, BlockPos)
+     * instead.
+     */
     public boolean isNormalCube()
     {
         return this.blockMaterial.isOpaque() && this.isFullCube() && !this.canProvidePower();
@@ -366,7 +377,7 @@ public class Block
     }
 
     /**
-     * The type of render function that is called for this block
+     * The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render
      */
     public int getRenderType()
     {
@@ -465,7 +476,7 @@ public class Block
     @SideOnly(Side.CLIENT)
     public boolean shouldSideBeRendered(IBlockAccess worldIn, BlockPos pos, EnumFacing side)
     {
-        return side == EnumFacing.DOWN && this.minY > 0.0D ? true : (side == EnumFacing.UP && this.maxY < 1.0D ? true : (side == EnumFacing.NORTH && this.minZ > 0.0D ? true : (side == EnumFacing.SOUTH && this.maxZ < 1.0D ? true : (side == EnumFacing.WEST && this.minX > 0.0D ? true : (side == EnumFacing.EAST && this.maxX < 1.0D ? true : !worldIn.getBlockState(pos).getBlock().isOpaqueCube())))));
+        return side == EnumFacing.DOWN && this.minY > 0.0D ? true : (side == EnumFacing.UP && this.maxY < 1.0D ? true : (side == EnumFacing.NORTH && this.minZ > 0.0D ? true : (side == EnumFacing.SOUTH && this.maxZ < 1.0D ? true : (side == EnumFacing.WEST && this.minX > 0.0D ? true : (side == EnumFacing.EAST && this.maxX < 1.0D ? true : !worldIn.getBlockState(pos).getBlock().doesSideBlockRendering(worldIn, pos, side))))));
     }
 
     /**
@@ -484,16 +495,14 @@ public class Block
 
     /**
      * Add all collision boxes of this Block to the list that intersect with the given mask.
-     *  
-     * @param collidingEntity the Entity colliding with this Block
      */
-    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List list, Entity collidingEntity)
+    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity)
     {
-        AxisAlignedBB axisalignedbb1 = this.getCollisionBoundingBox(worldIn, pos, state);
+        AxisAlignedBB axisalignedbb = this.getCollisionBoundingBox(worldIn, pos, state);
 
-        if (axisalignedbb1 != null && mask.intersectsWith(axisalignedbb1))
+        if (axisalignedbb != null && mask.intersectsWith(axisalignedbb))
         {
-            list.add(axisalignedbb1);
+            list.add(axisalignedbb);
         }
     }
 
@@ -502,6 +511,9 @@ public class Block
         return new AxisAlignedBB((double)pos.getX() + this.minX, (double)pos.getY() + this.minY, (double)pos.getZ() + this.minZ, (double)pos.getX() + this.maxX, (double)pos.getY() + this.maxY, (double)pos.getZ() + this.maxZ);
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return true;
@@ -528,20 +540,28 @@ public class Block
         this.updateTick(worldIn, pos, state, random);
     }
 
-    public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {}
+    public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
+    {
+    }
 
     @SideOnly(Side.CLIENT)
-    public void randomDisplayTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {}
+    public void randomDisplayTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
+    {
+    }
 
     /**
      * Called when a player destroys this Block
      */
-    public void onBlockDestroyedByPlayer(World worldIn, BlockPos pos, IBlockState state) {}
+    public void onBlockDestroyedByPlayer(World worldIn, BlockPos pos, IBlockState state)
+    {
+    }
 
     /**
      * Called when a neighboring block changes.
      */
-    public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock) {}
+    public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
+    {
+    }
 
     /**
      * How many world ticks before ticking
@@ -551,7 +571,9 @@ public class Block
         return 10;
     }
 
-    public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {}
+    public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state)
+    {
+    }
 
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
     {
@@ -571,8 +593,6 @@ public class Block
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -589,8 +609,6 @@ public class Block
 
     /**
      * Spawn this Block's drops into the World as EntityItems
-     *  
-     * @param forture the level of the Fortune enchantment on the player's tool
      */
     public final void dropBlockAsItem(World worldIn, BlockPos pos, IBlockState state, int forture)
     {
@@ -599,9 +617,6 @@ public class Block
 
     /**
      * Spawns this Block's drops into the World as EntityItems.
-     *  
-     * @param chance The chance that each Item is actually spawned (1.0 = always, 0.0 = never)
-     * @param fortune The player's fortune level
      */
     public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune)
     {
@@ -625,7 +640,7 @@ public class Block
      */
     public static void spawnAsEntity(World worldIn, BlockPos pos, ItemStack stack)
     {
-        if (!worldIn.isRemote && worldIn.getGameRules().getGameRuleBooleanValue("doTileDrops") && !worldIn.restoringBlockSnapshots) // do not drop items while restoring blockstates, prevents item dupe
+        if (!worldIn.isRemote && worldIn.getGameRules().getBoolean("doTileDrops") && !worldIn.restoringBlockSnapshots) // do not drop items while restoring blockstates, prevents item dupe
         {
             if (captureDrops.get())
             {
@@ -644,8 +659,6 @@ public class Block
 
     /**
      * Spawns the given amount of experience into the World as XP orb entities
-     *  
-     * @param amount The amount of XP to spawn
      */
     public void dropXpOnBlockBreak(World worldIn, BlockPos pos, int amount)
     {
@@ -653,15 +666,16 @@ public class Block
         {
             while (amount > 0)
             {
-                int j = EntityXPOrb.getXPSplit(amount);
-                amount -= j;
-                worldIn.spawnEntityInWorld(new EntityXPOrb(worldIn, (double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D, (double)pos.getZ() + 0.5D, j));
+                int i = EntityXPOrb.getXPSplit(amount);
+                amount -= i;
+                worldIn.spawnEntityInWorld(new EntityXPOrb(worldIn, (double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D, (double)pos.getZ() + 0.5D, i));
             }
         }
     }
 
     /**
-     * Get the damage value that this Block should drop
+     * Gets the metadata of the item this Block can drop. This method is called when the block gets destroyed. It
+     * returns the metadata of the dropped item based on the old metadata of the block.
      */
     public int damageDropped(IBlockState state)
     {
@@ -678,85 +692,82 @@ public class Block
 
     /**
      * Ray traces through the blocks collision from start vector to end vector returning a ray trace hit.
-     *  
-     * @param start The start vector
-     * @param end The end vector
      */
     public MovingObjectPosition collisionRayTrace(World worldIn, BlockPos pos, Vec3 start, Vec3 end)
     {
         this.setBlockBoundsBasedOnState(worldIn, pos);
         start = start.addVector((double)(-pos.getX()), (double)(-pos.getY()), (double)(-pos.getZ()));
         end = end.addVector((double)(-pos.getX()), (double)(-pos.getY()), (double)(-pos.getZ()));
-        Vec3 vec32 = start.getIntermediateWithXValue(end, this.minX);
-        Vec3 vec33 = start.getIntermediateWithXValue(end, this.maxX);
-        Vec3 vec34 = start.getIntermediateWithYValue(end, this.minY);
-        Vec3 vec35 = start.getIntermediateWithYValue(end, this.maxY);
-        Vec3 vec36 = start.getIntermediateWithZValue(end, this.minZ);
-        Vec3 vec37 = start.getIntermediateWithZValue(end, this.maxZ);
+        Vec3 vec3 = start.getIntermediateWithXValue(end, this.minX);
+        Vec3 vec31 = start.getIntermediateWithXValue(end, this.maxX);
+        Vec3 vec32 = start.getIntermediateWithYValue(end, this.minY);
+        Vec3 vec33 = start.getIntermediateWithYValue(end, this.maxY);
+        Vec3 vec34 = start.getIntermediateWithZValue(end, this.minZ);
+        Vec3 vec35 = start.getIntermediateWithZValue(end, this.maxZ);
 
-        if (!this.isVecInsideYZBounds(vec32))
+        if (!this.isVecInsideYZBounds(vec3))
+        {
+            vec3 = null;
+        }
+
+        if (!this.isVecInsideYZBounds(vec31))
+        {
+            vec31 = null;
+        }
+
+        if (!this.isVecInsideXZBounds(vec32))
         {
             vec32 = null;
         }
 
-        if (!this.isVecInsideYZBounds(vec33))
+        if (!this.isVecInsideXZBounds(vec33))
         {
             vec33 = null;
         }
 
-        if (!this.isVecInsideXZBounds(vec34))
+        if (!this.isVecInsideXYBounds(vec34))
         {
             vec34 = null;
         }
 
-        if (!this.isVecInsideXZBounds(vec35))
+        if (!this.isVecInsideXYBounds(vec35))
         {
             vec35 = null;
         }
 
-        if (!this.isVecInsideXYBounds(vec36))
+        Vec3 vec36 = null;
+
+        if (vec3 != null && (vec36 == null || start.squareDistanceTo(vec3) < start.squareDistanceTo(vec36)))
         {
-            vec36 = null;
+            vec36 = vec3;
         }
 
-        if (!this.isVecInsideXYBounds(vec37))
+        if (vec31 != null && (vec36 == null || start.squareDistanceTo(vec31) < start.squareDistanceTo(vec36)))
         {
-            vec37 = null;
+            vec36 = vec31;
         }
 
-        Vec3 vec38 = null;
-
-        if (vec32 != null && (vec38 == null || start.squareDistanceTo(vec32) < start.squareDistanceTo(vec38)))
+        if (vec32 != null && (vec36 == null || start.squareDistanceTo(vec32) < start.squareDistanceTo(vec36)))
         {
-            vec38 = vec32;
+            vec36 = vec32;
         }
 
-        if (vec33 != null && (vec38 == null || start.squareDistanceTo(vec33) < start.squareDistanceTo(vec38)))
+        if (vec33 != null && (vec36 == null || start.squareDistanceTo(vec33) < start.squareDistanceTo(vec36)))
         {
-            vec38 = vec33;
+            vec36 = vec33;
         }
 
-        if (vec34 != null && (vec38 == null || start.squareDistanceTo(vec34) < start.squareDistanceTo(vec38)))
+        if (vec34 != null && (vec36 == null || start.squareDistanceTo(vec34) < start.squareDistanceTo(vec36)))
         {
-            vec38 = vec34;
+            vec36 = vec34;
         }
 
-        if (vec35 != null && (vec38 == null || start.squareDistanceTo(vec35) < start.squareDistanceTo(vec38)))
+        if (vec35 != null && (vec36 == null || start.squareDistanceTo(vec35) < start.squareDistanceTo(vec36)))
         {
-            vec38 = vec35;
+            vec36 = vec35;
         }
 
-        if (vec36 != null && (vec38 == null || start.squareDistanceTo(vec36) < start.squareDistanceTo(vec38)))
-        {
-            vec38 = vec36;
-        }
-
-        if (vec37 != null && (vec38 == null || start.squareDistanceTo(vec37) < start.squareDistanceTo(vec38)))
-        {
-            vec38 = vec37;
-        }
-
-        if (vec38 == null)
+        if (vec36 == null)
         {
             return null;
         }
@@ -764,37 +775,37 @@ public class Block
         {
             EnumFacing enumfacing = null;
 
-            if (vec38 == vec32)
+            if (vec36 == vec3)
             {
                 enumfacing = EnumFacing.WEST;
             }
 
-            if (vec38 == vec33)
+            if (vec36 == vec31)
             {
                 enumfacing = EnumFacing.EAST;
             }
 
-            if (vec38 == vec34)
+            if (vec36 == vec32)
             {
                 enumfacing = EnumFacing.DOWN;
             }
 
-            if (vec38 == vec35)
+            if (vec36 == vec33)
             {
                 enumfacing = EnumFacing.UP;
             }
 
-            if (vec38 == vec36)
+            if (vec36 == vec34)
             {
                 enumfacing = EnumFacing.NORTH;
             }
 
-            if (vec38 == vec37)
+            if (vec36 == vec35)
             {
                 enumfacing = EnumFacing.SOUTH;
             }
 
-            return new MovingObjectPosition(vec38.addVector((double)pos.getX(), (double)pos.getY(), (double)pos.getZ()), enumfacing, pos);
+            return new MovingObjectPosition(vec36.addVector((double)pos.getX(), (double)pos.getY(), (double)pos.getZ()), enumfacing, pos);
         }
     }
 
@@ -825,11 +836,19 @@ public class Block
     /**
      * Called when this Block is destroyed by an Explosion
      */
-    public void onBlockDestroyedByExplosion(World worldIn, BlockPos pos, Explosion explosionIn) {}
+    public void onBlockDestroyedByExplosion(World worldIn, BlockPos pos, Explosion explosionIn)
+    {
+    }
 
     public boolean canReplace(World worldIn, BlockPos pos, EnumFacing side, ItemStack stack)
     {
         return this.canPlaceBlockOnSide(worldIn, pos, side);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public EnumWorldBlockLayer getBlockLayer()
+    {
+        return EnumWorldBlockLayer.SOLID;
     }
 
     /**
@@ -838,12 +857,6 @@ public class Block
     public boolean canPlaceBlockOnSide(World worldIn, BlockPos pos, EnumFacing side)
     {
         return this.canPlaceBlockAt(worldIn, pos);
-    }
-
-    @SideOnly(Side.CLIENT)
-    public EnumWorldBlockLayer getBlockLayer()
-    {
-        return EnumWorldBlockLayer.SOLID;
     }
 
     public boolean canPlaceBlockAt(World worldIn, BlockPos pos)
@@ -859,21 +872,31 @@ public class Block
     /**
      * Triggered whenever an entity collides with this block (enters into the block)
      */
-    public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, Entity entityIn) {}
+    public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, Entity entityIn)
+    {
+    }
 
+    /**
+     * Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the
+     * IBlockstate
+     */
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
         return this.getStateFromMeta(meta);
     }
 
-    public void onBlockClicked(World worldIn, BlockPos pos, EntityPlayer playerIn) {}
+    public void onBlockClicked(World worldIn, BlockPos pos, EntityPlayer playerIn)
+    {
+    }
 
     public Vec3 modifyAcceleration(World worldIn, BlockPos pos, Entity entityIn, Vec3 motion)
     {
         return motion;
     }
 
-    public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos) {}
+    public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
+    {
+    }
 
     /**
      * returns the block bounderies minX value
@@ -941,7 +964,7 @@ public class Block
         return 16777215;
     }
 
-    public int isProvidingWeakPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
+    public int getWeakPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
     {
         return 0;
     }
@@ -963,9 +986,11 @@ public class Block
     /**
      * Called When an Entity Collided with the Block
      */
-    public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {}
+    public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn)
+    {
+    }
 
-    public int isProvidingStrongPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
+    public int getStrongPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
     {
         return 0;
     }
@@ -973,7 +998,9 @@ public class Block
     /**
      * Sets the block's bounds for rendering it as an item
      */
-    public void setBlockBoundsForItemRender() {}
+    public void setBlockBoundsForItemRender()
+    {
+    }
 
     public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, TileEntity te)
     {
@@ -1032,7 +1059,17 @@ public class Block
         return this.quantityDropped(random);
     }
 
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {}
+    /**
+     * Called by ItemBlocks after a block is set in the world, to allow post-place logic
+     */
+    public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
+    {
+    }
+
+    public boolean func_181623_g()
+    {
+        return !this.blockMaterial.isSolid() && !this.blockMaterial.isLiquid();
+    }
 
     public Block setUnlocalizedName(String name)
     {
@@ -1089,13 +1126,11 @@ public class Block
     @SideOnly(Side.CLIENT)
     public float getAmbientOcclusionLightValue()
     {
-        return this.isSolidFullCube() ? 0.2F : 1.0F;
+        return this.isBlockNormalCube() ? 0.2F : 1.0F;
     }
 
     /**
      * Block's chance to react to a living entity falling on it.
-     *  
-     * @param fallDistance The distance the entity has fallen before landing
      */
     public void onFallenUpon(World worldIn, BlockPos pos, Entity entityIn, float fallDistance)
     {
@@ -1126,7 +1161,7 @@ public class Block
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
     {
         list.add(new ItemStack(itemIn, 1, 0));
     }
@@ -1137,7 +1172,9 @@ public class Block
         return this;
     }
 
-    public void onBlockHarvested(World worldIn, BlockPos pos, IBlockState state, EntityPlayer player) {}
+    public void onBlockHarvested(World worldIn, BlockPos pos, IBlockState state, EntityPlayer player)
+    {
+    }
 
     /**
      * Returns the CreativeTab to display the given block on.
@@ -1151,7 +1188,9 @@ public class Block
     /**
      * Called similar to random ticks, but only when it is raining.
      */
-    public void fillWithRain(World worldIn, BlockPos pos) {}
+    public void fillWithRain(World worldIn, BlockPos pos)
+    {
+    }
 
     /**
      * Returns true only if block is flowerPot
@@ -1233,6 +1272,11 @@ public class Block
         return Block.EnumOffsetType.NONE;
     }
 
+    public String toString()
+    {
+        return "Block{" + blockRegistry.getNameForObject(this) + "}";
+    }
+
     /* ======================================== FORGE START =====================================*/
     //For ForgeInternal use Only!
     protected ThreadLocal<EntityPlayer> harvesters = new ThreadLocal();
@@ -1283,6 +1327,25 @@ public class Block
     }
 
     /**
+     * Check if the face of a block should block rendering.
+     *
+     * Faces which are fully opaque should return true, faces with transparency
+     * or faces which do not span the full size of the block should return false.
+     *
+     * @param world The current world
+     * @param pos Block position in world
+     * @param side The side to check
+     * @return True if the block is opaque on the specified side.
+     */
+    public boolean doesSideBlockRendering(IBlockAccess world, BlockPos pos, EnumFacing face)
+    {
+        /**
+         * Used to determine ambient occlusion and culling when rebuilding chunks for render
+         */
+        return isOpaqueCube();
+    }
+
+    /**
      * Checks if the block is a solid face on the given side, used by placement logic.
      *
      * @param world The current world
@@ -1296,7 +1359,9 @@ public class Block
 
         if (this instanceof BlockSlab)
         {
-            return isFullBlock() || (state.getValue(BlockSlab.HALF) == BlockSlab.EnumBlockHalf.TOP && side == EnumFacing.UP);
+            return isFullBlock()
+                  || (state.getValue(BlockSlab.HALF) == BlockSlab.EnumBlockHalf.TOP    && side == EnumFacing.UP  )
+                  || (state.getValue(BlockSlab.HALF) == BlockSlab.EnumBlockHalf.BOTTOM && side == EnumFacing.DOWN);
         }
         else if (this instanceof BlockFarmland)
         {
@@ -1308,6 +1373,7 @@ public class Block
             BlockStairs.EnumShape shape = (BlockStairs.EnumShape)state.getValue(BlockStairs.SHAPE);
             EnumFacing facing = (EnumFacing)state.getValue(BlockStairs.FACING);
             if (side == EnumFacing.UP) return flipped;
+            if (side == EnumFacing.DOWN) return !flipped;
             if (facing == side) return true;
             if (flipped)
             {
@@ -1854,6 +1920,23 @@ public class Block
     }
 
     /**
+     * Allows a block to override the standard EntityLivingBase.updateFallState
+     * particles, this is a server side method that spawns particles with
+     * WorldServer.spawnParticle
+     *
+     * @param world The current Server world
+     * @param blockPosition of the block that the entity landed on.
+     * @param iblockstate State at the specific world/pos
+     * @param entity the entity that hit landed on the block.
+     * @param numberOfParticles that vanilla would have spawned.
+     * @return True to prevent vanilla landing particles form spawning.
+     */
+    public boolean addLandingEffects(net.minecraft.world.WorldServer worldObj, BlockPos blockPosition, IBlockState iblockstate, EntityLivingBase entity, int numberOfParticles )
+    {
+        return false;
+    }
+
+    /**
      * Spawn a digging particle effect in the world, this is a wrapper
      * around EffectRenderer.addBlockHitEffects to allow the block more
      * control over the particles. Useful when you have entirely different
@@ -2011,11 +2094,7 @@ public class Block
      */
     public boolean canEntityDestroy(IBlockAccess world, BlockPos pos, Entity entity)
     {
-        if (entity instanceof net.minecraft.entity.boss.EntityWither)
-        {
-            return this != net.minecraft.init.Blocks.barrier && this != net.minecraft.init.Blocks.bedrock && this != net.minecraft.init.Blocks.end_portal && this != net.minecraft.init.Blocks.end_portal_frame && this != net.minecraft.init.Blocks.command_block;
-        }
-        else if (entity instanceof net.minecraft.entity.boss.EntityDragon)
+        if (entity instanceof net.minecraft.entity.boss.EntityDragon)
         {
             return this != net.minecraft.init.Blocks.barrier && this != net.minecraft.init.Blocks.obsidian && this != net.minecraft.init.Blocks.end_stone && this != net.minecraft.init.Blocks.bedrock && this != net.minecraft.init.Blocks.command_block;
         }
@@ -2149,6 +2228,10 @@ public class Block
      */
     public boolean shouldCheckWeakPower(IBlockAccess world, BlockPos pos, EnumFacing side)
     {
+        /**
+         * Used for nearly all game logic (non-rendering) purposes. Use Forge-provided isNormalCube(IBlockAccess,
+         * BlockPos) instead.
+         */
         return isNormalCube();
     }
 
@@ -2182,7 +2265,7 @@ public class Block
      */
     public void setHarvestLevel(String toolClass, int level)
     {
-        Iterator<IBlockState> itr = getBlockState().getValidStates().iterator();
+        java.util.Iterator<IBlockState> itr = getBlockState().getValidStates().iterator();
         while (itr.hasNext())
         {
             setHarvestLevel(toolClass, level, itr.next());
@@ -2245,11 +2328,7 @@ public class Block
      */
     public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos)
     {
-        /**
-         * Get the actual Block state of this Block at the given position. This applies properties not visible in the
-         * metadata, such as fence connections.
-         */
-        return getActualState(state, world, pos);
+        return state;
     }
 
     /**
@@ -2284,6 +2363,55 @@ public class Block
             return capturedDrops.get();
         }
     }
+
+    private ResourceLocation registryName = null;
+    /**
+     * Sets a unique name for this Block. This should be used for uniquely identify the instance of the Block.
+     * This is the valid replacement for the atrocious 'getUnlocalizedName().substring(6)' stuff that everyone does.
+     * Unlocalized names have NOTHING to do with unique identifiers. As demonstrated by vanilla blocks and items.
+     *
+     * The supplied name will be prefixed with the currently active mod's modId.
+     * If the supplied name already has a prefix that is different, it will be used and a warning will be logged.
+     *
+     * If a name already exists, or this Block is already registered in a registry, then an IllegalStateException is thrown.
+     *
+     * Returns 'this' to allow for chaining.
+     *
+     * @param name Unique registry name
+     * @return This instance
+     */
+    public final Block setRegistryName(String name)
+    {
+        if (getRegistryName() != null)
+            throw new IllegalStateException("Attempted to set registry name on block with exisiting registry name! New: " + name + " Old: " + getRegistryName());
+        int index = name.lastIndexOf(':');
+        String oldPrefix = index == -1 ? "" : name.substring(0, index);
+        name = index == -1 ? name : name.substring(index + 1);
+        net.minecraftforge.fml.common.ModContainer mc = net.minecraftforge.fml.common.Loader.instance().activeModContainer();
+        String prefix = mc == null ? "minecraft" : mc.getModId();
+        if (!oldPrefix.equals(prefix) && oldPrefix.length() > 0)
+        {
+            net.minecraftforge.fml.common.FMLLog.bigWarning("Dangerous alternative prefix %s for name %s, invalid registry invocation/invalid name?", oldPrefix, name);
+            prefix = oldPrefix;
+        }
+        this.registryName = new ResourceLocation(prefix, name);
+        return this;
+    }
+    public final Block setRegistryName(ResourceLocation name){ return setRegistryName(name.toString()); }
+    public final Block setRegistryName(String modID, String name){ return setRegistryName(modID + ":" + name); }
+
+    /**
+     * A unique identifier for this block, if this block is registered in the game registry it will return that name.
+     * Otherwise it will return the name set in setRegistryName().
+     * If neither are valid null is returned.
+     *
+     * @return Unique identifier or null.
+     */
+    public final String getRegistryName()
+    {
+        if (delegate.getResourceName() != null) return delegate.getResourceName().toString();
+        return registryName != null ? registryName.toString() : null;
+    }
     /* ========================================= FORGE END ======================================*/
 
     public static void registerBlocks()
@@ -2312,7 +2440,7 @@ public class Block
         registerBlock(19, "sponge", (new BlockSponge()).setHardness(0.6F).setStepSound(soundTypeGrass).setUnlocalizedName("sponge"));
         registerBlock(20, "glass", (new BlockGlass(Material.glass, false)).setHardness(0.3F).setStepSound(soundTypeGlass).setUnlocalizedName("glass"));
         registerBlock(21, "lapis_ore", (new BlockOre()).setHardness(3.0F).setResistance(5.0F).setStepSound(soundTypePiston).setUnlocalizedName("oreLapis"));
-        registerBlock(22, "lapis_block", (new BlockCompressed(MapColor.lapisColor)).setHardness(3.0F).setResistance(5.0F).setStepSound(soundTypePiston).setUnlocalizedName("blockLapis").setCreativeTab(CreativeTabs.tabBlock));
+        registerBlock(22, "lapis_block", (new Block(Material.iron, MapColor.lapisColor)).setHardness(3.0F).setResistance(5.0F).setStepSound(soundTypePiston).setUnlocalizedName("blockLapis").setCreativeTab(CreativeTabs.tabBlock));
         registerBlock(23, "dispenser", (new BlockDispenser()).setHardness(3.5F).setStepSound(soundTypePiston).setUnlocalizedName("dispenser"));
         Block block2 = (new BlockSandStone()).setStepSound(soundTypePiston).setHardness(0.8F).setUnlocalizedName("sandStone");
         registerBlock(24, "sandstone", block2);
@@ -2325,7 +2453,7 @@ public class Block
         registerBlock(31, "tallgrass", (new BlockTallGrass()).setHardness(0.0F).setStepSound(soundTypeGrass).setUnlocalizedName("tallgrass"));
         registerBlock(32, "deadbush", (new BlockDeadBush()).setHardness(0.0F).setStepSound(soundTypeGrass).setUnlocalizedName("deadbush"));
         registerBlock(33, "piston", (new BlockPistonBase(false)).setUnlocalizedName("pistonBase"));
-        registerBlock(34, "piston_head", new BlockPistonExtension());
+        registerBlock(34, "piston_head", (new BlockPistonExtension()).setUnlocalizedName("pistonBase"));
         registerBlock(35, "wool", (new BlockColored(Material.cloth)).setHardness(0.8F).setStepSound(soundTypeCloth).setUnlocalizedName("cloth"));
         registerBlock(36, "piston_extension", new BlockPistonMoving());
         registerBlock(37, "yellow_flower", (new BlockYellowFlower()).setHardness(0.0F).setStepSound(soundTypeGrass).setUnlocalizedName("flower1"));
@@ -2334,11 +2462,11 @@ public class Block
         registerBlock(39, "brown_mushroom", block3);
         Block block4 = (new BlockMushroom()).setHardness(0.0F).setStepSound(soundTypeGrass).setUnlocalizedName("mushroom");
         registerBlock(40, "red_mushroom", block4);
-        registerBlock(41, "gold_block", (new BlockCompressed(MapColor.goldColor)).setHardness(3.0F).setResistance(10.0F).setStepSound(soundTypeMetal).setUnlocalizedName("blockGold"));
-        registerBlock(42, "iron_block", (new BlockCompressed(MapColor.ironColor)).setHardness(5.0F).setResistance(10.0F).setStepSound(soundTypeMetal).setUnlocalizedName("blockIron"));
+        registerBlock(41, "gold_block", (new Block(Material.iron, MapColor.goldColor)).setHardness(3.0F).setResistance(10.0F).setStepSound(soundTypeMetal).setUnlocalizedName("blockGold").setCreativeTab(CreativeTabs.tabBlock));
+        registerBlock(42, "iron_block", (new Block(Material.iron, MapColor.ironColor)).setHardness(5.0F).setResistance(10.0F).setStepSound(soundTypeMetal).setUnlocalizedName("blockIron").setCreativeTab(CreativeTabs.tabBlock));
         registerBlock(43, "double_stone_slab", (new BlockDoubleStoneSlab()).setHardness(2.0F).setResistance(10.0F).setStepSound(soundTypePiston).setUnlocalizedName("stoneSlab"));
         registerBlock(44, "stone_slab", (new BlockHalfStoneSlab()).setHardness(2.0F).setResistance(10.0F).setStepSound(soundTypePiston).setUnlocalizedName("stoneSlab"));
-        Block block5 = (new Block(Material.rock)).setHardness(2.0F).setResistance(10.0F).setStepSound(soundTypePiston).setUnlocalizedName("brick").setCreativeTab(CreativeTabs.tabBlock);
+        Block block5 = (new Block(Material.rock, MapColor.redColor)).setHardness(2.0F).setResistance(10.0F).setStepSound(soundTypePiston).setUnlocalizedName("brick").setCreativeTab(CreativeTabs.tabBlock);
         registerBlock(45, "brick_block", block5);
         registerBlock(46, "tnt", (new BlockTNT()).setHardness(0.0F).setStepSound(soundTypeGrass).setUnlocalizedName("tnt"));
         registerBlock(47, "bookshelf", (new BlockBookshelf()).setHardness(1.5F).setStepSound(soundTypeWood).setUnlocalizedName("bookshelf"));
@@ -2351,7 +2479,7 @@ public class Block
         registerBlock(54, "chest", (new BlockChest(0)).setHardness(2.5F).setStepSound(soundTypeWood).setUnlocalizedName("chest"));
         registerBlock(55, "redstone_wire", (new BlockRedstoneWire()).setHardness(0.0F).setStepSound(soundTypeStone).setUnlocalizedName("redstoneDust").disableStats());
         registerBlock(56, "diamond_ore", (new BlockOre()).setHardness(3.0F).setResistance(5.0F).setStepSound(soundTypePiston).setUnlocalizedName("oreDiamond"));
-        registerBlock(57, "diamond_block", (new BlockCompressed(MapColor.diamondColor)).setHardness(5.0F).setResistance(10.0F).setStepSound(soundTypeMetal).setUnlocalizedName("blockDiamond"));
+        registerBlock(57, "diamond_block", (new Block(Material.iron, MapColor.diamondColor)).setHardness(5.0F).setResistance(10.0F).setStepSound(soundTypeMetal).setUnlocalizedName("blockDiamond").setCreativeTab(CreativeTabs.tabBlock));
         registerBlock(58, "crafting_table", (new BlockWorkbench()).setHardness(2.5F).setStepSound(soundTypeWood).setUnlocalizedName("workbench"));
         registerBlock(59, "wheat", (new BlockCrops()).setUnlocalizedName("crops"));
         Block block6 = (new BlockFarmland()).setHardness(0.6F).setStepSound(soundTypeGravel).setUnlocalizedName("farmland");
@@ -2380,7 +2508,7 @@ public class Block
         registerBlock(82, "clay", (new BlockClay()).setHardness(0.6F).setStepSound(soundTypeGravel).setUnlocalizedName("clay"));
         registerBlock(83, "reeds", (new BlockReed()).setHardness(0.0F).setStepSound(soundTypeGrass).setUnlocalizedName("reeds").disableStats());
         registerBlock(84, "jukebox", (new BlockJukebox()).setHardness(2.0F).setResistance(10.0F).setStepSound(soundTypePiston).setUnlocalizedName("jukebox"));
-        registerBlock(85, "fence", (new BlockFence(Material.wood)).setHardness(2.0F).setResistance(5.0F).setStepSound(soundTypeWood).setUnlocalizedName("fence"));
+        registerBlock(85, "fence", (new BlockFence(Material.wood, BlockPlanks.EnumType.OAK.func_181070_c())).setHardness(2.0F).setResistance(5.0F).setStepSound(soundTypeWood).setUnlocalizedName("fence"));
         Block block7 = (new BlockPumpkin()).setHardness(1.0F).setStepSound(soundTypeWood).setUnlocalizedName("pumpkin");
         registerBlock(86, "pumpkin", block7);
         registerBlock(87, "netherrack", (new BlockNetherrack()).setHardness(0.4F).setStepSound(soundTypePiston).setUnlocalizedName("hellrock"));
@@ -2396,8 +2524,8 @@ public class Block
         registerBlock(97, "monster_egg", (new BlockSilverfish()).setHardness(0.75F).setUnlocalizedName("monsterStoneEgg"));
         Block block8 = (new BlockStoneBrick()).setHardness(1.5F).setResistance(10.0F).setStepSound(soundTypePiston).setUnlocalizedName("stonebricksmooth");
         registerBlock(98, "stonebrick", block8);
-        registerBlock(99, "brown_mushroom_block", (new BlockHugeMushroom(Material.wood, block3)).setHardness(0.2F).setStepSound(soundTypeWood).setUnlocalizedName("mushroom"));
-        registerBlock(100, "red_mushroom_block", (new BlockHugeMushroom(Material.wood, block4)).setHardness(0.2F).setStepSound(soundTypeWood).setUnlocalizedName("mushroom"));
+        registerBlock(99, "brown_mushroom_block", (new BlockHugeMushroom(Material.wood, MapColor.dirtColor, block3)).setHardness(0.2F).setStepSound(soundTypeWood).setUnlocalizedName("mushroom"));
+        registerBlock(100, "red_mushroom_block", (new BlockHugeMushroom(Material.wood, MapColor.redColor, block4)).setHardness(0.2F).setStepSound(soundTypeWood).setUnlocalizedName("mushroom"));
         registerBlock(101, "iron_bars", (new BlockPane(Material.iron, true)).setHardness(5.0F).setResistance(10.0F).setStepSound(soundTypeMetal).setUnlocalizedName("fenceIron"));
         registerBlock(102, "glass_pane", (new BlockPane(Material.glass, false)).setHardness(0.3F).setStepSound(soundTypeGlass).setUnlocalizedName("thinGlass"));
         Block block9 = (new BlockMelon()).setHardness(1.0F).setStepSound(soundTypeWood).setUnlocalizedName("melon");
@@ -2405,14 +2533,14 @@ public class Block
         registerBlock(104, "pumpkin_stem", (new BlockStem(block7)).setHardness(0.0F).setStepSound(soundTypeWood).setUnlocalizedName("pumpkinStem"));
         registerBlock(105, "melon_stem", (new BlockStem(block9)).setHardness(0.0F).setStepSound(soundTypeWood).setUnlocalizedName("pumpkinStem"));
         registerBlock(106, "vine", (new BlockVine()).setHardness(0.2F).setStepSound(soundTypeGrass).setUnlocalizedName("vine"));
-        registerBlock(107, "fence_gate", (new BlockFenceGate()).setHardness(2.0F).setResistance(5.0F).setStepSound(soundTypeWood).setUnlocalizedName("fenceGate"));
+        registerBlock(107, "fence_gate", (new BlockFenceGate(BlockPlanks.EnumType.OAK)).setHardness(2.0F).setResistance(5.0F).setStepSound(soundTypeWood).setUnlocalizedName("fenceGate"));
         registerBlock(108, "brick_stairs", (new BlockStairs(block5.getDefaultState())).setUnlocalizedName("stairsBrick"));
         registerBlock(109, "stone_brick_stairs", (new BlockStairs(block8.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.DEFAULT))).setUnlocalizedName("stairsStoneBrickSmooth"));
         registerBlock(110, "mycelium", (new BlockMycelium()).setHardness(0.6F).setStepSound(soundTypeGrass).setUnlocalizedName("mycel"));
         registerBlock(111, "waterlily", (new BlockLilyPad()).setHardness(0.0F).setStepSound(soundTypeGrass).setUnlocalizedName("waterlily"));
         Block block10 = (new BlockNetherBrick()).setHardness(2.0F).setResistance(10.0F).setStepSound(soundTypePiston).setUnlocalizedName("netherBrick").setCreativeTab(CreativeTabs.tabBlock);
         registerBlock(112, "nether_brick", block10);
-        registerBlock(113, "nether_brick_fence", (new BlockFence(Material.rock)).setHardness(2.0F).setResistance(10.0F).setStepSound(soundTypePiston).setUnlocalizedName("netherFence"));
+        registerBlock(113, "nether_brick_fence", (new BlockFence(Material.rock, MapColor.netherrackColor)).setHardness(2.0F).setResistance(10.0F).setStepSound(soundTypePiston).setUnlocalizedName("netherFence"));
         registerBlock(114, "nether_brick_stairs", (new BlockStairs(block10.getDefaultState())).setUnlocalizedName("stairsNetherBrick"));
         registerBlock(115, "nether_wart", (new BlockNetherWart()).setUnlocalizedName("netherStalk"));
         registerBlock(116, "enchanting_table", (new BlockEnchantmentTable()).setHardness(5.0F).setResistance(2000.0F).setUnlocalizedName("enchantmentTable"));
@@ -2420,7 +2548,7 @@ public class Block
         registerBlock(118, "cauldron", (new BlockCauldron()).setHardness(2.0F).setUnlocalizedName("cauldron"));
         registerBlock(119, "end_portal", (new BlockEndPortal(Material.portal)).setHardness(-1.0F).setResistance(6000000.0F));
         registerBlock(120, "end_portal_frame", (new BlockEndPortalFrame()).setStepSound(soundTypeGlass).setLightLevel(0.125F).setHardness(-1.0F).setUnlocalizedName("endPortalFrame").setResistance(6000000.0F).setCreativeTab(CreativeTabs.tabDecorations));
-        registerBlock(121, "end_stone", (new Block(Material.rock)).setHardness(3.0F).setResistance(15.0F).setStepSound(soundTypePiston).setUnlocalizedName("whiteStone").setCreativeTab(CreativeTabs.tabBlock));
+        registerBlock(121, "end_stone", (new Block(Material.rock, MapColor.sandColor)).setHardness(3.0F).setResistance(15.0F).setStepSound(soundTypePiston).setUnlocalizedName("whiteStone").setCreativeTab(CreativeTabs.tabBlock));
         registerBlock(122, "dragon_egg", (new BlockDragonEgg()).setHardness(3.0F).setResistance(15.0F).setStepSound(soundTypePiston).setLightLevel(0.125F).setUnlocalizedName("dragonEgg"));
         registerBlock(123, "redstone_lamp", (new BlockRedstoneLight(false)).setHardness(0.3F).setStepSound(soundTypeGlass).setUnlocalizedName("redstoneLight").setCreativeTab(CreativeTabs.tabRedstone));
         registerBlock(124, "lit_redstone_lamp", (new BlockRedstoneLight(true)).setHardness(0.3F).setStepSound(soundTypeGlass).setUnlocalizedName("redstoneLight"));
@@ -2432,7 +2560,7 @@ public class Block
         registerBlock(130, "ender_chest", (new BlockEnderChest()).setHardness(22.5F).setResistance(1000.0F).setStepSound(soundTypePiston).setUnlocalizedName("enderChest").setLightLevel(0.5F));
         registerBlock(131, "tripwire_hook", (new BlockTripWireHook()).setUnlocalizedName("tripWireSource"));
         registerBlock(132, "tripwire", (new BlockTripWire()).setUnlocalizedName("tripWire"));
-        registerBlock(133, "emerald_block", (new BlockCompressed(MapColor.emeraldColor)).setHardness(5.0F).setResistance(10.0F).setStepSound(soundTypeMetal).setUnlocalizedName("blockEmerald"));
+        registerBlock(133, "emerald_block", (new Block(Material.iron, MapColor.emeraldColor)).setHardness(5.0F).setResistance(10.0F).setStepSound(soundTypeMetal).setUnlocalizedName("blockEmerald").setCreativeTab(CreativeTabs.tabBlock));
         registerBlock(134, "spruce_stairs", (new BlockStairs(block1.getDefaultState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.SPRUCE))).setUnlocalizedName("stairsWoodSpruce"));
         registerBlock(135, "birch_stairs", (new BlockStairs(block1.getDefaultState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.BIRCH))).setUnlocalizedName("stairsWoodBirch"));
         registerBlock(136, "jungle_stairs", (new BlockStairs(block1.getDefaultState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.JUNGLE))).setUnlocalizedName("stairsWoodJungle"));
@@ -2446,13 +2574,13 @@ public class Block
         registerBlock(144, "skull", (new BlockSkull()).setHardness(1.0F).setStepSound(soundTypePiston).setUnlocalizedName("skull"));
         registerBlock(145, "anvil", (new BlockAnvil()).setHardness(5.0F).setStepSound(soundTypeAnvil).setResistance(2000.0F).setUnlocalizedName("anvil"));
         registerBlock(146, "trapped_chest", (new BlockChest(1)).setHardness(2.5F).setStepSound(soundTypeWood).setUnlocalizedName("chestTrap"));
-        registerBlock(147, "light_weighted_pressure_plate", (new BlockPressurePlateWeighted("gold_block", Material.iron, 15)).setHardness(0.5F).setStepSound(soundTypeWood).setUnlocalizedName("weightedPlate_light"));
-        registerBlock(148, "heavy_weighted_pressure_plate", (new BlockPressurePlateWeighted("iron_block", Material.iron, 150)).setHardness(0.5F).setStepSound(soundTypeWood).setUnlocalizedName("weightedPlate_heavy"));
+        registerBlock(147, "light_weighted_pressure_plate", (new BlockPressurePlateWeighted(Material.iron, 15, MapColor.goldColor)).setHardness(0.5F).setStepSound(soundTypeWood).setUnlocalizedName("weightedPlate_light"));
+        registerBlock(148, "heavy_weighted_pressure_plate", (new BlockPressurePlateWeighted(Material.iron, 150)).setHardness(0.5F).setStepSound(soundTypeWood).setUnlocalizedName("weightedPlate_heavy"));
         registerBlock(149, "unpowered_comparator", (new BlockRedstoneComparator(false)).setHardness(0.0F).setStepSound(soundTypeWood).setUnlocalizedName("comparator").disableStats());
         registerBlock(150, "powered_comparator", (new BlockRedstoneComparator(true)).setHardness(0.0F).setLightLevel(0.625F).setStepSound(soundTypeWood).setUnlocalizedName("comparator").disableStats());
         registerBlock(151, "daylight_detector", new BlockDaylightDetector(false));
-        registerBlock(152, "redstone_block", (new BlockCompressedPowered(MapColor.tntColor)).setHardness(5.0F).setResistance(10.0F).setStepSound(soundTypeMetal).setUnlocalizedName("blockRedstone"));
-        registerBlock(153, "quartz_ore", (new BlockOre()).setHardness(3.0F).setResistance(5.0F).setStepSound(soundTypePiston).setUnlocalizedName("netherquartz"));
+        registerBlock(152, "redstone_block", (new BlockCompressedPowered(Material.iron, MapColor.tntColor)).setHardness(5.0F).setResistance(10.0F).setStepSound(soundTypeMetal).setUnlocalizedName("blockRedstone").setCreativeTab(CreativeTabs.tabRedstone));
+        registerBlock(153, "quartz_ore", (new BlockOre(MapColor.netherrackColor)).setHardness(3.0F).setResistance(5.0F).setStepSound(soundTypePiston).setUnlocalizedName("netherquartz"));
         registerBlock(154, "hopper", (new BlockHopper()).setHardness(3.0F).setResistance(8.0F).setStepSound(soundTypeMetal).setUnlocalizedName("hopper"));
         Block block11 = (new BlockQuartz()).setStepSound(soundTypePiston).setHardness(0.8F).setUnlocalizedName("quartzBlock");
         registerBlock(155, "quartz_block", block11);
@@ -2473,7 +2601,7 @@ public class Block
         registerBlock(170, "hay_block", (new BlockHay()).setHardness(0.5F).setStepSound(soundTypeGrass).setUnlocalizedName("hayBlock").setCreativeTab(CreativeTabs.tabBlock));
         registerBlock(171, "carpet", (new BlockCarpet()).setHardness(0.1F).setStepSound(soundTypeCloth).setUnlocalizedName("woolCarpet").setLightOpacity(0));
         registerBlock(172, "hardened_clay", (new BlockHardenedClay()).setHardness(1.25F).setResistance(7.0F).setStepSound(soundTypePiston).setUnlocalizedName("clayHardened"));
-        registerBlock(173, "coal_block", (new Block(Material.rock)).setHardness(5.0F).setResistance(10.0F).setStepSound(soundTypePiston).setUnlocalizedName("blockCoal").setCreativeTab(CreativeTabs.tabBlock));
+        registerBlock(173, "coal_block", (new Block(Material.rock, MapColor.blackColor)).setHardness(5.0F).setResistance(10.0F).setStepSound(soundTypePiston).setUnlocalizedName("blockCoal").setCreativeTab(CreativeTabs.tabBlock));
         registerBlock(174, "packed_ice", (new BlockPackedIce()).setHardness(0.5F).setStepSound(soundTypeGlass).setUnlocalizedName("icePacked"));
         registerBlock(175, "double_plant", new BlockDoublePlant());
         registerBlock(176, "standing_banner", (new BlockBanner.BlockBannerStanding()).setHardness(1.0F).setStepSound(soundTypeWood).setUnlocalizedName("banner").disableStats());
@@ -2484,29 +2612,25 @@ public class Block
         registerBlock(180, "red_sandstone_stairs", (new BlockStairs(block12.getDefaultState().withProperty(BlockRedSandstone.TYPE, BlockRedSandstone.EnumType.SMOOTH))).setUnlocalizedName("stairsRedSandStone"));
         registerBlock(181, "double_stone_slab2", (new BlockDoubleStoneSlabNew()).setHardness(2.0F).setResistance(10.0F).setStepSound(soundTypePiston).setUnlocalizedName("stoneSlab2"));
         registerBlock(182, "stone_slab2", (new BlockHalfStoneSlabNew()).setHardness(2.0F).setResistance(10.0F).setStepSound(soundTypePiston).setUnlocalizedName("stoneSlab2"));
-        registerBlock(183, "spruce_fence_gate", (new BlockFenceGate()).setHardness(2.0F).setResistance(5.0F).setStepSound(soundTypeWood).setUnlocalizedName("spruceFenceGate"));
-        registerBlock(184, "birch_fence_gate", (new BlockFenceGate()).setHardness(2.0F).setResistance(5.0F).setStepSound(soundTypeWood).setUnlocalizedName("birchFenceGate"));
-        registerBlock(185, "jungle_fence_gate", (new BlockFenceGate()).setHardness(2.0F).setResistance(5.0F).setStepSound(soundTypeWood).setUnlocalizedName("jungleFenceGate"));
-        registerBlock(186, "dark_oak_fence_gate", (new BlockFenceGate()).setHardness(2.0F).setResistance(5.0F).setStepSound(soundTypeWood).setUnlocalizedName("darkOakFenceGate"));
-        registerBlock(187, "acacia_fence_gate", (new BlockFenceGate()).setHardness(2.0F).setResistance(5.0F).setStepSound(soundTypeWood).setUnlocalizedName("acaciaFenceGate"));
-        registerBlock(188, "spruce_fence", (new BlockFence(Material.wood)).setHardness(2.0F).setResistance(5.0F).setStepSound(soundTypeWood).setUnlocalizedName("spruceFence"));
-        registerBlock(189, "birch_fence", (new BlockFence(Material.wood)).setHardness(2.0F).setResistance(5.0F).setStepSound(soundTypeWood).setUnlocalizedName("birchFence"));
-        registerBlock(190, "jungle_fence", (new BlockFence(Material.wood)).setHardness(2.0F).setResistance(5.0F).setStepSound(soundTypeWood).setUnlocalizedName("jungleFence"));
-        registerBlock(191, "dark_oak_fence", (new BlockFence(Material.wood)).setHardness(2.0F).setResistance(5.0F).setStepSound(soundTypeWood).setUnlocalizedName("darkOakFence"));
-        registerBlock(192, "acacia_fence", (new BlockFence(Material.wood)).setHardness(2.0F).setResistance(5.0F).setStepSound(soundTypeWood).setUnlocalizedName("acaciaFence"));
+        registerBlock(183, "spruce_fence_gate", (new BlockFenceGate(BlockPlanks.EnumType.SPRUCE)).setHardness(2.0F).setResistance(5.0F).setStepSound(soundTypeWood).setUnlocalizedName("spruceFenceGate"));
+        registerBlock(184, "birch_fence_gate", (new BlockFenceGate(BlockPlanks.EnumType.BIRCH)).setHardness(2.0F).setResistance(5.0F).setStepSound(soundTypeWood).setUnlocalizedName("birchFenceGate"));
+        registerBlock(185, "jungle_fence_gate", (new BlockFenceGate(BlockPlanks.EnumType.JUNGLE)).setHardness(2.0F).setResistance(5.0F).setStepSound(soundTypeWood).setUnlocalizedName("jungleFenceGate"));
+        registerBlock(186, "dark_oak_fence_gate", (new BlockFenceGate(BlockPlanks.EnumType.DARK_OAK)).setHardness(2.0F).setResistance(5.0F).setStepSound(soundTypeWood).setUnlocalizedName("darkOakFenceGate"));
+        registerBlock(187, "acacia_fence_gate", (new BlockFenceGate(BlockPlanks.EnumType.ACACIA)).setHardness(2.0F).setResistance(5.0F).setStepSound(soundTypeWood).setUnlocalizedName("acaciaFenceGate"));
+        registerBlock(188, "spruce_fence", (new BlockFence(Material.wood, BlockPlanks.EnumType.SPRUCE.func_181070_c())).setHardness(2.0F).setResistance(5.0F).setStepSound(soundTypeWood).setUnlocalizedName("spruceFence"));
+        registerBlock(189, "birch_fence", (new BlockFence(Material.wood, BlockPlanks.EnumType.BIRCH.func_181070_c())).setHardness(2.0F).setResistance(5.0F).setStepSound(soundTypeWood).setUnlocalizedName("birchFence"));
+        registerBlock(190, "jungle_fence", (new BlockFence(Material.wood, BlockPlanks.EnumType.JUNGLE.func_181070_c())).setHardness(2.0F).setResistance(5.0F).setStepSound(soundTypeWood).setUnlocalizedName("jungleFence"));
+        registerBlock(191, "dark_oak_fence", (new BlockFence(Material.wood, BlockPlanks.EnumType.DARK_OAK.func_181070_c())).setHardness(2.0F).setResistance(5.0F).setStepSound(soundTypeWood).setUnlocalizedName("darkOakFence"));
+        registerBlock(192, "acacia_fence", (new BlockFence(Material.wood, BlockPlanks.EnumType.ACACIA.func_181070_c())).setHardness(2.0F).setResistance(5.0F).setStepSound(soundTypeWood).setUnlocalizedName("acaciaFence"));
         registerBlock(193, "spruce_door", (new BlockDoor(Material.wood)).setHardness(3.0F).setStepSound(soundTypeWood).setUnlocalizedName("doorSpruce").disableStats());
         registerBlock(194, "birch_door", (new BlockDoor(Material.wood)).setHardness(3.0F).setStepSound(soundTypeWood).setUnlocalizedName("doorBirch").disableStats());
         registerBlock(195, "jungle_door", (new BlockDoor(Material.wood)).setHardness(3.0F).setStepSound(soundTypeWood).setUnlocalizedName("doorJungle").disableStats());
         registerBlock(196, "acacia_door", (new BlockDoor(Material.wood)).setHardness(3.0F).setStepSound(soundTypeWood).setUnlocalizedName("doorAcacia").disableStats());
         registerBlock(197, "dark_oak_door", (new BlockDoor(Material.wood)).setHardness(3.0F).setStepSound(soundTypeWood).setUnlocalizedName("doorDarkOak").disableStats());
         blockRegistry.validateKey();
-        Iterator iterator = blockRegistry.iterator();
-        Block block13;
 
-        while (iterator.hasNext())
+        for (Block block13 : blockRegistry)
         {
-            block13 = (Block)iterator.next();
-
             if (block13.blockMaterial == Material.air)
             {
                 block13.useNeighborBrightness = false;
@@ -2529,17 +2653,11 @@ public class Block
             }
         }
 
-        iterator = blockRegistry.iterator();
-
-        while (iterator.hasNext())
+        for (Block block14 : blockRegistry)
         {
-            block13 = (Block)iterator.next();
-            Iterator iterator1 = block13.getBlockState().getValidStates().iterator();
-
-            while (iterator1.hasNext())
+            for (IBlockState iblockstate : block14.getBlockState().getValidStates())
             {
-                IBlockState iblockstate = (IBlockState)iterator1.next();
-                int i = blockRegistry.getIDForObject(block13) << 4 | block13.getMetaFromState(iblockstate);
+                int i = blockRegistry.getIDForObject(block14) << 4 | block14.getMetaFromState(iblockstate);
                 BLOCK_STATE_IDS.put(iblockstate, i);
             }
         }
@@ -2561,8 +2679,6 @@ public class Block
         NONE,
         XZ,
         XYZ;
-
-        private static final String __OBFID = "CL_00002132";
     }
 
     public static class SoundType
@@ -2570,7 +2686,6 @@ public class Block
             public final String soundName;
             public final float volume;
             public final float frequency;
-            private static final String __OBFID = "CL_00000203";
 
             public SoundType(String name, float volume, float frequency)
             {

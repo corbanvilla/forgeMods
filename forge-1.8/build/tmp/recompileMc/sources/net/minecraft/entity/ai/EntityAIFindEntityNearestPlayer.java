@@ -19,10 +19,9 @@ public class EntityAIFindEntityNearestPlayer extends EntityAIBase
 {
     private static final Logger field_179436_a = LogManager.getLogger();
     private EntityLiving field_179434_b;
-    private final Predicate field_179435_c;
+    private final Predicate<Entity> field_179435_c;
     private final EntityAINearestAttackableTarget.Sorter field_179432_d;
     private EntityLivingBase field_179433_e;
-    private static final String __OBFID = "CL_00002248";
 
     public EntityAIFindEntityNearestPlayer(EntityLiving p_i45882_1_)
     {
@@ -33,12 +32,15 @@ public class EntityAIFindEntityNearestPlayer extends EntityAIBase
             field_179436_a.warn("Use NearestAttackableTargetGoal.class for PathfinerMob mobs!");
         }
 
-        this.field_179435_c = new Predicate()
+        this.field_179435_c = new Predicate<Entity>()
         {
-            private static final String __OBFID = "CL_00002247";
-            public boolean func_179880_a(Entity p_179880_1_)
+            public boolean apply(Entity p_apply_1_)
             {
-                if (!(p_179880_1_ instanceof EntityPlayer))
+                if (!(p_apply_1_ instanceof EntityPlayer))
+                {
+                    return false;
+                }
+                else if (((EntityPlayer)p_apply_1_).capabilities.disableDamage)
                 {
                     return false;
                 }
@@ -46,14 +48,14 @@ public class EntityAIFindEntityNearestPlayer extends EntityAIBase
                 {
                     double d0 = EntityAIFindEntityNearestPlayer.this.func_179431_f();
 
-                    if (p_179880_1_.isSneaking())
+                    if (p_apply_1_.isSneaking())
                     {
                         d0 *= 0.800000011920929D;
                     }
 
-                    if (p_179880_1_.isInvisible())
+                    if (p_apply_1_.isInvisible())
                     {
-                        float f = ((EntityPlayer)p_179880_1_).getArmorVisibility();
+                        float f = ((EntityPlayer)p_apply_1_).getArmorVisibility();
 
                         if (f < 0.1F)
                         {
@@ -63,12 +65,8 @@ public class EntityAIFindEntityNearestPlayer extends EntityAIBase
                         d0 *= (double)(0.7F * f);
                     }
 
-                    return (double)p_179880_1_.getDistanceToEntity(EntityAIFindEntityNearestPlayer.this.field_179434_b) > d0 ? false : EntityAITarget.func_179445_a(EntityAIFindEntityNearestPlayer.this.field_179434_b, (EntityLivingBase)p_179880_1_, false, true);
+                    return (double)p_apply_1_.getDistanceToEntity(EntityAIFindEntityNearestPlayer.this.field_179434_b) > d0 ? false : EntityAITarget.isSuitableTarget(EntityAIFindEntityNearestPlayer.this.field_179434_b, (EntityLivingBase)p_apply_1_, false, true);
                 }
-            }
-            public boolean apply(Object p_apply_1_)
-            {
-                return this.func_179880_a((Entity)p_apply_1_);
             }
         };
         this.field_179432_d = new EntityAINearestAttackableTarget.Sorter(p_i45882_1_);
@@ -80,7 +78,7 @@ public class EntityAIFindEntityNearestPlayer extends EntityAIBase
     public boolean shouldExecute()
     {
         double d0 = this.func_179431_f();
-        List list = this.field_179434_b.worldObj.getEntitiesWithinAABB(EntityPlayer.class, this.field_179434_b.getEntityBoundingBox().expand(d0, 4.0D, d0), this.field_179435_c);
+        List<EntityPlayer> list = this.field_179434_b.worldObj.<EntityPlayer>getEntitiesWithinAABB(EntityPlayer.class, this.field_179434_b.getEntityBoundingBox().expand(d0, 4.0D, d0), this.field_179435_c);
         Collections.sort(list, this.field_179432_d);
 
         if (list.isEmpty())
@@ -106,6 +104,10 @@ public class EntityAIFindEntityNearestPlayer extends EntityAIBase
             return false;
         }
         else if (!entitylivingbase.isEntityAlive())
+        {
+            return false;
+        }
+        else if (entitylivingbase instanceof EntityPlayer && ((EntityPlayer)entitylivingbase).capabilities.disableDamage)
         {
             return false;
         }

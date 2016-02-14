@@ -29,17 +29,17 @@ public class GuiRepair extends GuiContainer implements ICrafting
     private ContainerRepair anvil;
     private GuiTextField nameField;
     private InventoryPlayer playerInventory;
-    private static final String __OBFID = "CL_00000738";
 
-    public GuiRepair(InventoryPlayer p_i45508_1_, World worldIn)
+    public GuiRepair(InventoryPlayer inventoryIn, World worldIn)
     {
-        super(new ContainerRepair(p_i45508_1_, worldIn, Minecraft.getMinecraft().thePlayer));
-        this.playerInventory = p_i45508_1_;
+        super(new ContainerRepair(inventoryIn, worldIn, Minecraft.getMinecraft().thePlayer));
+        this.playerInventory = inventoryIn;
         this.anvil = (ContainerRepair)this.inventorySlots;
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question.
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
      */
     public void initGui()
     {
@@ -51,9 +51,9 @@ public class GuiRepair extends GuiContainer implements ICrafting
         this.nameField.setTextColor(-1);
         this.nameField.setDisabledTextColour(-1);
         this.nameField.setEnableBackgroundDrawing(false);
-        this.nameField.setMaxStringLength(40);
+        this.nameField.setMaxStringLength(30);
         this.inventorySlots.removeCraftingFromCrafters(this);
-        this.inventorySlots.addCraftingToCrafters(this);
+        this.inventorySlots.onCraftGuiOpened(this);
     }
 
     /**
@@ -77,14 +77,14 @@ public class GuiRepair extends GuiContainer implements ICrafting
 
         if (this.anvil.maximumCost > 0)
         {
-            int k = 8453920;
+            int i = 8453920;
             boolean flag = true;
             String s = I18n.format("container.repair.cost", new Object[] {Integer.valueOf(this.anvil.maximumCost)});
 
             if (this.anvil.maximumCost >= 40 && !this.mc.thePlayer.capabilities.isCreativeMode)
             {
                 s = I18n.format("container.repair.expensive", new Object[0]);
-                k = 16736352;
+                i = 16736352;
             }
             else if (!this.anvil.getSlot(2).getHasStack())
             {
@@ -92,28 +92,28 @@ public class GuiRepair extends GuiContainer implements ICrafting
             }
             else if (!this.anvil.getSlot(2).canTakeStack(this.playerInventory.player))
             {
-                k = 16736352;
+                i = 16736352;
             }
 
             if (flag)
             {
-                int l = -16777216 | (k & 16579836) >> 2 | k & -16777216;
-                int i1 = this.xSize - 8 - this.fontRendererObj.getStringWidth(s);
-                byte b0 = 67;
+                int j = -16777216 | (i & 16579836) >> 2 | i & -16777216;
+                int k = this.xSize - 8 - this.fontRendererObj.getStringWidth(s);
+                int l = 67;
 
                 if (this.fontRendererObj.getUnicodeFlag())
                 {
-                    drawRect(i1 - 3, b0 - 2, this.xSize - 7, b0 + 10, -16777216);
-                    drawRect(i1 - 2, b0 - 1, this.xSize - 8, b0 + 9, -12895429);
+                    drawRect(k - 3, l - 2, this.xSize - 7, l + 10, -16777216);
+                    drawRect(k - 2, l - 1, this.xSize - 8, l + 9, -12895429);
                 }
                 else
                 {
-                    this.fontRendererObj.drawString(s, i1, b0 + 1, l);
-                    this.fontRendererObj.drawString(s, i1 + 1, b0, l);
-                    this.fontRendererObj.drawString(s, i1 + 1, b0 + 1, l);
+                    this.fontRendererObj.drawString(s, k, l + 1, j);
+                    this.fontRendererObj.drawString(s, k + 1, l, j);
+                    this.fontRendererObj.drawString(s, k + 1, l + 1, j);
                 }
 
-                this.fontRendererObj.drawString(s, i1, b0, k);
+                this.fontRendererObj.drawString(s, k, l, i);
             }
         }
 
@@ -121,7 +121,7 @@ public class GuiRepair extends GuiContainer implements ICrafting
     }
 
     /**
-     * Fired when a key is typed (except F11 who toggle full screen). This is the equivalent of
+     * Fired when a key is typed (except F11 which toggles full screen). This is the equivalent of
      * KeyListener.keyTyped(KeyEvent e). Args : character (character on the key), keyCode (lwjgl Keyboard key code)
      */
     protected void keyTyped(char typedChar, int keyCode) throws IOException
@@ -177,24 +177,21 @@ public class GuiRepair extends GuiContainer implements ICrafting
     {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(anvilResource);
-        int k = (this.width - this.xSize) / 2;
-        int l = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(k, l, 0, 0, this.xSize, this.ySize);
-        this.drawTexturedModalRect(k + 59, l + 20, 0, this.ySize + (this.anvil.getSlot(0).getHasStack() ? 0 : 16), 110, 16);
+        int i = (this.width - this.xSize) / 2;
+        int j = (this.height - this.ySize) / 2;
+        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
+        this.drawTexturedModalRect(i + 59, j + 20, 0, this.ySize + (this.anvil.getSlot(0).getHasStack() ? 0 : 16), 110, 16);
 
         if ((this.anvil.getSlot(0).getHasStack() || this.anvil.getSlot(1).getHasStack()) && !this.anvil.getSlot(2).getHasStack())
         {
-            this.drawTexturedModalRect(k + 99, l + 45, this.xSize, 0, 28, 21);
+            this.drawTexturedModalRect(i + 99, j + 45, this.xSize, 0, 28, 21);
         }
     }
 
     /**
      * update the crafting window inventory with the items in the list
-     *  
-     * @param containerToSend The container whose contents are to be sent to the player.
-     * @param itemsList The items to be sent to the player.
      */
-    public void sendContainerAndContentsToPlayer(Container containerToSend, List itemsList)
+    public void updateCraftingInventory(Container containerToSend, List<ItemStack> itemsList)
     {
         this.sendSlotContents(containerToSend, 0, containerToSend.getSlot(0).getStack());
     }
@@ -202,10 +199,6 @@ public class GuiRepair extends GuiContainer implements ICrafting
     /**
      * Sends the contents of an inventory slot to the client-side Container. This doesn't have to match the actual
      * contents of that slot. Args: Container, slot number, slot contents
-     *  
-     * @param containerToSend The container that is to be updated on the client.
-     * @param slotInd The slot index that is to be updated.
-     * @param stack The itemstack to be updated in the selected slot.
      */
     public void sendSlotContents(Container containerToSend, int slotInd, ItemStack stack)
     {
@@ -225,12 +218,12 @@ public class GuiRepair extends GuiContainer implements ICrafting
      * Sends two ints to the client-side Container. Used for furnace burning time, smelting progress, brewing progress,
      * and enchanting level. Normally the first int identifies which variable to update, and the second contains the new
      * value. Both are truncated to shorts in non-local SMP.
-     *  
-     * @param containerIn The container sending a progress bar update.
-     * @param varToUpdate The integer corresponding the variable to be updated.
-     * @param newValue The value the variable is to be updated with.
      */
-    public void sendProgressBarUpdate(Container containerIn, int varToUpdate, int newValue) {}
+    public void sendProgressBarUpdate(Container containerIn, int varToUpdate, int newValue)
+    {
+    }
 
-    public void func_175173_a(Container p_175173_1_, IInventory p_175173_2_) {}
+    public void sendAllWindowProperties(Container p_175173_1_, IInventory p_175173_2_)
+    {
+    }
 }

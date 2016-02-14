@@ -7,8 +7,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class PositionedSoundRecord extends PositionedSound
 {
-    private static final String __OBFID = "CL_00001120";
-
     public static PositionedSoundRecord create(ResourceLocation soundResource, float pitch)
     {
         return new PositionedSoundRecord(soundResource, 0.25F, pitch, false, 0, ISound.AttenuationType.NONE, 0.0F, 0.0F, 0.0F);

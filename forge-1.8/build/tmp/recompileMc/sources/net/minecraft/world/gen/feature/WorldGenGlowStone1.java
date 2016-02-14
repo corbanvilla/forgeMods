@@ -9,37 +9,31 @@ import net.minecraft.world.World;
 
 public class WorldGenGlowStone1 extends WorldGenerator
 {
-    private static final String __OBFID = "CL_00000419";
-
-    public boolean generate(World worldIn, Random p_180709_2_, BlockPos p_180709_3_)
+    public boolean generate(World worldIn, Random rand, BlockPos position)
     {
-        if (!worldIn.isAirBlock(p_180709_3_))
+        if (!worldIn.isAirBlock(position))
         {
             return false;
         }
-        else if (worldIn.getBlockState(p_180709_3_.up()).getBlock() != Blocks.netherrack)
+        else if (worldIn.getBlockState(position.up()).getBlock() != Blocks.netherrack)
         {
             return false;
         }
         else
         {
-            worldIn.setBlockState(p_180709_3_, Blocks.glowstone.getDefaultState(), 2);
+            worldIn.setBlockState(position, Blocks.glowstone.getDefaultState(), 2);
 
             for (int i = 0; i < 1500; ++i)
             {
-                BlockPos blockpos1 = p_180709_3_.add(p_180709_2_.nextInt(8) - p_180709_2_.nextInt(8), -p_180709_2_.nextInt(12), p_180709_2_.nextInt(8) - p_180709_2_.nextInt(8));
+                BlockPos blockpos = position.add(rand.nextInt(8) - rand.nextInt(8), -rand.nextInt(12), rand.nextInt(8) - rand.nextInt(8));
 
-                if (worldIn.getBlockState(blockpos1).getBlock().getMaterial() == Material.air)
+                if (worldIn.getBlockState(blockpos).getBlock().getMaterial() == Material.air)
                 {
                     int j = 0;
-                    EnumFacing[] aenumfacing = EnumFacing.values();
-                    int k = aenumfacing.length;
 
-                    for (int l = 0; l < k; ++l)
+                    for (EnumFacing enumfacing : EnumFacing.values())
                     {
-                        EnumFacing enumfacing = aenumfacing[l];
-
-                        if (worldIn.getBlockState(blockpos1.offset(enumfacing)).getBlock() == Blocks.glowstone)
+                        if (worldIn.getBlockState(blockpos.offset(enumfacing)).getBlock() == Blocks.glowstone)
                         {
                             ++j;
                         }
@@ -52,7 +46,7 @@ public class WorldGenGlowStone1 extends WorldGenerator
 
                     if (j == 1)
                     {
-                        worldIn.setBlockState(blockpos1, Blocks.glowstone.getDefaultState(), 2);
+                        worldIn.setBlockState(blockpos, Blocks.glowstone.getDefaultState(), 2);
                     }
                 }
             }

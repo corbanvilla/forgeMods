@@ -16,8 +16,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ContainerLocalMenu extends InventoryBasic implements ILockableContainer
 {
     private String guiID;
-    private Map field_174895_b = Maps.newHashMap();
-    private static final String __OBFID = "CL_00002570";
+    private Map<Integer, Integer> field_174895_b = Maps.<Integer, Integer>newHashMap();
 
     public ContainerLocalMenu(String id, IChatComponent title, int slotCount)
     {
@@ -45,7 +44,9 @@ public class ContainerLocalMenu extends InventoryBasic implements ILockableConta
         return false;
     }
 
-    public void setLockCode(LockCode code) {}
+    public void setLockCode(LockCode code)
+    {
+    }
 
     public LockCode getLockCode()
     {

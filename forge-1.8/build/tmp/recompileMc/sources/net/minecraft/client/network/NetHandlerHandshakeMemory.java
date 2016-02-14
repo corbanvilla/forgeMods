@@ -14,7 +14,6 @@ public class NetHandlerHandshakeMemory implements INetHandlerHandshakeServer
 {
     private final MinecraftServer mcServer;
     private final NetworkManager networkManager;
-    private static final String __OBFID = "CL_00001445";
 
     public NetHandlerHandshakeMemory(MinecraftServer p_i45287_1_, NetworkManager p_i45287_2_)
     {
@@ -37,5 +36,7 @@ public class NetHandlerHandshakeMemory implements INetHandlerHandshakeServer
     /**
      * Invoked when disconnecting, the parameter is a ChatComponent describing the reason for termination
      */
-    public void onDisconnect(IChatComponent reason) {}
+    public void onDisconnect(IChatComponent reason)
+    {
+    }
 }

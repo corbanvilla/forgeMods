@@ -13,11 +13,10 @@ public class SlotFurnaceOutput extends Slot
     /** The player that is using the GUI where this slot resides. */
     private EntityPlayer thePlayer;
     private int field_75228_b;
-    private static final String __OBFID = "CL_00002183";
 
-    public SlotFurnaceOutput(EntityPlayer player, IInventory p_i45793_2_, int slotIndex, int xPosition, int yPosition)
+    public SlotFurnaceOutput(EntityPlayer player, IInventory inventoryIn, int slotIndex, int xPosition, int yPosition)
     {
-        super(p_i45793_2_, slotIndex, xPosition, yPosition);
+        super(inventoryIn, slotIndex, xPosition, yPosition);
         this.thePlayer = player;
     }
 
@@ -70,7 +69,6 @@ public class SlotFurnaceOutput extends Slot
         {
             int i = this.field_75228_b;
             float f = FurnaceRecipes.instance().getSmeltingExperience(stack);
-            int j;
 
             if (f == 0.0F)
             {
@@ -78,7 +76,7 @@ public class SlotFurnaceOutput extends Slot
             }
             else if (f < 1.0F)
             {
-                j = MathHelper.floor_float((float)i * f);
+                int j = MathHelper.floor_float((float)i * f);
 
                 if (j < MathHelper.ceiling_float_int((float)i * f) && Math.random() < (double)((float)i * f - (float)j))
                 {
@@ -90,9 +88,9 @@ public class SlotFurnaceOutput extends Slot
 
             while (i > 0)
             {
-                j = EntityXPOrb.getXPSplit(i);
-                i -= j;
-                this.thePlayer.worldObj.spawnEntityInWorld(new EntityXPOrb(this.thePlayer.worldObj, this.thePlayer.posX, this.thePlayer.posY + 0.5D, this.thePlayer.posZ + 0.5D, j));
+                int k = EntityXPOrb.getXPSplit(i);
+                i -= k;
+                this.thePlayer.worldObj.spawnEntityInWorld(new EntityXPOrb(this.thePlayer.worldObj, this.thePlayer.posX, this.thePlayer.posY + 0.5D, this.thePlayer.posZ + 0.5D, k));
             }
         }
 

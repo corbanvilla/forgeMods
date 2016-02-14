@@ -1,7 +1,6 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -9,16 +8,17 @@ import net.minecraft.util.IChatComponent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class S45PacketTitle implements Packet
+public class S45PacketTitle implements Packet<INetHandlerPlayClient>
 {
     private S45PacketTitle.Type type;
     private IChatComponent message;
     private int fadeInTime;
     private int displayTime;
     private int fadeOutTime;
-    private static final String __OBFID = "CL_00002287";
 
-    public S45PacketTitle() {}
+    public S45PacketTitle()
+    {
+    }
 
     public S45PacketTitle(S45PacketTitle.Type type, IChatComponent message)
     {
@@ -79,45 +79,40 @@ public class S45PacketTitle implements Packet
         }
     }
 
-    public void process(INetHandlerPlayClient handler)
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
+    public void processPacket(INetHandlerPlayClient handler)
     {
         handler.handleTitle(this);
     }
 
     @SideOnly(Side.CLIENT)
-    public S45PacketTitle.Type func_179807_a()
+    public S45PacketTitle.Type getType()
     {
         return this.type;
     }
 
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.process((INetHandlerPlayClient)handler);
-    }
-
     @SideOnly(Side.CLIENT)
-    public IChatComponent func_179805_b()
+    public IChatComponent getMessage()
     {
         return this.message;
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_179806_c()
+    public int getFadeInTime()
     {
         return this.fadeInTime;
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_179804_d()
+    public int getDisplayTime()
     {
         return this.displayTime;
     }
 
     @SideOnly(Side.CLIENT)
-    public int func_179803_e()
+    public int getFadeOutTime()
     {
         return this.fadeOutTime;
     }
@@ -130,20 +125,13 @@ public class S45PacketTitle implements Packet
         CLEAR,
         RESET;
 
-        private static final String __OBFID = "CL_00002286";
-
         public static S45PacketTitle.Type byName(String name)
         {
-            S45PacketTitle.Type[] atype = values();
-            int i = atype.length;
-
-            for (int j = 0; j < i; ++j)
+            for (S45PacketTitle.Type s45packettitle$type : values())
             {
-                S45PacketTitle.Type type = atype[j];
-
-                if (type.name().equalsIgnoreCase(name))
+                if (s45packettitle$type.name().equalsIgnoreCase(name))
                 {
-                    return type;
+                    return s45packettitle$type;
                 }
             }
 
@@ -154,13 +142,10 @@ public class S45PacketTitle implements Packet
         {
             String[] astring = new String[values().length];
             int i = 0;
-            S45PacketTitle.Type[] atype = values();
-            int j = atype.length;
 
-            for (int k = 0; k < j; ++k)
+            for (S45PacketTitle.Type s45packettitle$type : values())
             {
-                S45PacketTitle.Type type = atype[k];
-                astring[i++] = type.name().toLowerCase();
+                astring[i++] = s45packettitle$type.name().toLowerCase();
             }
 
             return astring;

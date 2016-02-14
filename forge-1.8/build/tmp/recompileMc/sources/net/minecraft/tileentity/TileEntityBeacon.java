@@ -2,7 +2,6 @@ package net.minecraft.tileentity;
 
 import com.google.common.collect.Lists;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockStainedGlass;
@@ -23,20 +22,20 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.ITickable;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class TileEntityBeacon extends TileEntityLockable implements IUpdatePlayerListBox, IInventory
+public class TileEntityBeacon extends TileEntityLockable implements ITickable, IInventory
 {
     /** List of effects that Beacon can apply */
     public static final Potion[][] effectsList = new Potion[][] {{Potion.moveSpeed, Potion.digSpeed}, {Potion.resistance, Potion.jump}, {Potion.damageBoost}, {Potion.regeneration}};
-    private final List field_174909_f = Lists.newArrayList();
+    private final List<TileEntityBeacon.BeamSegment> beamSegments = Lists.<TileEntityBeacon.BeamSegment>newArrayList();
     @SideOnly(Side.CLIENT)
-    private long field_146016_i;
+    private long beamRenderCounter;
     @SideOnly(Side.CLIENT)
     private float field_146014_j;
     private boolean isComplete;
@@ -49,82 +48,74 @@ public class TileEntityBeacon extends TileEntityLockable implements IUpdatePlaye
     /** Item given to this beacon as payment. */
     private ItemStack payment;
     private String customName;
-    private static final String __OBFID = "CL_00000339";
 
     /**
-     * Updates the JList with a new model.
+     * Like the old updateEntity(), except more generic.
      */
     public void update()
     {
         if (this.worldObj.getTotalWorldTime() % 80L == 0L)
         {
-            this.func_174908_m();
+            this.updateBeacon();
         }
     }
 
-    public void func_174908_m()
+    public void updateBeacon()
     {
-        this.func_146003_y();
-        this.func_146000_x();
+        this.updateSegmentColors();
+        this.addEffectsToPlayers();
     }
 
-    private void func_146000_x()
+    private void addEffectsToPlayers()
     {
         if (this.isComplete && this.levels > 0 && !this.worldObj.isRemote && this.primaryEffect > 0)
         {
             double d0 = (double)(this.levels * 10 + 10);
-            byte b0 = 0;
+            int i = 0;
 
             if (this.levels >= 4 && this.primaryEffect == this.secondaryEffect)
             {
-                b0 = 1;
+                i = 1;
             }
 
-            int i = this.pos.getX();
-            int j = this.pos.getY();
-            int k = this.pos.getZ();
-            AxisAlignedBB axisalignedbb = (new AxisAlignedBB((double)i, (double)j, (double)k, (double)(i + 1), (double)(j + 1), (double)(k + 1))).expand(d0, d0, d0).addCoord(0.0D, (double)this.worldObj.getHeight(), 0.0D);
-            List list = this.worldObj.getEntitiesWithinAABB(EntityPlayer.class, axisalignedbb);
-            Iterator iterator = list.iterator();
-            EntityPlayer entityplayer;
+            int j = this.pos.getX();
+            int k = this.pos.getY();
+            int l = this.pos.getZ();
+            AxisAlignedBB axisalignedbb = (new AxisAlignedBB((double)j, (double)k, (double)l, (double)(j + 1), (double)(k + 1), (double)(l + 1))).expand(d0, d0, d0).addCoord(0.0D, (double)this.worldObj.getHeight(), 0.0D);
+            List<EntityPlayer> list = this.worldObj.<EntityPlayer>getEntitiesWithinAABB(EntityPlayer.class, axisalignedbb);
 
-            while (iterator.hasNext())
+            for (EntityPlayer entityplayer : list)
             {
-                entityplayer = (EntityPlayer)iterator.next();
-                entityplayer.addPotionEffect(new PotionEffect(this.primaryEffect, 180, b0, true, true));
+                entityplayer.addPotionEffect(new PotionEffect(this.primaryEffect, 180, i, true, true));
             }
 
             if (this.levels >= 4 && this.primaryEffect != this.secondaryEffect && this.secondaryEffect > 0)
             {
-                iterator = list.iterator();
-
-                while (iterator.hasNext())
+                for (EntityPlayer entityplayer1 : list)
                 {
-                    entityplayer = (EntityPlayer)iterator.next();
-                    entityplayer.addPotionEffect(new PotionEffect(this.secondaryEffect, 180, 0, true, true));
+                    entityplayer1.addPotionEffect(new PotionEffect(this.secondaryEffect, 180, 0, true, true));
                 }
             }
         }
     }
 
-    private void func_146003_y()
+    private void updateSegmentColors()
     {
         int i = this.levels;
         int j = this.pos.getX();
         int k = this.pos.getY();
         int l = this.pos.getZ();
         this.levels = 0;
-        this.field_174909_f.clear();
+        this.beamSegments.clear();
         this.isComplete = true;
-        TileEntityBeacon.BeamSegment beamsegment = new TileEntityBeacon.BeamSegment(EntitySheep.func_175513_a(EnumDyeColor.WHITE));
-        this.field_174909_f.add(beamsegment);
+        TileEntityBeacon.BeamSegment tileentitybeacon$beamsegment = new TileEntityBeacon.BeamSegment(EntitySheep.func_175513_a(EnumDyeColor.WHITE));
+        this.beamSegments.add(tileentitybeacon$beamsegment);
         boolean flag = true;
-        int i1;
+        BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
 
-        for (i1 = k + 1; i1 < this.worldObj.getActualHeight(); ++i1)
+        for (int i1 = k + 1; i1 < 256; ++i1)
         {
-            BlockPos blockpos = new BlockPos(j, i1, l);
-            IBlockState iblockstate = this.worldObj.getBlockState(blockpos);
+            IBlockState iblockstate = this.worldObj.getBlockState(blockpos$mutableblockpos.set(j, i1, l));
             float[] afloat;
 
             if (iblockstate.getBlock() == Blocks.stained_glass)
@@ -135,14 +126,14 @@ public class TileEntityBeacon extends TileEntityLockable implements IUpdatePlaye
             {
                 if (iblockstate.getBlock() != Blocks.stained_glass_pane)
                 {
-                    if (iblockstate.getBlock().getLightOpacity() >= 15)
+                    if (iblockstate.getBlock().getLightOpacity() >= 15 && iblockstate.getBlock() != Blocks.bedrock)
                     {
                         this.isComplete = false;
-                        this.field_174909_f.clear();
+                        this.beamSegments.clear();
                         break;
                     }
 
-                    beamsegment.func_177262_a();
+                    tileentitybeacon$beamsegment.incrementHeight();
                     continue;
                 }
 
@@ -151,17 +142,17 @@ public class TileEntityBeacon extends TileEntityLockable implements IUpdatePlaye
 
             if (!flag)
             {
-                afloat = new float[] {(beamsegment.func_177263_b()[0] + afloat[0]) / 2.0F, (beamsegment.func_177263_b()[1] + afloat[1]) / 2.0F, (beamsegment.func_177263_b()[2] + afloat[2]) / 2.0F};
+                afloat = new float[] {(tileentitybeacon$beamsegment.getColors()[0] + afloat[0]) / 2.0F, (tileentitybeacon$beamsegment.getColors()[1] + afloat[1]) / 2.0F, (tileentitybeacon$beamsegment.getColors()[2] + afloat[2]) / 2.0F};
             }
 
-            if (Arrays.equals(afloat, beamsegment.func_177263_b()))
+            if (Arrays.equals(afloat, tileentitybeacon$beamsegment.getColors()))
             {
-                beamsegment.func_177262_a();
+                tileentitybeacon$beamsegment.incrementHeight();
             }
             else
             {
-                beamsegment = new TileEntityBeacon.BeamSegment(afloat);
-                this.field_174909_f.add(beamsegment);
+                tileentitybeacon$beamsegment = new TileEntityBeacon.BeamSegment(afloat);
+                this.beamSegments.add(tileentitybeacon$beamsegment);
             }
 
             flag = false;
@@ -169,24 +160,24 @@ public class TileEntityBeacon extends TileEntityLockable implements IUpdatePlaye
 
         if (this.isComplete)
         {
-            for (i1 = 1; i1 <= 4; this.levels = i1++)
+            for (int l1 = 1; l1 <= 4; this.levels = l1++)
             {
-                int k1 = k - i1;
+                int i2 = k - l1;
 
-                if (k1 < 0)
+                if (i2 < 0)
                 {
                     break;
                 }
 
                 boolean flag1 = true;
 
-                for (int l1 = j - i1; l1 <= j + i1 && flag1; ++l1)
+                for (int j1 = j - l1; j1 <= j + l1 && flag1; ++j1)
                 {
-                    for (int j1 = l - i1; j1 <= l + i1; ++j1)
+                    for (int k1 = l - l1; k1 <= l + l1; ++k1)
                     {
-                        Block block = this.worldObj.getBlockState(new BlockPos(l1, k1, j1)).getBlock();
+                        Block block = this.worldObj.getBlockState(new BlockPos(j1, i2, k1)).getBlock();
 
-                        if (!block.isBeaconBase(this.worldObj, new BlockPos(l1, k1, j1), getPos()))
+                        if (!block.isBeaconBase(this.worldObj, new BlockPos(j1, i2, k1), getPos()))
                         {
                             flag1 = false;
                             break;
@@ -208,20 +199,17 @@ public class TileEntityBeacon extends TileEntityLockable implements IUpdatePlaye
 
         if (!this.worldObj.isRemote && this.levels == 4 && i < this.levels)
         {
-            Iterator iterator = this.worldObj.getEntitiesWithinAABB(EntityPlayer.class, (new AxisAlignedBB((double)j, (double)k, (double)l, (double)j, (double)(k - 4), (double)l)).expand(10.0D, 5.0D, 10.0D)).iterator();
-
-            while (iterator.hasNext())
+            for (EntityPlayer entityplayer : this.worldObj.getEntitiesWithinAABB(EntityPlayer.class, (new AxisAlignedBB((double)j, (double)k, (double)l, (double)j, (double)(k - 4), (double)l)).expand(10.0D, 5.0D, 10.0D)))
             {
-                EntityPlayer entityplayer = (EntityPlayer)iterator.next();
                 entityplayer.triggerAchievement(AchievementList.fullBeacon);
             }
         }
     }
 
     @SideOnly(Side.CLIENT)
-    public List func_174907_n()
+    public List<TileEntityBeacon.BeamSegment> getBeamSegments()
     {
-        return this.field_174909_f;
+        return this.beamSegments;
     }
 
     @SideOnly(Side.CLIENT)
@@ -233,8 +221,8 @@ public class TileEntityBeacon extends TileEntityLockable implements IUpdatePlaye
         }
         else
         {
-            int i = (int)(this.worldObj.getTotalWorldTime() - this.field_146016_i);
-            this.field_146016_i = this.worldObj.getTotalWorldTime();
+            int i = (int)(this.worldObj.getTotalWorldTime() - this.beamRenderCounter);
+            this.beamRenderCounter = this.worldObj.getTotalWorldTime();
 
             if (i > 1)
             {
@@ -274,11 +262,24 @@ public class TileEntityBeacon extends TileEntityLockable implements IUpdatePlaye
         return 65536.0D;
     }
 
+    private int func_183001_h(int p_183001_1_)
+    {
+        if (p_183001_1_ >= 0 && p_183001_1_ < Potion.potionTypes.length && Potion.potionTypes[p_183001_1_] != null)
+        {
+            Potion potion = Potion.potionTypes[p_183001_1_];
+            return potion != Potion.moveSpeed && potion != Potion.digSpeed && potion != Potion.resistance && potion != Potion.jump && potion != Potion.damageBoost && potion != Potion.regeneration ? 0 : p_183001_1_;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
     public void readFromNBT(NBTTagCompound compound)
     {
         super.readFromNBT(compound);
-        this.primaryEffect = compound.getInteger("Primary");
-        this.secondaryEffect = compound.getInteger("Secondary");
+        this.primaryEffect = this.func_183001_h(compound.getInteger("Primary"));
+        this.secondaryEffect = this.func_183001_h(compound.getInteger("Secondary"));
         this.levels = compound.getInteger("Levels");
     }
 
@@ -299,7 +300,7 @@ public class TileEntityBeacon extends TileEntityLockable implements IUpdatePlaye
     }
 
     /**
-     * Returns the stack in slot i
+     * Returns the stack in the given slot.
      */
     public ItemStack getStackInSlot(int index)
     {
@@ -307,8 +308,7 @@ public class TileEntityBeacon extends TileEntityLockable implements IUpdatePlaye
     }
 
     /**
-     * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a
-     * new stack.
+     * Removes up to a specified number of items from an inventory slot and returns them in a new stack.
      */
     public ItemStack decrStackSize(int index, int count)
     {
@@ -333,10 +333,9 @@ public class TileEntityBeacon extends TileEntityLockable implements IUpdatePlaye
     }
 
     /**
-     * When some containers are closed they call this on each slot, then drop whatever it returns as an EntityItem -
-     * like when you close a workbench GUI.
+     * Removes a stack from the given slot and returns it.
      */
-    public ItemStack getStackInSlotOnClosing(int index)
+    public ItemStack removeStackFromSlot(int index)
     {
         if (index == 0 && this.payment != null)
         {
@@ -362,7 +361,7 @@ public class TileEntityBeacon extends TileEntityLockable implements IUpdatePlaye
     }
 
     /**
-     * Gets the name of this command sender (usually username, but possibly "Rcon")
+     * Get the name of this object. For players this returns their username
      */
     public String getName()
     {
@@ -377,14 +376,13 @@ public class TileEntityBeacon extends TileEntityLockable implements IUpdatePlaye
         return this.customName != null && this.customName.length() > 0;
     }
 
-    public void func_145999_a(String p_145999_1_)
+    public void setName(String name)
     {
-        this.customName = p_145999_1_;
+        this.customName = name;
     }
 
     /**
-     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended. *Isn't
-     * this more of a set than a get?*
+     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended.
      */
     public int getInventoryStackLimit()
     {
@@ -399,9 +397,13 @@ public class TileEntityBeacon extends TileEntityLockable implements IUpdatePlaye
         return this.worldObj.getTileEntity(this.pos) != this ? false : player.getDistanceSq((double)this.pos.getX() + 0.5D, (double)this.pos.getY() + 0.5D, (double)this.pos.getZ() + 0.5D) <= 64.0D;
     }
 
-    public void openInventory(EntityPlayer player) {}
+    public void openInventory(EntityPlayer player)
+    {
+    }
 
-    public void closeInventory(EntityPlayer player) {}
+    public void closeInventory(EntityPlayer player)
+    {
+    }
 
     /**
      * Returns true if automation is allowed to insert the given stack (ignoring stack size) into the given slot.
@@ -444,10 +446,10 @@ public class TileEntityBeacon extends TileEntityLockable implements IUpdatePlaye
                 this.levels = value;
                 break;
             case 1:
-                this.primaryEffect = value;
+                this.primaryEffect = this.func_183001_h(value);
                 break;
             case 2:
-                this.secondaryEffect = value;
+                this.secondaryEffect = this.func_183001_h(value);
         }
     }
 
@@ -465,7 +467,7 @@ public class TileEntityBeacon extends TileEntityLockable implements IUpdatePlaye
     {
         if (id == 1)
         {
-            this.func_174908_m();
+            this.updateBeacon();
             return true;
         }
         else
@@ -476,30 +478,33 @@ public class TileEntityBeacon extends TileEntityLockable implements IUpdatePlaye
 
     public static class BeamSegment
         {
-            private final float[] field_177266_a;
-            private int field_177265_b;
-            private static final String __OBFID = "CL_00002042";
+            /** RGB (0 to 1.0) colors of this beam segment */
+            private final float[] colors;
+            private int height;
 
             public BeamSegment(float[] p_i45669_1_)
             {
-                this.field_177266_a = p_i45669_1_;
-                this.field_177265_b = 1;
+                this.colors = p_i45669_1_;
+                this.height = 1;
             }
 
-            protected void func_177262_a()
+            protected void incrementHeight()
             {
-                ++this.field_177265_b;
+                ++this.height;
             }
 
-            public float[] func_177263_b()
+            /**
+             * Returns RGB (0 to 1.0) colors of this beam segment
+             */
+            public float[] getColors()
             {
-                return this.field_177266_a;
+                return this.colors;
             }
 
             @SideOnly(Side.CLIENT)
-            public int func_177264_c()
+            public int getHeight()
             {
-                return this.field_177265_b;
+                return this.height;
             }
         }
 }

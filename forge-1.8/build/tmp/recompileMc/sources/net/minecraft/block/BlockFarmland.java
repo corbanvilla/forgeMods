@@ -1,6 +1,5 @@
 package net.minecraft.block;
 
-import java.util.Iterator;
 import java.util.Random;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -14,6 +13,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -21,7 +22,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BlockFarmland extends Block
 {
     public static final PropertyInteger MOISTURE = PropertyInteger.create("moisture", 0, 7);
-    private static final String __OBFID = "CL_00000241";
 
     protected BlockFarmland()
     {
@@ -37,6 +37,9 @@ public class BlockFarmland extends Block
         return new AxisAlignedBB((double)pos.getX(), (double)pos.getY(), (double)pos.getZ(), (double)(pos.getX() + 1), (double)(pos.getY() + 1), (double)(pos.getZ() + 1));
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -70,8 +73,6 @@ public class BlockFarmland extends Block
 
     /**
      * Block's chance to react to a living entity falling on it.
-     *  
-     * @param fallDistance The distance the entity has fallen before landing
      */
     public void onFallenUpon(World worldIn, BlockPos pos, Entity entityIn, float fallDistance)
     {
@@ -79,7 +80,7 @@ public class BlockFarmland extends Block
         {
             if (!worldIn.isRemote && worldIn.rand.nextFloat() < fallDistance - 0.5F)
             {
-                if (!(entityIn instanceof EntityPlayer) && !worldIn.getGameRules().getGameRuleBooleanValue("mobGriefing"))
+                if (!(entityIn instanceof EntityPlayer) && !worldIn.getGameRules().getBoolean("mobGriefing"))
                 {
                     return;
                 }
@@ -99,21 +100,15 @@ public class BlockFarmland extends Block
 
     private boolean hasWater(World worldIn, BlockPos pos)
     {
-        Iterator iterator = BlockPos.getAllInBoxMutable(pos.add(-4, 0, -4), pos.add(4, 1, 4)).iterator();
-        BlockPos.MutableBlockPos mutableblockpos;
-
-        do
+        for (BlockPos.MutableBlockPos blockpos$mutableblockpos : BlockPos.getAllInBoxMutable(pos.add(-4, 0, -4), pos.add(4, 1, 4)))
         {
-            if (!iterator.hasNext())
+            if (worldIn.getBlockState(blockpos$mutableblockpos).getBlock().getMaterial() == Material.water)
             {
-                return false;
+                return true;
             }
-
-            mutableblockpos = (BlockPos.MutableBlockPos)iterator.next();
         }
-        while (worldIn.getBlockState(mutableblockpos).getBlock().getMaterial() != Material.water);
 
-        return true;
+        return false;
     }
 
     /**
@@ -129,10 +124,26 @@ public class BlockFarmland extends Block
         }
     }
 
+    @SideOnly(Side.CLIENT)
+    public boolean shouldSideBeRendered(IBlockAccess worldIn, BlockPos pos, EnumFacing side)
+    {
+        switch (side)
+        {
+            case UP:
+                return true;
+            case NORTH:
+            case SOUTH:
+            case WEST:
+            case EAST:
+                Block block = worldIn.getBlockState(pos).getBlock();
+                return !block.isOpaqueCube() && block != Blocks.farmland;
+            default:
+                return super.shouldSideBeRendered(worldIn, pos, side);
+        }
+    }
+
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {

@@ -1,7 +1,6 @@
 package net.minecraft.client.renderer.vertex;
 
 import com.google.common.collect.Lists;
-import java.util.Iterator;
 import java.util.List;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -12,34 +11,33 @@ import org.apache.logging.log4j.Logger;
 public class VertexFormat
 {
     private static final Logger LOGGER = LogManager.getLogger();
-    private final List elements;
-    private final List offsets;
+    private final List<VertexFormatElement> elements;
+    private final List<Integer> offsets;
     /** The next available offset in this vertex format */
     private int nextOffset;
     private int colorElementOffset;
-    private List elementOffsetsById;
+    private List<Integer> uvOffsetsById;
     private int normalElementOffset;
-    private static final String __OBFID = "CL_00002401";
 
-    public VertexFormat(VertexFormat p_i46097_1_)
+    public VertexFormat(VertexFormat vertexFormatIn)
     {
         this();
 
-        for (int i = 0; i < p_i46097_1_.getElementCount(); ++i)
+        for (int i = 0; i < vertexFormatIn.getElementCount(); ++i)
         {
-            this.setElement(p_i46097_1_.getElement(i));
+            this.addElement(vertexFormatIn.getElement(i));
         }
 
-        this.nextOffset = p_i46097_1_.getNextOffset();
+        this.nextOffset = vertexFormatIn.getNextOffset();
     }
 
     public VertexFormat()
     {
-        this.elements = Lists.newArrayList();
-        this.offsets = Lists.newArrayList();
+        this.elements = Lists.<VertexFormatElement>newArrayList();
+        this.offsets = Lists.<Integer>newArrayList();
         this.nextOffset = 0;
         this.colorElementOffset = -1;
-        this.elementOffsetsById = Lists.newArrayList();
+        this.uvOffsetsById = Lists.<Integer>newArrayList();
         this.normalElementOffset = -1;
     }
 
@@ -48,35 +46,38 @@ public class VertexFormat
         this.elements.clear();
         this.offsets.clear();
         this.colorElementOffset = -1;
-        this.elementOffsetsById.clear();
+        this.uvOffsetsById.clear();
         this.normalElementOffset = -1;
         this.nextOffset = 0;
     }
 
-    public void setElement(VertexFormatElement p_177349_1_)
+    @SuppressWarnings("incomplete-switch")
+    public VertexFormat addElement(VertexFormatElement element)
     {
-        if (p_177349_1_.isPositionElement() && this.hasPosition())
+        if (element.isPositionElement() && this.hasPosition())
         {
             LOGGER.warn("VertexFormat error: Trying to add a position VertexFormatElement when one already exists, ignoring.");
+            return this;
         }
         else
         {
-            this.elements.add(p_177349_1_);
+            this.elements.add(element);
             this.offsets.add(Integer.valueOf(this.nextOffset));
-            p_177349_1_.setOffset(this.nextOffset);
-            this.nextOffset += p_177349_1_.getSize();
 
-            switch (VertexFormat.SwitchEnumUsage.field_177382_a[p_177349_1_.getUsage().ordinal()])
+            switch (element.getUsage())
             {
-                case 1:
-                    this.normalElementOffset = p_177349_1_.getOffset();
+                case NORMAL:
+                    this.normalElementOffset = this.nextOffset;
                     break;
-                case 2:
-                    this.colorElementOffset = p_177349_1_.getOffset();
+                case COLOR:
+                    this.colorElementOffset = this.nextOffset;
                     break;
-                case 3:
-                    this.elementOffsetsById.add(p_177349_1_.getIndex(), Integer.valueOf(p_177349_1_.getOffset()));
+                case UV:
+                    this.uvOffsetsById.add(element.getIndex(), Integer.valueOf(this.nextOffset));
             }
+
+            this.nextOffset += element.getSize();
+            return this;
         }
     }
 
@@ -100,14 +101,14 @@ public class VertexFormat
         return this.colorElementOffset;
     }
 
-    public boolean hasElementOffset(int id)
+    public boolean hasUvOffset(int id)
     {
-        return this.elementOffsetsById.size() - 1 >= id;
+        return this.uvOffsetsById.size() - 1 >= id;
     }
 
-    public int getElementOffsetById(int id)
+    public int getUvOffsetById(int id)
     {
-        return ((Integer)this.elementOffsetsById.get(id)).intValue();
+        return ((Integer)this.uvOffsetsById.get(id)).intValue();
     }
 
     public String toString()
@@ -129,21 +130,24 @@ public class VertexFormat
 
     private boolean hasPosition()
     {
-        Iterator iterator = this.elements.iterator();
-        VertexFormatElement vertexformatelement;
+        int i = 0;
 
-        do
+        for (int j = this.elements.size(); i < j; ++i)
         {
-            if (!iterator.hasNext())
+            VertexFormatElement vertexformatelement = (VertexFormatElement)this.elements.get(i);
+
+            if (vertexformatelement.isPositionElement())
             {
-                return false;
+                return true;
             }
-
-            vertexformatelement = (VertexFormatElement)iterator.next();
         }
-        while (!vertexformatelement.isPositionElement());
 
-        return true;
+        return false;
+    }
+
+    public int func_181719_f()
+    {
+        return this.getNextOffset() / 4;
     }
 
     public int getNextOffset()
@@ -151,7 +155,7 @@ public class VertexFormat
         return this.nextOffset;
     }
 
-    public List getElements()
+    public List<VertexFormatElement> getElements()
     {
         return this.elements;
     }
@@ -161,9 +165,14 @@ public class VertexFormat
         return this.elements.size();
     }
 
-    public VertexFormatElement getElement(int p_177348_1_)
+    public VertexFormatElement getElement(int index)
     {
-        return (VertexFormatElement)this.elements.get(p_177348_1_);
+        return (VertexFormatElement)this.elements.get(index);
+    }
+
+    public int func_181720_d(int p_181720_1_)
+    {
+        return ((Integer)this.offsets.get(p_181720_1_)).intValue();
     }
 
     public boolean equals(Object p_equals_1_)
@@ -190,42 +199,4 @@ public class VertexFormat
         i = 31 * i + this.nextOffset;
         return i;
     }
-
-    @SideOnly(Side.CLIENT)
-
-    static final class SwitchEnumUsage
-        {
-            static final int[] field_177382_a = new int[VertexFormatElement.EnumUsage.values().length];
-            private static final String __OBFID = "CL_00002400";
-
-            static
-            {
-                try
-                {
-                    field_177382_a[VertexFormatElement.EnumUsage.NORMAL.ordinal()] = 1;
-                }
-                catch (NoSuchFieldError var3)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_177382_a[VertexFormatElement.EnumUsage.COLOR.ordinal()] = 2;
-                }
-                catch (NoSuchFieldError var2)
-                {
-                    ;
-                }
-
-                try
-                {
-                    field_177382_a[VertexFormatElement.EnumUsage.UV.ordinal()] = 3;
-                }
-                catch (NoSuchFieldError var1)
-                {
-                    ;
-                }
-            }
-        }
 }

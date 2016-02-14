@@ -8,13 +8,12 @@ public class EntityAIOpenDoor extends EntityAIDoorInteract
     boolean closeDoor;
     /** The temporisation before the entity close the door (in ticks, always 20 = 1 second) */
     int closeDoorTemporisation;
-    private static final String __OBFID = "CL_00001603";
 
-    public EntityAIOpenDoor(EntityLiving p_i1644_1_, boolean p_i1644_2_)
+    public EntityAIOpenDoor(EntityLiving entitylivingIn, boolean shouldClose)
     {
-        super(p_i1644_1_);
-        this.theEntity = p_i1644_1_;
-        this.closeDoor = p_i1644_2_;
+        super(entitylivingIn);
+        this.theEntity = entitylivingIn;
+        this.closeDoor = shouldClose;
     }
 
     /**

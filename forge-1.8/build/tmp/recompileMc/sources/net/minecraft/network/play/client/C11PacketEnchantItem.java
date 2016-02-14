@@ -1,20 +1,20 @@
 package net.minecraft.network.play.client;
 
 import java.io.IOException;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class C11PacketEnchantItem implements Packet
+public class C11PacketEnchantItem implements Packet<INetHandlerPlayServer>
 {
     private int windowId;
     private int button;
-    private static final String __OBFID = "CL_00001352";
 
-    public C11PacketEnchantItem() {}
+    public C11PacketEnchantItem()
+    {
+    }
 
     @SideOnly(Side.CLIENT)
     public C11PacketEnchantItem(int windowId, int button)
@@ -57,13 +57,5 @@ public class C11PacketEnchantItem implements Packet
     public int getButton()
     {
         return this.button;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandler handler)
-    {
-        this.processPacket((INetHandlerPlayServer)handler);
     }
 }

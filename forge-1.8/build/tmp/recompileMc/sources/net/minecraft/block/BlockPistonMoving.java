@@ -25,8 +25,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BlockPistonMoving extends BlockContainer
 {
     public static final PropertyDirection FACING = BlockPistonExtension.FACING;
-    public static final PropertyEnum TYPE = BlockPistonExtension.TYPE;
-    private static final String __OBFID = "CL_00000368";
+    public static final PropertyEnum<BlockPistonExtension.EnumPistonType> TYPE = BlockPistonExtension.TYPE;
 
     public BlockPistonMoving()
     {
@@ -80,15 +79,18 @@ public class BlockPistonMoving extends BlockContainer
      */
     public void onBlockDestroyedByPlayer(World worldIn, BlockPos pos, IBlockState state)
     {
-        BlockPos blockpos1 = pos.offset(((EnumFacing)state.getValue(FACING)).getOpposite());
-        IBlockState iblockstate1 = worldIn.getBlockState(blockpos1);
+        BlockPos blockpos = pos.offset(((EnumFacing)state.getValue(FACING)).getOpposite());
+        IBlockState iblockstate = worldIn.getBlockState(blockpos);
 
-        if (iblockstate1.getBlock() instanceof BlockPistonBase && ((Boolean)iblockstate1.getValue(BlockPistonBase.EXTENDED)).booleanValue())
+        if (iblockstate.getBlock() instanceof BlockPistonBase && ((Boolean)iblockstate.getValue(BlockPistonBase.EXTENDED)).booleanValue())
         {
-            worldIn.setBlockToAir(blockpos1);
+            worldIn.setBlockToAir(blockpos);
         }
     }
 
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -114,8 +116,6 @@ public class BlockPistonMoving extends BlockContainer
 
     /**
      * Get the Item that this Block should drop when harvested.
-     *  
-     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -124,9 +124,6 @@ public class BlockPistonMoving extends BlockContainer
 
     /**
      * Spawns this Block's drops into the World as EntityItems.
-     *  
-     * @param chance The chance that each Item is actually spawned (1.0 = always, 0.0 = never)
-     * @param fortune The player's fortune level
      */
     public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune)
     {
@@ -135,9 +132,6 @@ public class BlockPistonMoving extends BlockContainer
 
     /**
      * Ray traces through the blocks collision from start vector to end vector returning a ray trace hit.
-     *  
-     * @param start The start vector
-     * @param end The end vector
      */
     public MovingObjectPosition collisionRayTrace(World worldIn, BlockPos pos, Vec3 start, Vec3 end)
     {
@@ -165,7 +159,7 @@ public class BlockPistonMoving extends BlockContainer
         }
         else
         {
-            float f = tileentitypiston.func_145860_a(0.0F);
+            float f = tileentitypiston.getProgress(0.0F);
 
             if (tileentitypiston.isExtending())
             {
@@ -190,7 +184,7 @@ public class BlockPistonMoving extends BlockContainer
                 return;
             }
 
-            float f = tileentitypiston.func_145860_a(0.0F);
+            float f = tileentitypiston.getProgress(0.0F);
 
             if (tileentitypiston.isExtending())
             {
@@ -294,8 +288,8 @@ public class BlockPistonMoving extends BlockContainer
      */
     public int getMetaFromState(IBlockState state)
     {
-        byte b0 = 0;
-        int i = b0 | ((EnumFacing)state.getValue(FACING)).getIndex();
+        int i = 0;
+        i = i | ((EnumFacing)state.getValue(FACING)).getIndex();
 
         if (state.getValue(TYPE) == BlockPistonExtension.EnumPistonType.STICKY)
         {

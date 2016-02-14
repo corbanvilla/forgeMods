@@ -1,43 +1,120 @@
 package net.minecraft.command;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.scoreboard.Score;
 import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.IChatComponent;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 
 public class CommandResultStats
 {
     /** The number of result command result types that are possible. */
     private static final int NUM_RESULT_TYPES = CommandResultStats.Type.values().length;
-    private static final String[] field_179674_b = new String[NUM_RESULT_TYPES];
+    private static final String[] STRING_RESULT_TYPES = new String[NUM_RESULT_TYPES];
     private String[] field_179675_c;
     private String[] field_179673_d;
-    private static final String __OBFID = "CL_00002364";
 
     public CommandResultStats()
     {
-        this.field_179675_c = field_179674_b;
-        this.field_179673_d = field_179674_b;
+        this.field_179675_c = STRING_RESULT_TYPES;
+        this.field_179673_d = STRING_RESULT_TYPES;
     }
 
-    public void func_179672_a(ICommandSender sender, CommandResultStats.Type p_179672_2_, int p_179672_3_)
+    public void func_179672_a(final ICommandSender sender, CommandResultStats.Type resultTypeIn, int p_179672_3_)
     {
-        String s = this.field_179675_c[p_179672_2_.getTypeID()];
+        String s = this.field_179675_c[resultTypeIn.getTypeID()];
 
         if (s != null)
         {
+            ICommandSender icommandsender = new ICommandSender()
+            {
+                /**
+                 * Get the name of this object. For players this returns their username
+                 */
+                public String getName()
+                {
+                    return sender.getName();
+                }
+                /**
+                 * Get the formatted ChatComponent that will be used for the sender's username in chat
+                 */
+                public IChatComponent getDisplayName()
+                {
+                    return sender.getDisplayName();
+                }
+                /**
+                 * Send a chat message to the CommandSender
+                 */
+                public void addChatMessage(IChatComponent component)
+                {
+                    sender.addChatMessage(component);
+                }
+                /**
+                 * Returns {@code true} if the CommandSender is allowed to execute the command, {@code false} if not
+                 */
+                public boolean canCommandSenderUseCommand(int permLevel, String commandName)
+                {
+                    return true;
+                }
+                /**
+                 * Get the position in the world. <b>{@code null} is not allowed!</b> If you are not an entity in the
+                 * world, return the coordinates 0, 0, 0
+                 */
+                public BlockPos getPosition()
+                {
+                    return sender.getPosition();
+                }
+                /**
+                 * Get the position vector. <b>{@code null} is not allowed!</b> If you are not an entity in the world,
+                 * return 0.0D, 0.0D, 0.0D
+                 */
+                public Vec3 getPositionVector()
+                {
+                    return sender.getPositionVector();
+                }
+                /**
+                 * Get the world, if available. <b>{@code null} is not allowed!</b> If you are not an entity in the
+                 * world, return the overworld
+                 */
+                public World getEntityWorld()
+                {
+                    return sender.getEntityWorld();
+                }
+                /**
+                 * Returns the entity associated with the command sender. MAY BE NULL!
+                 */
+                public Entity getCommandSenderEntity()
+                {
+                    return sender.getCommandSenderEntity();
+                }
+                /**
+                 * Returns true if the command sender should be sent feedback about executed commands
+                 */
+                public boolean sendCommandFeedback()
+                {
+                    return sender.sendCommandFeedback();
+                }
+                public void setCommandStat(CommandResultStats.Type type, int amount)
+                {
+                    sender.setCommandStat(type, amount);
+                }
+            };
             String s1;
 
             try
             {
-                s1 = CommandBase.getEntityName(sender, s);
+                s1 = CommandBase.getEntityName(icommandsender, s);
             }
-            catch (EntityNotFoundException entitynotfoundexception)
+            catch (EntityNotFoundException var11)
             {
                 return;
             }
 
-            String s2 = this.field_179673_d[p_179672_2_.getTypeID()];
+            String s2 = this.field_179673_d[resultTypeIn.getTypeID()];
 
             if (s2 != null)
             {
@@ -56,52 +133,46 @@ public class CommandResultStats
         }
     }
 
-    public void func_179668_a(NBTTagCompound p_179668_1_)
+    public void readStatsFromNBT(NBTTagCompound tagcompound)
     {
-        if (p_179668_1_.hasKey("CommandStats", 10))
+        if (tagcompound.hasKey("CommandStats", 10))
         {
-            NBTTagCompound nbttagcompound1 = p_179668_1_.getCompoundTag("CommandStats");
-            CommandResultStats.Type[] atype = CommandResultStats.Type.values();
-            int i = atype.length;
+            NBTTagCompound nbttagcompound = tagcompound.getCompoundTag("CommandStats");
 
-            for (int j = 0; j < i; ++j)
+            for (CommandResultStats.Type commandresultstats$type : CommandResultStats.Type.values())
             {
-                CommandResultStats.Type type = atype[j];
-                String s = type.getTypeName() + "Name";
-                String s1 = type.getTypeName() + "Objective";
+                String s = commandresultstats$type.getTypeName() + "Name";
+                String s1 = commandresultstats$type.getTypeName() + "Objective";
 
-                if (nbttagcompound1.hasKey(s, 8) && nbttagcompound1.hasKey(s1, 8))
+                if (nbttagcompound.hasKey(s, 8) && nbttagcompound.hasKey(s1, 8))
                 {
-                    String s2 = nbttagcompound1.getString(s);
-                    String s3 = nbttagcompound1.getString(s1);
-                    func_179667_a(this, type, s2, s3);
+                    String s2 = nbttagcompound.getString(s);
+                    String s3 = nbttagcompound.getString(s1);
+                    func_179667_a(this, commandresultstats$type, s2, s3);
                 }
             }
         }
     }
 
-    public void func_179670_b(NBTTagCompound p_179670_1_)
+    public void writeStatsToNBT(NBTTagCompound tagcompound)
     {
-        NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-        CommandResultStats.Type[] atype = CommandResultStats.Type.values();
-        int i = atype.length;
+        NBTTagCompound nbttagcompound = new NBTTagCompound();
 
-        for (int j = 0; j < i; ++j)
+        for (CommandResultStats.Type commandresultstats$type : CommandResultStats.Type.values())
         {
-            CommandResultStats.Type type = atype[j];
-            String s = this.field_179675_c[type.getTypeID()];
-            String s1 = this.field_179673_d[type.getTypeID()];
+            String s = this.field_179675_c[commandresultstats$type.getTypeID()];
+            String s1 = this.field_179673_d[commandresultstats$type.getTypeID()];
 
             if (s != null && s1 != null)
             {
-                nbttagcompound1.setString(type.getTypeName() + "Name", s);
-                nbttagcompound1.setString(type.getTypeName() + "Objective", s1);
+                nbttagcompound.setString(commandresultstats$type.getTypeName() + "Name", s);
+                nbttagcompound.setString(commandresultstats$type.getTypeName() + "Objective", s1);
             }
         }
 
-        if (!nbttagcompound1.hasNoTags())
+        if (!nbttagcompound.hasNoTags())
         {
-            p_179670_1_.setTag("CommandStats", nbttagcompound1);
+            tagcompound.setTag("CommandStats", nbttagcompound);
         }
     }
 
@@ -109,7 +180,7 @@ public class CommandResultStats
     {
         if (p_179667_2_ != null && p_179667_2_.length() != 0 && p_179667_3_ != null && p_179667_3_.length() != 0)
         {
-            if (stats.field_179675_c == field_179674_b || stats.field_179673_d == field_179674_b)
+            if (stats.field_179675_c == STRING_RESULT_TYPES || stats.field_179673_d == STRING_RESULT_TYPES)
             {
                 stats.field_179675_c = new String[NUM_RESULT_TYPES];
                 stats.field_179673_d = new String[NUM_RESULT_TYPES];
@@ -124,21 +195,17 @@ public class CommandResultStats
         }
     }
 
-    private static void func_179669_a(CommandResultStats p_179669_0_, CommandResultStats.Type p_179669_1_)
+    private static void func_179669_a(CommandResultStats resultStatsIn, CommandResultStats.Type resultTypeIn)
     {
-        if (p_179669_0_.field_179675_c != field_179674_b && p_179669_0_.field_179673_d != field_179674_b)
+        if (resultStatsIn.field_179675_c != STRING_RESULT_TYPES && resultStatsIn.field_179673_d != STRING_RESULT_TYPES)
         {
-            p_179669_0_.field_179675_c[p_179669_1_.getTypeID()] = null;
-            p_179669_0_.field_179673_d[p_179669_1_.getTypeID()] = null;
+            resultStatsIn.field_179675_c[resultTypeIn.getTypeID()] = null;
+            resultStatsIn.field_179673_d[resultTypeIn.getTypeID()] = null;
             boolean flag = true;
-            CommandResultStats.Type[] atype = CommandResultStats.Type.values();
-            int i = atype.length;
 
-            for (int j = 0; j < i; ++j)
+            for (CommandResultStats.Type commandresultstats$type : CommandResultStats.Type.values())
             {
-                CommandResultStats.Type type = atype[j];
-
-                if (p_179669_0_.field_179675_c[type.getTypeID()] != null && p_179669_0_.field_179673_d[type.getTypeID()] != null)
+                if (resultStatsIn.field_179675_c[commandresultstats$type.getTypeID()] != null && resultStatsIn.field_179673_d[commandresultstats$type.getTypeID()] != null)
                 {
                     flag = false;
                     break;
@@ -147,21 +214,17 @@ public class CommandResultStats
 
             if (flag)
             {
-                p_179669_0_.field_179675_c = field_179674_b;
-                p_179669_0_.field_179673_d = field_179674_b;
+                resultStatsIn.field_179675_c = STRING_RESULT_TYPES;
+                resultStatsIn.field_179673_d = STRING_RESULT_TYPES;
             }
         }
     }
 
-    public void func_179671_a(CommandResultStats p_179671_1_)
+    public void func_179671_a(CommandResultStats resultStatsIn)
     {
-        CommandResultStats.Type[] atype = CommandResultStats.Type.values();
-        int i = atype.length;
-
-        for (int j = 0; j < i; ++j)
+        for (CommandResultStats.Type commandresultstats$type : CommandResultStats.Type.values())
         {
-            CommandResultStats.Type type = atype[j];
-            func_179667_a(this, type, p_179671_1_.field_179675_c[type.getTypeID()], p_179671_1_.field_179673_d[type.getTypeID()]);
+            func_179667_a(this, commandresultstats$type, resultStatsIn.field_179675_c[commandresultstats$type.getTypeID()], resultStatsIn.field_179673_d[commandresultstats$type.getTypeID()]);
         }
     }
 
@@ -172,12 +235,11 @@ public class CommandResultStats
         AFFECTED_ENTITIES(2, "AffectedEntities"),
         AFFECTED_ITEMS(3, "AffectedItems"),
         QUERY_RESULT(4, "QueryResult");
+
         /** The integer ID of the Result Type. */
         final int typeID;
         /** The string representation of the type. */
         final String typeName;
-
-        private static final String __OBFID = "CL_00002363";
 
         private Type(int id, String name)
         {
@@ -208,13 +270,10 @@ public class CommandResultStats
         {
             String[] astring = new String[values().length];
             int i = 0;
-            CommandResultStats.Type[] atype = values();
-            int j = atype.length;
 
-            for (int k = 0; k < j; ++k)
+            for (CommandResultStats.Type commandresultstats$type : values())
             {
-                CommandResultStats.Type type = atype[k];
-                astring[i++] = type.getTypeName();
+                astring[i++] = commandresultstats$type.getTypeName();
             }
 
             return astring;
@@ -222,21 +281,14 @@ public class CommandResultStats
 
         /**
          * Retrieves the Type indicated by the supplied name string.
-         *  
-         * @param name The name of the type that is attempting to be retrieved.
          */
         public static CommandResultStats.Type getTypeByName(String name)
         {
-            CommandResultStats.Type[] atype = values();
-            int i = atype.length;
-
-            for (int j = 0; j < i; ++j)
+            for (CommandResultStats.Type commandresultstats$type : values())
             {
-                CommandResultStats.Type type = atype[j];
-
-                if (type.getTypeName().equals(name))
+                if (commandresultstats$type.getTypeName().equals(name))
                 {
-                    return type;
+                    return commandresultstats$type;
                 }
             }
 

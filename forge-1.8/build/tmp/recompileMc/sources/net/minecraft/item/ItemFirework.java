@@ -1,7 +1,6 @@
 package net.minecraft.item;
 
 import com.google.common.collect.Lists;
-import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.player.EntityPlayer;
@@ -16,13 +15,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemFirework extends Item
 {
-    private static final String __OBFID = "CL_00000031";
-
     /**
      * Called when a Block is right-clicked with this Item
-     *  
-     * @param pos The block being right-clicked
-     * @param side The side being right-clicked
      */
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
@@ -46,12 +40,9 @@ public class ItemFirework extends Item
 
     /**
      * allows items to add custom lines of information to the mouseover description
-     *  
-     * @param tooltip All lines to display in the Item's tooltip. This is a List of Strings.
-     * @param advanced Whether the setting "Advanced tooltips" is enabled
      */
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced)
+    public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced)
     {
         if (stack.hasTagCompound())
         {
@@ -71,17 +62,17 @@ public class ItemFirework extends Item
                     for (int i = 0; i < nbttaglist.tagCount(); ++i)
                     {
                         NBTTagCompound nbttagcompound1 = nbttaglist.getCompoundTagAt(i);
-                        ArrayList arraylist = Lists.newArrayList();
-                        ItemFireworkCharge.addExplosionInfo(nbttagcompound1, arraylist);
+                        List<String> list = Lists.<String>newArrayList();
+                        ItemFireworkCharge.addExplosionInfo(nbttagcompound1, list);
 
-                        if (arraylist.size() > 0)
+                        if (list.size() > 0)
                         {
-                            for (int j = 1; j < arraylist.size(); ++j)
+                            for (int j = 1; j < ((List)list).size(); ++j)
                             {
-                                arraylist.set(j, "  " + (String)arraylist.get(j));
+                                list.set(j, "  " + (String)list.get(j));
                             }
 
-                            tooltip.addAll(arraylist);
+                            tooltip.addAll(list);
                         }
                     }
                 }

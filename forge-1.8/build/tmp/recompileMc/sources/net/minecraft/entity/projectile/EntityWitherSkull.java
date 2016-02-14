@@ -1,8 +1,9 @@
 package net.minecraft.entity.projectile;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.init.Blocks;
+import net.minecraft.entity.boss.EntityWither;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.BlockPos;
@@ -16,17 +17,15 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class EntityWitherSkull extends EntityFireball
 {
-    private static final String __OBFID = "CL_00001728";
-
     public EntityWitherSkull(World worldIn)
     {
         super(worldIn);
         this.setSize(0.3125F, 0.3125F);
     }
 
-    public EntityWitherSkull(World worldIn, EntityLivingBase p_i1794_2_, double p_i1794_3_, double p_i1794_5_, double p_i1794_7_)
+    public EntityWitherSkull(World worldIn, EntityLivingBase shooter, double accelX, double accelY, double accelZ)
     {
-        super(worldIn, p_i1794_2_, p_i1794_3_, p_i1794_5_, p_i1794_7_);
+        super(worldIn, shooter, accelX, accelY, accelZ);
         this.setSize(0.3125F, 0.3125F);
     }
 
@@ -39,9 +38,9 @@ public class EntityWitherSkull extends EntityFireball
     }
 
     @SideOnly(Side.CLIENT)
-    public EntityWitherSkull(World worldIn, double p_i1795_2_, double p_i1795_4_, double p_i1795_6_, double p_i1795_8_, double p_i1795_10_, double p_i1795_12_)
+    public EntityWitherSkull(World worldIn, double x, double y, double z, double accelX, double accelY, double accelZ)
     {
-        super(worldIn, p_i1795_2_, p_i1795_4_, p_i1795_6_, p_i1795_8_, p_i1795_10_, p_i1795_12_);
+        super(worldIn, x, y, z, accelX, accelY, accelZ);
         this.setSize(0.3125F, 0.3125F);
     }
 
@@ -56,11 +55,12 @@ public class EntityWitherSkull extends EntityFireball
     /**
      * Explosion resistance of a block relative to this entity
      */
-    public float getExplosionResistance(Explosion p_180428_1_, World worldIn, BlockPos p_180428_3_, IBlockState p_180428_4_)
+    public float getExplosionResistance(Explosion explosionIn, World worldIn, BlockPos pos, IBlockState blockStateIn)
     {
-        float f = super.getExplosionResistance(p_180428_1_, worldIn, p_180428_3_, p_180428_4_);
+        float f = super.getExplosionResistance(explosionIn, worldIn, pos, blockStateIn);
+        Block block = blockStateIn.getBlock();
 
-        if (this.isInvulnerable() && p_180428_4_.getBlock() != Blocks.bedrock && p_180428_4_.getBlock() != Blocks.end_portal && p_180428_4_.getBlock() != Blocks.end_portal_frame && p_180428_4_.getBlock() != Blocks.command_block)
+        if (this.isInvulnerable() && EntityWither.func_181033_a(block))
         {
             f = Math.min(0.8F, f);
         }
@@ -87,7 +87,7 @@ public class EntityWitherSkull extends EntityFireball
                         }
                         else
                         {
-                            this.func_174815_a(this.shootingEntity, movingObject.entityHit);
+                            this.applyEnchantments(this.shootingEntity, movingObject.entityHit);
                         }
                     }
                 }
@@ -98,25 +98,25 @@ public class EntityWitherSkull extends EntityFireball
 
                 if (movingObject.entityHit instanceof EntityLivingBase)
                 {
-                    byte b0 = 0;
+                    int i = 0;
 
                     if (this.worldObj.getDifficulty() == EnumDifficulty.NORMAL)
                     {
-                        b0 = 10;
+                        i = 10;
                     }
                     else if (this.worldObj.getDifficulty() == EnumDifficulty.HARD)
                     {
-                        b0 = 40;
+                        i = 40;
                     }
 
-                    if (b0 > 0)
+                    if (i > 0)
                     {
-                        ((EntityLivingBase)movingObject.entityHit).addPotionEffect(new PotionEffect(Potion.wither.id, 20 * b0, 1));
+                        ((EntityLivingBase)movingObject.entityHit).addPotionEffect(new PotionEffect(Potion.wither.id, 20 * i, 1));
                     }
                 }
             }
 
-            this.worldObj.newExplosion(this, this.posX, this.posY, this.posZ, 1.0F, false, this.worldObj.getGameRules().getGameRuleBooleanValue("mobGriefing"));
+            this.worldObj.newExplosion(this, this.posX, this.posY, this.posZ, 1.0F, false, this.worldObj.getGameRules().getBoolean("mobGriefing"));
             this.setDead();
         }
     }
@@ -153,8 +153,8 @@ public class EntityWitherSkull extends EntityFireball
     /**
      * Set whether this skull comes from an invulnerable (aura) wither boss.
      */
-    public void setInvulnerable(boolean p_82343_1_)
+    public void setInvulnerable(boolean invulnerable)
     {
-        this.dataWatcher.updateObject(10, Byte.valueOf((byte)(p_82343_1_ ? 1 : 0)));
+        this.dataWatcher.updateObject(10, Byte.valueOf((byte)(invulnerable ? 1 : 0)));
     }
 }

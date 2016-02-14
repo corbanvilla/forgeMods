@@ -18,7 +18,6 @@ public class TileEntitySkull extends TileEntity
     private int skullType;
     private int skullRotation;
     private GameProfile playerProfile = null;
-    private static final String __OBFID = "CL_00000364";
 
     public void writeToNBT(NBTTagCompound compound)
     {
@@ -28,9 +27,9 @@ public class TileEntitySkull extends TileEntity
 
         if (this.playerProfile != null)
         {
-            NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-            NBTUtil.writeGameProfile(nbttagcompound1, this.playerProfile);
-            compound.setTag("Owner", nbttagcompound1);
+            NBTTagCompound nbttagcompound = new NBTTagCompound();
+            NBTUtil.writeGameProfile(nbttagcompound, this.playerProfile);
+            compound.setTag("Owner", nbttagcompound);
         }
     }
 
@@ -108,22 +107,22 @@ public class TileEntitySkull extends TileEntity
             }
             else
             {
-                GameProfile gameprofile1 = MinecraftServer.getServer().getPlayerProfileCache().getGameProfileForUsername(input.getName());
+                GameProfile gameprofile = MinecraftServer.getServer().getPlayerProfileCache().getGameProfileForUsername(input.getName());
 
-                if (gameprofile1 == null)
+                if (gameprofile == null)
                 {
                     return input;
                 }
                 else
                 {
-                    Property property = (Property)Iterables.getFirst(gameprofile1.getProperties().get("textures"), (Object)null);
+                    Property property = (Property)Iterables.getFirst(gameprofile.getProperties().get("textures"), null);
 
                     if (property == null)
                     {
-                        gameprofile1 = MinecraftServer.getServer().getMinecraftSessionService().fillProfileProperties(gameprofile1, true);
+                        gameprofile = MinecraftServer.getServer().getMinecraftSessionService().fillProfileProperties(gameprofile, true);
                     }
 
-                    return gameprofile1;
+                    return gameprofile;
                 }
             }
         }

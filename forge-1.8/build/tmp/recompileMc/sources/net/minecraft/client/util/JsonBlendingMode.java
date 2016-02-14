@@ -18,7 +18,6 @@ public class JsonBlendingMode
     private final int field_148112_f;
     private final boolean field_148113_g;
     private final boolean field_148119_h;
-    private static final String __OBFID = "CL_00001038";
 
     private JsonBlendingMode(boolean p_i45084_1_, boolean p_i45084_2_, int p_i45084_3_, int p_i45084_4_, int p_i45084_5_, int p_i45084_6_, int p_i45084_7_)
     {
@@ -126,7 +125,7 @@ public class JsonBlendingMode
             boolean flag = true;
             boolean flag1 = false;
 
-            if (JsonUtils.jsonObjectFieldTypeIsString(p_148110_0_, "func"))
+            if (JsonUtils.isString(p_148110_0_, "func"))
             {
                 i = func_148108_a(p_148110_0_.get("func").getAsString());
 
@@ -136,7 +135,7 @@ public class JsonBlendingMode
                 }
             }
 
-            if (JsonUtils.jsonObjectFieldTypeIsString(p_148110_0_, "srcrgb"))
+            if (JsonUtils.isString(p_148110_0_, "srcrgb"))
             {
                 j = func_148107_b(p_148110_0_.get("srcrgb").getAsString());
 
@@ -146,7 +145,7 @@ public class JsonBlendingMode
                 }
             }
 
-            if (JsonUtils.jsonObjectFieldTypeIsString(p_148110_0_, "dstrgb"))
+            if (JsonUtils.isString(p_148110_0_, "dstrgb"))
             {
                 k = func_148107_b(p_148110_0_.get("dstrgb").getAsString());
 
@@ -156,7 +155,7 @@ public class JsonBlendingMode
                 }
             }
 
-            if (JsonUtils.jsonObjectFieldTypeIsString(p_148110_0_, "srcalpha"))
+            if (JsonUtils.isString(p_148110_0_, "srcalpha"))
             {
                 l = func_148107_b(p_148110_0_.get("srcalpha").getAsString());
 
@@ -168,7 +167,7 @@ public class JsonBlendingMode
                 flag1 = true;
             }
 
-            if (JsonUtils.jsonObjectFieldTypeIsString(p_148110_0_, "dstalpha"))
+            if (JsonUtils.isString(p_148110_0_, "dstalpha"))
             {
                 i1 = func_148107_b(p_148110_0_.get("dstalpha").getAsString());
 
@@ -186,17 +185,17 @@ public class JsonBlendingMode
 
     private static int func_148108_a(String p_148108_0_)
     {
-        String s1 = p_148108_0_.trim().toLowerCase();
-        return s1.equals("add") ? 32774 : (s1.equals("subtract") ? 32778 : (s1.equals("reversesubtract") ? 32779 : (s1.equals("reverse_subtract") ? 32779 : (s1.equals("min") ? 32775 : (s1.equals("max") ? 32776 : 32774)))));
+        String s = p_148108_0_.trim().toLowerCase();
+        return s.equals("add") ? 32774 : (s.equals("subtract") ? 32778 : (s.equals("reversesubtract") ? 32779 : (s.equals("reverse_subtract") ? 32779 : (s.equals("min") ? 32775 : (s.equals("max") ? 32776 : 32774)))));
     }
 
     private static int func_148107_b(String p_148107_0_)
     {
-        String s1 = p_148107_0_.trim().toLowerCase();
-        s1 = s1.replaceAll("_", "");
-        s1 = s1.replaceAll("one", "1");
-        s1 = s1.replaceAll("zero", "0");
-        s1 = s1.replaceAll("minus", "-");
-        return s1.equals("0") ? 0 : (s1.equals("1") ? 1 : (s1.equals("srccolor") ? 768 : (s1.equals("1-srccolor") ? 769 : (s1.equals("dstcolor") ? 774 : (s1.equals("1-dstcolor") ? 775 : (s1.equals("srcalpha") ? 770 : (s1.equals("1-srcalpha") ? 771 : (s1.equals("dstalpha") ? 772 : (s1.equals("1-dstalpha") ? 773 : -1)))))))));
+        String s = p_148107_0_.trim().toLowerCase();
+        s = s.replaceAll("_", "");
+        s = s.replaceAll("one", "1");
+        s = s.replaceAll("zero", "0");
+        s = s.replaceAll("minus", "-");
+        return s.equals("0") ? 0 : (s.equals("1") ? 1 : (s.equals("srccolor") ? 768 : (s.equals("1-srccolor") ? 769 : (s.equals("dstcolor") ? 774 : (s.equals("1-dstcolor") ? 775 : (s.equals("srcalpha") ? 770 : (s.equals("1-srcalpha") ? 771 : (s.equals("dstalpha") ? 772 : (s.equals("1-dstalpha") ? 773 : -1)))))))));
     }
 }

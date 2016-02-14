@@ -3,61 +3,61 @@ package net.minecraft.world.gen.feature;
 import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
 public class WorldGenShrub extends WorldGenTrees
 {
-    private int field_150528_a;
-    private int field_150527_b;
-    private static final String __OBFID = "CL_00000411";
+    private final IBlockState leavesMetadata;
+    private final IBlockState woodMetadata;
 
-    public WorldGenShrub(int p_i2015_1_, int p_i2015_2_)
+    public WorldGenShrub(IBlockState p_i46450_1_, IBlockState p_i46450_2_)
     {
         super(false);
-        this.field_150527_b = p_i2015_1_;
-        this.field_150528_a = p_i2015_2_;
+        this.woodMetadata = p_i46450_1_;
+        this.leavesMetadata = p_i46450_2_;
     }
 
-    public boolean generate(World worldIn, Random p_180709_2_, BlockPos p_180709_3_)
+    public boolean generate(World worldIn, Random rand, BlockPos position)
     {
         Block block;
 
         do
         {
-            block = worldIn.getBlockState(p_180709_3_).getBlock();
-            if (!block.isAir(worldIn, p_180709_3_) && !block.isLeaves(worldIn, p_180709_3_)) break;
-            p_180709_3_ = p_180709_3_.down();
-        } while (p_180709_3_.getY() > 0);
+            block = worldIn.getBlockState(position).getBlock();
+            if (!block.isAir(worldIn, position) && !block.isLeaves(worldIn, position)) break;
+            position = position.down();
+        } while (position.getY() > 0);
 
-        Block block1 = worldIn.getBlockState(p_180709_3_).getBlock();
+        Block block1 = worldIn.getBlockState(position).getBlock();
 
-        if (block1.canSustainPlant(worldIn, p_180709_3_, net.minecraft.util.EnumFacing.UP, ((net.minecraft.block.BlockSapling)Blocks.sapling)))
+        if (block1.canSustainPlant(worldIn, position, net.minecraft.util.EnumFacing.UP, ((net.minecraft.block.BlockSapling)Blocks.sapling)))
         {
-            p_180709_3_ = p_180709_3_.up();
-            this.func_175905_a(worldIn, p_180709_3_, Blocks.log, this.field_150527_b);
+            position = position.up();
+            this.setBlockAndNotifyAdequately(worldIn, position, this.woodMetadata);
 
-            for (int i = p_180709_3_.getY(); i <= p_180709_3_.getY() + 2; ++i)
+            for (int i = position.getY(); i <= position.getY() + 2; ++i)
             {
-                int j = i - p_180709_3_.getY();
+                int j = i - position.getY();
                 int k = 2 - j;
 
-                for (int l = p_180709_3_.getX() - k; l <= p_180709_3_.getX() + k; ++l)
+                for (int l = position.getX() - k; l <= position.getX() + k; ++l)
                 {
-                    int i1 = l - p_180709_3_.getX();
+                    int i1 = l - position.getX();
 
-                    for (int j1 = p_180709_3_.getZ() - k; j1 <= p_180709_3_.getZ() + k; ++j1)
+                    for (int j1 = position.getZ() - k; j1 <= position.getZ() + k; ++j1)
                     {
-                        int k1 = j1 - p_180709_3_.getZ();
+                        int k1 = j1 - position.getZ();
 
-                        if (Math.abs(i1) != k || Math.abs(k1) != k || p_180709_2_.nextInt(2) != 0)
+                        if (Math.abs(i1) != k || Math.abs(k1) != k || rand.nextInt(2) != 0)
                         {
-                            BlockPos blockpos1 = new BlockPos(l, i, j1);
+                            BlockPos blockpos = new BlockPos(l, i, j1);
 
-                            if (worldIn.getBlockState(blockpos1).getBlock().canBeReplacedByLeaves(worldIn, blockpos1))
+                            if (worldIn.getBlockState(blockpos).getBlock().canBeReplacedByLeaves(worldIn, blockpos))
                             {
-                                this.func_175905_a(worldIn, blockpos1, Blocks.leaves, this.field_150528_a);
+                                this.setBlockAndNotifyAdequately(worldIn, blockpos, this.leavesMetadata);
                             }
                         }
                     }

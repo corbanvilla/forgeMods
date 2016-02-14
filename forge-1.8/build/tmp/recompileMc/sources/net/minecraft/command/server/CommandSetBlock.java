@@ -19,12 +19,10 @@ import net.minecraft.world.World;
 
 public class CommandSetBlock extends CommandBase
 {
-    private static final String __OBFID = "CL_00000949";
-
     /**
-     * Get the name of the command
+     * Gets the name of the command
      */
-    public String getName()
+    public String getCommandName()
     {
         return "setblock";
     }
@@ -37,15 +35,23 @@ public class CommandSetBlock extends CommandBase
         return 2;
     }
 
+    /**
+     * Gets the usage string for the command.
+     *  
+     * @param sender The command sender that executed the command
+     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.setblock.usage";
     }
 
     /**
-     * Called when a CommandSender executes this command
+     * Callback when the command is invoked
+     *  
+     * @param sender The command sender that executed the command
+     * @param args The arguments that were passed
      */
-    public void execute(ICommandSender sender, String[] args) throws CommandException
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 4)
         {
@@ -54,7 +60,7 @@ public class CommandSetBlock extends CommandBase
         else
         {
             sender.setCommandStat(CommandResultStats.Type.AFFECTED_BLOCKS, 0);
-            BlockPos blockpos = func_175757_a(sender, args, 0, false);
+            BlockPos blockpos = parseBlockPos(sender, args, 0, false);
             Block block = CommandBase.getBlockByText(sender, args[3]);
             int i = 0;
 
@@ -82,7 +88,7 @@ public class CommandSetBlock extends CommandBase
 
                     try
                     {
-                        nbttagcompound = JsonToNBT.func_180713_a(s);
+                        nbttagcompound = JsonToNBT.getTagFromJson(s);
                         flag = true;
                     }
                     catch (NBTException nbtexception)
@@ -150,8 +156,8 @@ public class CommandSetBlock extends CommandBase
         }
     }
 
-    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
-        return args.length > 0 && args.length <= 3 ? func_175771_a(args, 0, pos) : (args.length == 4 ? func_175762_a(args, Block.blockRegistry.getKeys()) : (args.length == 6 ? getListOfStringsMatchingLastWord(args, new String[] {"replace", "destroy", "keep"}): null));
+        return args.length > 0 && args.length <= 3 ? func_175771_a(args, 0, pos) : (args.length == 4 ? getListOfStringsMatchingLastWord(args, Block.blockRegistry.getKeys()) : (args.length == 6 ? getListOfStringsMatchingLastWord(args, new String[] {"replace", "destroy", "keep"}): null));
     }
 }

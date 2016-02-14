@@ -2,7 +2,6 @@ package net.minecraft.client.multiplayer;
 
 import com.google.common.collect.Lists;
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -19,9 +18,7 @@ public class ServerList
     private static final Logger logger = LogManager.getLogger();
     /** The Minecraft instance. */
     private final Minecraft mc;
-    /** List of ServerData instances. */
-    private final List servers = Lists.newArrayList();
-    private static final String __OBFID = "CL_00000891";
+    private final List<ServerData> servers = Lists.<ServerData>newArrayList();
 
     public ServerList(Minecraft mcIn)
     {
@@ -54,7 +51,7 @@ public class ServerList
         }
         catch (Exception exception)
         {
-            logger.error("Couldn\'t load server list", exception);
+            logger.error((String)"Couldn\'t load server list", (Throwable)exception);
         }
     }
 
@@ -67,11 +64,9 @@ public class ServerList
         try
         {
             NBTTagList nbttaglist = new NBTTagList();
-            Iterator iterator = this.servers.iterator();
 
-            while (iterator.hasNext())
+            for (ServerData serverdata : this.servers)
             {
-                ServerData serverdata = (ServerData)iterator.next();
                 nbttaglist.appendTag(serverdata.getNBTCompound());
             }
 
@@ -81,7 +76,7 @@ public class ServerList
         }
         catch (Exception exception)
         {
-            logger.error("Couldn\'t save server list", exception);
+            logger.error((String)"Couldn\'t save server list", (Throwable)exception);
         }
     }
 
@@ -140,9 +135,9 @@ public class ServerList
 
         for (int i = 0; i < serverlist.countServers(); ++i)
         {
-            ServerData serverdata1 = serverlist.getServerData(i);
+            ServerData serverdata = serverlist.getServerData(i);
 
-            if (serverdata1.serverName.equals(p_147414_0_.serverName) && serverdata1.serverIP.equals(p_147414_0_.serverIP))
+            if (serverdata.serverName.equals(p_147414_0_.serverName) && serverdata.serverIP.equals(p_147414_0_.serverIP))
             {
                 serverlist.func_147413_a(i, p_147414_0_);
                 break;
