@@ -1,0 +1,24 @@
+package org.devoxx4kids.forge.mods;
+
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+public class GetHandheldItem {
+	private Item handItem;
+	static Block HandBlock;
+	
+	@SubscribeEvent
+	public void handItems(PlayerInteractEvent event) {
+		if (event.entityPlayer.getHeldItem() == null) {
+			return;
+		}
+		
+		else {
+			handItem = event.entityPlayer.getHeldItem().getItem();
+			HandBlock = Block.getBlockFromItem(handItem);
+			
+		}
+	}
+}

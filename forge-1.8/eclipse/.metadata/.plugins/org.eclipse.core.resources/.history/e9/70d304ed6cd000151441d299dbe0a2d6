@@ -1,0 +1,15 @@
+package org.devoxx4kids.forge.mods;
+
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
+
+public class invincible {
+	@SubsribeEvent
+	public void damageTaken(LivingAttackEvent event) {
+		if (!(event.entity instanceof EntityPlayer)) {
+			return;
+		}
+		
+	}
+	
+}

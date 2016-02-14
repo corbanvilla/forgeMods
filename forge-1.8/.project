@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>forge-1.8-11.14.4.1569-mdk</name>
+	<comment/>
+	<projects/>
+	<natures>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+	</natures>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments/>
+		</buildCommand>
+	</buildSpec>
+	<linkedResources>
+		<link>
+			<name>.link1</name>
+			<type>2</type>
+			<location>/Users/Corban/.gradle/caches/minecraft/net/minecraftforge/forge/1.8-11.14.4.1569/start</location>
+		</link>
+	</linkedResources>
+</projectDescription>
