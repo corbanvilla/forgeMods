@@ -2,5 +2,15 @@
 <qualifiedTypeNameHistroy>
 <fullyQualifiedTypeName name="net.minecraft.command.ICommand"/>
 <fullyQualifiedTypeName name="net.minecraft.client.Minecraft"/>
+<fullyQualifiedTypeName name="net.minecraftforge.common.util.EnumHelper"/>
 <fullyQualifiedTypeName name="net.minecraft.client.resources.model.ModelResourceLocation"/>
+<fullyQualifiedTypeName name="net.minecraft.block.material.Material"/>
+<fullyQualifiedTypeName name="net.minecraftforge.fml.common.eventhandler.Event.Result"/>
+<fullyQualifiedTypeName name="java.util.Set"/>
+<fullyQualifiedTypeName name="net.minecraft.block.Block"/>
+<fullyQualifiedTypeName name="net.minecraft.item.ItemPickaxe"/>
+<fullyQualifiedTypeName name="net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent"/>
+<fullyQualifiedTypeName name="org.devoxx4kids.forge.mods.GetHandheldItem"/>
+<fullyQualifiedTypeName name="net.minecraft.item.Item"/>
+<fullyQualifiedTypeName name="org.devoxx4kids.forge.mods.SonicScrewdriver"/>
 </qualifiedTypeNameHistroy>

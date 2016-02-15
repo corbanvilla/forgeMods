@@ -1,0 +1,12 @@
+{
+	"parent": "block/cube", 
+	"textures": { 
+		"down": "improved-minecraft:blocks/enderBlock",
+		"up": "improved-minecraft:blocks/enderBlock",
+		"north": "improved-minecraft:blocks/enderBlock",
+		"south": "improved-minecraft:blocks/enderBlock",
+		"west": "improved-minecraft:blocks/enderBlock",
+		"east": "improved-minecraft:blocks/enderBlock",
+		"particle": "improved-minecraft:blocks/enderBlock"
+	}
+}

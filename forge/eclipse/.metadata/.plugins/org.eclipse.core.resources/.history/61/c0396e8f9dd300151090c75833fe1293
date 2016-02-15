@@ -1,0 +1,14 @@
+package org.devoxx4kids.forge.mods;
+
+import net.minecraft.item.ItemPickaxe;
+
+public class SonicScrewdriver extends ItemPickaxe{
+
+	public SonicScrewdriver(ToolMaterial material) {
+		super(material);
+		this.setUnlocalizedName("sonicScrewdriver");
+		
+	}
+	
+
+}

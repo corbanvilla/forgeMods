@@ -33745,21 +33745,18 @@ Adding 0 imports
 End  Processing: org/devoxx4kids/forge/mods/ExplodingMinecarts.java
 
 Start Processing: org/devoxx4kids/forge/mods/GetHandheldItem.java
-Rename class net/minecraft/item/Item[351,355]::Item->Item
-Rename class net/minecraft/block/Block[374,379]::Block->Block
-[method, org/devoxx4kids/forge/mods/GetHandheldItem/handItems, (Lnet/minecraftforge/event/entity/player/PlayerInteractEvent;)V]
-No rename for class net/minecraftforge/event/entity/player/PlayerInteractEvent
-No rename for field net/minecraftforge/event/entity/player/PlayerEvent/entityPlayer
-Rename method net/minecraft/entity/EntityLivingBase/getHeldItem ()Lnet/minecraft/item/ItemStack;[486,497]::getHeldItem->func_70694_bm
-No rename for field net/minecraftforge/event/entity/player/PlayerEvent/entityPlayer
-Rename field net/minecraft/entity/player/EntityPlayer/capabilities[537,549]::capabilities->field_71075_bZ
-Rename field net/minecraft/entity/player/PlayerCapabilities/isCreativeMode[552,566]::isCreativeMode->field_75098_d
-No rename for field net/minecraftforge/event/entity/player/PlayerEvent/entityPlayer
-Rename method net/minecraft/entity/EntityLivingBase/getHeldItem ()Lnet/minecraft/item/ItemStack;[627,638]::getHeldItem->func_70694_bm
-Rename method net/minecraft/item/ItemStack/getItem ()Lnet/minecraft/item/Item;[643,650]::getItem->func_77973_b
+Rename class net/minecraft/item/Item[283,287]::Item->Item
+Rename class net/minecraft/block/Block[334,339]::Block->Block
+[method, org/devoxx4kids/forge/mods/GetHandheldItem/handItems, (Lnet/minecraftforge/fml/common/gameevent/TickEvent$PlayerTickEvent;)V]
+No rename for class net/minecraftforge/fml/common/gameevent/TickEvent/PlayerTickEvent
+No rename for field net/minecraftforge/fml/common/gameevent/TickEvent/PlayerTickEvent/player
+Rename method net/minecraft/entity/EntityLivingBase/getHeldItem ()Lnet/minecraft/item/ItemStack;[436,447]::getHeldItem->func_70694_bm
+No rename for field net/minecraftforge/fml/common/gameevent/TickEvent/PlayerTickEvent/player
+Rename method net/minecraft/entity/EntityLivingBase/getHeldItem ()Lnet/minecraft/item/ItemStack;[514,525]::getHeldItem->func_70694_bm
+Rename method net/minecraft/item/ItemStack/getItem ()Lnet/minecraft/item/Item;[530,537]::getItem->func_77973_b
 [method, java/io/PrintStream/println, (Ljava/lang/String;)V]
-Rename class net/minecraft/block/Block[738,743]::Block->Block
-Rename method net/minecraft/block/Block/getBlockFromItem (Lnet/minecraft/item/Item;)Lnet/minecraft/block/Block;[744,760]::getBlockFromItem->func_149634_a
+Rename class net/minecraft/block/Block[625,630]::Block->Block
+Rename method net/minecraft/block/Block/getBlockFromItem (Lnet/minecraft/item/Item;)Lnet/minecraft/block/Block;[631,647]::getBlockFromItem->func_149634_a
 [method, java/io/PrintStream/println, (Ljava/lang/String;)V]
 Import: net.minecraft.block.Block
 Import: net.minecraft.item.Item
@@ -34033,54 +34030,53 @@ End  Processing: org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java
 Start Processing: org/devoxx4kids/forge/mods/SonicScrewdriver.java
 [method, org/devoxx4kids/forge/mods/SonicScrewdriver/SonicScrewdriver, (Lnet/minecraft/item/Item$ToolMaterial;)V]
 FOUND CONSTR method org/devoxx4kids/forge/mods/SonicScrewdriver/SonicScrewdriver (Lnet/minecraft/item/Item$ToolMaterial;)V org/devoxx4kids/forge/mods/SonicScrewdriver
-Rename class net/minecraft/item/Item/ToolMaterial[454,466]::ToolMaterial->ToolMaterial
-Rename method net/minecraft/item/Item/setUnlocalizedName (Ljava/lang/String;)Lnet/minecraft/item/Item;[505,523]::setUnlocalizedName->func_77655_b
+Rename class net/minecraft/item/Item/ToolMaterial[405,417]::ToolMaterial->ToolMaterial
+Rename method net/minecraft/item/Item/setUnlocalizedName (Ljava/lang/String;)Lnet/minecraft/item/Item;[456,474]::setUnlocalizedName->func_77655_b
 [method, net/minecraft/item/Item/getToolClasses, (Lnet/minecraft/item/ItemStack;)Ljava/util/Set;]
 No rename for method net/minecraft/item/Item/getToolClasses (Lnet/minecraft/item/ItemStack;)Ljava/util/Set;
-Rename class net/minecraft/item/ItemStack[599,608]::ItemStack->ItemStack
+Rename class net/minecraft/item/ItemStack[550,559]::ItemStack->ItemStack
 [method, com/google/common/collect/ImmutableSet/of, (Ljava/lang/Object;Ljava/lang/Object;)Lcom/google/common/collect/ImmutableSet;]
 [method, com/google/common/collect/Sets/newHashSet, ([Ljava/lang/Object;)Ljava/util/HashSet;]
-Rename class net/minecraft/block/Block[743,748]::Block->Block
-Rename class net/minecraft/init/Blocks[762,768]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/grass[769,774]::grass->field_150349_c
-Rename class net/minecraft/init/Blocks[785,791]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/dirt[792,796]::dirt->field_150346_d
-Rename class net/minecraft/init/Blocks[808,814]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/sand[815,819]::sand->field_150354_m
-Rename class net/minecraft/init/Blocks[831,837]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/gravel[838,844]::gravel->field_150351_n
-Rename class net/minecraft/init/Blocks[864,870]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/snow_layer[871,881]::snow_layer->field_150431_aC
-Rename class net/minecraft/init/Blocks[888,894]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/snow[895,899]::snow->field_150433_aE
-Rename class net/minecraft/init/Blocks[912,918]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/clay[919,923]::clay->field_150435_aG
-Rename class net/minecraft/init/Blocks[936,942]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/farmland[943,951]::farmland->field_150458_ak
-Rename class net/minecraft/init/Blocks[970,976]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/soul_sand[977,986]::soul_sand->field_150425_aM
-Rename class net/minecraft/init/Blocks[994,1000]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/mycelium[1001,1009]::mycelium->field_150391_bh
-Rename class net/minecraft/init/Blocks[1018,1024]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/planks[1025,1031]::planks->field_150344_f
-Rename class net/minecraft/init/Blocks[1041,1047]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/bookshelf[1048,1057]::bookshelf->field_150342_X
-Rename class net/minecraft/init/Blocks[1074,1080]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/log[1081,1084]::log->field_150364_r
-Rename class net/minecraft/init/Blocks[1097,1103]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/log2[1104,1108]::log2->field_150363_s
-Rename class net/minecraft/init/Blocks[1120,1126]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/chest[1127,1132]::chest->field_150486_ae
-Rename class net/minecraft/init/Blocks[1144,1150]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/pumpkin[1151,1158]::pumpkin->field_150423_aK
-Rename class net/minecraft/init/Blocks[1168,1174]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/lit_pumpkin[1175,1186]::lit_pumpkin->field_150428_aP
+Rename class net/minecraft/block/Block[704,709]::Block->Block
+Rename class net/minecraft/init/Blocks[723,729]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/grass[730,735]::grass->field_150349_c
+Rename class net/minecraft/init/Blocks[746,752]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/dirt[753,757]::dirt->field_150346_d
+Rename class net/minecraft/init/Blocks[769,775]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/sand[776,780]::sand->field_150354_m
+Rename class net/minecraft/init/Blocks[792,798]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/gravel[799,805]::gravel->field_150351_n
+Rename class net/minecraft/init/Blocks[825,831]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/snow_layer[832,842]::snow_layer->field_150431_aC
+Rename class net/minecraft/init/Blocks[849,855]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/snow[856,860]::snow->field_150433_aE
+Rename class net/minecraft/init/Blocks[873,879]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/clay[880,884]::clay->field_150435_aG
+Rename class net/minecraft/init/Blocks[897,903]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/farmland[904,912]::farmland->field_150458_ak
+Rename class net/minecraft/init/Blocks[931,937]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/soul_sand[938,947]::soul_sand->field_150425_aM
+Rename class net/minecraft/init/Blocks[955,961]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/mycelium[962,970]::mycelium->field_150391_bh
+Rename class net/minecraft/init/Blocks[979,985]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/planks[986,992]::planks->field_150344_f
+Rename class net/minecraft/init/Blocks[1002,1008]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/bookshelf[1009,1018]::bookshelf->field_150342_X
+Rename class net/minecraft/init/Blocks[1035,1041]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/log[1042,1045]::log->field_150364_r
+Rename class net/minecraft/init/Blocks[1058,1064]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/log2[1065,1069]::log2->field_150363_s
+Rename class net/minecraft/init/Blocks[1081,1087]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/chest[1088,1093]::chest->field_150486_ae
+Rename class net/minecraft/init/Blocks[1105,1111]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/pumpkin[1112,1119]::pumpkin->field_150423_aK
+Rename class net/minecraft/init/Blocks[1129,1135]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/lit_pumpkin[1136,1147]::lit_pumpkin->field_150428_aP
 Import: net.minecraft.block.Block
 Import: net.minecraft.init.Blocks
-Import: net.minecraft.item.Item.ToolMaterial
+Import: net.minecraft.item.Item
 Import: net.minecraft.item.ItemPickaxe
 Import: net.minecraft.item.ItemStack
-Import: net.minecraft.item.ItemTool
 Adding 1 imports
 End  Processing: org/devoxx4kids/forge/mods/SonicScrewdriver.java
 

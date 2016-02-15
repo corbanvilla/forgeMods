@@ -1,0 +1,14 @@
+package org.devoxx4kids.forge.mods;
+
+import net.minecraft.item.ItemSword;
+
+public class SonicScrewdriver extends ItemSword{
+
+	public SonicScrewdriver(ToolMaterial material) {
+		super(material);
+		this.setUnlocalizedName("sonicScrewdriver");
+		
+	}
+	
+
+}
