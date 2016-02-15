@@ -1,15 +1,15 @@
 [
 {
-  "modid": "examplemod",
-  "name": "Example Mod",
-  "description": "Example placeholder mod.",
+  "modid": "Improved Minecraft",
+  "name": "Improved Minecraft",
+  "description": "This mod includes small improvemnts to the normal minecraft game, adding features and a few new things.",
   "version": "1.0",
   "mcversion": "1.8.9",
   "url": "",
   "updateUrl": "",
-  "authorList": ["ExampleDude"],
-  "credits": "The Forge and FML guys, for making this example",
-  "logoFile": "",
+  "authorList": ["Animcogn"],
+  "credits": "This mod was created by Animcogn",
+  "logoFile": "logo.png",
   "screenshots": [],
   "dependencies": []
 }
