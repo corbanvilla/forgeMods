@@ -33784,7 +33784,27 @@ Rename class net/minecraft/block/Block[1035,1040]::Block->Block
 Rename class net/minecraft/item/Item[1068,1072]::Item->Item
 Rename class net/minecraft/item/Item[1100,1104]::Item->Item
 Rename class net/minecraft/item/Item[1130,1134]::Item->Item
-Rename class net/minecraft/item/Item/ToolMaterial[1182,1194]::ToolMaterial->ToolMaterial
+Rename class net/minecraft/item/Item[1168,1172]::Item->Item
+Rename class net/minecraft/item/Item[1202,1206]::Item->Item
+Rename class net/minecraft/item/Item[1235,1239]::Item->Item
+Rename class net/minecraft/item/Item[1265,1269]::Item->Item
+Rename class net/minecraft/item/Item/ToolMaterial[1311,1323]::ToolMaterial->ToolMaterial
+No rename for class net/minecraftforge/common/util/EnumHelper
+[method, net/minecraftforge/common/util/EnumHelper/addToolMaterial, (Ljava/lang/String;IIFFI)Lnet/minecraft/item/Item$ToolMaterial;]
+No rename for method net/minecraftforge/common/util/EnumHelper/addToolMaterial (Ljava/lang/String;IIFFI)Lnet/minecraft/item/Item$ToolMaterial;
+Rename class net/minecraft/item/Item/ToolMaterial[1413,1425]::ToolMaterial->ToolMaterial
+No rename for class net/minecraftforge/common/util/EnumHelper
+[method, net/minecraftforge/common/util/EnumHelper/addToolMaterial, (Ljava/lang/String;IIFFI)Lnet/minecraft/item/Item$ToolMaterial;]
+No rename for method net/minecraftforge/common/util/EnumHelper/addToolMaterial (Ljava/lang/String;IIFFI)Lnet/minecraft/item/Item$ToolMaterial;
+Rename class net/minecraft/item/Item/ToolMaterial[1513,1525]::ToolMaterial->ToolMaterial
+No rename for class net/minecraftforge/common/util/EnumHelper
+[method, net/minecraftforge/common/util/EnumHelper/addToolMaterial, (Ljava/lang/String;IIFFI)Lnet/minecraft/item/Item$ToolMaterial;]
+No rename for method net/minecraftforge/common/util/EnumHelper/addToolMaterial (Ljava/lang/String;IIFFI)Lnet/minecraft/item/Item$ToolMaterial;
+Rename class net/minecraft/item/Item/ToolMaterial[1607,1619]::ToolMaterial->ToolMaterial
+No rename for class net/minecraftforge/common/util/EnumHelper
+[method, net/minecraftforge/common/util/EnumHelper/addToolMaterial, (Ljava/lang/String;IIFFI)Lnet/minecraft/item/Item$ToolMaterial;]
+No rename for method net/minecraftforge/common/util/EnumHelper/addToolMaterial (Ljava/lang/String;IIFFI)Lnet/minecraft/item/Item$ToolMaterial;
+Rename class net/minecraft/item/Item/ToolMaterial[1706,1718]::ToolMaterial->ToolMaterial
 No rename for class net/minecraftforge/common/util/EnumHelper
 [method, net/minecraftforge/common/util/EnumHelper/addToolMaterial, (Ljava/lang/String;IIFFI)Lnet/minecraft/item/Item$ToolMaterial;]
 No rename for method net/minecraftforge/common/util/EnumHelper/addToolMaterial (Ljava/lang/String;IIFFI)Lnet/minecraft/item/Item$ToolMaterial;
@@ -33862,114 +33882,210 @@ No rename for class net/minecraftforge/fml/common/registry/GameRegistry
 [method, net/minecraftforge/fml/common/registry/GameRegistry/registerItem, (Lnet/minecraft/item/Item;Ljava/lang/String;)V]
 No rename for method net/minecraftforge/fml/common/registry/GameRegistry/registerItem (Lnet/minecraft/item/Item;Ljava/lang/String;)V
 No rename for class net/minecraftforge/fml/common/registry/GameRegistry
-[method, net/minecraftforge/fml/common/registry/GameRegistry/addRecipe, (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V]
-No rename for method net/minecraftforge/fml/common/registry/GameRegistry/addRecipe (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V
-Rename class net/minecraft/item/ItemStack[2672,2681]::ItemStack->ItemStack
-Rename class net/minecraft/init/Blocks[2682,2688]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/cobblestone[2689,2700]::cobblestone->field_150347_e
-Rename class net/minecraft/init/Blocks[2738,2744]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/dirt[2745,2749]::dirt->field_150346_d
+[method, net/minecraftforge/fml/common/registry/GameRegistry/registerItem, (Lnet/minecraft/item/Item;Ljava/lang/String;)V]
+No rename for method net/minecraftforge/fml/common/registry/GameRegistry/registerItem (Lnet/minecraft/item/Item;Ljava/lang/String;)V
+No rename for class net/minecraftforge/fml/common/registry/GameRegistry
+[method, net/minecraftforge/fml/common/registry/GameRegistry/registerItem, (Lnet/minecraft/item/Item;Ljava/lang/String;)V]
+No rename for method net/minecraftforge/fml/common/registry/GameRegistry/registerItem (Lnet/minecraft/item/Item;Ljava/lang/String;)V
+No rename for class net/minecraftforge/fml/common/registry/GameRegistry
+[method, net/minecraftforge/fml/common/registry/GameRegistry/registerItem, (Lnet/minecraft/item/Item;Ljava/lang/String;)V]
+No rename for method net/minecraftforge/fml/common/registry/GameRegistry/registerItem (Lnet/minecraft/item/Item;Ljava/lang/String;)V
+No rename for class net/minecraftforge/fml/common/registry/GameRegistry
+[method, net/minecraftforge/fml/common/registry/GameRegistry/registerItem, (Lnet/minecraft/item/Item;Ljava/lang/String;)V]
+No rename for method net/minecraftforge/fml/common/registry/GameRegistry/registerItem (Lnet/minecraft/item/Item;Ljava/lang/String;)V
 No rename for class net/minecraftforge/fml/common/registry/GameRegistry
 [method, net/minecraftforge/fml/common/registry/GameRegistry/addRecipe, (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V]
 No rename for method net/minecraftforge/fml/common/registry/GameRegistry/addRecipe (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V
-Rename class net/minecraft/item/ItemStack[2796,2805]::ItemStack->ItemStack
+Rename class net/minecraft/item/ItemStack[3629,3638]::ItemStack->ItemStack
+Rename class net/minecraft/init/Blocks[3639,3645]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/cobblestone[3646,3657]::cobblestone->field_150347_e
+Rename class net/minecraft/init/Blocks[3695,3701]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/dirt[3702,3706]::dirt->field_150346_d
 No rename for class net/minecraftforge/fml/common/registry/GameRegistry
 [method, net/minecraftforge/fml/common/registry/GameRegistry/addRecipe, (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V]
 No rename for method net/minecraftforge/fml/common/registry/GameRegistry/addRecipe (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V
-Rename class net/minecraft/item/ItemStack[2908,2917]::ItemStack->ItemStack
-Rename class net/minecraft/init/Items[2973,2978]::Items->Items
-Rename field net/minecraft/init/Items/ender_eye[2979,2988]::ender_eye->field_151061_bv
-Rename class net/minecraft/init/Blocks[3005,3011]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/obsidian[3012,3020]::obsidian->field_150343_Z
+Rename class net/minecraft/item/ItemStack[3753,3762]::ItemStack->ItemStack
 No rename for class net/minecraftforge/fml/common/registry/GameRegistry
 [method, net/minecraftforge/fml/common/registry/GameRegistry/addRecipe, (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V]
 No rename for method net/minecraftforge/fml/common/registry/GameRegistry/addRecipe (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V
-Rename class net/minecraft/item/ItemStack[3063,3072]::ItemStack->ItemStack
-Rename class net/minecraft/init/Items[3134,3139]::Items->Items
-Rename field net/minecraft/init/Items/diamond_pickaxe[3140,3155]::diamond_pickaxe->field_151046_w
-Rename class net/minecraft/init/Items[3165,3170]::Items->Items
-Rename field net/minecraft/init/Items/emerald[3171,3178]::emerald->field_151166_bC
-Rename class net/minecraft/init/Blocks[3197,3203]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/obsidian[3204,3212]::obsidian->field_150343_Z
-Rename class net/minecraft/init/Items[3229,3234]::Items->Items
-Rename field net/minecraft/init/Items/diamond_sword[3235,3248]::diamond_sword->field_151048_u
-Rename class net/minecraft/init/Items[3260,3265]::Items->Items
-Rename field net/minecraft/init/Items/diamond_axe[3266,3277]::diamond_axe->field_151056_x
-Rename class net/minecraft/init/Items[3291,3296]::Items->Items
-Rename field net/minecraft/init/Items/diamond[3297,3304]::diamond->field_151045_i
-Rename class net/minecraft/init/Items[3322,3327]::Items->Items
-Rename field net/minecraft/init/Items/diamond_shovel[3328,3342]::diamond_shovel->field_151047_v
+Rename class net/minecraft/item/ItemStack[3865,3874]::ItemStack->ItemStack
+Rename class net/minecraft/init/Items[3930,3935]::Items->Items
+Rename field net/minecraft/init/Items/ender_eye[3936,3945]::ender_eye->field_151061_bv
+Rename class net/minecraft/init/Blocks[3962,3968]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/obsidian[3969,3977]::obsidian->field_150343_Z
+No rename for class net/minecraftforge/fml/common/registry/GameRegistry
+[method, net/minecraftforge/fml/common/registry/GameRegistry/addRecipe, (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V]
+No rename for method net/minecraftforge/fml/common/registry/GameRegistry/addRecipe (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V
+Rename class net/minecraft/item/ItemStack[4020,4029]::ItemStack->ItemStack
+Rename class net/minecraft/init/Items[4114,4119]::Items->Items
+Rename field net/minecraft/init/Items/emerald[4120,4127]::emerald->field_151166_bC
+Rename class net/minecraft/init/Items[4167,4172]::Items->Items
+Rename field net/minecraft/init/Items/diamond[4173,4180]::diamond->field_151045_i
+Rename class net/minecraft/init/Blocks[4198,4204]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/obsidian[4205,4213]::obsidian->field_150343_Z
+No rename for class net/minecraftforge/fml/common/registry/GameRegistry
+[method, net/minecraftforge/fml/common/registry/GameRegistry/addRecipe, (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V]
+No rename for method net/minecraftforge/fml/common/registry/GameRegistry/addRecipe (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V
+Rename class net/minecraft/item/ItemStack[4297,4306]::ItemStack->ItemStack
+Rename class net/minecraft/init/Blocks[4362,4368]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/obsidian[4369,4377]::obsidian->field_150343_Z
+Rename class net/minecraft/init/Items[4394,4399]::Items->Items
+Rename field net/minecraft/init/Items/emerald[4400,4407]::emerald->field_151166_bC
+Rename class net/minecraft/init/Items[4426,4431]::Items->Items
+Rename field net/minecraft/init/Items/diamond[4432,4439]::diamond->field_151045_i
+Rename class net/minecraft/init/Items[4457,4462]::Items->Items
+Rename field net/minecraft/init/Items/diamond_sword[4463,4476]::diamond_sword->field_151048_u
+No rename for class net/minecraftforge/fml/common/registry/GameRegistry
+[method, net/minecraftforge/fml/common/registry/GameRegistry/addRecipe, (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V]
+No rename for method net/minecraftforge/fml/common/registry/GameRegistry/addRecipe (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V
+Rename class net/minecraft/item/ItemStack[4514,4523]::ItemStack->ItemStack
+Rename class net/minecraft/init/Blocks[4580,4586]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/obsidian[4587,4595]::obsidian->field_150343_Z
+Rename class net/minecraft/init/Items[4612,4617]::Items->Items
+Rename field net/minecraft/init/Items/emerald[4618,4625]::emerald->field_151166_bC
+Rename class net/minecraft/init/Items[4644,4649]::Items->Items
+Rename field net/minecraft/init/Items/diamond[4650,4657]::diamond->field_151045_i
+Rename class net/minecraft/init/Items[4675,4680]::Items->Items
+Rename field net/minecraft/init/Items/diamond_shovel[4681,4695]::diamond_shovel->field_151047_v
+No rename for class net/minecraftforge/fml/common/registry/GameRegistry
+[method, net/minecraftforge/fml/common/registry/GameRegistry/addRecipe, (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V]
+No rename for method net/minecraftforge/fml/common/registry/GameRegistry/addRecipe (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V
+Rename class net/minecraft/item/ItemStack[4732,4741]::ItemStack->ItemStack
+Rename class net/minecraft/init/Blocks[4799,4805]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/obsidian[4806,4814]::obsidian->field_150343_Z
+Rename class net/minecraft/init/Items[4831,4836]::Items->Items
+Rename field net/minecraft/init/Items/emerald[4837,4844]::emerald->field_151166_bC
+Rename class net/minecraft/init/Items[4863,4868]::Items->Items
+Rename field net/minecraft/init/Items/diamond[4869,4876]::diamond->field_151045_i
+Rename class net/minecraft/init/Items[4894,4899]::Items->Items
+Rename field net/minecraft/init/Items/diamond_pickaxe[4900,4915]::diamond_pickaxe->field_151046_w
+No rename for class net/minecraftforge/fml/common/registry/GameRegistry
+[method, net/minecraftforge/fml/common/registry/GameRegistry/addRecipe, (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V]
+No rename for method net/minecraftforge/fml/common/registry/GameRegistry/addRecipe (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V
+Rename class net/minecraft/item/ItemStack[4951,4960]::ItemStack->ItemStack
+Rename class net/minecraft/init/Blocks[5014,5020]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/obsidian[5021,5029]::obsidian->field_150343_Z
+Rename class net/minecraft/init/Items[5046,5051]::Items->Items
+Rename field net/minecraft/init/Items/emerald[5052,5059]::emerald->field_151166_bC
+Rename class net/minecraft/init/Items[5078,5083]::Items->Items
+Rename field net/minecraft/init/Items/diamond[5084,5091]::diamond->field_151045_i
+Rename class net/minecraft/init/Items[5109,5114]::Items->Items
+Rename field net/minecraft/init/Items/diamond_axe[5115,5126]::diamond_axe->field_151056_x
 No rename for class net/minecraftforge/fml/common/registry/GameRegistry
 [method, net/minecraftforge/fml/common/registry/GameRegistry/addShapelessRecipe, (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V]
 No rename for method net/minecraftforge/fml/common/registry/GameRegistry/addShapelessRecipe (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V
-Rename class net/minecraft/item/ItemStack[3413,3422]::ItemStack->ItemStack
-Rename class net/minecraft/item/ItemStack[3447,3456]::ItemStack->ItemStack
+Rename class net/minecraft/item/ItemStack[5200,5209]::ItemStack->ItemStack
+Rename class net/minecraft/item/ItemStack[5234,5243]::ItemStack->ItemStack
 No rename for class net/minecraftforge/fml/common/registry/GameRegistry
 [method, net/minecraftforge/fml/common/registry/GameRegistry/addShapelessRecipe, (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V]
 No rename for method net/minecraftforge/fml/common/registry/GameRegistry/addShapelessRecipe (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V
-Rename class net/minecraft/item/ItemStack[3514,3523]::ItemStack->ItemStack
-Rename class net/minecraft/item/ItemStack[3549,3558]::ItemStack->ItemStack
-Rename class net/minecraft/item/ItemStack[3583,3592]::ItemStack->ItemStack
-Rename class net/minecraft/init/Items[3593,3598]::Items->Items
-Rename field net/minecraft/init/Items/iron_ingot[3599,3609]::iron_ingot->field_151042_j
-Rename class net/minecraft/item/ItemStack[3624,3633]::ItemStack->ItemStack
-Rename class net/minecraft/init/Items[3634,3639]::Items->Items
-Rename field net/minecraft/init/Items/gold_ingot[3640,3650]::gold_ingot->field_151043_k
+Rename class net/minecraft/item/ItemStack[5301,5310]::ItemStack->ItemStack
+Rename class net/minecraft/item/ItemStack[5336,5345]::ItemStack->ItemStack
+Rename class net/minecraft/item/ItemStack[5370,5379]::ItemStack->ItemStack
+Rename class net/minecraft/init/Items[5380,5385]::Items->Items
+Rename field net/minecraft/init/Items/iron_ingot[5386,5396]::iron_ingot->field_151042_j
+Rename class net/minecraft/item/ItemStack[5411,5420]::ItemStack->ItemStack
+Rename class net/minecraft/init/Items[5421,5426]::Items->Items
+Rename field net/minecraft/init/Items/gold_ingot[5427,5437]::gold_ingot->field_151043_k
 No rename for class net/minecraftforge/fml/common/registry/GameRegistry
 [method, net/minecraftforge/fml/common/registry/GameRegistry/addSmelting, (Lnet/minecraft/item/Item;Lnet/minecraft/item/ItemStack;F)V]
 No rename for method net/minecraftforge/fml/common/registry/GameRegistry/addSmelting (Lnet/minecraft/item/Item;Lnet/minecraft/item/ItemStack;F)V
-Rename class net/minecraft/init/Items[3690,3695]::Items->Items
-Rename field net/minecraft/init/Items/ender_pearl[3696,3707]::ender_pearl->field_151079_bi
-Rename class net/minecraft/item/ItemStack[3721,3730]::ItemStack->ItemStack
-Rename class net/minecraft/init/Items[3760,3765]::Items->Items
-Rename field net/minecraft/init/Items/cake[3766,3770]::cake->field_151105_aU
-Rename method net/minecraft/item/Item/setPotionEffect (Ljava/lang/String;)Lnet/minecraft/item/Item;[3782,3797]::setPotionEffect->func_77631_c
-Rename class net/minecraft/potion/PotionHelper[3795,3807]::PotionHelper->PotionHelper
-Rename field net/minecraft/potion/PotionHelper/blazePowderEffect[3808,3825]::blazePowderEffect->field_77919_g
-Rename class net/minecraft/item/Item[3861,3865]::Item->Item
+Rename class net/minecraft/init/Items[5477,5482]::Items->Items
+Rename field net/minecraft/init/Items/ender_pearl[5483,5494]::ender_pearl->field_151079_bi
+Rename class net/minecraft/item/ItemStack[5508,5517]::ItemStack->ItemStack
+Rename class net/minecraft/init/Items[5547,5552]::Items->Items
+Rename field net/minecraft/init/Items/cake[5553,5557]::cake->field_151105_aU
+Rename method net/minecraft/item/Item/setPotionEffect (Ljava/lang/String;)Lnet/minecraft/item/Item;[5569,5584]::setPotionEffect->func_77631_c
+Rename class net/minecraft/potion/PotionHelper[5582,5594]::PotionHelper->PotionHelper
+Rename field net/minecraft/potion/PotionHelper/blazePowderEffect[5595,5612]::blazePowderEffect->field_77919_g
+Rename class net/minecraft/item/Item[5648,5652]::Item->Item
 No rename for class net/minecraftforge/fml/common/registry/GameRegistry
 [method, net/minecraftforge/fml/common/registry/GameRegistry/findItem, (Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/item/Item;]
 No rename for method net/minecraftforge/fml/common/registry/GameRegistry/findItem (Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/item/Item;
-Rename class net/minecraft/client/resources/model/ModelResourceLocation[3945,3966]::ModelResourceLocation->ModelResourceLocation
-Rename class net/minecraft/client/resources/model/ModelResourceLocation[3992,4013]::ModelResourceLocation->ModelResourceLocation
-Rename class net/minecraft/client/Minecraft[4064,4073]::Minecraft->Minecraft
-Rename method net/minecraft/client/Minecraft/getMinecraft ()Lnet/minecraft/client/Minecraft;[4074,4086]::getMinecraft->func_71410_x
-Rename method net/minecraft/client/Minecraft/getRenderItem ()Lnet/minecraft/client/renderer/entity/RenderItem;[4089,4102]::getRenderItem->func_175599_af
-Rename method net/minecraft/client/renderer/entity/RenderItem/getItemModelMesher ()Lnet/minecraft/client/renderer/ItemModelMesher;[4106,4124]::getItemModelMesher->func_175037_a
-Rename method net/minecraft/client/renderer/ItemModelMesher/register (Lnet/minecraft/item/Item;ILnet/minecraft/client/resources/model/ModelResourceLocation;)V[4126,4134]::register->func_178086_a
-Rename class net/minecraft/item/Item[4181,4185]::Item->Item
+Rename class net/minecraft/client/resources/model/ModelResourceLocation[5732,5753]::ModelResourceLocation->ModelResourceLocation
+Rename class net/minecraft/client/resources/model/ModelResourceLocation[5779,5800]::ModelResourceLocation->ModelResourceLocation
+Rename class net/minecraft/client/Minecraft[5851,5860]::Minecraft->Minecraft
+Rename method net/minecraft/client/Minecraft/getMinecraft ()Lnet/minecraft/client/Minecraft;[5861,5873]::getMinecraft->func_71410_x
+Rename method net/minecraft/client/Minecraft/getRenderItem ()Lnet/minecraft/client/renderer/entity/RenderItem;[5876,5889]::getRenderItem->func_175599_af
+Rename method net/minecraft/client/renderer/entity/RenderItem/getItemModelMesher ()Lnet/minecraft/client/renderer/ItemModelMesher;[5893,5911]::getItemModelMesher->func_175037_a
+Rename method net/minecraft/client/renderer/ItemModelMesher/register (Lnet/minecraft/item/Item;ILnet/minecraft/client/resources/model/ModelResourceLocation;)V[5913,5921]::register->func_178086_a
+Rename class net/minecraft/item/Item[5968,5972]::Item->Item
 No rename for class net/minecraftforge/fml/common/registry/GameRegistry
 [method, net/minecraftforge/fml/common/registry/GameRegistry/findItem, (Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/item/Item;]
 No rename for method net/minecraftforge/fml/common/registry/GameRegistry/findItem (Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/item/Item;
-Rename class net/minecraft/client/resources/model/ModelResourceLocation[4265,4286]::ModelResourceLocation->ModelResourceLocation
-Rename class net/minecraft/client/resources/model/ModelResourceLocation[4312,4333]::ModelResourceLocation->ModelResourceLocation
-Rename class net/minecraft/client/Minecraft[4383,4392]::Minecraft->Minecraft
-Rename method net/minecraft/client/Minecraft/getMinecraft ()Lnet/minecraft/client/Minecraft;[4393,4405]::getMinecraft->func_71410_x
-Rename method net/minecraft/client/Minecraft/getRenderItem ()Lnet/minecraft/client/renderer/entity/RenderItem;[4408,4421]::getRenderItem->func_175599_af
-Rename method net/minecraft/client/renderer/entity/RenderItem/getItemModelMesher ()Lnet/minecraft/client/renderer/ItemModelMesher;[4425,4443]::getItemModelMesher->func_175037_a
-Rename method net/minecraft/client/renderer/ItemModelMesher/register (Lnet/minecraft/item/Item;ILnet/minecraft/client/resources/model/ModelResourceLocation;)V[4445,4453]::register->func_178086_a
-Rename class net/minecraft/item/Item[4501,4505]::Item->Item
+Rename class net/minecraft/client/resources/model/ModelResourceLocation[6052,6073]::ModelResourceLocation->ModelResourceLocation
+Rename class net/minecraft/client/resources/model/ModelResourceLocation[6099,6120]::ModelResourceLocation->ModelResourceLocation
+Rename class net/minecraft/client/Minecraft[6170,6179]::Minecraft->Minecraft
+Rename method net/minecraft/client/Minecraft/getMinecraft ()Lnet/minecraft/client/Minecraft;[6180,6192]::getMinecraft->func_71410_x
+Rename method net/minecraft/client/Minecraft/getRenderItem ()Lnet/minecraft/client/renderer/entity/RenderItem;[6195,6208]::getRenderItem->func_175599_af
+Rename method net/minecraft/client/renderer/entity/RenderItem/getItemModelMesher ()Lnet/minecraft/client/renderer/ItemModelMesher;[6212,6230]::getItemModelMesher->func_175037_a
+Rename method net/minecraft/client/renderer/ItemModelMesher/register (Lnet/minecraft/item/Item;ILnet/minecraft/client/resources/model/ModelResourceLocation;)V[6232,6240]::register->func_178086_a
+Rename class net/minecraft/item/Item[6288,6292]::Item->Item
 No rename for class net/minecraftforge/fml/common/registry/GameRegistry
 [method, net/minecraftforge/fml/common/registry/GameRegistry/findItem, (Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/item/Item;]
 No rename for method net/minecraftforge/fml/common/registry/GameRegistry/findItem (Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/item/Item;
-Rename class net/minecraft/client/resources/model/ModelResourceLocation[4580,4601]::ModelResourceLocation->ModelResourceLocation
-Rename class net/minecraft/client/resources/model/ModelResourceLocation[4625,4646]::ModelResourceLocation->ModelResourceLocation
-Rename class net/minecraft/client/Minecraft[4694,4703]::Minecraft->Minecraft
-Rename method net/minecraft/client/Minecraft/getMinecraft ()Lnet/minecraft/client/Minecraft;[4704,4716]::getMinecraft->func_71410_x
-Rename method net/minecraft/client/Minecraft/getRenderItem ()Lnet/minecraft/client/renderer/entity/RenderItem;[4719,4732]::getRenderItem->func_175599_af
-Rename method net/minecraft/client/renderer/entity/RenderItem/getItemModelMesher ()Lnet/minecraft/client/renderer/ItemModelMesher;[4736,4754]::getItemModelMesher->func_175037_a
-Rename method net/minecraft/client/renderer/ItemModelMesher/register (Lnet/minecraft/item/Item;ILnet/minecraft/client/resources/model/ModelResourceLocation;)V[4756,4764]::register->func_178086_a
-Rename class net/minecraft/item/Item[4808,4812]::Item->Item
+Rename class net/minecraft/client/resources/model/ModelResourceLocation[6367,6388]::ModelResourceLocation->ModelResourceLocation
+Rename class net/minecraft/client/resources/model/ModelResourceLocation[6412,6433]::ModelResourceLocation->ModelResourceLocation
+Rename class net/minecraft/client/Minecraft[6481,6490]::Minecraft->Minecraft
+Rename method net/minecraft/client/Minecraft/getMinecraft ()Lnet/minecraft/client/Minecraft;[6491,6503]::getMinecraft->func_71410_x
+Rename method net/minecraft/client/Minecraft/getRenderItem ()Lnet/minecraft/client/renderer/entity/RenderItem;[6506,6519]::getRenderItem->func_175599_af
+Rename method net/minecraft/client/renderer/entity/RenderItem/getItemModelMesher ()Lnet/minecraft/client/renderer/ItemModelMesher;[6523,6541]::getItemModelMesher->func_175037_a
+Rename method net/minecraft/client/renderer/ItemModelMesher/register (Lnet/minecraft/item/Item;ILnet/minecraft/client/resources/model/ModelResourceLocation;)V[6543,6551]::register->func_178086_a
+Rename class net/minecraft/item/Item[6595,6599]::Item->Item
 No rename for class net/minecraftforge/fml/common/registry/GameRegistry
 [method, net/minecraftforge/fml/common/registry/GameRegistry/findItem, (Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/item/Item;]
 No rename for method net/minecraftforge/fml/common/registry/GameRegistry/findItem (Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/item/Item;
-Rename class net/minecraft/client/resources/model/ModelResourceLocation[4903,4924]::ModelResourceLocation->ModelResourceLocation
-Rename class net/minecraft/client/resources/model/ModelResourceLocation[4957,4978]::ModelResourceLocation->ModelResourceLocation
-Rename class net/minecraft/client/Minecraft[5034,5043]::Minecraft->Minecraft
-Rename method net/minecraft/client/Minecraft/getMinecraft ()Lnet/minecraft/client/Minecraft;[5044,5056]::getMinecraft->func_71410_x
-Rename method net/minecraft/client/Minecraft/getRenderItem ()Lnet/minecraft/client/renderer/entity/RenderItem;[5059,5072]::getRenderItem->func_175599_af
-Rename method net/minecraft/client/renderer/entity/RenderItem/getItemModelMesher ()Lnet/minecraft/client/renderer/ItemModelMesher;[5076,5094]::getItemModelMesher->func_175037_a
-Rename method net/minecraft/client/renderer/ItemModelMesher/register (Lnet/minecraft/item/Item;ILnet/minecraft/client/resources/model/ModelResourceLocation;)V[5096,5104]::register->func_178086_a
+Rename class net/minecraft/client/resources/model/ModelResourceLocation[6690,6711]::ModelResourceLocation->ModelResourceLocation
+Rename class net/minecraft/client/resources/model/ModelResourceLocation[6744,6765]::ModelResourceLocation->ModelResourceLocation
+Rename class net/minecraft/client/Minecraft[6821,6830]::Minecraft->Minecraft
+Rename method net/minecraft/client/Minecraft/getMinecraft ()Lnet/minecraft/client/Minecraft;[6831,6843]::getMinecraft->func_71410_x
+Rename method net/minecraft/client/Minecraft/getRenderItem ()Lnet/minecraft/client/renderer/entity/RenderItem;[6846,6859]::getRenderItem->func_175599_af
+Rename method net/minecraft/client/renderer/entity/RenderItem/getItemModelMesher ()Lnet/minecraft/client/renderer/ItemModelMesher;[6863,6881]::getItemModelMesher->func_175037_a
+Rename method net/minecraft/client/renderer/ItemModelMesher/register (Lnet/minecraft/item/Item;ILnet/minecraft/client/resources/model/ModelResourceLocation;)V[6883,6891]::register->func_178086_a
+Rename class net/minecraft/item/Item[6951,6955]::Item->Item
+No rename for class net/minecraftforge/fml/common/registry/GameRegistry
+[method, net/minecraftforge/fml/common/registry/GameRegistry/findItem, (Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/item/Item;]
+No rename for method net/minecraftforge/fml/common/registry/GameRegistry/findItem (Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/item/Item;
+Rename class net/minecraft/client/resources/model/ModelResourceLocation[7034,7055]::ModelResourceLocation->ModelResourceLocation
+Rename class net/minecraft/client/resources/model/ModelResourceLocation[7082,7103]::ModelResourceLocation->ModelResourceLocation
+Rename class net/minecraft/client/Minecraft[7153,7162]::Minecraft->Minecraft
+Rename method net/minecraft/client/Minecraft/getMinecraft ()Lnet/minecraft/client/Minecraft;[7163,7175]::getMinecraft->func_71410_x
+Rename method net/minecraft/client/Minecraft/getRenderItem ()Lnet/minecraft/client/renderer/entity/RenderItem;[7178,7191]::getRenderItem->func_175599_af
+Rename method net/minecraft/client/renderer/entity/RenderItem/getItemModelMesher ()Lnet/minecraft/client/renderer/ItemModelMesher;[7195,7213]::getItemModelMesher->func_175037_a
+Rename method net/minecraft/client/renderer/ItemModelMesher/register (Lnet/minecraft/item/Item;ILnet/minecraft/client/resources/model/ModelResourceLocation;)V[7215,7223]::register->func_178086_a
+Rename class net/minecraft/item/Item[7269,7273]::Item->Item
+No rename for class net/minecraftforge/fml/common/registry/GameRegistry
+[method, net/minecraftforge/fml/common/registry/GameRegistry/findItem, (Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/item/Item;]
+No rename for method net/minecraftforge/fml/common/registry/GameRegistry/findItem (Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/item/Item;
+Rename class net/minecraft/client/resources/model/ModelResourceLocation[7352,7373]::ModelResourceLocation->ModelResourceLocation
+Rename class net/minecraft/client/resources/model/ModelResourceLocation[7402,7423]::ModelResourceLocation->ModelResourceLocation
+Rename class net/minecraft/client/Minecraft[7471,7480]::Minecraft->Minecraft
+Rename method net/minecraft/client/Minecraft/getMinecraft ()Lnet/minecraft/client/Minecraft;[7481,7493]::getMinecraft->func_71410_x
+Rename method net/minecraft/client/Minecraft/getRenderItem ()Lnet/minecraft/client/renderer/entity/RenderItem;[7496,7509]::getRenderItem->func_175599_af
+Rename method net/minecraft/client/renderer/entity/RenderItem/getItemModelMesher ()Lnet/minecraft/client/renderer/ItemModelMesher;[7513,7531]::getItemModelMesher->func_175037_a
+Rename method net/minecraft/client/renderer/ItemModelMesher/register (Lnet/minecraft/item/Item;ILnet/minecraft/client/resources/model/ModelResourceLocation;)V[7533,7541]::register->func_178086_a
+Rename class net/minecraft/item/Item[7593,7597]::Item->Item
+No rename for class net/minecraftforge/fml/common/registry/GameRegistry
+[method, net/minecraftforge/fml/common/registry/GameRegistry/findItem, (Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/item/Item;]
+No rename for method net/minecraftforge/fml/common/registry/GameRegistry/findItem (Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/item/Item;
+Rename class net/minecraft/client/resources/model/ModelResourceLocation[7672,7693]::ModelResourceLocation->ModelResourceLocation
+Rename class net/minecraft/client/resources/model/ModelResourceLocation[7718,7739]::ModelResourceLocation->ModelResourceLocation
+Rename class net/minecraft/client/Minecraft[7787,7796]::Minecraft->Minecraft
+Rename method net/minecraft/client/Minecraft/getMinecraft ()Lnet/minecraft/client/Minecraft;[7797,7809]::getMinecraft->func_71410_x
+Rename method net/minecraft/client/Minecraft/getRenderItem ()Lnet/minecraft/client/renderer/entity/RenderItem;[7812,7825]::getRenderItem->func_175599_af
+Rename method net/minecraft/client/renderer/entity/RenderItem/getItemModelMesher ()Lnet/minecraft/client/renderer/ItemModelMesher;[7829,7847]::getItemModelMesher->func_175037_a
+Rename method net/minecraft/client/renderer/ItemModelMesher/register (Lnet/minecraft/item/Item;ILnet/minecraft/client/resources/model/ModelResourceLocation;)V[7849,7857]::register->func_178086_a
+Rename class net/minecraft/item/Item[7901,7905]::Item->Item
+No rename for class net/minecraftforge/fml/common/registry/GameRegistry
+[method, net/minecraftforge/fml/common/registry/GameRegistry/findItem, (Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/item/Item;]
+No rename for method net/minecraftforge/fml/common/registry/GameRegistry/findItem (Ljava/lang/String;Ljava/lang/String;)Lnet/minecraft/item/Item;
+Rename class net/minecraft/client/resources/model/ModelResourceLocation[7986,8007]::ModelResourceLocation->ModelResourceLocation
+Rename class net/minecraft/client/resources/model/ModelResourceLocation[8035,8056]::ModelResourceLocation->ModelResourceLocation
+Rename class net/minecraft/client/Minecraft[8107,8116]::Minecraft->Minecraft
+Rename method net/minecraft/client/Minecraft/getMinecraft ()Lnet/minecraft/client/Minecraft;[8117,8129]::getMinecraft->func_71410_x
+Rename method net/minecraft/client/Minecraft/getRenderItem ()Lnet/minecraft/client/renderer/entity/RenderItem;[8132,8145]::getRenderItem->func_175599_af
+Rename method net/minecraft/client/renderer/entity/RenderItem/getItemModelMesher ()Lnet/minecraft/client/renderer/ItemModelMesher;[8149,8167]::getItemModelMesher->func_175037_a
+Rename method net/minecraft/client/renderer/ItemModelMesher/register (Lnet/minecraft/item/Item;ILnet/minecraft/client/resources/model/ModelResourceLocation;)V[8169,8177]::register->func_178086_a
 [method, org/devoxx4kids/forge/mods/Main/registerCommands, (Lnet/minecraftforge/fml/common/event/FMLServerStartingEvent;)V]
 No rename for class net/minecraftforge/fml/common/event/FMLServerStartingEvent
 Import: net.minecraft.block.Block
@@ -34027,58 +34143,117 @@ Import: net.minecraft.item.Item
 Adding 0 imports
 End  Processing: org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java
 
+Start Processing: org/devoxx4kids/forge/mods/SonicAxe.java
+[method, org/devoxx4kids/forge/mods/SonicAxe/SonicAxe, (Lnet/minecraft/item/Item$ToolMaterial;)V]
+FOUND CONSTR method org/devoxx4kids/forge/mods/SonicAxe/SonicAxe (Lnet/minecraft/item/Item$ToolMaterial;)V org/devoxx4kids/forge/mods/SonicAxe
+Rename class net/minecraft/item/Item/ToolMaterial[178,190]::ToolMaterial->ToolMaterial
+Rename method net/minecraft/item/Item/setUnlocalizedName (Ljava/lang/String;)Lnet/minecraft/item/Item;[229,247]::setUnlocalizedName->func_77655_b
+Import: net.minecraft.item.Item.ToolMaterial
+Import: net.minecraft.item.ItemAxe
+Adding 1 imports
+End  Processing: org/devoxx4kids/forge/mods/SonicAxe.java
+
+Start Processing: org/devoxx4kids/forge/mods/SonicPickaxe.java
+[method, org/devoxx4kids/forge/mods/SonicPickaxe/SonicPickaxe, (Lnet/minecraft/item/Item$ToolMaterial;)V]
+FOUND CONSTR method org/devoxx4kids/forge/mods/SonicPickaxe/SonicPickaxe (Lnet/minecraft/item/Item$ToolMaterial;)V org/devoxx4kids/forge/mods/SonicPickaxe
+Rename class net/minecraft/item/Item/ToolMaterial[149,161]::ToolMaterial->ToolMaterial
+Rename method net/minecraft/item/Item/setUnlocalizedName (Ljava/lang/String;)Lnet/minecraft/item/Item;[200,218]::setUnlocalizedName->func_77655_b
+Import: net.minecraft.item.ItemPickaxe
+Adding 1 imports
+End  Processing: org/devoxx4kids/forge/mods/SonicPickaxe.java
+
 Start Processing: org/devoxx4kids/forge/mods/SonicScrewdriver.java
 [method, org/devoxx4kids/forge/mods/SonicScrewdriver/SonicScrewdriver, (Lnet/minecraft/item/Item$ToolMaterial;)V]
 FOUND CONSTR method org/devoxx4kids/forge/mods/SonicScrewdriver/SonicScrewdriver (Lnet/minecraft/item/Item$ToolMaterial;)V org/devoxx4kids/forge/mods/SonicScrewdriver
-Rename class net/minecraft/item/Item/ToolMaterial[405,417]::ToolMaterial->ToolMaterial
-Rename method net/minecraft/item/Item/setUnlocalizedName (Ljava/lang/String;)Lnet/minecraft/item/Item;[456,474]::setUnlocalizedName->func_77655_b
+Rename class net/minecraft/item/Item/ToolMaterial[423,435]::ToolMaterial->ToolMaterial
+Rename method net/minecraft/item/Item/setUnlocalizedName (Ljava/lang/String;)Lnet/minecraft/item/Item;[474,492]::setUnlocalizedName->func_77655_b
 [method, net/minecraft/item/Item/getToolClasses, (Lnet/minecraft/item/ItemStack;)Ljava/util/Set;]
 No rename for method net/minecraft/item/Item/getToolClasses (Lnet/minecraft/item/ItemStack;)Ljava/util/Set;
-Rename class net/minecraft/item/ItemStack[550,559]::ItemStack->ItemStack
-[method, com/google/common/collect/ImmutableSet/of, (Ljava/lang/Object;Ljava/lang/Object;)Lcom/google/common/collect/ImmutableSet;]
+Rename class net/minecraft/item/ItemStack[568,577]::ItemStack->ItemStack
+[method, com/google/common/collect/ImmutableSet/of, (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Lcom/google/common/collect/ImmutableSet;]
 [method, com/google/common/collect/Sets/newHashSet, ([Ljava/lang/Object;)Ljava/util/HashSet;]
-Rename class net/minecraft/block/Block[704,709]::Block->Block
-Rename class net/minecraft/init/Blocks[723,729]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/grass[730,735]::grass->field_150349_c
-Rename class net/minecraft/init/Blocks[746,752]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/dirt[753,757]::dirt->field_150346_d
-Rename class net/minecraft/init/Blocks[769,775]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/sand[776,780]::sand->field_150354_m
-Rename class net/minecraft/init/Blocks[792,798]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/gravel[799,805]::gravel->field_150351_n
-Rename class net/minecraft/init/Blocks[825,831]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/snow_layer[832,842]::snow_layer->field_150431_aC
-Rename class net/minecraft/init/Blocks[849,855]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/snow[856,860]::snow->field_150433_aE
-Rename class net/minecraft/init/Blocks[873,879]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/clay[880,884]::clay->field_150435_aG
-Rename class net/minecraft/init/Blocks[897,903]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/farmland[904,912]::farmland->field_150458_ak
-Rename class net/minecraft/init/Blocks[931,937]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/soul_sand[938,947]::soul_sand->field_150425_aM
-Rename class net/minecraft/init/Blocks[955,961]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/mycelium[962,970]::mycelium->field_150391_bh
-Rename class net/minecraft/init/Blocks[979,985]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/planks[986,992]::planks->field_150344_f
-Rename class net/minecraft/init/Blocks[1002,1008]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/bookshelf[1009,1018]::bookshelf->field_150342_X
-Rename class net/minecraft/init/Blocks[1035,1041]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/log[1042,1045]::log->field_150364_r
-Rename class net/minecraft/init/Blocks[1058,1064]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/log2[1065,1069]::log2->field_150363_s
-Rename class net/minecraft/init/Blocks[1081,1087]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/chest[1088,1093]::chest->field_150486_ae
-Rename class net/minecraft/init/Blocks[1105,1111]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/pumpkin[1112,1119]::pumpkin->field_150423_aK
-Rename class net/minecraft/init/Blocks[1129,1135]::Blocks->Blocks
-Rename field net/minecraft/init/Blocks/lit_pumpkin[1136,1147]::lit_pumpkin->field_150428_aP
+Rename class net/minecraft/block/Block[719,724]::Block->Block
+Rename class net/minecraft/init/Blocks[738,744]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/grass[745,750]::grass->field_150349_c
+Rename class net/minecraft/init/Blocks[761,767]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/dirt[768,772]::dirt->field_150346_d
+Rename class net/minecraft/init/Blocks[784,790]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/sand[791,795]::sand->field_150354_m
+Rename class net/minecraft/init/Blocks[807,813]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/gravel[814,820]::gravel->field_150351_n
+Rename class net/minecraft/init/Blocks[840,846]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/snow_layer[847,857]::snow_layer->field_150431_aC
+Rename class net/minecraft/init/Blocks[864,870]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/snow[871,875]::snow->field_150433_aE
+Rename class net/minecraft/init/Blocks[888,894]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/clay[895,899]::clay->field_150435_aG
+Rename class net/minecraft/init/Blocks[912,918]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/farmland[919,927]::farmland->field_150458_ak
+Rename class net/minecraft/init/Blocks[946,952]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/soul_sand[953,962]::soul_sand->field_150425_aM
+Rename class net/minecraft/init/Blocks[970,976]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/mycelium[977,985]::mycelium->field_150391_bh
+Rename class net/minecraft/init/Blocks[994,1000]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/planks[1001,1007]::planks->field_150344_f
+Rename class net/minecraft/init/Blocks[1017,1023]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/bookshelf[1024,1033]::bookshelf->field_150342_X
+Rename class net/minecraft/init/Blocks[1050,1056]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/log[1057,1060]::log->field_150364_r
+Rename class net/minecraft/init/Blocks[1073,1079]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/log2[1080,1084]::log2->field_150363_s
+Rename class net/minecraft/init/Blocks[1096,1102]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/chest[1103,1108]::chest->field_150486_ae
+Rename class net/minecraft/init/Blocks[1120,1126]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/pumpkin[1127,1134]::pumpkin->field_150423_aK
+Rename class net/minecraft/init/Blocks[1144,1150]::Blocks->Blocks
+Rename field net/minecraft/init/Blocks/lit_pumpkin[1151,1162]::lit_pumpkin->field_150428_aP
+Rename method net/minecraft/item/Item/canHarvestBlock (Lnet/minecraft/block/Block;)Z[1208,1223]::canHarvestBlock->func_150897_b
+Rename class net/minecraft/block/Block[1222,1227]::Block->Block
+[method, java/util/Collection/contains, (Ljava/lang/Object;)Z]
+Rename method net/minecraft/item/Item/canHarvestBlock (Lnet/minecraft/block/Block;)Z[1300,1315]::canHarvestBlock->func_150897_b
+Rename method net/minecraft/item/Item/getStrVsBlock (Lnet/minecraft/item/ItemStack;Lnet/minecraft/block/Block;)F[1364,1377]::getStrVsBlock->func_150893_a
+Rename class net/minecraft/item/ItemStack[1378,1387]::ItemStack->ItemStack
+Rename class net/minecraft/block/Block[1395,1400]::Block->Block
+Rename method net/minecraft/block/Block/getMaterial ()Lnet/minecraft/block/material/Material;[1428,1439]::getMaterial->func_149688_o
+Rename class net/minecraft/block/material/Material[1447,1455]::Material->Material
+Rename field net/minecraft/block/material/Material/wood[1456,1460]::wood->field_151575_d
+Rename method net/minecraft/block/Block/getMaterial ()Lnet/minecraft/block/material/Material;[1480,1491]::getMaterial->func_149688_o
+Rename class net/minecraft/block/material/Material[1499,1507]::Material->Material
+Rename field net/minecraft/block/material/Material/vine[1508,1512]::vine->field_151582_l
+Rename method net/minecraft/block/Block/getMaterial ()Lnet/minecraft/block/material/Material;[1532,1543]::getMaterial->func_149688_o
+Rename class net/minecraft/block/material/Material[1551,1559]::Material->Material
+Rename field net/minecraft/block/material/Material/plants[1560,1566]::plants->field_151585_k
+Rename field net/minecraft/item/ItemTool/efficiencyOnProperMaterial[1600,1626]::efficiencyOnProperMaterial->field_77864_a
+[method, java/util/Collection/contains, (Ljava/lang/Object;)Z]
+Rename field net/minecraft/item/ItemTool/efficiencyOnProperMaterial[1670,1696]::efficiencyOnProperMaterial->field_77864_a
+Rename method net/minecraft/item/Item/getStrVsBlock (Lnet/minecraft/item/ItemStack;Lnet/minecraft/block/Block;)F[1692,1705]::getStrVsBlock->func_150893_a
 Import: net.minecraft.block.Block
+Import: net.minecraft.block.material.Material
 Import: net.minecraft.init.Blocks
-Import: net.minecraft.item.Item
 Import: net.minecraft.item.ItemPickaxe
 Import: net.minecraft.item.ItemStack
 Adding 1 imports
 End  Processing: org/devoxx4kids/forge/mods/SonicScrewdriver.java
+
+Start Processing: org/devoxx4kids/forge/mods/SonicShovel.java
+[method, org/devoxx4kids/forge/mods/SonicShovel/SonicShovel, (Lnet/minecraft/item/Item$ToolMaterial;)V]
+FOUND CONSTR method org/devoxx4kids/forge/mods/SonicShovel/SonicShovel (Lnet/minecraft/item/Item$ToolMaterial;)V org/devoxx4kids/forge/mods/SonicShovel
+Rename class net/minecraft/item/Item/ToolMaterial[188,200]::ToolMaterial->ToolMaterial
+Rename method net/minecraft/item/Item/setUnlocalizedName (Ljava/lang/String;)Lnet/minecraft/item/Item;[239,257]::setUnlocalizedName->func_77655_b
+Import: net.minecraft.item.ItemSpade
+Import: net.minecraft.item.Item.ToolMaterial
+Adding 1 imports
+End  Processing: org/devoxx4kids/forge/mods/SonicShovel.java
+
+Start Processing: org/devoxx4kids/forge/mods/SonicSword.java
+[method, org/devoxx4kids/forge/mods/SonicSword/SonicSword, (Lnet/minecraft/item/Item$ToolMaterial;)V]
+FOUND CONSTR method org/devoxx4kids/forge/mods/SonicSword/SonicSword (Lnet/minecraft/item/Item$ToolMaterial;)V org/devoxx4kids/forge/mods/SonicSword
+Rename class net/minecraft/item/Item/ToolMaterial[186,198]::ToolMaterial->ToolMaterial
+Rename method net/minecraft/item/Item/setUnlocalizedName (Ljava/lang/String;)Lnet/minecraft/item/Item;[237,255]::setUnlocalizedName->func_77655_b
+Import: net.minecraft.item.Item.ToolMaterial
+Import: net.minecraft.item.ItemSword
+Adding 1 imports
+End  Processing: org/devoxx4kids/forge/mods/SonicSword.java
 
 Start Processing: org/devoxx4kids/forge/mods/SuperJump.java
 [method, org/devoxx4kids/forge/mods/SuperJump/makeJumpHigher, (Lnet/minecraftforge/event/entity/living/LivingEvent$LivingJumpEvent;)V]

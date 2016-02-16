@@ -23,7 +23,7 @@ Note: /Users/Corban/github/forgeMods/forge/build/sources/main/java/org/devoxx4ki
 Note: Recompile with -Xlint:unchecked for details.
 1 warning
 
-:processResources
+:processResources UP-TO-DATE
 :classes
 :jar
 :sourceTestJava UP-TO-DATE
@@ -48,4 +48,4 @@ remapping source...
 
 BUILD SUCCESSFUL
 
-Total time: 52.317 secs
+Total time: 23.016 secs

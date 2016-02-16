@@ -29,9 +29,17 @@ public class Main {
 	public static Item enderIngot;
 	public static Item enderEye;
 	public static Item sonicScrewdriver;
+	public static Item sonicPickaxe;
+	public static Item sonicShovel;
+	public static Item sonicAxe;
+	public static Item sonicSword;
 	
 	//Material
-	public static ToolMaterial MyMaterial = EnumHelper.addToolMaterial("MyMaterial", 4, 3000, 5.0F, 8.0F, 30);
+	public static ToolMaterial Pickaxe = EnumHelper.addToolMaterial("Pickaxe", 4, 1500, 4.5F, 6.0F, 30);
+	public static ToolMaterial Shovel = EnumHelper.addToolMaterial("Shovel", 4, 1500, 4.5F, 6.0F, 30);
+	public static ToolMaterial Axe = EnumHelper.addToolMaterial("Axe", 4, 1500, 4.5F, 8.0F, 30);
+	public static ToolMaterial Sword = EnumHelper.addToolMaterial("Sword", 4, 1500, 2.0F, 10.0F, 30);
+	public static ToolMaterial SonicScrewdriver = EnumHelper.addToolMaterial("SonicScrewdriver", 30, 10000, 30.0F, 40.0F, 100);
 	
 	@EventHandler
 	public void init(FMLInitializationEvent event)
@@ -59,9 +67,25 @@ public class Main {
 		GameRegistry.registerItem(enderIngot, "enderIngot");
 		enderEye = new EnderEye();
 		GameRegistry.registerItem(enderEye, "enderEye");
-		sonicScrewdriver = new SonicScrewdriver(MyMaterial);
+		
+		//Sonic Mod
+		sonicScrewdriver = new SonicScrewdriver(SonicScrewdriver);
 		GameRegistry.registerItem(sonicScrewdriver, "sonicScrewdriver");
 		
+		sonicPickaxe = new SonicPickaxe(Pickaxe);
+		GameRegistry.registerItem(sonicPickaxe, "sonicPic");
+		
+		sonicShovel = new SonicShovel(Shovel);
+		GameRegistry.registerItem(sonicShovel, "sonicShovel");
+		
+		sonicSword = new SonicSword(Sword);
+		GameRegistry.registerItem(sonicSword, "sonicSword");
+		
+		sonicAxe = new SonicAxe(Axe);
+		GameRegistry.registerItem(sonicAxe, "sonicAxe");
+		
+		
+				
 		//Shaped Recipes
 		GameRegistry.addRecipe(
 				new ItemStack(Blocks.field_150347_e, 2),
@@ -83,16 +107,52 @@ public class Main {
 				'o', Blocks.field_150343_Z);
 		GameRegistry.addRecipe(
 				new ItemStack(sonicScrewdriver),
-				"pep",
-				"oso",
-				"adh",
-				'p', Items.field_151046_w,
+				"pes",
+				"dod",
+				"hda",
+				'p', sonicPickaxe,
 				'e', Items.field_151166_bC,
-				'o', Blocks.field_150343_Z,
-				's', Items.field_151048_u,
-				'a', Items.field_151056_x,
+				's', sonicSword,
 				'd', Items.field_151045_i,
-				'h', Items.field_151047_v);
+				'o', Blocks.field_150343_Z,
+				'h', sonicShovel,
+				'a', sonicAxe);
+		GameRegistry.addRecipe(
+				new ItemStack(sonicSword),
+				"oeo",
+				"dsd",
+				"ddd",
+				'o', Blocks.field_150343_Z,
+				'e', Items.field_151166_bC,
+				'd', Items.field_151045_i,
+				's', Items.field_151048_u);
+		GameRegistry.addRecipe(
+				new ItemStack(sonicShovel),
+				"oeo",
+				"dsd",
+				"ddd",
+				'o', Blocks.field_150343_Z,
+				'e', Items.field_151166_bC,
+				'd', Items.field_151045_i,
+				's', Items.field_151047_v);
+		GameRegistry.addRecipe(
+				new ItemStack(sonicPickaxe),
+				"oeo",
+				"dsd",
+				"ddd",
+				'o', Blocks.field_150343_Z,
+				'e', Items.field_151166_bC,
+				'd', Items.field_151045_i,
+				's', Items.field_151046_w);
+		GameRegistry.addRecipe(
+				new ItemStack(sonicAxe),
+				"oeo",
+				"dsd",
+				"ddd",
+				'o', Blocks.field_150343_Z,
+				'e', Items.field_151166_bC,
+				'd', Items.field_151045_i,
+				's', Items.field_151056_x);
 		
 		//Shapeless Recipes
 		GameRegistry.addShapelessRecipe(
@@ -134,6 +194,30 @@ public class Main {
 			new ModelResourceLocation("improved-minecraft:sonicScrewdriver", "inventory");
 		Minecraft.func_71410_x().func_175599_af().func_175037_a()
 			.func_178086_a(sonicScrewdriverItem, 0, sonicScrewdriverModel);
+		
+		Item sonicSwordItem = GameRegistry.findItem("improved-minecraft", "sonicSword");
+		ModelResourceLocation sonicSwordModel = 
+			new ModelResourceLocation("improved-minecraft:sonicSword", "inventory");
+		Minecraft.func_71410_x().func_175599_af().func_175037_a()
+			.func_178086_a(sonicSwordItem, 0, sonicSwordModel);
+
+		Item sonicPickaxeItem = GameRegistry.findItem("improved-minecraft", "sonicPic");
+		ModelResourceLocation sonicPickaxeModel = 
+			new ModelResourceLocation("improved-minecraft:sonicPic", "inventory");
+		Minecraft.func_71410_x().func_175599_af().func_175037_a()
+			.func_178086_a(sonicPickaxeItem, 0, sonicPickaxeModel);
+		
+		Item sonicAxeItem = GameRegistry.findItem("improved-minecraft", "sonicAxe");
+		ModelResourceLocation sonicAxeModel = 
+			new ModelResourceLocation("improved-minecraft:sonicAxe", "inventory");
+		Minecraft.func_71410_x().func_175599_af().func_175037_a()
+			.func_178086_a(sonicAxeItem, 0, sonicAxeModel);
+		
+		Item sonicShovelItem = GameRegistry.findItem("improved-minecraft", "sonicShovel");
+		ModelResourceLocation sonicShovelModel = 
+			new ModelResourceLocation("improved-minecraft:sonicShovel", "inventory");
+		Minecraft.func_71410_x().func_175599_af().func_175037_a()
+			.func_178086_a(sonicShovelItem, 0, sonicShovelModel);
 		
 	}
 	@EventHandler

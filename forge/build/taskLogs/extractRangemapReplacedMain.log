@@ -1,5 +1,5 @@
 Symbol range map extraction starting
-Processing 20 files
+Processing 24 files
 processing com/example/examplemod/ExampleMod.java
 processing org/devoxx4kids/forge/mods/BiggerTNTExplosions.java
 processing org/devoxx4kids/forge/mods/BlockBreakMessage.java
@@ -17,6 +17,10 @@ processing org/devoxx4kids/forge/mods/GolemWallClimb.java
 processing org/devoxx4kids/forge/mods/Main.java
 processing org/devoxx4kids/forge/mods/Parachute.java
 processing org/devoxx4kids/forge/mods/PigsDroppingDiamonds.java
+processing org/devoxx4kids/forge/mods/SonicAxe.java
+processing org/devoxx4kids/forge/mods/SonicPickaxe.java
 processing org/devoxx4kids/forge/mods/SonicScrewdriver.java
+processing org/devoxx4kids/forge/mods/SonicShovel.java
+processing org/devoxx4kids/forge/mods/SonicSword.java
 processing org/devoxx4kids/forge/mods/SuperJump.java
 processing org/devoxx4kids/forge/mods/ZombieKnights.java
